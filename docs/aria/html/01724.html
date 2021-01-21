@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laLineGraphWidget Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '01724.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00461.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00566.html" target="topic">Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria Graphics Library</a> &gt; <a href="00557.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01724.html" target="topic">laLineGraphWidget Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00461.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="01721.html" target="topic">Previous</a> | <a href="00557.html" target="topic">Up</a> | <a href="02016.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laLineGraphWidget Topic Title: laLineGraphWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laLineGraphWidget Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Structure: laLineGraphWidget_t&nbsp;</p>
+<p class="Element10">
+A line graph widget draws a line graph. All coordinates are expressed in local widget space.&nbsp;</p>
+<p class="Element10">
+The color of the graph is determined by the widget scheme's 'foreground' color.</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">typedef</span></strong> <strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laLineGraphWidget_t</span></strong> {
+  <a href="02524.html" target="topic">laWidget</a> <strong><span style="color: #000000">widget</span></strong>;
+  uint32_t <strong><span style="color: #000000">tickLength</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">fillGraphArea</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">fillValueArea</span></strong>;
+  int32_t <strong><span style="color: #000000">maxValue</span></strong>;
+  int32_t <strong><span style="color: #000000">minValue</span></strong>;
+  uint32_t <strong><span style="color: #000000">tickInterval</span></strong>;
+  uint32_t <strong><span style="color: #000000">subtickInterval</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">valueAxisLabelsVisible</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">valueAxisTicksVisible</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">valueAxisSubticksVisible</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">valueGridlinesVisible</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">stacked</span></strong>;
+  <a href="00749.html" target="topic">laArray</a> <strong><span style="color: #000000">dataSeries</span></strong>;
+  <a href="00717.html" target="topic">GFXU_StringTableAsset</a> * <strong><span style="color: #000000">stringTable</span></strong>;
+  uint32_t <strong><span style="color: #000000">ticksLabelsStringID</span></strong>;
+  <a href="01716.html" target="topic">laLineGraphTickPosition</a> <strong><span style="color: #000000">valueAxisTicksPosition</span></strong>;
+  <a href="01716.html" target="topic">laLineGraphTickPosition</a> <strong><span style="color: #000000">valueAxisSubticksPosition</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">categAxisLabelsVisible</span></strong>;
+  <a href="00856.html" target="topic">laBool</a> <strong><span style="color: #000000">categAxisTicksVisible</span></strong>;
+  <a href="01716.html" target="topic">laLineGraphTickPosition</a> <strong><span style="color: #000000">categAxisTicksPosition</span></strong>;
+  <a href="00749.html" target="topic">laArray</a> <strong><span style="color: #000000">categories</span></strong>;
+  <a href="00610.html" target="topic">GFXU_ExternalAssetReader</a>* <strong><span style="color: #000000">reader</span></strong>;
+} laLineGraphWidget;</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget widget;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+base widget header&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t maxValue;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+Value axis properties&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_StringTableAsset * stringTable;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+string table&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t ticksLabelsStringID;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+ID of Superset string containing numbers&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool categAxisLabelsVisible;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+Category axis properties&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_ExternalAssetReader* reader;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+asset reader&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00461.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00566.html" target="topic">Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria Graphics Library</a> &gt; <a href="00557.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01724.html" target="topic">laLineGraphWidget Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00461.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="01721.html" target="topic">Previous</a> | <a href="00557.html" target="topic">Up</a> | <a href="02016.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laLineGraphWidget Topic Title: laLineGraphWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

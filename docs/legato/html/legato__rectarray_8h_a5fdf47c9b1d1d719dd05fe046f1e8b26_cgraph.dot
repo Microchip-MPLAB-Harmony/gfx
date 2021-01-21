@@ -1,0 +1,18 @@
+digraph "leRectArray_MergeSimilar"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="leRectArray_MergeSimilar",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Merge rectangles."];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="leRectArray_RemoveAt",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__rectarray_8h.html#a1e6341f70f90246584c3d0208c7f584a",tooltip="Removes a rectangle from the array at an index."];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="leRectCombine",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__rect_8h.html#ae9ebad0216ea50650c8303bf7bbc7908",tooltip="Combine rectangles."];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="leMaxi",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__math_8h.html#ac06ee9a5a66b42a332e3dd73f81c2aba",tooltip="Calculate maximum of two integers."];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="leMini",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__math_8h.html#a1eb8c7816f265d0a378b495781d48676",tooltip="Calculate minimum of two integers."];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="leRectsAreSimilar",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__rect_8h.html#a93bff7dab1ccc33fa0ff7f55cb7eac1a",tooltip="Determine if two rectanges are similar."];
+}

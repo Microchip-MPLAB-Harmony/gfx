@@ -1,0 +1,11 @@
+digraph "gfx/middleware/legato/library/src/gfx/legato/memory" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_9f5729dad30c3a99415d090dcffece40 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="legato" fontname="Helvetica", fontsize="10", URL="dir_9f5729dad30c3a99415d090dcffece40.html"]
+  dir_7041c860d75402dd8f73717e5fc4b977 [shape=box, label="memory", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_7041c860d75402dd8f73717e5fc4b977.html"];
+  }
+  dir_192fb4248a7d7f0c34634334a26d417f [shape=box label="common" URL="dir_192fb4248a7d7f0c34634334a26d417f.html"];
+  dir_7041c860d75402dd8f73717e5fc4b977->dir_192fb4248a7d7f0c34634334a26d417f [headlabel="3", labeldistance=1.5 headhref="dir_000063_000055.html"];
+}

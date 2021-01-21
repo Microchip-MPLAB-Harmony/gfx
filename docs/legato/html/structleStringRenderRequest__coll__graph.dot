@@ -1,0 +1,13 @@
+digraph "leStringRenderRequest"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="leStringRenderRequest",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="This struct represents a string render request."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" str" ,fontname="Helvetica"];
+  Node2 [label="leString",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleString.html",tooltip="This struct represents a string."];
+  Node3 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" preCBUserData\npreInvCallback\ninvCBUserData\ninvCallback" ,fontname="Helvetica"];
+  Node3 [label="void",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node4 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" fn" ,fontname="Helvetica"];
+  Node4 [label="leStringVTable",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleStringVTable.html",tooltip=" "];
+}

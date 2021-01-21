@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>aria_bm_a5d2_xu_tm4301b.IAR</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '00050.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00004.html" target="topic">aria_benchmark</a> &gt; <a href="00050.html" target="topic">aria_bm_a5d2_xu_tm4301b.IAR</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="00052.html" target="topic">Previous</a> | <a href="00004.html" target="topic">Up</a> | <a href="00049.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_bm_a5d2_xu_tm4301b.IAR Topic Title: aria_bm_a5d2_xu_tm4301b.IAR)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+aria_bm_a5d2_xu_tm4301b.IAR</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<div class="Element15">
+Defining the Architecture</div>
+<p class="Element10" style="text-align: center;">
+<img src="APPS GFX a5d2 arch.png" border="0" alt="" title=""></p><p class="Element10">
+The application continuously uses the graphics library to render text, fill areas, and draw images to the screen. Once a layer is completely rendered to, the graphics library increments a layer swap counter. The application periodically (at 1 second intervals) samples the layer swap counter and calculates the difference from the previous sample. This difference is shown as the Frame Update Rate (Hz).&nbsp;</p>
+<p class="Element10">
+The following diagrams show the various software and hardware blocks used by each project:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+In this configuration, the Aria Graphics library renders the frame to a 32-bit frame buffer in external DDR. The LCDC display controller on the A5D2 is used to drive frame data from DDR to the display. 32-bit RGBA8888 frame buffer is stored in the external DDR memory.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+User touch input on the display panel is received thru the PCAP capacitive touch controller, which sends a notification to the Touch Input Driver. The Touch Input Driver reads the touch information over I2C and sends the touch event to the Graphics Library thru the Input System Service.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element15">
+Demonstration Features</div>
+<p class="Element10">
+• Input system service and driver&nbsp;</p>
+<p class="Element10">
+• Time system service, timer-counter peripheral library and driver&nbsp;</p>
+<p class="Element10">
+• LCDC peripheral and driver&nbsp;</p>
+<p class="Element10">
+• I2C driver&nbsp;</p>
+<p class="Element10">
+• 32-bit RGBA8888 color depth support&nbsp;</p>
+<p class="Element10">
+• RAW, RAW RLE, JPEG and PNG images stored in internal flash&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element15">
+Creating the Project</div>
+<p class="Element10" style="text-align: center;">
+<img src="APPS GFX archdiag_bench_a5d2.png" border="0" alt="" title=""></p><p class="Element10">
+The Project Graph diagram below shows the Harmony components that are included in this application. Lines between components are drawn to satisfy components that depend on a capability that another component provides.&nbsp;</p>
+<p class="Element10">
+Adding the “SAM A5D2 XPlained Ultra BSP” and “Aria Graphics w/ PDA TM4301B Display” Graphics Template component into the project graph will automatically add the components needed for a graphics project and resolve their dependencies. It will also configure the pins needed to drive the external peripherals like the display and the touch controller.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The GFX template automatically sets the heap size to 32768 bytes. The heap is set in the System component properties as shown in the image below. </p><p class="Element10" style="text-align: center;">
+<img src="APPS GFX a5d2_config_options.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<div class="Element15">
+Build the Application</div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The parent directory for this application is gfx_apps/apps/aria_benchmark.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The application requires the IAR Embedded Workbench to build. In the IAR workbench, open the workspace from gfx_apps/apps/aria_benchmark/firmware/aria_bm_a5d2_xu_tm4301b.IAR and build it. The build will generate a binary file harmony.bin. Copy harmony.bin to a FAT32-formatted SD card. The SD card must also contain the supplied bootloader binary needed to boot Harmony applications. Insert the card to the SDMMC1 port on the SAM A5D2 Xplained Ultra board.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+To build this application, see <span class="Element145">Getting Started with Harmony 3 on SAMA5D2</span>.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>MPLAB X IDE Project Configurations</strong>&nbsp;</p>
+<p class="Element10">
+The following table lists and describes the supported configurations: </p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="25%">
+<div class="Element66">
+Project Name&nbsp;</div></td><td class="Element65" valign="top" width="13%">
+<div class="Element66">
+BSP Used&nbsp;</div></td><td class="Element65" valign="top" width="25%">
+<div class="Element66">
+Graphics Template Used&nbsp;</div></td><td class="Element65" valign="top" width="37%">
+<div class="Element66">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="25%">
+<div class="Element68">
+aria_bm_a5d2_xu_tm4301b.IAR&nbsp;</div></td><td class="Element67" valign="top" width="13%">
+<div class="Element68">
+SAM A5D2 Xplained Pro&nbsp;</div></td><td class="Element67" valign="top" width="25%">
+<div class="Element68">
+Aria Graphics w/ PDA TM4301B Display&nbsp;</div></td><td class="Element67" valign="top" width="37%">
+<div class="Element68">
+Aria GFX on SAM A5D2 Xplained Ultra with PDA TM4301B 480x272 (WQVGA) Display&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Important Star.png" border="0" alt="" title=""><strong> Important!</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+This application may contain custom code that is marked by the comments <span class="Element146">// START OF CUSTOM CODE ...</span> and <span class="Element146">// END OF CUSTOM CODE</span>. When using the MPLAB Harmony Configurator to regenerate the application code, use the &quot;ALL&quot; merging strategy and <i>do not</i> remove or replace the custom code.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+Configuring the Hardware</div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The final hardware set-up should be:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="APPS GFX benchmark_a5d2.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<div class="Element15">
+Running the Application</div>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+On start-up, the application will display a splash screen.&nbsp;</p>
+<p class="Element10">
+After the splash-screen completes, the String Update benchmark screen is shown. In this screen, a counter is incremented at every application cycle. The screen demonstrates the rate at which the graphics library renders a string on the screen. This involves a fill operation that clears the background, lookup of the glyphs from the string library, and the drawing of the glyphs on the frame buffer. </p><p class="Element10" style="text-align: center;">
+<img src="APPS GFX aria_benchmark string update screen_H3.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The “Frame Update (Hz)” field shows the current or instantaneous rate at which the graphics library updates the label widget that shows the counter value. Touching the Frame Update value switches between the current value (curr) and the average (avg) value across 10 samples.&nbsp;</p>
+<p class="Element10">
+Touching the “+” and “-“ buttons increases and decreases the size of the string, respectively.&nbsp;</p>
+<p class="Element10">
+Touching the “Next” button switches to the Motion and Fill benchmark screen. In this screen, squares are showing moving across the screen. The Frame Update value is the rate at which the graphics library is able to render all the squares on the screen at their new positions. This involves a fill operation of the background color at the old location of the squares and a fill of the squares’ colors at the new position. </p><p class="Element10" style="text-align: center;">
+<img src="APPS GFX aria_benchmark motion fill screen_H3.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The number and size of the squares can be increased and decreased using the “+“ and “-“ buttons. If the maximum or minimum size is reached, touching “+” or “-“, respectively, will switch to a full screen fill of alternating colors.&nbsp;</p>
+<p class="Element10">
+Touching the “Next” button transitions to the Image Decode and Rendering screen. In this screen, two images of the same size are alternately rendered between application cycles. This involves a fill of the background color, decode and conversion of the image to the frame buffer format, and the drawing of the image to the frame buffer. The Frame Update value is the rate at which the graphics library is able to render an image on the screen. </p><p class="Element10" style="text-align: center;">
+<img src="APPS GFX aria_benchmark image rendering_H3.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The size of the images can be increased and decreased using the “+“ and “-“ buttons.&nbsp;</p>
+<p class="Element10">
+Touching the “&lt;” and “&gt;” buttons switches between the various image formats. The formats that are supported are PNG, RAW RLE 16-bit, RAW 16-bit and JPG 24-bit. RAW 32-bit pre-decoded in DDR is also supported in the PIC32MZ DA configurations with DDR memory</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00004.html" target="topic">aria_benchmark</a> &gt; <a href="00050.html" target="topic">aria_bm_a5d2_xu_tm4301b.IAR</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="00052.html" target="topic">Previous</a> | <a href="00004.html" target="topic">Up</a> | <a href="00049.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_bm_a5d2_xu_tm4301b.IAR Topic Title: aria_bm_a5d2_xu_tm4301b.IAR)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

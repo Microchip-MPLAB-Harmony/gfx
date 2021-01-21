@@ -1,0 +1,12 @@
+digraph "leRectArray_RemoveAt"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="leRectArray_RemoveAt",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Removes a rectangle from the array at an index."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="leRectArray_MergeSimilar",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__rectarray_8h.html#a5fdf47c9b1d1d719dd05fe046f1e8b26",tooltip="Merge rectangles."];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="leRectArray_RemoveOverlapping",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__rectarray_8h.html#a36be2da2dc30b184e972a312601d1d3c",tooltip="Remove overlappping rectangles."];
+}

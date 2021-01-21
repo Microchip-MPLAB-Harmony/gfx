@@ -1,0 +1,10 @@
+digraph "leEvent_ClearList"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="leEvent_ClearList",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Clear event list."];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="leList_Destroy",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__list_8h.html#ab62898f37fb364ca5e07b1b8b449ddf3",tooltip="Remove array."];
+}

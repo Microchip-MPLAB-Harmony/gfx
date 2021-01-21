@@ -1,0 +1,15 @@
+digraph "gfx/middleware/legato/driver" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_b190f1068f9fbe431bd6ea3e2624de65 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="legato" fontname="Helvetica", fontsize="10", URL="dir_b190f1068f9fbe431bd6ea3e2624de65.html"]
+  subgraph clusterdir_dc69da7afc904c98ae9c02297ceecff5 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_dc69da7afc904c98ae9c02297ceecff5.html"];
+    dir_dc69da7afc904c98ae9c02297ceecff5 [shape=plaintext label="driver"];
+    dir_5ed46f5af1b08e6b346f3ffb349cacea [shape=box label="config" color="black" fillcolor="white" style="filled" URL="dir_5ed46f5af1b08e6b346f3ffb349cacea.html"];
+    dir_e6eb55ddd9845b5885a3a2ab539bc514 [shape=box label="controller" color="red" fillcolor="white" style="filled" URL="dir_e6eb55ddd9845b5885a3a2ab539bc514.html"];
+    dir_008ef5a82862db34c46e4bd05fc5956f [shape=box label="processor" color="red" fillcolor="white" style="filled" URL="dir_008ef5a82862db34c46e4bd05fc5956f.html"];
+  }
+  }
+}

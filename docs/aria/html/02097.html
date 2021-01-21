@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laRadialMenuWidget Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02097.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="02097.html" target="topic">laRadialMenuWidget Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02036.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="02165.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laRadialMenuWidget Topic Title: laRadialMenuWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laRadialMenuWidget Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Enumeration: laRadialMenuWidget_t&nbsp;</p>
+<p class="Element10">
+A radial menu is a master widget that manages the movement, in an elliptical track, of a list of widgets. It also manages the draw order and scaling of each widget item.&nbsp;</p>
+<p class="Element10">
+It is essentially a group of widgets which provides a mutually exclusive selection capability so that only one item may be selected at any one time.</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">typedef</span></strong> <strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laRadialMenuWidget_t</span></strong> {
+  <a href="02525.html" target="topic">laWidget</a> <strong><span style="color: #000000">widget</span></strong>;
+  <a href="02165.html" target="topic">laRadialMenuWidgetState</a> <strong><span style="color: #000000">state</span></strong>;
+  int32_t <strong><span style="color: #000000">prominentIndex</span></strong>;
+  int32_t <strong><span style="color: #000000">lastProminentIndex</span></strong>;
+  int32_t <strong><span style="color: #000000">userRequestedAngleDiff</span></strong>;
+  int32_t <strong><span style="color: #000000">targetAngleDiff</span></strong>;
+  int32_t <strong><span style="color: #000000">userRequestedDirection</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">drawEllipse</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">highlightProminent</span></strong>;
+  <a href="01319.html" target="topic">laHAlignment</a> <strong><span style="color: #000000">halign</span></strong>;
+  <a href="02521.html" target="topic">laVAlignment</a> <strong><span style="color: #000000">valign</span></strong>;
+  <a href="01404.html" target="topic">laImageWidget</a>* <strong><span style="color: #000000">highlighter</span></strong>;
+  int32_t <strong><span style="color: #000000">a</span></strong>;
+  int32_t <strong><span style="color: #000000">b</span></strong>;
+  int32_t <strong><span style="color: #000000">theta</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">touchPressed</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">ellipseChanged</span></strong>;
+  <a href="02160.html" target="topic">laRadialMenuWidgetScaleType</a> <strong><span style="color: #000000">scaleItemSize</span></strong>;
+  int32_t <strong><span style="color: #000000">maxSizePercent</span></strong>;
+  int32_t <strong><span style="color: #000000">minSizePercent</span></strong>;
+  <a href="00507.html" target="topic">GFX_Rect</a> <strong><span style="color: #000000">touchArea</span></strong>;
+  <a href="02160.html" target="topic">laRadialMenuWidgetScaleType</a> <strong><span style="color: #000000">scaleItemAlpha</span></strong>;
+  int32_t <strong><span style="color: #000000">maxAlphaAmount</span></strong>;
+  int32_t <strong><span style="color: #000000">minAlphaAmount</span></strong>;
+  int32_t <strong><span style="color: #000000">itemsShown</span></strong>;
+  <a href="01816.html" target="topic">laList</a> <strong><span style="color: #000000">widgetList</span></strong>;
+  <a href="01816.html" target="topic">laList</a> <strong><span style="color: #000000">shownList</span></strong>;
+  <a href="01816.html" target="topic">laList</a> <strong><span style="color: #000000">hiddenList</span></strong>;
+  <a href="02088.html" target="topic">laRadialMenuItemNode</a>* <strong><span style="color: #000000">widestWidgetItem</span></strong>;
+  <a href="02088.html" target="topic">laRadialMenuItemNode</a>* <strong><span style="color: #000000">tallestWidgetItem</span></strong>;
+  <a href="02107.html" target="topic">laRadialMenuWidget_ItemSelectedEvent</a> <strong><span style="color: #000000">itemSelectedEvent</span></strong>;
+  <a href="02106.html" target="topic">laRadialMenuWidget_ItemProminenceChangedEvent</a> <strong><span style="color: #000000">itemProminenceChangedEvent</span></strong>;
+  <a href="02083.html" target="topic">laRadialMenuEllipseType</a> <strong><span style="color: #000000">ellipseType</span></strong>;
+  <a href="00611.html" target="topic">GFXU_ExternalAssetReader</a>* <strong><span style="color: #000000">reader</span></strong>;
+} laRadialMenuWidget;</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget widget;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+widget base class&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t userRequestedAngleDiff;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the angle for the radial menu to rotate as requested by user&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t targetAngleDiff;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the angle for the radial menu to rotate for prominent item to be in front&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t userRequestedDirection;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+tracks the direction that the user requested for rotation&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool drawEllipse;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+indicates if the radial menu is selected&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool highlightProminent;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+highlight the prominent widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laHAlignment halign;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+horizontal alignment&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laVAlignment valign;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+vertical alignment&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laImageWidget* highlighter;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+this widget manages the selector art asset&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t a;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the half-length of the 0-180 axis of the ellipse&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t b;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the half-length of the 90-270 axis of the ellipse&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t theta;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the angle of rotation of the entire ellipse&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool touchPressed;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+keep track of users touch input&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool ellipseChanged;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+keeps track if the elliptical track has changed&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuWidgetScaleType scaleItemSize;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the enable item size scaling within the widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t maxSizePercent;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the maximum size scale between 1 - 200&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t minSizePercent;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the minimum size scale between 1 - 200&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_Rect touchArea;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the area specified within the widget that touch events are detected&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuWidgetScaleType scaleItemAlpha;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the enable item alpha scaling within the widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t maxAlphaAmount;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the maximum alpha between 0 - 255&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t minAlphaAmount;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the minimum alpha between 0 - 255&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t itemsShown;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+keeps count of how many items to visible, this number should be less than or equal to total number of widget items&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laList widgetList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+this is the list of widgets&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laList shownList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+this is the partial list of widgets shown&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laList hiddenList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+this is the partial list of widgets hidden&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuItemNode* widestWidgetItem;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+keeps track of which widget is the widgets for major axis calculation&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuItemNode* tallestWidgetItem;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+keeps track of which widget is the widgets for minor axis calculation&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuWidget_ItemSelectedEvent itemSelectedEvent;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+an item is selected event callback&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRadialMenuWidget_ItemProminenceChangedEvent itemProminenceChangedEvent;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+whenever a new item is in prominence event callback&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_ExternalAssetReader* reader;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+asset reader&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="02097.html" target="topic">laRadialMenuWidget Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02036.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="02165.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laRadialMenuWidget Topic Title: laRadialMenuWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

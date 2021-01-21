@@ -1,0 +1,34 @@
+digraph "leRawDecodeState"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="leRawDecodeState",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" palette" ,fontname="Helvetica"];
+  Node2 [label="lePixelBuffer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structlePixelBuffer.html",tooltip=" "];
+  Node3 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" pixels" ,fontname="Helvetica"];
+  Node3 [label="void",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node4 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" size" ,fontname="Helvetica"];
+  Node4 [label="leSize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleSize.html",tooltip="This structure is used represents the size of an item."];
+  Node5 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" target\nsource" ,fontname="Helvetica"];
+  Node5 [label="leImage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleImage.html",tooltip=" "];
+  Node2 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" buffer" ,fontname="Helvetica"];
+  Node6 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node6 [label="leStreamDescriptor",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleStreamDescriptor.html",tooltip="This struct represents a stream descriptor."];
+  Node3 -> Node6 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" address" ,fontname="Helvetica"];
+  Node5 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" palette" ,fontname="Helvetica"];
+  Node7 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" map\nalphaMap" ,fontname="Helvetica"];
+  Node7 [label="leImageMap",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleImageMap.html",tooltip="This struct represents an image map."];
+  Node2 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" buffer" ,fontname="Helvetica"];
+  Node6 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node8 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" readOperation" ,fontname="Helvetica"];
+  Node8 [label="leRawSourceReadOperation",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRawSourceReadOperation.html",tooltip=" "];
+  Node9 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" targetOrigin\nsourceOrigin" ,fontname="Helvetica"];
+  Node9 [label="lePoint",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structlePoint.html",tooltip="This structure represents a integer Cartesian point."];
+  Node10 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" destRect\nsourceRect" ,fontname="Helvetica"];
+  Node10 [label="leRect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRect.html",tooltip="This struct represents a rectangle."];
+  Node11 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" stages" ,fontname="Helvetica"];
+  Node11 [label="leRawDecodeStage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRawDecodeStage.html",tooltip=" "];
+  Node3 -> Node11 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cleanup" ,fontname="Helvetica"];
+  Node1 -> Node11 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" state" ,fontname="Helvetica"];
+}

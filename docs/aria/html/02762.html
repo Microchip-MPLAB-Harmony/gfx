@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Enabling RTOS with Aria Graphics</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02762.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02762.html" target="topic">Enabling RTOS with Aria Graphics</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02770.html" target="topic">Previous</a> | <a href="02750.html" target="topic">Up</a> | <a href="02798.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Enabling RTOS Topic Title: Enabling RTOS with Aria Graphics)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Enabling RTOS with Aria Graphics</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+In an RTOS-based system, the Aria Graphics Library can be configured to run as a stand-alone task that blocks and waits for external events from the input/touch task or the application task. This offers a couple of advantages: (1) this allows the Aria Graphics library to run efficiently by relinquishing CPU time to other tasks when the UI is idle, (2) the Aria Graphics library can be run as a high priority task and be more responsive to user input since it can preempt lower priority tasks.&nbsp;</p>
+<p class="Element10">
+To create a Harmony Graphics project with RTOS, the initial configuration is similar to a bare-metal Graphics project. The following Harmony components must be added to the project:&nbsp;</p>
+<p class="Element10">
+1. Display&nbsp;</p>
+<p class="Element10">
+2. Display controller interface peripheral and driver&nbsp;</p>
+<p class="Element10">
+3. Touch interface peripheral and driver&nbsp;</p>
+<p class="Element10">
+4. GFX Core (Hardware Abstraction Layer)&nbsp;</p>
+<p class="Element10">
+5. Input System Service&nbsp;</p>
+<p class="Element10">
+6. Harmony Core&nbsp;</p>
+<p class="Element10">
+7. Aria Graphics Library&nbsp;</p>
+<p class="Element10">
+The project graph for this initial (bare-metal) configuration would look something like the one below:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<img src="RTOS bare-metal project graph.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+To add RTOS, the FreeRTOS component from Third Party Libraries -&gt; RTOS -&gt; FreeRTOS needs to be added to the project.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<img src="RTOS freertos project graph.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+After the FreeRTOS component is added to the Project, “RTOS settings” will be available in the Aria Graphics Library Configuration Options. By default, the “Use RTOS Extensions” setting is enabled. This configures the Aria task to run as a stand-alone, blocking task. To make the UI more responsive, the Aria Task Priority can be manually increased to 2.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<img src="RTOS config_options.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+These files contain the RTOS extensions:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="16%">
+<div class="Element66">
+RTOS extension files&nbsp;</div></td><td class="Element65" valign="top" width="84%">
+<div class="Element66">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="16%">
+<div class="Element68">
+libaria_rtos.c/h&nbsp;</div></td><td class="Element67" valign="top" width="84%">
+<div class="Element68">
+RTOS extension to libaria.c/h. Contains RTOS version of the <a href="02495.html" target="topic">laUpdate</a>() function.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="16%">
+<div class="Element68">
+libaria_context_rtos.c/h&nbsp;</div></td><td class="Element67" valign="top" width="84%">
+<div class="Element68">
+RTOS extension to libaria_context.c/h. Contains the RTOS version of the <a href="01229.html" target="topic">laContext_Update</a>() function. It also contains APIs that must be used to send events to the library to refresh the UI or change the screen.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="16%">
+<div class="Element68">
+libaria_event_rtos.c/h&nbsp;</div></td><td class="Element67" valign="top" width="84%">
+<div class="Element68">
+RTOS extension to libaria_event.c/h. Contains thread-safe APIs and routines for sending and processing Aria Graphics events.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="16%">
+<div class="Element68">
+libaria_input_rtos.c/h&nbsp;</div></td><td class="Element67" valign="top" width="84%">
+<div class="Element68">
+RTOS extension to libaria_input.c/h. Contains thread-safe callbacks for sending touch events to the graphics library.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The RTOS extensions provides APIs that need to be called from external tasks (e.g., application code) to interface with the Aria Graphics library in a thread-safe way. These functions have _Ext_RTOS() suffix, which means they can be safely called by other tasks.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="18%">
+<div class="Element66">
+RTOS Extension APIs&nbsp;</div></td><td class="Element65" valign="top" width="82%">
+<div class="Element66">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+laEvent_SendEvent_Ext_RTOS()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+API to use to send events to graphics library.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+<a href="01197.html" target="topic">laContext_SendSetActiveScreenEvent_Ext_RTOS</a>()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+Wrapper for laEvent_SendEvent_Ext_RTOS()to send an event to change the active screen.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+<a href="01195.html" target="topic">laContext_RefreshActiveScreen_Ext_RTOS</a>()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+Wrapper for laEvent_SendEvent_Ext_RTOS()to send an event to the graphics library to repaint the frame. This needs to be called after widget properties are changed, so that the widget is updated and repainted.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+laInput_SendTouchDown_Ext_RTOS()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+Wrapper for laEvent_SendEvent_Ext_RTOS()to send a touch down event to the graphics library. This typically registered as a callback to the System Input Service and called when a touch down event is detected.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+laInput_SendTouchUp_Ext_RTOS()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+Wrapper for laEvent_SendEvent_Ext_RTOS()to send a touch up event to the graphics library. This typically registered as a callback to the System Input Service and called when a touch down event is detected.&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="18%">
+<div class="Element68">
+laInput_SendTouchMoved_Ext_RTOS()&nbsp;</div></td><td class="Element67" valign="top" width="82%">
+<div class="Element68">
+Wrapper for laEvent_SendEvent_Ext_RTOS()to send a touch moved event to the graphics library. This typically registered as a callback to the System Input Service and called when a touch down event is detected.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Here’s a diagram of how the Aria Graphics library runs in an RTOS environment with the Input System Service and Application as source of events:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<img src="RTOS sequence diag.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+After initialization, the Aria Task calls <a href="02496.html" target="topic">laUpdate_RTOS</a>(). In this function, it will block to wait for events.&nbsp;</p>
+<p class="Element10">
+For a touch event, the Input System Service task calls the laInput_SendTouchDown_Ext_RTOS() callback function to send an LA_EVENT_TOUCH_DOWN event to the Aria Task. This will unblock the Aria Task to start processing events. The Aria Task will call laEvent_ProcessEvents_RTOS() to process the touch event, call <a href="01229.html" target="topic">laContext_Update</a>() to update and mark widgets that need to be repainted, and calls laContext_Paint() to repaint the layers. The Aria Task repeats this process while there are pending events that needs to be process. The Aria task blocks again when all events are handled.&nbsp;</p>
+<p class="Element10">
+If the application updates a widget, say to move its position using <a href="02613.html" target="topic">laWidget_Translate</a>(), it needs to call <a href="01195.html" target="topic">laContext_RefreshActiveScreen_Ext_RTOS</a>() that sends a dummy event to unblock the Aria Task so it can process the event and update the widget and screen. The Aria Task repeats this process while there are events in its events list or while the counting semaphore has a non-zero value. The Aria task blocks again when the counting semaphore is back to zero.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02762.html" target="topic">Enabling RTOS with Aria Graphics</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02770.html" target="topic">Previous</a> | <a href="02750.html" target="topic">Up</a> | <a href="02798.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Enabling RTOS Topic Title: Enabling RTOS with Aria Graphics)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

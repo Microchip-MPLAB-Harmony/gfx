@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Small Buttons Controlled by Phantom Buttons</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02786.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02776.html" target="topic">Improved Touch Performance with Phantom Buttons</a> &gt; <a href="02786.html" target="topic">Small Buttons Controlled by Phantom Buttons</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02751.html" target="topic">Previous</a> | <a href="02776.html" target="topic">Up</a> | <a href="02756.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Small Buttons Controlled by Phantom Buttons Topic Title: Small Buttons Controlled by Phantom Buttons)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Small Buttons Controlled by Phantom Buttons</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+When the border is not set to <i>None</i>, and the background is not set to <i>None</i>, the button widget provides a direct visible clue to the user when it is pressed. Which can be seen in the following figure with the button from aria_quickstart. In aria_quickstart, ButtonWidget1 has a bevel border, and a fill background.&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG buttonwidget gfx quickstart.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+Let’s use aria_quickstart to demonstrate how to control ButtonWidget1 using a phantom button to surround it, thereby increasing touch responsiveness.&nbsp;</p>
+<p class="Element10">
+When using a bevel border and filled background, the button provides visible feedback when it is asserted.&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG buttonwidget scheme helper.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+To use this feedback mechanism instead of images, there is a way to have a small button on the display, with a larger touch zone provided by another phantom button.&nbsp;</p>
+<p class="Element10">
+<i>Steps:</i>&nbsp;</p>
+<ol class="Element630">
+<li value="1" class="Element600">Click on <i>ButtonWidget1</i> in the <i>Screen Designer</i> panel. Go to the <i>Properties Editor</i> panel for the widget and uncheck the<i> Enabled</i> property to disable the button. Enable <i>Toggleable</i> so that this button will have a memory.</li>
+<li value="2" class="Element600">Drag a new button from the Widget Tool Box panel and center it around <i>ButtonWidget1</i>. In the <i>Properties Editor</i> panel for this new button, change the name of the widget to<i> PhantomButton</i>. Change the <i>Background Type</i> to <i>None</i>. Leave the <i>Border</i> set as <i>Bevel</i> for now. The following figure displays the new button in the <i>Screen Designer</i> panel:</li>
+</ol><p class="Element10">
+<img src="MHGC UG Makechanges generate run.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+The <i>Properties Editor</i> panel should display the following information.&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG Properties editor for buttons.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+3. In the <i>Tree View</i> panel, drag <i>ButtonWidget1</i> to be a daughter widget of <i>PhantomWidget</i>. When <i>PhantomWidget</i> is moved, <i>ButtonWidget1</i> will move along with the parent.&nbsp;</p>
+<p class="Element10">
+<img src="MHCG UG Tree View.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+4. Click on <i>PhantomButton</i> again in the <i>Screen Designer panel</i> and move to the <i>Properties Editor</i>. Enable both the <i>Pressed</i> and <i>Released</i> events. Then click on the (…) icon to define the events. (See the following two steps.)&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG released Pressed events.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+5. Defining the Pressed Event.&nbsp;</p>
+<p class="Element10">
+Click on the (…) icon. In the <i>Event Editor</i>, under<i> Pressed</i> dialog, click the <i>New</i> icon to define a new event. In the <i>Action Edit Dialog</i> that next appears, leave the selection on the template and hit the <i>Next</i> button. In the next window, select the target of the event. We want to change the state of <i>ButtonWidget1</i>, so select it and hit <i>Next</i>. The next dialog shows all the template actions that we can use to modify ButtonWidget1. Choose <i>Set Pressed State</i> and hit <i>Next</i>. Set the Argument to <i> Enable Pressed</i>. Name this event <i>Set Press state for ButtonWidget1</i> then hit Finish. Leave the Event Editor by hitting <i>Ok</i>.&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG Set Press State.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+6. Defining the Released Event.&nbsp;</p>
+<p class="Element10">
+Click on the (…) icon. In the <i>Event Editor</i>, under <i>Released dialog</i>, click the New icon to define a new event. In the <i>Action Edit Dialog</i> that next appears, leave the selection on the template and hit the <i>Next</i> button. In the next window, select the target of the event. We want to change the state of ButtonWidget1, so select it and hit <i>Next</i>. Choose <i>Set Pressed State</i> and hit<i> Next</i>. Leave the <i>Argument</i> disabled. Name this event <i>Unset Press state for ButtonWidget1</i> then hit Finish. Leave the Event Editor by hitting<i> Ok</i>.&nbsp;</p>
+<p class="Element10">
+<img src="MHGC UG unset press state.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+7. Generate the application from the MPLAB Harmony Configurator main menu.&nbsp;</p>
+<p class="Element10">
+8. From the MPLAB main menu, build and run the project. To verify that ButtonWidget1 does change, click outside of the original boundaries.&nbsp;</p>
+<p class="Element10">
+9. As a final step, hide the PhantomButton by changing its border to <i>None</i>. Next, Generate the code again from MHC. Finally, build and run the project from MPLAB and see how much easier it is to assert ButtonWidget1 using a phantom button.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02776.html" target="topic">Improved Touch Performance with Phantom Buttons</a> &gt; <a href="02786.html" target="topic">Small Buttons Controlled by Phantom Buttons</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02751.html" target="topic">Previous</a> | <a href="02776.html" target="topic">Up</a> | <a href="02756.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Small Buttons Controlled by Phantom Buttons Topic Title: Small Buttons Controlled by Phantom Buttons)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

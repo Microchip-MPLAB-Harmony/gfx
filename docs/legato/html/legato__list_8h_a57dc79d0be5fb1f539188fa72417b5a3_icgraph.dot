@@ -1,0 +1,10 @@
+digraph "leList_PushBack"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="leList_PushBack",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Push value on back."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="leList_InsertAt",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__list_8h.html#ac27d0af9db9f051b3bda9f7d62c1b6f4",tooltip="Insert value at index."];
+}

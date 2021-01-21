@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Graphics Composer Macros</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02761.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02779.html" target="topic">MHGC Tools</a> &gt; <a href="02763.html" target="topic">Event Manager</a> &gt; <a href="02761.html" target="topic">Graphics Composer Macros</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02766.html" target="topic">Previous</a> | <a href="02763.html" target="topic">Up</a> | <a href="02765.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Egent Mgr Graphibs Composer Macros Topic Title: Graphics Composer Macros)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Graphics Composer Macros</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Macros implement event handlers for events that originate outside of graphics primitives such as widgets and are designed to change or manipulate widgets inside of the graphics part of an application. (Events that originate outside of graphics and don’t touch the graphics part of the application are outside of the scope of the Graphics Event Manager and are not discussed here.)&nbsp;</p>
+<p class="Element10">
+The following figure shows a simple example of a macro. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Simple Macro Example.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The toolbar for Macros has three icons. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Macros Tool Bar Icons.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Creating a new macro and selecting its actions is just like that of a widget event:</p>
+<ol class="Element630">
+<li value="1" class="Element600">Create a new macro using the “Create New Macro” tool. The check box to the left of the new macro’s name enables/disables the macro. Clearing it removes the macro from the next code generation.</li>
+<li value="2" class="Element600">Select the new macro and edit it using the second icon (shown previously).</li>
+<li value="3" class="Element600">In the Actions: window, select Create New Action. An optional name can be provided in the Name: box. The user can then choose to use a Template and select a predefined action or Custom to create a customized action.</li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Create New Action Macro.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ol class="Element630">
+<li value="4" class="Element600">A “Custom” action is picked, proceed as discussed previous in Graphics Composer Events. When using templates the next step is to choose the target widget for the action. This choice is limited to those only the widgets in the currently “active” screen. If the application has multiple screens and the widget that is being targeted is not part of the currently active screen, the user would need to change the active screen.
+<ul class="Element631">
+<li class="Element601">Changing the active screen can be done by selecting the corresponding screen tab at the bottom of the Graphics Composer Screen Designer</li>
+</ul></li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Macro FirstScreen.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600">Alternately, the screen can be switched using the Graphics Composer Manager:Screens tab</li>
+</ul><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Screens Tab Macro.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ol class="Element630">
+<li value="5" class="Element600">After selecting the target widget for this macro, click Next button to select an action related to this widget. (Just as with template-based widget events.) The macro can contain more than one action, targeting more than one widget.</li>
+</ol></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02779.html" target="topic">MHGC Tools</a> &gt; <a href="02763.html" target="topic">Event Manager</a> &gt; <a href="02761.html" target="topic">Graphics Composer Macros</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02766.html" target="topic">Previous</a> | <a href="02763.html" target="topic">Up</a> | <a href="02765.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Egent Mgr Graphibs Composer Macros Topic Title: Graphics Composer Macros)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laLayer_t Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '01660.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01660.html" target="topic">laLayer_t Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="01635.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01685.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laLayer_t Topic Title: laLayer_t Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laLayer_t Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Structure: laLayer_t</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laLayer_t</span></strong> {
+  <a href="02525.html" target="topic">laWidget</a> <strong><span style="color: #000000">widget</span></strong>;
+  <a href="02281.html" target="topic">laScreen</a>* <strong><span style="color: #000000">screen</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">deleting</span></strong>;
+  uint32_t <strong><span style="color: #000000">bufferCount</span></strong>;
+  <a href="01685.html" target="topic">laLayerBuffer</a> <strong><span style="color: #000000">buffers</span></strong>[GFX_MAX_BUFFER_COUNT];
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">alphaEnable</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">maskEnable</span></strong>;
+  GFX_Color <strong><span style="color: #000000">maskColor</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">vsync</span></strong>;
+  <a href="02232.html" target="topic">laRectArray</a> <strong><span style="color: #000000">prevDamageRects</span></strong>;
+  <a href="02232.html" target="topic">laRectArray</a> <strong><span style="color: #000000">currentDamageRects</span></strong>;
+  <a href="02232.html" target="topic">laRectArray</a> <strong><span style="color: #000000">pendingDamageRects</span></strong>;
+  <a href="02232.html" target="topic">laRectArray</a> <strong><span style="color: #000000">scratchRectList</span></strong>;
+  <a href="02232.html" target="topic">laRectArray</a> <strong><span style="color: #000000">frameRectList</span></strong>;
+  uint32_t <strong><span style="color: #000000">frameRectIdx</span></strong>;
+  <a href="00507.html" target="topic">GFX_Rect</a> <strong><span style="color: #000000">clippedDrawingRect</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">drawingPrev</span></strong>;
+  <a href="01693.html" target="topic">laLayerFrameState</a> <strong><span style="color: #000000">frameState</span></strong>;
+  uint32_t <strong><span style="color: #000000">layerDrawCount</span></strong>;
+  uint32_t <strong><span style="color: #000000">frameDrawCount</span></strong>;
+  <a href="00507.html" target="topic">GFX_Rect</a> <strong><span style="color: #000000">inputRect</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">inputRectLocked</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">allowInputPassThrough</span></strong>;
+  uint32_t <strong><span style="color: #000000">deltaTime</span></strong>;
+};</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget widget;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+base widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laScreen* screen;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+owning screen pointer&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool deleting;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+flag indicating that no changes should be made to the layer because it is in the process of being deleted&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t bufferCount;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+number of buffers in the layer&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laLayerBuffer buffers[GFX_MAX_BUFFER_COUNT];&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+buffer array&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool alphaEnable;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+layer-based alpha blending enable flag&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool maskEnable;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+layer-based color masking enable flag&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_Color maskColor;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+layer-based masking color value&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool vsync;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+layer vsync flag&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRectArray prevDamageRects;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+previous damaged rectangle list&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRectArray currentDamageRects;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+queued damaged rectangle list&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRectArray pendingDamageRects;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+pending damaged rectangle list these are rectangles added during a frame in progress&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRectArray scratchRectList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+used for rectangle culling phase&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRectArray frameRectList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+this of rects to draw for a frame <a href="00507.html" target="topic">GFX_Rect</a> currentDrawingRect; // the current damage rectangle&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_Rect clippedDrawingRect;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the current damage rectangle clipped to the currently rendering widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool drawingPrev;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+indicates if the layer is currently drawing from its previous rectangle array&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laLayerFrameState frameState;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the current frame render state of the layer&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t layerDrawCount;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the number of times this layer has drawn&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t frameDrawCount;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the number of widgets that have rendered on this layer this frame&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_Rect inputRect;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+layer input area&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool inputRectLocked;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+input area matches layer dimensions&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool allowInputPassThrough;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+indicates that input events should be propagated through the layer node to left siblings&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t deltaTime;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+stores delta time for updates that happen during rendering&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01660.html" target="topic">laLayer_t Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="01635.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01685.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laLayer_t Topic Title: laLayer_t Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

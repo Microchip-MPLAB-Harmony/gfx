@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laCircularSliderWidget Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '01103.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01103.html" target="topic">laCircularSliderWidget Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="01099.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01119.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laCircularSliderWidget Topic Title: laCircularSliderWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laCircularSliderWidget Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Structure: laCircularSliderWidget_t&nbsp;</p>
+<p class="Element10">
+A slider widget draws a slider of the specified origin and radius inside the widget bounds. All coordinates are expressed in local widget space.&nbsp;</p>
+<p class="Element10">
+The color of the slider is determined by the widget scheme's 'foreground' color.</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">typedef</span></strong> <strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laCircularSliderWidget_t</span></strong> {
+  <a href="02525.html" target="topic">laWidget</a> <strong><span style="color: #000000">widget</span></strong>;
+  uint32_t <strong><span style="color: #000000">radius</span></strong>;
+  uint32_t <strong><span style="color: #000000">startAngle</span></strong>;
+  uint32_t <strong><span style="color: #000000">value</span></strong>;
+  uint32_t <strong><span style="color: #000000">startValue</span></strong>;
+  uint32_t <strong><span style="color: #000000">endValue</span></strong>;
+  <strong><span style="color: #000080">float</span></strong> <strong><span style="color: #000000">degPerUnit</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">roundEdges</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">sticky</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">buttonTouch</span></strong>;
+  <a href="01167.html" target="topic">laCircularSliderWidgetDir</a> <strong><span style="color: #000000">direction</span></strong>;
+  <a href="01091.html" target="topic">laCircularSliderArc</a> <strong><span style="color: #000000">activeArc</span></strong>;
+  <a href="01091.html" target="topic">laCircularSliderArc</a> <strong><span style="color: #000000">inActiveArc</span></strong>;
+  <a href="01091.html" target="topic">laCircularSliderArc</a> <strong><span style="color: #000000">outsideBorderArc</span></strong>;
+  <a href="01091.html" target="topic">laCircularSliderArc</a> <strong><span style="color: #000000">insideBorderArc</span></strong>;
+  <a href="01091.html" target="topic">laCircularSliderArc</a> <strong><span style="color: #000000">circleButtonArc</span></strong>;
+  <a href="01099.html" target="topic">laCircularSliderButtonState</a> <strong><span style="color: #000000">btnState</span></strong>;
+  <a href="01119.html" target="topic">laCircularSliderWidget_PressedEvent</a> <strong><span style="color: #000000">pressedCallback</span></strong>;
+  <a href="01159.html" target="topic">laCircularSliderWidget_ValueChangedEvent</a> <strong><span style="color: #000000">valueChangedCallback</span></strong>;
+  <a href="01120.html" target="topic">laCircularSliderWidget_ReleasedEvent</a> <strong><span style="color: #000000">releasedCallback</span></strong>;
+} laCircularSliderWidget;</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget widget;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+base widget header&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t radius;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the radius of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t startAngle;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the start angle of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t value;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the value of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t startValue;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the start value of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t endValue;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the end value of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+float degPerUnit;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+degrees per unit in the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool roundEdges;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+round edges&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool sticky;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+snaps to start value before wrapping around&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool buttonTouch;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+only button is active to touch&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderWidgetDir direction;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the direction of the slider&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderArc activeArc;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the arc for the slider value&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderArc inActiveArc;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the arc for the slider remainder&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderArc outsideBorderArc;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the arc for the outside border&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderArc insideBorderArc;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the arc for the inside border&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderArc circleButtonArc;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the arc for the circle button&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laCircularSliderButtonState btnState;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the state of the circular slider button&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01103.html" target="topic">laCircularSliderWidget Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="01099.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01119.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laCircularSliderWidget Topic Title: laCircularSliderWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

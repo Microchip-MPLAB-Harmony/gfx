@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>aria_qs_a5d2_xu_tm5000.X</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '00071.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00029.html" target="topic">aria_quickstart</a> &gt; <a href="00071.html" target="topic">aria_qs_a5d2_xu_tm5000.X</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="00069.html" target="topic">Previous</a> | <a href="00029.html" target="topic">Up</a> | <a href="00070.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_qs_a5d2_xu_tm5000.X Topic Title: aria_qs_a5d2_xu_tm5000.X)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+aria_qs_a5d2_xu_tm5000.X</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+<strong>Defining the Architecture</strong> </p><p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="aria_qs_a5d2_xu_tm5000.X_arch.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+In this configuration, the Aria Graphics library renders the frame to a 32-bit frame buffer in external DDR. The LCDC display controller on the A5D2 is used to drive frame data from DDR to the display. 16-bit RGB565 frame buffer is stored in the internal SRAM.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+User touch input on the display panel is received thru the PCAP capacitive touch controller, which sends a notification to the Touch Input Driver. The Touch Input Driver reads the touch information over I2C and sends the touch events to the Aria Graphics Library Task thru the Input System Service Task.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+This aria_quickstart configuration runs the Aria Graphics Library in a FreeRTOS environment. The Aria Graphics Library runs as stand-alone task, fully-blocking and waiting for events from external tasks like system service task or the application task. Thread-safe APIs for sending events to the Aria task are provided by the Aria RTOS extension library.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>Demonstration Features</strong>&nbsp;</p>
+<p class="Element10">
+• Aria RTOS extensions, FreeRTOS&nbsp;</p>
+<p class="Element10">
+• LCDC peripheral and driver, external DDR frame buffer&nbsp;</p>
+<p class="Element10">
+• Touch input driver, Input System Service&nbsp;</p>
+<p class="Element10">
+• 32-bit RGBA8888 color depth support&nbsp;</p>
+<p class="Element10">
+• Button, Label and Image widgets&nbsp;</p>
+<p class="Element10">
+• WVGA 800x480 display resolution&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>Creating the Project Graph</strong> &nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="APP GFX aria_quickstart freertos config a5d2.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+The Project Graph diagram shows the Harmony components that are included in this application. Lines between components are drawn to satisfy components that depend on a capability that another component provides.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Adding the “SAM A5D2 XPlained Ultra BSP” and “Aria Graphics w/ PDA TM5000 Display” Graphics Template component into the project graph will automatically add the components needed for a graphics project and resolve their dependencies. It will also configure the pins needed to drive the external peripherals like the display and the touch controller.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>Building the Application</strong>&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The parent directory for this application is gfx/apps/aria_quickstart. To build this application, using MPLAB X open the gfx/apps/aria_quickstart/firmware/aria_qs_a5d2_xu_tm5000.X project file.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The following table lists configuration properties:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="25%">
+<div class="Element66">
+Project Name&nbsp;</div></td><td class="Element65" valign="top" width="13%">
+<div class="Element66">
+BSP Used&nbsp;</div></td><td class="Element65" valign="top" width="24%">
+<div class="Element66">
+Graphics Template Used&nbsp;</div></td><td class="Element65" valign="top" width="38%">
+<div class="Element66">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="25%">
+<div class="Element68">
+aria_qs_a5d2_xu_tm5000_freertos.X&nbsp;</div></td><td class="Element67" valign="top" width="13%">
+<div class="Element68">
+SAM A5D2 Xplained Ultra&nbsp;</div></td><td class="Element67" valign="top" width="24%">
+<div class="Element68">
+Aria Graphics w/ PDA TM5000 Display&nbsp;</div></td><td class="Element67" valign="top" width="38%">
+<div class="Element68">
+Aria GFX on SAM A5D2 Xplained Ultra Board and PDA TM5000 WVGA Display with FreeRTOS&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Important Star.png" border="0" alt="" title=""><strong> Important!</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+This application may contain custom code that is marked by the comments // START OF CUSTOM CODE ... and // END OF CUSTOM CODE. When using the MPLAB Harmony Configurator to regenerate the application code, use the &quot;ALL&quot; merging strategy and <i>do not</i> remove or replace the custom code.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>Configuring the Hardware</strong>&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The final setup should be:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="sama5d2_xult_tm5000.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<strong>Running the Demonstration</strong>&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+When power-on is successful, the demonstration will display a similar menu to that shown in the following figure (different configurations may have slight variation in the screen aspect ratio):&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_quickstart_screen.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+When <strong>Make changes. Generate. Run</strong>. is touched, the button will toggle with each individual touch.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_quickstart_screen_pressed.png" border="0" alt="" title="">&nbsp;</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00029.html" target="topic">aria_quickstart</a> &gt; <a href="00071.html" target="topic">aria_qs_a5d2_xu_tm5000.X</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="00069.html" target="topic">Previous</a> | <a href="00029.html" target="topic">Up</a> | <a href="00070.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_qs_a5d2_xu_tm5000.X Topic Title: aria_qs_a5d2_xu_tm5000.X)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

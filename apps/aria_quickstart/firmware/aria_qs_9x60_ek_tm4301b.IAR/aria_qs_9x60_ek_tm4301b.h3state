@@ -1,0 +1,23 @@
+{
+    "linker": {
+        "script": "..\\src\\config\\lcdc_rgba8888_mxt_9x60_wqvga\\ddram.icf"
+    }, 
+    "assembler": {
+        "macros": [], 
+        "includes": []
+    }, 
+    "general": {
+        "name": "lcdc_rgba8888_mxt_9x60_wqvga", 
+        "device": "SAM9X60"
+    }, 
+    "compiler": {
+        "macros": [], 
+        "includes": [
+            "..\\src", 
+            "..\\src\\config\\lcdc_rgba8888_mxt_9x60_wqvga", 
+            "..\\src\\packs\\SAM9X60_DFP", 
+            "..\\src\\packs\\CMSIS\\CMSIS\\Core\\Include", 
+            "..\\src\\packs\\CMSIS"
+        ]
+    }
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Memory Configuration</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02777.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02777.html" target="topic">Memory Configuration</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02768.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02755.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Memory Configuration Topic Title: Memory Configuration)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Memory Configuration</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+The Memory Locations window is launched from the Graphics Composer’s Asset menu. Selecting Memory Locations this brings up a window with three sub-tabs (in this example, the <a href="00034.html" target="topic">Aria Showcase</a> demonstration is referenced): </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Asset Menu Memory Configuration.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+Window Toolbar</div>
+<p class="Element10">
+The window’s tools icons support:</p>
+<ol class="Element630">
+<li value="1" class="Element600"><strong>Add New Memory Location</strong> – This supports multiple external memory resources.</li>
+<li value="2" class="Element600"><strong>Delete Selected Memory Location</strong> – Removes a previously defined memory location.</li>
+<li value="3" class="Element600"><strong>Rename Selected Memory Location</strong> – Renames a previously defined memory location.</li>
+<li value="4" class="Element600"><strong>Configure External Media Application Callback</strong> – This allow definition of media callbacks, which must be provided in the project.</li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG External Media Application Callback dialog.png" border="0" alt="" title=""></p>
+<ol class="Element630">
+<li value="5" class="Element600"><strong>Show Values as Percent</strong> – Memory utilization on the bar graph can be in bytes or as a percent of the total internal flash memory assigned to support asset storage. (That memory allocation is set using the Configuration sub-tab.)</li>
+</ol><p class="Element10">
+The APIs for the external media callback functions are as follows: </p><div class="Element13"><div class="Element12"><pre class="Element12">GFX_Result app_externalMediaOpen(GFXU_AssetHeader* asset);
+GFX_Result app_externalMediaRead(GFXU_ExternalAssetReader* reader,
+                                 GFXU_AssetHeader* asset,
+                                 <strong><span style="color: #000080">void</span></strong>* address,
+                                 uint32_t readSize,
+                                 uint8_t* destBuffer,
+                                 GFXU_MediaReadRequestCallback_FnPtr cb);
+<strong><span style="color: #000080">void</span></strong> app_externalMediaClose(GFXU_AssetHeader* asset);</pre></div></div>
+<p class="Element10">
+The graphics demonstration project, <span class="Element145">aria_external_resources</span>, provides an example of how to write these callbacks. This demonstration supports three types of external memory: SQI External Memory, USB Binary, and USB with File System. Examples of these callbacks are found in the project’s <span class="Element146">app.c</span> file. The Aria demonstration projects <span class="Element145">Aria External Resources</span> and <a href="00012.html" target="topic">Aria Flash</a> provide more details on how to use external memory to store graphics assets.</p><div class="Element15">
+Sub-tabs</div>
+<p class="Element10">
+There are three sub-tabs to this window.&nbsp;</p>
+<p class="Element10">
+<strong>Summary Sub-tab</strong>&nbsp;</p>
+<p class="Element10">
+This sub-tab summarizes program flash allocations for images, strings, and fonts. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Summary Subtab.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The memory allocation shown for “Font Glyphs” measure the space that holds all the font glyphs used by the application, either by static strings or by glyph ranges defined in support of dynamic strings. Strings are defined by arrays of pointers to glyphs, so string memory usage measures the size of these arrays, not the actual font glyphs used. (“Glyph” is defined here.) </p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""> <strong>Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+The word “glyph” comes from the Greek for “carving”, as seen in the word hieroglyph – Greek for “sacred writing”. In modern usage, a glyph is an elemental or atomic symbol representing a readable character for purposes of communicating through writing.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+<strong>Configuration Sub-tab</strong>&nbsp;</p>
+<p class="Element10">
+This sub-tab specifies the intended allocation of internal (program) flash memory to graphics assets (Total Size). (The default value is 1024 bytes.) It also names the graphics assets file name (here it will be <span class="Element146">gfx_assets.c</span>). The allocation of flash is only used to scale the Total/Used/Available bar graph at the top of the display. Under sizing or oversizing this amount does not affect how the application is built. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Configuration Subtab.png" border="0" alt="" title=""></p><p class="Element10">
+If the device has 1024 Kbytes (1048576 bytes) of flash, the user can assign 40% to asset storage and 60% to code. In that case the “Total Size” in the above sub-tab would be set to 419430 (= 40% of 1048576).&nbsp;</p>
+<p class="Element10">
+The Calculator button can assist in allocating internal flash. Click on it and then set the device flash capacity. Then the user can apply an adjustment to that value to assign that memory to asset storage.&nbsp;</p>
+<p class="Element10">
+<strong>Example:</strong>&nbsp;</p>
+<p class="Element10">
+If the device has 2 Mbytes of internal Flash, click <strong>2MB</strong>. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Configure Memory Location Capacity 2MB.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+Then, to assign 75% of the 2 Mbytes to asset storage, click <strong>-25%</strong> to reduce the 2 MB by 25%, leaving 75%, and then click <strong>OK</strong> to finish. This will then assign 1,536,000 bytes to asset storage. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Configure Memory Location Capacity -25 percent.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Internal (program) Flash is shared between the application’s code and asset storage. If the application code and graphics assets (fonts, strings, images) won’t fit into the available flash memory then the linker will be unable to build the application and an error will be generated in MPLAB X IDE.&nbsp;</p>
+<p class="Element10">
+The <strong>Output File Name</strong> must be compatible with the operating system hosting MPLAB X IDE. In most cases the default name (<span class="Element146">gfx_asset.c</span>) will suffice, but this is provided for additional flexibility in building the application.&nbsp;</p>
+<p class="Element10">
+<strong>Optimization Sub-tab</strong>&nbsp;</p>
+<p class="Element10">
+The Optimization sub-tab for the Aria Quickstart demonstration is shown in the following figure. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Optimization Subtab.png" border="0" alt="" title=""></p><p class="Element10">
+The <strong>Size</strong> column shows the bytes allocated for storage in internal flash for the images, fonts, and binaries of the application.&nbsp;</p>
+<p class="Element10">
+The <strong>References</strong> column shows the number of known references for these assets by the application’s widgets. A references count of zero suggests that the asset is not used by the application, but it could also mean that the asset is only used in real-time when it is dynamically assigned to a widget by the application. Clicking the title of a column (Name, Size, or References) sorts the lists of graphics assets by that column. Clicking the same column again reverses the sort order.&nbsp;</p>
+<p class="Element10">
+The window’s tools icons support:</p>
+<ol class="Element630">
+<li value="1" class="Element600"><strong>Edit Selected Asset</strong> – This brings up the edit dialog for the image, font, or binary chosen</li>
+<li value="2" class="Element600"><strong>Delete Selected Assets</strong> – Removes the selected assets</li>
+<li value="3" class="Element600"><strong>Move Selected Assets</strong> – Move assets from one location to another. This is useful for moving assets to/from internal memory from/to external memory.</li>
+<li value="4" class="Element600"><strong>Show Only Images</strong> – Show image assets toggle on/off</li>
+<li value="5" class="Element600"><strong>Show Only Fonts</strong> – Show font assets toggle on/off</li>
+<li value="6" class="Element600"><strong>Show Only Binaries</strong> – Show binary assets toggle on/off</li>
+</ol></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02777.html" target="topic">Memory Configuration</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02768.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02755.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Memory Configuration Topic Title: Memory Configuration)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

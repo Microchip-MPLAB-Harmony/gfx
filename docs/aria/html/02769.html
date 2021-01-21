@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Microchip Aria Designer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02769.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02794.html" target="topic">Previous</a> | <a href="02794.html" target="topic">Up</a> | <a href="02784.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Graphics Composer Window User Interface Topic Title: Microchip Aria Designer)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Microchip Aria Designer</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+MHGC for Aria is launched from the MPLAB Harmony Configurator (MHC) Tools menu. Launching the Graphics Composer creates a new screen. Shown below is the MHGC screen for the Aria Showcase demonstration. (If you don’t see this screen layout, reset the screen by selecting <i>Window &gt; Reset Dock Areas</i> from the window’s menus.) </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG MHC Window Overview.png" border="0" alt="" title=""></p><div class="Element15">
+Panels</div>
+<p class="Element10">
+By default, there are five active panels and one minimize panel on this screen:</p>
+<ul class="Element630">
+<li class="Element600"><a href="02784.html" target="topic">Screen Designer</a> – Shows the screen design for the selected screen. Tabs on the bottom of the Screen Designer panel show the available screens.</li>
+<li class="Element600"><a href="02790.html" target="topic">Tree View</a> – Shows the layer and widget hierarchy for the current screen.</li>
+<li class="Element600"><a href="02785.html" target="topic">Screens</a> – Manages screens in the application.</li>
+<li class="Element600"><a href="02783.html" target="topic">Schemes</a> – Manages coloring schemes in the application.</li>
+<li class="Element600"><a href="02793.html" target="topic">Widget Tool Box</a> – Available graphics widgets are shown on this panel. Widgets are added to the screen by selecting an icon and dragging or clicking. Widget properties are discussed in the Widget Properties section below.</li>
+<li class="Element600">Properties Editor – All properties for the currently selected object are shown in this panel.</li>
+<li class="Element600">The MHGC Output console is parked at the bottom of the Screen Designer window. This console panel can be used to debug problems when the Graphics Composer boots up or during its operation.</li>
+</ul><p class="Element10">
+Each of the panels has a window tool icon at the upper right corner. Minimizing a panel parks it on the screen just like the Output Console. Undocking the panel creates a new, free floating window. Re-docking returns a previously undocked window to its original location on the Screen Designer window. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG  Panel Docking.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+When a panel is undocked, its edges become active and support moving or manipulating the panel as an independent window. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Panel Undocking.png" border="0" alt="" title=""></p><div class="Element15">
+Tool Bar</div>
+<p class="Element10">
+There are 18 tool bar icons on the Screen Designer Window, as described in the following figure. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Screen Designer Window Icons.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+<strong>Create New Design</strong> brings up a New Project Wizard dialog that allows you to select anew the screen size, color mode, memory size, and project type. This will erase the currently displayed design.&nbsp;</p>
+<p class="Element10">
+<strong>Save Design</strong> saves the current graphics design.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""> <strong>Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+The target configuration's <span class="Element146">configuration.xml</span> will not be updated to reflect these changes in the graphics design until one of the following events happens:&nbsp;</p>
+<ol class="Element630">
+<li value="1" class="Element600">The application is regenerated in MHC,</li>
+<li value="2" class="Element600">The target configurations are changed in the MPLAB X IDE,</li>
+<li value="3" class="Element600">MPLAB X IDE is exited.</li>
+</ol><p class="Element68">
+In items 2 and 3 you will be prompted to save the new configuration.&nbsp;</div></td></tr></table></div></div>
+
+<ul class="Element630">
+<li class="Element600"><strong>Undo</strong> and <strong>Redo</strong> manipulate changes in the screen design into internal MHC memory.</li>
+<li class="Element600"><strong>Cut/Copy/Paste</strong> support the manipulation of graphics objects (widgets).</li>
+<li class="Element600"><strong>Canvas Size Dialog</strong> brings up a dialog window allowing changes in the pixel width and height of the Screen Designer panel. (Note: Dimensions smaller than the display’s dimensions are ignored).</li>
+<li class="Element600"><strong>Center View</strong> centers the panel’s view of the screen.</li>
+<li class="Element600"><strong>Zoom In and Zoom Out</strong> allow you to change the scale of the Screen Designer’s display of the current window. Currently this only supports coarse zooming (powers of two zooms in and out).</li>
+<li class="Element600"><strong>Toggle Line Snapping</strong> enables/disables line snapping when moving objects (widgets).</li>
+<li class="Element600"><strong>Show Grid</strong> turns the Screen Designer pixel grid on/off.</li>
+<li class="Element600"><strong>X and Y Grid Size</strong> adjust the pixel grid.</li>
+<li class="Element600"><strong>Grid Color</strong> selects the pixel grid color.</li>
+<li class="Element600"><strong>Toggle Object Clipping</strong> turns object clipping on/off.</li>
+<li class="Element600"><strong>Toggle Screen Info</strong> turns the display of screen information (X and Y axes) on/off.</li>
+<li class="Element600"><strong>Select Text Preview Language</strong> changes the language used on all text strings shown, when the application supports more than one language.</li>
+</ul></div>
+</div>
+<a name="546F70696373"></a><div class="Element14">
+Topics</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element212">
+<div class="TableDiv">
+<table cellspacing="0" class="Table1">
+<tr>
+<td class="Element200" valign="top" width="35%">
+<div class="Element201">
+Name&nbsp;</div></td><td class="Element204" valign="top" width="65%">
+<div class="Element205">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02784.html" target="topic">Screen Designer Window</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+Most of the work of the MPLAB Harmony Graphics Composer is done using the Screen Designer. This section covers the basics of how a graphical user interface is designed using the screen designer.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02778.html" target="topic">Menus</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This section provides information on the menus for the MPLAB Harmony Graphics Composer screen.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02780.html" target="topic">New Project Wizard</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The New Project Wizard is launched from the Welcome dialog of the MPLAB Harmony Graphics Composer (MHGC), which supports the creation of a new graphics design, or the importing of an existing graphics design.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02790.html" target="topic">Tree View Panel</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The organization of application widgets and layers, including draw order, is managed using this panel.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02785.html" target="topic">Screens Panel</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+Application screens are managed using the Screens Panel.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02783.html" target="topic">Schemes Panel</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+Application color schemes are managed using the Schemes Panel.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02781.html" target="topic">Options</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+Provides information on the defeatured Options window.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02793.html" target="topic">Widget Tool Box Panel</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The Widget Tool Box panel is the interface by which users add widgets into the screen representation.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02782.html" target="topic">Properties Editor Panel</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The properties for all layers and widgets are managed using this panel.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02768.html" target="topic">Graphics Composer Asset Management</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The Asset menu supports managing all graphical assets (memory, images, languages, fonts, strings, and binary data).&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02779.html" target="topic">MHGC Tools</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+The Tools menu supports managing all graphics events, using a global palette, and estimating heap memory usage.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02792.html" target="topic">Widget Colors</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+Provides information on widget coloring.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="02775.html" target="topic">Importing and Exporting Graphics Data</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This topic provides information on importing and exporting graphics composer-related data.&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02794.html" target="topic">Previous</a> | <a href="02794.html" target="topic">Up</a> | <a href="02784.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Graphics Composer Window User Interface Topic Title: Microchip Aria Designer)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

@@ -1,0 +1,738 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Using a Third-Party Display Module</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02791.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02791.html" target="topic">Using a Third-Party Display Module</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02787.html" target="topic">Previous</a> | <a href="02750.html" target="topic">Up</a> | <a href="02770.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Using Third-Party Display Module Topic Title: Using a Third-Party Display Module)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Using a Third-Party Display Module</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+ &nbsp;</p>
+<p class="Element10">
+This tutorial aims to demonstrate how to run MPLAB Harmony Graphics Suite with a third-party capacitive touch display module. For this tutorial, we will use a Mikroe TFT Proto 5” Capacitive display module that is connected to a PIC3MZ EF Starter Kit. The display module has an 800x480 resolution display with an SSD1963 display controller, and a FT5306 capacitive touch controller.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+This tutorial requires knowledge of how to create an MPLAB Harmony project and using MPLAB Harmony Graphics Composer to design a screen. These processes won’t be covered in this tutorial.&nbsp;</p>
+<p class="Element10">
+1. Create an<strong> MPLAB Harmony Project</strong> for the PIC32MZ2048EFM144. Make sure to include the <strong>gfx</strong> package when creating the project.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+2. In the <strong>MPLAB Harmony Configurator</strong>, add and connect the components as shown in the Project Graph below.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_pg.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+3. Next, set the configuration options in the following components in the Project Graph</p>
+<ul class="Element630">
+<li class="Element600"> EBI Peripheral Library</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_ebi_config.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600"> Parallel (EBI) Display Interface</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_pary_i2c..png" border="0" alt="" title=""></p>
+<ul class="Element630">
+<li class="Element600"> TMR2 Peripheral Library</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_timer_config.png" border="0" alt="" title=""></p>
+<ul class="Element630">
+<li class="Element600"> I2C_BB, I2C Bit Bang</li>
+</ul><p class="Element10" style="text-align: center;">
+<img src="at_third_pary_i2c..png" border="0" alt="" title=""></p>
+<ul class="Element630">
+<li class="Element600"> Aria Graphics library</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_aria_config.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+4. In the MHC Project Graph, select and configure the External Controller component to generate a driver for the SSD1963 display controller on the display module.&nbsp;</p>
+<p class="Element10">
+The External Controller component can generate a driver for class of controllers that have the following properties:&nbsp;</p>
+<p class="Element10">
+• Supports SPI 4-line or Parallel (16- or 8-bit) 8080 interface&nbsp;</p>
+<p class="Element10">
+• Supports command + data writes for controller setup and frame data&nbsp;</p>
+<p class="Element10">
+• Supports frame data write using Column/Row addressing&nbsp;</p>
+<p class="Element10">
+• Supports 16-bit RGB565 color mode&nbsp;</p>
+<p class="Element10">
+Examples of controllers that are supported are the ILI9488, SSD1963, ST7796S and SSD1351.&nbsp;</p>
+<p class="Element10">
+To start configuring the driver generator for SSD1963,&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<ul class="Element630">
+<li class="Element600"> Set the Display <strong>Interface Type to Parallel 8080</strong></li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_interface_type.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600"> Under Reset Settings, set the Post Reset Delay(ms) to 30. This adds a 30ms delay after the reset signal is asserted, before the MCU starts communicating with the display controller.</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_post_reset.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600">The Initialization Settings lets you specify the commands and parameters that will be sent to configure the display controller.</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+To configure the SSD1963 display controller to drive the display at the right timing and resolution, 12 sets of commands and parameters are needed. Set the <strong>Number of Init Commands</strong> to <strong>12</strong>, and fill out the options for the commands and parameters as shown below. A Comment option is set to describe what the <strong>command</strong> does.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_init.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_init2.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600">Next, the <strong>Pixel Transfer Function</strong> options must be set. <strong>The Pixel Transfer Function</strong> sends the command and parameter set to write or read pixel data on the display controller.</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The <strong>Pixel Data Settings</strong> configures the driver based on the format of the pixel data. The Pixel Data Transfer Size is set based on the width of the pixel data frame thru the display interface. In the case of this tutorial, we are using a<strong> 16-bit</strong> wide parallel interface.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_pixel_trans.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The position of the pixel is set using the Set Column/X and Set Page/Y commands and the parameters of these commands are the X and Y addresses. The values for these commands for the SSD1963 are set with the size of the address parameter as 2-bytes.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_param.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The value of the commands for writing and reading pixel data in the SSD1963 display controller memory are set.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Note: For controllers that require a pixel transfer function/protocol that cannot be generated by the driver generator, the driver generator can be configured to generate stub or empty pixel transfer functions. In this case, the user will need to complete the function definition in the generated driver file. Set the Pixel Transfer Functions Generate Mode to Stub for this case.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_pixel_transfer.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+5. In the MHC Project Graph, select and configure the Generic Touch Controller component to generate a driver for the FT5306 capacitive touch controller on the display module&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The Generic Touch Controller can generate a driver for a class of touch controllers with the following properties:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+• Uses I2C interface for configuration and reading touch data&nbsp;</p>
+<p class="Element10">
+• Asserts a GPIO signal to the host MCU for valid touch data&nbsp;</p>
+<p class="Element10">
+• Uses command + data writes for controller setup&nbsp;</p>
+<p class="Element10">
+• Bytes/Frame containing touch event type and position values have fixed offsets in the touch data&nbsp;</p>
+<p class="Element10">
+Examples of controllers that are supported are the FT5306 and FT5426.&nbsp;</p>
+<p class="Element10">
+To configure the driver generator for FT5306,&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+a. Set the touch resolution.&nbsp;</p>
+<p class="Element10">
+b. Set the I2C interface settings. The FT5306 I2C slave address is set to 0x38.&nbsp;</p>
+<p class="Element10">
+c. The default Reset Settings are used. </p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_generic_touch.png" border="0" alt="" title=""></p><p class="Element10">
+d. Next, the initialization command(s) are set. In the case of the FT5306, the device only needs to be set to Working Mode by writing 0x0, 0x0 over the I2C bus. </p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_init_commands.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+e. Next, the Touch Event Settings are set.&nbsp;</p>
+<p class="Element10">
+The FT5306 pulls to low (0) the INT signal when a valid touch event is detected. The <strong>Valid Interrupt Value</strong> is set to <strong>0</strong> so the driver will start reading the touch data when the INT signal is low. </p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_event_interrup.png" border="0" alt="" title=""></p><p class="Element10">
+We will use the Register Map of the FT5306 as reference for configuring how to read and interpret the touch data.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+<img src="at_third_party_regs_map.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The Register Map indicates that the touch event and touch position is contained in the first 7 bytes of data that is read from address 0. So the driver is configured to read 7 bytes (<strong>Size of touch data to read</strong>) starting at address 0x0 (<strong>Read Register Address</strong>).&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_event_interrup.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+f. Next, the Touch Event must be extracted and interpreted from the Touch Data.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Based on the Register Map, the Touch Event type is in Address/Byte 3, bits 7 &amp; 6. To extract the value of the Touch Event, Byte 3 (<strong>Event Byte Index</strong>) must be masked with 0xc0 (<strong>Event Mask</strong>) and shifted 6 (<strong>Event Shift</strong>) bits to the right.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The value of the touch event is to be interpreted as follows:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_xh.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Given this information, the Touch Event options are configured as follows: </p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_data_settings.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+g. Next, the Touch Position needs to be extracted from the Touch Data. Based on the FT5306 register map, the X and Y positions are 2-bytes long.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The upper byte of the X position is in byte 3, and lower byte in byte 4. Bytes 5 and 6 contains the upper and lower bytes of the Y position.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_om_regs_map.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+With this, the X and Y Position options are set as follows:&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_masks.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Note: For controllers with touch data format that cannot be supported by the touch driver generator, the driver generator can be configured to generate stub or empty touch data processing function. In this case, the user will need to complete the definition of the drv_touch_process_data() function in the generated driver file, drv_touch_controller.c.&nbsp;</p>
+<p class="Element10">
+Set the <strong>Generate Touch Data Function</strong> option to Stub for this case.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_event_settings.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+6. Next, the pins used to interface with the display module need to be configured in MHC Pin Settings.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The table below lists the PIC32MZ EF that are used to drive the LCD and Touch signals to the display module.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="23%">
+<div class="Element66">
+Signal&nbsp;</div></td><td class="Element65" valign="top" width="9%">
+<div class="Element66">
+MCU Pin #&nbsp;</div></td><td class="Element65" valign="top" width="11%">
+<div class="Element66">
+MCU Pin ID&nbsp;</div></td><td class="Element65" valign="top" width="32%">
+<div class="Element66">
+Name&nbsp;</div></td><td class="Element65" valign="top" width="17%">
+<div class="Element66">
+Function&nbsp;</div></td><td class="Element65" valign="top" width="4%">
+<div class="Element66">
+Direction&nbsp;</div></td><td class="Element65" valign="top" width="4%">
+<div class="Element66">
+Latch&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D5&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+3&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE5&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID5&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID5&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D6&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+4&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE6&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID6&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID6&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-WR#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+6&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE7&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID7&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID7&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-WR#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+12&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RC3&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+GFX_DISP_INTF_PIN_WR&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+Out&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-RD#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+13&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RC4&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+GFX_DISP_INTF_PIN_RD&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-RST#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+22&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RA0&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+GFX_DISP_INTF_PIN_RESET&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+Out&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-CS#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+87&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RA4&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+GFX_DISP_INTF_PIN_CS&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+Out&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+CTP-SCL&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+95&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RA14&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+I2C_BB_SCL&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+In&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+CTP-SDA&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+96&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RA15&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+I2C_BB_SDA&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+In&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+CTP-RST#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+97&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD9&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+DRV_TOUCH_PIN_RESET&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+Out&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+CTP-INT#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+104&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD0&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+DRV_TOUCH_PIN_INT&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+In&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D/C#&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+109&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD1&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+GFX_DISP_INTF_PIN_RDSC&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+GPIO&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+Out&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+High&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D14&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+110&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD2&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID14&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID14&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D15&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+111&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD3&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID15&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID15&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D12&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+112&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD12&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID12&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID12&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D13&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+113&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RD13&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID13&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID13&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D11&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+124&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RF0&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID11&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID11&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D10&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+125&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RF1&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID10&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID10&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D9&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+127&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RG1&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID9&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID9&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D8&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+128&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RG0&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID8&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID8&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D0&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+135&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE0&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID0&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID0&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D1&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+138&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE1&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID1&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID1&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D2&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+142&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE2&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID2&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID2&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D3&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+143&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE3&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID3&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID3&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="23%">
+<div class="Element68">
+TFT-D4&nbsp;</div></td><td class="Element67" valign="top" width="9%">
+<div class="Element68">
+144&nbsp;</div></td><td class="Element67" valign="top" width="11%">
+<div class="Element68">
+RE4&nbsp;</div></td><td class="Element67" valign="top" width="32%">
+<div class="Element68">
+EBID4&nbsp;</div></td><td class="Element67" valign="top" width="17%">
+<div class="Element68">
+EBID4&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td><td class="Element67" valign="top" width="4%">
+<div class="Element68">
+&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+These pins are set to the corresponding Name, Function, Direction and Latch values in the MHC Pin Settings.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_pins1.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_pins2.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="at_third_party_pins3.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+7. Next in <strong>MHC</strong>, launch <strong>Tools -&gt; Graphics Composer</strong> to design the screen. Here’s the sample design that adds image, label, button and touch test widgets to the screen.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_composer.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+8. When done composing the screen, go back to <strong>MHC</strong> and <strong>generate</strong> the project code. <strong>Compile and Run</strong> the code on the target to see the screen on the display. The widgets on the screen should respond to touch events when touched.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="at_third_party_touch_final.png" border="0" alt="" title="">&nbsp;</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02791.html" target="topic">Using a Third-Party Display Module</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02787.html" target="topic">Previous</a> | <a href="02750.html" target="topic">Up</a> | <a href="02770.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Using Third-Party Display Module Topic Title: Using a Third-Party Display Module)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Font Assets</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02749.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02749.html" target="topic">Font Assets</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02774.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02789.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC Font Assets Topic Title: Font Assets)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Font Assets</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+The Font Assets window is launched from the Graphics Composer’s Asset menu. </p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""><strong> Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+There are three dimensions to text support: Languages, Fonts, and Strings. Language “ID” strings are identified when an application supports more than one language. (In the case of single language support, the language default is provided.) Fonts are imported and organized using the Font Assets window. Strings are defined by a string name, and this name is used by widgets to reference the string. For each string and each language supported the glyphs are defined to spell out the string’s text and the font is chosen for that text.</p>
+<ul class="Element630">
+<li class="Element600">Languages are managed within the <a href="02789.html" target="topic">String Table Configuration</a> window</li>
+<li class="Element600">Fonts are managed within the Font Assets window (this topic)</li>
+<li class="Element600">Strings are managed within the <a href="02788.html" target="topic">String Assets</a> window</li>
+</ul><p class="Element68">
+&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+The following figure shows the Font Assets window from the <span class="Element145">Aria Coffee Maker</span> demonstration. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Font Assets Window.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The Size (bytes): for a Font asset shows how much memory is needed to store all the glyphs used by the application from this font. For static strings MHGC determines which glyphs are used by the application’s pre-defined strings and builds these glyphs into the application. For dynamic strings (i.e. strings created during run time) ranges of glyphs are selected by the designer and these ranges are also included in the application by MHGC. The memory needed to store all these glyphs is shown by Size (bytes): .</p><div class="Element15">
+Window Toolbar</div>
+<p class="Element10">
+There are five icons on the toolbar below the Images tab:</p>
+<ol class="Element630">
+<li value="1" class="Element600"><strong>Add Font From File</strong> – Adds a font asset from a file.</li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Import Font File.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ol class="Element630">
+<li value="2" class="Element600"><strong>Add Installed Font</strong> – Add a font installed on your computer.</li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Select System Font.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ol class="Element630">
+<li value="3" class="Element600"><strong>Replace Existing Font Data with New Source Font</strong> – Both Add Font From File and Add Installed Font create a new font asset. This icon allows the user to update an existing font asset, importing from a file or using a font installed on the user's computer.</li>
+<li value="4" class="Element600"><strong>Rename Selected Font</strong> – Renames an existing font asset. In the example above, the Arial font was installed twice, first as a 16 point font and second as a 12 point font. If added to the fonts assets in this order, the 12 point font will have the name Arial_1. This font asset was renamed to Arial_Small using this tool.</li>
+<li value="5" class="Element600"><strong>Delete Selected Fonts</strong> – Removes selected font assets from the application.</li>
+</ol><div class="Element15">
+Sub-tabs</div>
+<p class="Element10">
+There are three sub-tabs to this window.&nbsp;</p>
+<p class="Element10">
+<strong>Style Sub-tab</strong> &nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Style Subtab.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The Size (bytes): shown represents the memory needed to store all the font’s glyphs. The application only stores the glyphs that are used by static (build-time) strings and by predefined glyph ranges to support dynamic (run-time) strings.&nbsp;</p>
+<p class="Element10">
+The choices for Memory Location must be defined before the font can be assigned. Go to the Memory Configuration window to add a new location before using it in this sub-tab.&nbsp;</p>
+<p class="Element10">
+Each font asset consists of a font, size, and some combination of the { Bold, Italic, Anti-Aliasing } options, including selecting none of these options. If bold is needed for one set of strings and italic for another, then the user will need two font assets, one with Bold checked and a second with Italic checked. The same applies for font sizes. Each font size requires its own font asset. Thus if the user needs two sizes of Arial, with plain, bold, and italic for each size, there will have to be 6 separate assets (6 = 2 Sizes x 3 ).&nbsp;</p>
+<p class="Element10">
+Glyphs are normally (Anti-Aliasing off) stored as a pixel bit array, with each pixel represented by only one bit. Turning on Anti-Aliasing replaces each pixel bit with an 8-bit gray scale, thereby increasing font storage by a factor of 8!&nbsp;</p>
+<p class="Element10">
+What if a font is chosen that does not support the character types of the text used for a particular language in the application? How can the user test and debug this? There a basically two ways:</p>
+<ul class="Element630">
+<li class="Element600">Use an external font viewer to examine if the needed glyphs exist</li>
+<li class="Element600">Configure, build, and run the application and verify the strings are correctly rendered</li>
+</ul><p class="Element10">
+If the glyphs are not available they will be rendered as rectangles ( <img src="MHGC UG Unrendered Font Notification.png" border="0" alt="" title=""> ).</p><div class="Element15">
+Strings Sub-tab</div>
+<p class="Element10" style="text-align: center;">
+<img src="MHGC UG Strings Subtab.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+The Bound check box accomplishes the same thing as assigning a font to a text string in the Strings Assets window (Window:Strings menu). Assigning a string to a font means that the font will generate glyphs for that string. This is just another way to accomplish the binding of the string text to font.&nbsp;</p>
+<p class="Element10">
+This sub-tab is also useful in a complicated graphics design to see how many strings use a particular font. Lightly-used or unused fonts can be eliminated to free up internal Flash memory.</p><div class="Element15">
+Glyphs Sub-tab</div>
+<div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""><strong> Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+The word “glyph” comes from the Greek for “carving”, as seen in the word hieroglyph – Greek for “sacred writing”. In modern usage a glyph is an elemental or atomic symbol representing a readable character for purposes of communicating via writing.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+The Glyph sub-tab is only used when your application supports dynamic strings. For static (build-time) strings MHGC automatically determines which font glyphs are used based on the characters present in all the strings used by the application’s graphics widgets. Only these glyphs are included as part of the application’s font assets. With dynamic (i.e. run-time) strings this is not possible. This sub-tab allows you to specify which range of glyphs will be used by run-time strings. Once glyph ranges are defined, these glyphs are added to the font glyphs used by static strings.&nbsp;</p>
+<p class="Element10">
+The Create New Custom Import Range icon ( <img src="MHGC UG Create New Custom Import Range icon.png" border="0" alt="" title=""> ) allows the user to input a new glyph range for the font. Selecting this icon opens the Font Assets window. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Font Assets Window II.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><div class="Element15">
+NOTE:</div>
+<p class="Element10">
+Installing fonts already installed in your OS may produce over-aliased glyphs. It is better to using the installation source files rather than the installed files. This is especially true of fonts using non-Roman alphabets, such as Chinese, Japanese, or Korean. Here is an example: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Good vs Over Aliased Font.png" border="0" alt="" title=""></p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02749.html" target="topic">Font Assets</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02774.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02789.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC Font Assets Topic Title: Font Assets)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

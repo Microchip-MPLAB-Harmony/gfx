@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laListWheelWidget Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '01855.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01855.html" target="topic">laListWheelWidget Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="01851.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01858.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laListWheelWidget Topic Title: laListWheelWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laListWheelWidget Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Structure: laListWheelWidget_t&nbsp;</p>
+<p class="Element10">
+A list wheel widget is a widget that is similar to a normal list widget but can be dragged up or down to cycle through a single active value. This widget is also capable of momentum and motion over time.</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">typedef</span></strong> <strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laListWheelWidget_t</span></strong> {
+  <a href="02525.html" target="topic">laWidget</a> <strong><span style="color: #000000">widget</span></strong>;
+  <a href="00750.html" target="topic">laArray</a> <strong><span style="color: #000000">items</span></strong>;
+  int32_t <strong><span style="color: #000000">selectedItem</span></strong>;
+  int32_t <strong><span style="color: #000000">visibleItems</span></strong>;
+  int32_t <strong><span style="color: #000000">topItem</span></strong>;
+  <a href="01319.html" target="topic">laHAlignment</a> <strong><span style="color: #000000">halign</span></strong>;
+  <a href="02252.html" target="topic">laRelativePosition</a> <strong><span style="color: #000000">iconPos</span></strong>;
+  uint32_t <strong><span style="color: #000000">iconMargin</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">showIndicators</span></strong>;
+  uint32_t <strong><span style="color: #000000">indicatorArea</span></strong>;
+  uint32_t <strong><span style="color: #000000">shaded</span></strong>;
+  int32_t <strong><span style="color: #000000">cycleDistance</span></strong>;
+  int32_t <strong><span style="color: #000000">cycleDelta</span></strong>;
+  int32_t <strong><span style="color: #000000">firstTouchY</span></strong>;
+  int32_t <strong><span style="color: #000000">touchY</span></strong>;
+  int32_t <strong><span style="color: #000000">lastTouchY</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">stillTouching</span></strong>;
+  int32_t <strong><span style="color: #000000">minFlickDelta</span></strong>;
+  int32_t <strong><span style="color: #000000">momentum</span></strong>;
+  int32_t <strong><span style="color: #000000">maxMomentum</span></strong>;
+  int32_t <strong><span style="color: #000000">momentumFalloff</span></strong>;
+  int32_t <strong><span style="color: #000000">rotation</span></strong>;
+  int32_t <strong><span style="color: #000000">rotationCounter</span></strong>;
+  int32_t <strong><span style="color: #000000">rotationTick</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">snapPending</span></strong>;
+  <a href="01846.html" target="topic">laListWheelIndicatorFill</a> <strong><span style="color: #000000">indicatorFill</span></strong>;
+  <a href="01939.html" target="topic">laListWheelZoomEffects</a> <strong><span style="color: #000000">zoomEffects</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">autoHideWheel</span></strong>;
+  <a href="00857.html" target="topic">laBool</a> <strong><span style="color: #000000">hideWheel</span></strong>;
+  <strong><span style="color: #000080">struct</span></strong> {
+    int32_t <strong><span style="color: #000000">y</span></strong>;
+    int32_t <strong><span style="color: #000000">per</span></strong>;
+    uint32_t <strong><span style="color: #000000">nextItem</span></strong>;
+  } paintState;
+  <a href="01880.html" target="topic">laListWheelWidget_SelectedItemChangedEvent</a> <strong><span style="color: #000000">cb</span></strong>;
+  <a href="00861.html" target="topic">laBorderType</a> <strong><span style="color: #000000">borderTypeCache</span></strong>;
+  <a href="00766.html" target="topic">laBackgroundType</a> <strong><span style="color: #000000">backgroundTypeCache</span></strong>;
+  <a href="00611.html" target="topic">GFXU_ExternalAssetReader</a>* <strong><span style="color: #000000">reader</span></strong>;
+} laListWheelWidget;</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget widget;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+widget base class&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laArray items;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+list of items for the wheel&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t selectedItem;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+currently selected item&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t visibleItems;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+number of visible items in the wheel must be odd and &gt;= 3&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t topItem;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the current top item&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laHAlignment halign;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the horizontal alignment of the items&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laRelativePosition iconPos;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the icon position of the items&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t iconMargin;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the icon margin of the items&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool showIndicators;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+controls the visibility of the horizontal indicator bars in the center of the widget&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t indicatorArea;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+controls the distance between the indicator bars&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t shaded;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+determins if the background of the widget uses gradient shading to show depth&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t cycleDistance;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+determins the amount of drag distance needed to cycle between items&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t cycleDelta;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+tracks the current amount of drag distance&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t firstTouchY;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+these track drag movement over time&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t minFlickDelta;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+amount of distance that must be dragged in a single frame to trigger momentum mode&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t momentum;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+current momentum value&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t maxMomentum;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+maximum momentum value&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t momentumFalloff;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+momentum falloff rate&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t rotation;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+determines actual rotation of the wheel&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t rotationCounter;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+time-based limiter for rotation calculations&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+int32_t rotationTick;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+rotation time accumulator&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laListWheelIndicatorFill indicatorFill;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the indicator's fill type&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laListWheelZoomEffects zoomEffects;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+zoomEffects&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool autoHideWheel;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+auto hides the wheel&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBool hideWheel;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+flag to hide/show the wheel&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laListWheelWidget_SelectedItemChangedEvent cb;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+item changed callback&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBorderType borderTypeCache;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+Copy of border type, used to restore borders on auto-hide&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laBackgroundType backgroundTypeCache;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+Copy of background type, used to restore borders on auto-hide&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_ExternalAssetReader* reader;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+asset reader&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a> &gt; <a href="00558.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01855.html" target="topic">laListWheelWidget Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="01851.html" target="topic">Previous</a> | <a href="00558.html" target="topic">Up</a> | <a href="01858.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laListWheelWidget Topic Title: laListWheelWidget Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

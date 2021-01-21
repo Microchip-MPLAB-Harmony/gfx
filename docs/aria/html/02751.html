@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>aria_coffeemaker Demonstration Example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02751.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02776.html" target="topic">Improved Touch Performance with Phantom Buttons</a> &gt; <a href="02751.html" target="topic">aria_coffeemaker Demonstration Example</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02776.html" target="topic">Previous</a> | <a href="02776.html" target="topic">Up</a> | <a href="02786.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG aria_coffeemaker Demonstration Example Topic Title: aria_coffeemaker Demonstration Example)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+aria_coffeemaker Demonstration Example</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Small buttons are hard to activate on the screen. The use of phantom (invisible) buttons can improve touch performance without increasing the size of the visible footprint of the button on the display.&nbsp;</p>
+<p class="Element10">
+The aria_coffee_maker has a sliding tray on each side of the display. Sliding a tray in, or out, is accomplished by a phantom (invisible) button. Looking at the left tray, we see the three parts of this phantom button.</p>
+<ol class="Element630">
+<li value="1" class="Element600"><i>LeftTrayLid</i>: An invisible button widget, whose outline is shown in blue. This area is the touch field.</li>
+<li value="2" class="Element600"><i>ImageWidget5</i>: An image widget containing a hand icon, providing a visual clue as to how to manipulate the tray.</li>
+<li value="3" class="Element600"><i>The Release Image and Pressed Image</i>: These are defined as part of the button widget properties. The Pressed Image has a darker coloring than the Released Image. This difference is what shows the user that the button has been pressed.</li>
+</ol><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Lefttraylid.png" border="0" alt="" title=""></p><p class="Element10">
+The drawing hierarchy for this part of the design is shows that ImageWidget5 is a daughter widget to the LeftTrayLid button widget. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Lefttray widget.png" border="0" alt="" title=""></p><p class="Element10">
+Examining the properties of the LeftTrayLid button widget reveals more about how this works. The following figure demonstrates these three properties.&nbsp;</p>
+<p class="Element10">
+1. The <i>Border</i> is defined as <i>None</i>.&nbsp;</p>
+<p class="Element10">
+2. <i>Background Type</i> is defined as <i>None</i>.&nbsp;</p>
+<p class="Element10">
+3. The different images used will show when the button is <i>Pressed</i> or <i>Released</i>.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Left tray lid properties editor.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+By setting the border and background to <i>None</i>, the button is invisible. Only by providing different images for <i>Released</i> versus <i>Pressed</i> does the user know when the button has been pressed.&nbsp;</p>
+<p class="Element10">
+The actual touch region defined by the button is much larger than the images shown on the display. This extra area increases the touch response of the display.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02750.html" target="topic">Advanced Topics</a> &gt; <a href="02776.html" target="topic">Improved Touch Performance with Phantom Buttons</a> &gt; <a href="02751.html" target="topic">aria_coffeemaker Demonstration Example</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02776.html" target="topic">Previous</a> | <a href="02776.html" target="topic">Up</a> | <a href="02786.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG aria_coffeemaker Demonstration Example Topic Title: aria_coffeemaker Demonstration Example)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

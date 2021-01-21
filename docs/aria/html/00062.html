@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>aria_fl_mzef_sk_meb2_tm4301b.X</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '00062.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00012.html" target="topic">aria_flash</a> &gt; <a href="00062.html" target="topic">aria_fl_mzef_sk_meb2_tm4301b.X</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="00059.html" target="topic">Previous</a> | <a href="00012.html" target="topic">Up</a> | <a href="00008.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_fl_mzef_sk_meb2_tm4301b.X Topic Title: aria_fl_mzef_sk_meb2_tm4301b.X)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+aria_fl_mzef_sk_meb2_tm4301b.X</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<div class="Element15">
+Defining the Architecture</div>
+<p class="Element10" style="text-align: center;">
+<img src="mzef_cu_tm3201b.png" border="0" alt="" title=""></p><p class="Element10">
+The aria_flash application uses the USB file systems in MPLAB Harmony and the USB driver to scan the MSD for a .hex file with resources and reads them sector by sector and programs the external non-volatile SQI memory. The Graphics Library is used to render graphics to the display. Using the DMA, the Low-Cost Controllerless (LCC) Display Driver continuously transfers frame data from the frame buffer out to the LCD display.&nbsp;</p>
+<p class="Element10">
+The application also features user touch input through the integrated touch screen on the display panel. Touch input from the touch controller goes through the I2C port, and the Input System Service acquires the touch input information from the Touch and I2C drivers. The Input System Service sends touch events to the Graphics Library, which processes these events and updates the frame data accordingly.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+This configuration runs on the PIC32MZ EF Starter Kit with RGB565 GFX Interface board and WQVGA display. Two frame buffers are stored in the internal SRAM in a double buffer configuration, and the Low-Cost Controllerless (LCC) display driver is used to manage the DMA that transfers the frame buffer contents to the display via the EBI peripheral.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Since two 16-bit RGB565 frame buffers cannot fit into the internal device SRAM, this configuration uses two 8-bit buffers to support double-buffering. The 8-bit buffers contain the indices of 16-bit colors in a palette lookup table (CLUT). The graphics library renders the widgets by writing the index of a pixel color into the buffer. During a display line refresh, the LCC driver performs a palette lookup to convert the 8-bit indices to their 16-bit color equivalent for each line and then writes the line data to the display via DMA. Using 8-bit palettized buffers allows for double-buffering and eliminates tearing during rendering. On the other hand, the lookup table conversion requires extra processing time and reduces performance.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+User touch input on the display panel is received thru the PCAP capacitive touch controller, which sends a notification to the Touch Input Driver. The Touch Input Driver reads the touch information over I2C and sends the touch event to the Graphics Library thru the Input System Service.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The USB peripheral is setup in MSD Host mode with the File System service support. It scans for a file named SQI.hex when a USB MSD device is connected.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The SD Card reader on the MEB-II is connected to the MZ EF via the SPI peripheral with the File System service support. It scans for a file named SQI.hex when an SD card MSD device is connected. </p><p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><div class="Element15">
+Demonstration Features</div>
+<p class="Element10">
+• Aria Graphics Library&nbsp;</p>
+<p class="Element10">
+• Input system service and touch driver&nbsp;</p>
+<p class="Element10">
+• Time system service, timer-counter peripheral library and driver&nbsp;</p>
+<p class="Element10">
+• Low-Cost Controllerless driver with global palette support&nbsp;</p>
+<p class="Element10">
+• 16-bit RGB565 color depth (8-bit palettized double buffering)&nbsp;</p>
+<p class="Element10">
+• EBI peripheral library and driver&nbsp;</p>
+<p class="Element10">
+• I2C peripheral library and driver&nbsp;</p>
+<p class="Element10">
+• SST26 SQI driver&nbsp;</p>
+<p class="Element10">
+• USB MSD driver (Host Mode)&nbsp;</p>
+<p class="Element10">
+• SD Card driver (supported via SPI)&nbsp;</p>
+<p class="Element10">
+• File System&nbsp;</p>
+<p class="Element10">
+• Images and Fonts for user interface stored in internal flash&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element15">
+Creating the Project Graph</div>
+<p class="Element10" style="text-align: center;">
+<img src="glcd_rgba8888_mxt_mzda_intddr_sk_ariaflash.png" border="0" alt="" title=""></p><p class="Element10">
+The Project Graph diagram below shows the Harmony components that are included in this application. Lines between components are drawn to satisfy components that depend on a capability that another component provides. </p><p class="Element10" style="text-align: right;">
+&nbsp;</p>
+<p class="Element10">
+Adding the “PIC32MZ EF Starter Kit BSP” and “Aria Graphics w/ PDA TM4301B Display” Graphics Template component into the project graph will automatically add the components needed for a graphics project and resolve their dependencies. It will also configure the pins needed to drive the display and the touch controller.&nbsp;</p>
+<p class="Element10">
+For the GFX Core component enable double buffering. (Global Palette Mode is enabled and grayed out since it is inherited from the Aria Graphics Library component.)&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_e70_xu_tm4301b_cfg_gfxcore.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+Additional components to support USB, SQI and SD Card needs to be added and connected manually.&nbsp;</p>
+<p class="Element10">
+Some of these components are fine with default settings, while other require some changes. The following is a list of all the components that required custom settings.&nbsp;</p>
+<p class="Element10">
+SD Card (SPI) component&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzda_intddr_sk_meb2_tm4301b_cfg_sdcard.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+SPI2 component </p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzda_intddr_sk_meb2_tm4301b_cfg_spi.png" border="0" alt="" title=""></p><p class="Element10">
+SST26 </p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzda_intddr_sk_meb2_tm4301b_cfg_sst26.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+The SD Card (SPI) driver needs access to a chip select pin. Make sure pin RB14 is set to GPIO (Latch High, Pull Up) </p><p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+The USB MSD driver in Host mode will require VBUS_AH detection. In the Pin Configuration window, make sure pin RB5 is setup for VBUS_AH&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+For SQI access, make sure all 7 pins for SQI1 is mapped.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+To support the SD card reader with the SPI2 peripheral pins SCK2 and SDO2 needs to be mapped.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element15">
+Building the Application</div>
+<p class="Element10">
+In MPLABX, open the project in gfx_apps\apps\aria_flash\firmware&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table2">
+<tr>
+<td class="Element65" valign="top" width="20%">
+<div class="Element66">
+Project Configuration Name&nbsp;</div></td><td class="Element65" valign="top" width="8%">
+<div class="Element66">
+BSP Used&nbsp;</div></td><td class="Element65" valign="top" width="37%">
+<div class="Element66">
+GraAria Graphics w/ PDA TM4301b Displayphics Template Used&nbsp;</div></td><td class="Element65" valign="top" width="35%">
+<div class="Element66">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element67" valign="top" width="20%">
+<div class="Element68">
+aria_th_mzef_sk_tm4301b.X&nbsp;</div></td><td class="Element67" valign="top" width="8%">
+<div class="Element68">
+PIC32MZ EF SK&nbsp;</div></td><td class="Element67" valign="top" width="37%">
+<div class="Element68">
+Aria Graphics w/ PDA TM4301b Display&nbsp;</div></td><td class="Element67" valign="top" width="35%">
+<div class="Element68">
+PIC32MZ EF Multimedia Expansion Board II with 4.3” WQVGA PCAP Touch display&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Important Star.png" border="0" alt="" title=""><br><strong>Important!</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+This application may contain custom code that is marked by the comments // CUSTOM CODE ... and // END OF CUSTOM CODE. When using the MPLAB Harmony Configurator to regenerate the application code, use the &quot;Prompt Merge For All Differences&quot; merging strategy and <i>do not</i> remove or replace the custom code.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<div class="Element15">
+Configuring the Hardware</div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+This section describes how to configure the supported hardware.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+On the MEB II, the EBIWE and LCD_PCLK (J9) must be jumpered to use the internal SRAM for graphics frame buffer. The J9 jumper is located on the bottom of the MEB II board, beneath where the starter kit is plugged into the board. Refer to the following figure for the exact location.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Connect the PIC32MZ EF Starter Kit to the MEB II board&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><div class="Element15">
+Running the Demonstration</div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+When power-on is successful, without a USB or SD Card MSD device attached to the ‘Target USB’ port the demonstration will display a screen with the message “No valid storage mediums found. Please insert a USB device or SD Card”: </p><p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzda_intddr_sk_meb2_tm4301b_running1.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+Connect a USB MSD device or SD card at the slots indicated in the picture. </p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzef_sk_meb2_tm4301b_running1.png" border="0" alt="" title=""></p><p class="Element10">
+If a valid USB MSD device is connected, the display will show a USB button. LED1 (red on the starter kit) will light up. LED D3 on the MEB-II will also light up.&nbsp;</p>
+<p class="Element10">
+If a valid SD Card device is connected, the display will show a SD Card button. LED2 (yellow on the starter kit) will light up. LED D5 on the MEB-II will also light up.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_mzda_intddr_sk_meb2_tm4301b_running2.png" border="0" alt="" title="">&nbsp;</p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Make sure the USB MSD device has FAT32 file system format and a valid external resources file named precisely ‘SQI.hex’ is copied inside.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Press and release the USB button on-screen. The application will initiate the data transfer on release of the button. Depending on the size of SQI.hex file (greater than 500 kilobytes), the application may freeze with no visual feedback, upwards of 30 seconds. It will then display a progress bar to indicate the transfer. The transfer completes when the progress bar is filled. The application will then display a button with ‘OK’.&nbsp;</p>
+<p class="Element10">
+&nbsp;</p><p class="Element10" style="text-align: center;">
+<img src="aria_fl_rta3.png" border="0" alt="" title="">&nbsp;</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00728.html" target="topic">Examples and Demonstrations</a> &gt; <a href="00727.html" target="topic">Aria Applications</a> &gt; <a href="00012.html" target="topic">aria_flash</a> &gt; <a href="00062.html" target="topic">aria_fl_mzef_sk_meb2_tm4301b.X</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="00059.html" target="topic">Previous</a> | <a href="00012.html" target="topic">Up</a> | <a href="00008.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: aria_fl_mzef_sk_meb2_tm4301b.X Topic Title: aria_fl_mzef_sk_meb2_tm4301b.X)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

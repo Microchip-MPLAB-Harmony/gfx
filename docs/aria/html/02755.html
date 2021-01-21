@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>DDR Organizer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '02755.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02755.html" target="topic">DDR Organizer</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="02777.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02774.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG DDR_Organizer Topic Title: DDR Organizer)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+DDR Organizer</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+The DDR Organizer tool supports managing buffers, raw images, and other memory resources in the DDR memory of DA devices and only DDR-enabled DA devices.&nbsp;</p>
+<p class="Element10">
+A Graphics Hardware Accelerator (Graphics Processor) must be installed in the MHC's Project Graph. For the GFX Core component, do a right mouse click on the Graphics Processor component and then select among the available Graphics Processors. Select the &quot;Nano2D&quot; processor from the Satisfiers list: </p><p class="Element10">
+Next, click on the Aria Graphics Library component and in its Configuration Panel enable display acceleration: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Aria Graphics Library Component.png" border="0" alt="" title=""> <img src="MHGC UG EnableDisplayAccel.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The DDR Organizer tool is launched from the Assets Management pull-down menu: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG DDR organization pull down menu.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The following window will appear if the tool has not been used before for the active project target configuration: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG DRR organization target configuration.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Select the memory profile that corresponds to the target DDR-enabled DA device: </p><p class="Element10" style="text-align: center;">
+<img src="NHGC UG DDR organization ddr enabled da device.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Then select the<strong> Load</strong> Button to load that memory configuration into the tool.&nbsp;</p>
+<p class="Element10">
+When Preprocessing is enabled for an image under the Image Assets tool: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG DDR organization preprocessing options.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+An entry for the image appears in the DDR Organizer window: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG DDR organization DDR organizer window.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+When the memory profile is loaded, the tool automatically reserves DDR memory for the GLCD Frame Buffers sufficient for three double-buffered layers, allocating 32 bits (4 bytes) for RGBA_8888 format for each pixel. This provides 384,000 pixels (800x480) per frame buffer.&nbsp;</p>
+<p class="Element10">
+The tool icons support adding non-image memory allocations to the DDR memory map. To add or remove the memory allocation belonging to an image, the Preprocessing enabled property for that image is enabled/disabled using the Image Asset tool.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="02794.html" target="topic">Designer</a> &gt; <a href="02769.html" target="topic">Microchip Aria Designer</a> &gt; <a href="02768.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="02755.html" target="topic">DDR Organizer</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="02777.html" target="topic">Previous</a> | <a href="02768.html" target="topic">Up</a> | <a href="02774.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG DDR_Organizer Topic Title: DDR Organizer)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

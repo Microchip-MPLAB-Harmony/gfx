@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_lcdc_le" id="D417C1AA-65F8-4BE3-AE34-666ADA97DBF2" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

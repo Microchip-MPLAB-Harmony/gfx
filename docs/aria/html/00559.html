@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Aria Graphics Library</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '00559.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="00567.html" target="topic">Previous</a> | <a href="00567.html" target="topic">Up</a> | <a href="00558.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: GFXLIB Graphics Aria User Interface Library Topic Title: Aria Graphics Library)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Aria Graphics Library</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+ &nbsp;</p>
+<p class="Element10">
+The aria graphics library is responsible for presenting a visual means of interaction between a user and an application. The library provides the building blocks to construct a complex user interface and is responsible for managing the interface once created. It is also responsible for responding to external input from users other sources and reacting appropriately. The goals of this library are to be:</p>
+<ul class="Element630">
+<li class="Element600">Able to provide a simple but powerful user experience</li>
+<li class="Element600">Customizable to the needs of the application</li>
+<li class="Element600">Light and flexible with regards to resource consumption</li>
+<li class="Element600">Easily extensible to meet future design needs</li>
+</ul><div class="Element15">
+Definitions</div>
+<p class="Element10">
+<strong>Alignment</strong> – Indicates the placement of objects within a given bounding area&nbsp;</p>
+<p class="Element10">
+<strong>Bounding Rectangle</strong> – The rectangle that an object occupies in a given space&nbsp;</p>
+<p class="Element10">
+<strong>Context</strong> – A discrete instance of the user interface library&nbsp;</p>
+<p class="Element10">
+<strong>Event</strong> – An indication of some kind of occurrence that may require attention&nbsp;</p>
+<p class="Element10">
+<strong>Layer</strong> – Directly related to the layers offered by the Hardware Abstraction Layer. Aria layers also function as direct children to a screen. Widgets are added to layers and become part of the overall widget tree.&nbsp;</p>
+<p class="Element10">
+<strong>Margin</strong> – A buffer area at the edge of a bounding rectangle&nbsp;</p>
+<p class="Element10">
+<strong>Occlusion</strong> – The state of being completely obstructed by another entity.&nbsp;</p>
+<p class="Element10">
+<strong>Rasterize</strong> – The process of translating a user interface model from a logical mathematical representation into a visual image.&nbsp;</p>
+<p class="Element10">
+<strong>Scheme</strong> – A list of colors that can be referenced for drawing purposes&nbsp;</p>
+<p class="Element10">
+<strong>Screen</strong> – The root node of a widget tree. Represents a discrete configuration of layers and widgets. Can have a unique life cycle for custom memory management.&nbsp;</p>
+<p class="Element10">
+<strong>String</strong> – A logical array of linguistic characters&nbsp;</p>
+<p class="Element10">
+<strong>Widget</strong> – An abstract object that is part of a user interface&nbsp;</p>
+<p class="Element10">
+<strong>Widget Tree</strong> – A tree data structure of widgets that, when rendered, generates a user interface image.&nbsp;</p><div class="Element15">
+Overview</div>
+<p class="Element10">
+The aria graphics library is responsible for:</p>
+<ul class="Element630">
+<li class="Element600">HAL Configuration</li>
+<li class="Element600">Widget Tree Management</li>
+<li class="Element600">Event Management</li>
+<li class="Element600">Input Handling</li>
+<li class="Element600">Scene Rendering</li>
+</ul><p class="Element10">
+<strong>HAL Configuration</strong>&nbsp;</p>
+<p class="Element10">
+The Aria User Interface library is context-based similar to other portions of the graphics stack. For ease of use, the library is responsible for creating and managing a HAL context internally. This releases the application from having to interact with the HAL API.&nbsp;</p>
+<p class="Element10">
+The context contains all of the information required to manage the state of the library. It contains the screen state, the event list, the input state, and various other settings.&nbsp;</p>
+<p class="Element10">
+<strong>Widget Tree Management</strong>&nbsp;</p>
+<p class="Element10">
+The widget tree is a tree data structure comprised primarily of widgets. At its root is a screen object. Each of the screen object’s direct children is a layer object. Any descendants of a layer are widgets.&nbsp;</p>
+<p class="Element10">
+<strong>Heterogeneous Space</strong>&nbsp;</p>
+<p class="Element10">
+When dealing with objects in a tree it is helpful to understand objects do not live in the same coordinate space as their ancestors or descendants. Each level of the tree represents a unique area of spatial coordinates with the root coordinate space, or the screen space, being the physical space of the display device. Each space is a two dimensional Cartesian coordinate system in both the positive and negative directions.&nbsp;</p>
+<p class="Element10">
+For example, assume a widget is a child of a layer which is a child of a screen. The screen position is (0,0) in physical space. The layer position is (20,20). Widget 1 is at (20,20) and widget 2 is at (20,20). All of these coordinates aside from the screen are relative. Each widget is (20,20) offset from its parent. However, Widget 2 is not at (20,20) in physical space, it’s actually (60,60). In global space each space builds on its parent, but it’s entirely relative. </p><p class="Element10" style="text-align: center;">
+<img src="Aria graphics screen rendering.png" border="0" alt="" title=""></p><p class="Element10">
+The following is two screen examples showing different visual representations with identical logical (tree) representations. </p><p class="Element10" style="text-align: center;">
+<img src="Aria graphics visual representations.png" border="0" alt="" title=""></p><p class="Element10">
+Using a tree to manage the logical state of a user interface provides numerous benefits.</p>
+<ul class="Element630">
+<li class="Element600"><strong>Position Inheritance</strong> – Child coordinate systems logically inherit from their parents but are not directly affected by them. Thus, if some ancestor changes position in its space, children likewise change overall position but their positions in their relative space do not change. This allows for easy manipulation of large portions of the user interface through very small changes.</li>
+<li class="Element600"><strong>Intelligent Rendering</strong> – The tree structure allows for fast analysis of widget states when determining how and when to render the overall scene. Nodes in the tree track changes in the states of widgets and their descendants. This allows the library to use intelligent methods to cull portions of the user interface to avoid the processing overhead of redrawing widgets that have not changed.</li>
+<li class="Element600"><strong>Effect Propagation</strong> – As with coordinate propagation, effects can also be inherited along tree branches. For instance, if some node in the tree is made invisible, all descendants are also made invisible. If a node is made partially transparent, then that transparency is propagated to all descendant nodes.</li>
+</ul><div class="Element15">
+Screens</div>
+<p class="Element10">
+A screen is defined as the logical root of the user interface scene. Its direct descendants are always one or more layers, as seen in the above diagram. Its size always matches the physical dimensions of the display device used.</p><div class="Element15">
+Life Cycle</div>
+<p class="Element10">
+The life cycle of a screen can be configured to better manage run-time memory usage. The relevant options are:&nbsp;</p>
+<p class="Element10">
+<strong>Persistent</strong> – By default screens will create their widget tree when shown and will free the memory consumed by their widget tree when they are hidden. A screen that is marked as persistent will not free their widget tree when hidden. This allows widgets in a screen to maintain their state when the screen is no longer visible. The downside is that more heap memory is consumed.&nbsp;</p>
+<p class="Element10">
+<strong>Create At Startup</strong> – By default screens are only created when they are shown thus keeping run-time memory usage to a minimum. However, the application may want to access widgets in a screen before it is shown for the first time. This option will cause the screen to allocate all of its memory when the screen is first added to the user interface library context.&nbsp;</p><div class="Element15">
+Orientation</div>
+<p class="Element10">
+Because the Hardware Abstraction Layer supports dynamic orthogonal orientation, screens can take advantage of this feature. Thus, screens have the option to set a magnitude of rotation to some factor of 90 degrees.</p><div class="Element15">
+Layers</div>
+<p class="Element10">
+User interface layers serve several functions. They function as the de-facto root parent for widgets, they directly configure hardware layers in the graphics driver, and they manage per-layer effects.&nbsp;</p>
+<p class="Element10">
+In the simplest case the hardware supports a single layer that is the same dimension as the physical display. More advanced cases may have several layers that can have unique coordinates and dimensions within the physical display space.&nbsp;</p>
+<p class="Element10">
+When a screen becomes active, it iterates over all of its layers and applies the settings of each through the appropriate HAL APIs to set up the display state for that particular screen. Two screens may have different layer counts, layouts, and buffer counts.</p><div class="Element15">
+Schemes</div>
+<p class="Element10">
+Schemes in Aria are simply collections of colors with given names. If a scheme is assigned to a widget then that scheme will be referenced by that widget during rendering. Aria has an internal scheme that all widgets use by default in the event that a scheme is not assigned.&nbsp;</p>
+<p class="Element10">
+Below is a list of scheme colors and a description of how it is often used. There is no restriction on how a widget references a scheme. The color names are merely a recommendation.&nbsp;</p>
+<p class="Element10">
+<strong>Scheme Colors</strong>&nbsp;</p>
+<ul class="Element630">
+<li class="Element600"><strong>Base</strong> – Default area fill</li>
+<li class="Element600"><strong>Highlight</strong> – Light embossing</li>
+<li class="Element600"><strong>Highlight Light</strong> – Very light embossing</li>
+<li class="Element600"><strong>Shadow</strong> – Dark embossing</li>
+<li class="Element600"><strong>Shadow Dark</strong> – Very dark embossing</li>
+<li class="Element600"><strong>Foreground</strong> – A foreground color</li>
+<li class="Element600"><strong>Foreground Inactive</strong> – Foreground color when inactive</li>
+<li class="Element600"><strong>Foreground Disabled</strong> – Foreground color when disabled</li>
+<li class="Element600"><strong>Background</strong> – A background color, usually to differentiate from Base</li>
+<li class="Element600"><strong>Background Inactive</strong> – Background when inactive</li>
+<li class="Element600"><strong>Background Disabled</strong> – Background when disabled</li>
+<li class="Element600"><strong>Text</strong> – Text color</li>
+<li class="Element600"><strong>Text Highlight</strong> – Text color background when highlighted</li>
+<li class="Element600"><strong>Text Highlight Text</strong> – Text color when highlighted</li>
+<li class="Element600"><strong>Text Inactive</strong> – Text color when inactive</li>
+<li class="Element600"><strong>Text Disabled</strong> – Text color when disabled</li>
+</ul><div class="Element15">
+Widgets</div>
+<p class="Element10">
+A widget is an abstract representation of an object in the user interface. In its most basic form it is a rectangle that is capable of drawing a border, a background color, and containing child widgets. More specific implementations extend the basic widget implementation to provide advanced functionality.&nbsp;</p>
+<p class="Element10">
+The Aria library relies on function pointers to take advantage of some object oriented programming concepts like inheritance and polymorphism.&nbsp;</p>
+<p class="Element10">
+Widgets are typically created by calling their specific “new” function. For instance: “<a href="02550.html" target="topic">laWidget_New</a>()” will allocate a new basic widget and return a pointer to it (similar to calling new in C++). Calling this function will automatically initialize the widget by calling the constructor for that widget. Deleting widgets is done through the use of the function “<a href="02527.html" target="topic">laWidget_Delete</a>()”.&nbsp;</p>
+<p class="Element10">
+Widgets can then be added to layers or other widgets as desired.&nbsp;</p>
+<p class="Element10">
+<strong>Edit Widgets</strong>&nbsp;</p>
+<p class="Element10">
+Edit widgets are a special class of widget that inherits from the EditWidget base implementation instead of Widget. These widgets are capable of becoming the active “edit” widget which means that they will receive any edit events raised by a widget capable of issuing edit events, such as a key pad.&nbsp;</p>
+<p class="Element10">
+<strong>Widget Implementations</strong>&nbsp;</p>
+<p class="Element10">
+The following are descriptions of the widgets offered by Aria:</p>
+<ul class="Element630">
+<li class="Element600">Button
+<ul class="Element631">
+<li class="Element601">Standard button type widget.</li>
+<li class="Element601">Can have text and image icon.</li>
+<li class="Element601">Has a toggle mode.</li>
+</ul></li>
+<li class="Element600">Check Box
+<ul class="Element631">
+<li class="Element601">Standard check box widget.</li>
+<li class="Element601">Has built in image for checked and unchecked state.</li>
+<li class="Element601">Can use custom image for checked and unchecked state.</li>
+</ul></li>
+<li class="Element600">Circle
+<ul class="Element631">
+<li class="Element601">Widget that draws a circle</li>
+</ul></li>
+<li class="Element600">Draw Surface
+<ul class="Element631">
+<li class="Element601">Widget that has a callback during its paint loop</li>
+<li class="Element601">Allows application to make raw HAL draw calls during Aria’s paint loop</li>
+</ul></li>
+<li class="Element600">Gradient
+<ul class="Element631">
+<li class="Element601">Widget that draws linearly interpolated gradient for its background</li>
+<li class="Element601">Can use as a parent for other widgets to achieve custom backgrounds</li>
+</ul></li>
+<li class="Element600">Group Box
+<ul class="Element631">
+<li class="Element601">Widget that functions as a decorated container</li>
+<li class="Element601">Offers a line border and a horizontally aligned title</li>
+</ul></li>
+<li class="Element600">Image
+<ul class="Element631">
+<li class="Element601">Widget that draws an image</li>
+<li class="Element601">Image is clipped to the bounds of the widget.</li>
+<li class="Element601">Image can be vertically or horizontally aligned to the bounds of the widget</li>
+</ul></li>
+<li class="Element600">Image Sequence
+<ul class="Element631">
+<li class="Element601">Widget that functions as an automatic image slideshow renderer</li>
+<li class="Element601">Can add a sequence of widgets and a list of time delays</li>
+<li class="Element601">Can automatically cycle through list of images without application input</li>
+</ul></li>
+<li class="Element600">Key Pad
+<ul class="Element631">
+<li class="Element601">A grid of button widgets</li>
+<li class="Element601">Buttons can be configured to send edit events to the library edit API</li>
+</ul></li>
+<li class="Element600">Label
+<ul class="Element631">
+<li class="Element601">Widget that draws a string</li>
+<li class="Element601">Can be aligned vertically and horizontally</li>
+</ul></li>
+<li class="Element600">Line
+<ul class="Element631">
+<li class="Element601">Widget that draws a line between two specified coordinates</li>
+</ul></li>
+<li class="Element600">List
+<ul class="Element631">
+<li class="Element601">A list box of strings</li>
+<li class="Element601">Strings can have icons</li>
+<li class="Element601">Can be configured to have single, sequential, or multi-selection state</li>
+</ul></li>
+<li class="Element600">List Wheel
+<ul class="Element631">
+<li class="Element601">A rotating wheel of strings</li>
+<li class="Element601">Cycles seamlessly through the list</li>
+<li class="Element601">Responds to drag input</li>
+</ul></li>
+<li class="Element600">Panel Widget
+<ul class="Element631">
+<li class="Element601">Panels are containers of other widgets, including daughter panels, in support of a parent-child tree of widgets, with the Panel widget as the parent</li>
+</ul></li>
+<li class="Element600">Progress Bar
+<ul class="Element631">
+<li class="Element601">Widget that fills in a direction based on a given percentage</li>
+</ul></li>
+<li class="Element600">Radio Button
+<ul class="Element631">
+<li class="Element601">A button that can belong to a group of radio buttons</li>
+<li class="Element601">Only one button in group can be selected at any one time</li>
+</ul></li>
+<li class="Element600">Rectangle
+<ul class="Element631">
+<li class="Element601">Widget that draws a rectangle</li>
+</ul></li>
+<li class="Element600">Scroll Bar
+<ul class="Element631">
+<li class="Element601">A scroll bar that has a configurable scroll range.</li>
+<li class="Element601">Normally embedded in other widgets like the list box</li>
+</ul></li>
+<li class="Element600">Slider
+<ul class="Element631">
+<li class="Element601">A widget that slides between a min and max value</li>
+</ul></li>
+<li class="Element600">Text Field
+<ul class="Element631">
+<li class="Element601">A field of text that can be modified by edit event inputs</li>
+</ul></li>
+<li class="Element600">Touch Text
+<ul class="Element631">
+<li class="Element601">A widget that draws lines based on input events</li>
+<li class="Element601">Helps to demonstrate input functionality</li>
+</ul></li>
+<li class="Element600">Window
+<ul class="Element631">
+<li class="Element601">A container that can be decorated with a title bar</li>
+<li class="Element601">Title bar can have title text and an icon</li>
+</ul></li>
+</ul><div class="Element15">
+Event Management</div>
+<p class="Element10">
+The Aria state maintains an internal list of events that must get serviced frequently. This is done by called by “<a href="02495.html" target="topic">laUpdate</a>()”. This is known as the ‘update loop’.</p><div class="Element15">
+Input Handling</div>
+<p class="Element10">
+The user interface library has no knowledge of existing hardware but it must provide the means for the user to interact with the scene. Aria thus provides several generic APIs to allow any source to inject input events into the system. These events are stored in the internal event list and are handled during the next update phase.</p><div class="Element15">
+Scene Rendering</div>
+<p class="Element10">
+The widget tree is a logical representation of the state of the user interface. The library must be capable of transforming this information into a visual representation that can be sent to the graphics display. The actual rendering is handled by the HAL. The individual widgets contain the algorithms necessary to render themselves but Aria is responsible for telling the widgets when to render themselves. This is known as the ‘paint loop’&nbsp;</p>
+<p class="Element10">
+The library is responsible for evaluating the widget tree to detect widgets that indicate invalid visual states and managing the redraw. It is essential that widgets only redraw when necessary to avoid needlessly consuming processing resources. It is also important that the library not attempt to draw too much at once as that may starve the rest of the application.</p><div class="Element15">
+How to Use the Library</div>
+<div class="Element13"><div class="Element12"><pre class="Element12"><i><span style="color: #008000">// initialize the HAL layer</span></i>
+GFX_Initialize();
+
+<i><span style="color: #008000">// initialize the user interface library</span></i>
+laInitialize();
+
+<i><span style="color: #008000">// create a ui context and set active</span></i>
+laContext* uiContext;
+
+iuContext = laContext_Create(0, 0, 0, GFX_COLOR_MODE_RGB_565, NULL);
+laContext_SetActive(uiContext);
+
+<i><span style="color: #008000">// create a screen</span></i>
+laScreen* screen;
+
+screen = laScreen_New(LA_FALSE, LA_FALSE, &amp;screenCreate);
+
+<i><span style="color: #008000">// add screen to context</span></i>
+laContext_AddScreen(screen);
+
+<i><span style="color: #008000">// this would be done inside a function called “screenCreate()”</span></i>
+<i><span style="color: #008000">// create layer</span></i>
+laLayer* layer0 = laLayer_New();
+laWidget_SetPosition((laWidget*)layer0, 0, 0);
+laWidget_SetSize((laWidget*)layer0, 480, 272);
+
+<i><span style="color: #008000">// create a buffer in the layer</span></i>
+laLayer_SetBufferCount(layer0, 1);
+
+<i><span style="color: #008000">// set the layer to the screen</span></i>
+laScreen_SetLayer(screen, 0, layer0);
+
+<i><span style="color: #008000">// create a child widget</span></i>
+laButtonWidget* ButtonWidget1 = laButtonWidget_New();
+laWidget_SetPosition((laWidget*)ButtonWidget1, 411, 201);
+laWidget_SetSize((laWidget*)ButtonWidget1, 60, 60);
+laWidget_SetLocalRedraw((laWidget*)ButtonWidget1, LA_TRUE);
+laWidget_SetDrawBackground((laWidget*)ButtonWidget1, LA_FALSE);
+laWidget_SetBorderType((laWidget*)ButtonWidget1, LA_WIDGET_BORDER_NONE);
+laButtonWidget_SetPressedOffset(ButtonWidget1, 0);
+laButtonWidget_SetReleasedEventCallback(ButtonWidget1, &amp;ButtonWidget1_ReleasedEvent);
+
+<i><span style="color: #008000">// add child to parent (layer 0)</span></i>
+laWidget_AddChild((laWidget*)layer0, (laWidget*)ButtonWidget1);
+
+<i><span style="color: #008000">// do this inside application update loop</span></i>
+<i><span style="color: #008000">// update HAL</span></i>
+GFX_Update()
+
+<i><span style="color: #008000">// set ui context as active</span></i>
+laContext_SetActive(uiContext);
+
+<i><span style="color: #008000">// update context (argument is update time in ms)</span></i>
+laUpdate(0);</pre></div></div>
+</div>
+</div>
+<a name="546F70696373"></a><div class="Element14">
+Topics</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element212">
+<div class="TableDiv">
+<table cellspacing="0" class="Table1">
+<tr>
+<td class="Element200" valign="top" width="35%">
+<div class="Element201">
+Name&nbsp;</div></td><td class="Element204" valign="top" width="65%">
+<div class="Element205">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="00558.html" target="topic">Aria User Interface Library Interface</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This section Aria User Interface Library Interface.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="00561.html" target="topic">Files</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+ &nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="00569.html" target="topic">Aria Graphics Utilities Library</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This topic describes the graphics utilities which provide facilities which enhance the middleware library.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="00540.html" target="topic">Aria Drivers</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This topic provides information about the graphics library drivers available in MPLAB® Harmony Graphics Suite.&nbsp;</div></td></tr><tr>
+<td class="Element202" valign="top" width="35%">
+<div class="Element203">
+<a href="00563.html" target="topic">Aria Hardware Abstraction Layer (HAL)</a>&nbsp;</div></td><td class="Element206" valign="top" width="65%">
+<div class="Element207">
+This topic describes the Hardware Abstraction Layer (HAL) which provides an abstraction layer between the middleware UI elements and graphics drivers.&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00462.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00567.html" target="topic">Graphics Library</a> &gt; <a href="00559.html" target="topic">Aria Graphics Library</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00462.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="00567.html" target="topic">Previous</a> | <a href="00567.html" target="topic">Up</a> | <a href="00558.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: GFXLIB Graphics Aria User Interface Library Topic Title: Aria Graphics Library)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>
