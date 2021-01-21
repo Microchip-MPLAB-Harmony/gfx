@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   Custom ${ControllerName}Display Top-Level Driver Source File
@@ -65,7 +63,7 @@
 #define DISPLAY_WIDTH   ${Val_Width}
 #define DISPLAY_HEIGHT  ${Val_Height}
 
-#define PIXEL_BUFFER_COLOR_MODE LE_COLOR_MODE_RGB_565
+#define PIXEL_BUFFER_COLOR_MODE GFX_COLOR_MODE_RGB_565
 #define SCREEN_WIDTH DISPLAY_WIDTH
 #define SCREEN_HEIGHT DISPLAY_HEIGHT
 </#if>
@@ -189,9 +187,9 @@ int DRV_${ControllerName}_Initialize(void)
     return 0;
 }
 
-static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drv)
+static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr)
 {
-    GFX_Disp_Intf intf = (GFX_Disp_Intf) drv->port_priv;
+    GFX_Disp_Intf intf = (GFX_Disp_Intf) drvPtr->port_priv;
 <#if InitCommandsCount != 0>
     uint8_t cmd;
     uint8_t parms[${MaXNumParms}];
@@ -245,15 +243,20 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drv)
     None.
 
   Returns:
-    * LE_SUCCESS       - Operation successful
-    * LE_FAILURE       - Operation failed
+    * GFX_SUCCESS       - Operation successful
+    * GFX_FAILURE       - Operation failed
 
 */
 void DRV_${ControllerName}_Update(void)
 {
+    uint32_t openVal;
+    
     if(drv.state == INIT)
     {
-        drv.port_priv = (void *) GFX_Disp_Intf_Open();
+        openVal = GFX_Disp_Intf_Open();
+        
+        drv.port_priv = (void *)openVal;
+        
         if (drv.port_priv == 0)
         {
             drv.state = ERROR;
@@ -271,44 +274,10 @@ void DRV_${ControllerName}_Update(void)
 }
 
 <#if PassiveDriver == false>
-leColorMode DRV_${ControllerName}_GetColorMode(void)
-{
-    return PIXEL_BUFFER_COLOR_MODE;
-}
 
-uint32_t DRV_${ControllerName}_GetBufferCount(void)
-{
-    return 1;
-}
-
-uint32_t DRV_${ControllerName}_GetDisplayWidth(void)
-{
-    return SCREEN_WIDTH;
-}
-
-uint32_t DRV_${ControllerName}_GetDisplayHeight(void)
-{
-    return SCREEN_HEIGHT;
-}
-
-uint32_t DRV_${ControllerName}_GetLayerCount()
-{
-    return 1;
-}
-
-uint32_t DRV_${ControllerName}_GetActiveLayer()
-{
-    return 0;
-}
-
-leResult DRV_${ControllerName}_SetActiveLayer(uint32_t idx)
-{
-    return LE_SUCCESS;
-}
-
-leResult DRV_${ControllerName}_BlitBuffer(int32_t x,
-                                int32_t y,
-                                lePixelBuffer* buf)
+gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
+                                           int32_t y,
+                                           gfxPixelBuffer* buf)
 {
 
 <#if BlitBufferFunctionGenerateMode == "Use Bulk Write">
@@ -322,7 +291,7 @@ leResult DRV_${ControllerName}_BlitBuffer(int32_t x,
     GFX_Disp_Intf intf;
     
     if (drv.state != RUN)
-        return LE_FAILURE;
+        return GFX_FAILURE;
     
     intf = (GFX_Disp_Intf) drv.port_priv;
 
@@ -371,11 +340,11 @@ leResult DRV_${ControllerName}_BlitBuffer(int32_t x,
     GFX_Disp_Intf_WriteCommand(intf, 0x${MemoryWriteCommand});
 
 <#if DataWriteSize == "16">
-    ptr = lePixelBufferOffsetGet_Unsafe(buf, 0, 0);
+    ptr = gfxPixelBufferOffsetGet_Unsafe(buf, 0, 0);
     GFX_Disp_Intf_WriteData16(intf, (uint16_t *) ptr, buf->size.width * buf->size.height);
 <#elseif DataWriteSize == "8">
 <#if PixelDataTxSize8Bit == "2 (Little-Endian)">
-    ptr = lePixelBufferOffsetGet_Unsafe(buf, 0, 0);
+    ptr = gfxPixelBufferOffsetGet_Unsafe(buf, 0, 0);
     GFX_Disp_Intf_WriteData(intf,
                             (uint8_t *) ptr,
                             PIXEL_BUFFER_BYTES_PER_PIXEL *
@@ -386,7 +355,7 @@ buf->size.height);
     for(row = 0; row < buf->size.height; row++)
     {
         int col, dataIdx;
-        ptr = lePixelBufferOffsetGet_Unsafe(buf, 0, row);
+        ptr = gfxPixelBufferOffsetGet_Unsafe(buf, 0, row);
 <#if PixelDataTxSize8Bit != "2 (Little-Endian)">
         for(col = 0, dataIdx = 0; col < buf->size.width; col++)
         {
@@ -414,17 +383,84 @@ buf->size.height);
 #error "Blit buffer procedure is not complete. Please complete definition of blit function."
 </#if>
 
-    return LE_SUCCESS;
+    return GFX_SUCCESS;
 }
 
-void DRV_${ControllerName}_Swap(void)
+gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request,
+                                     void* arg)
 {
-    swapCount++;
-}
-
-uint32_t DRV_${ControllerName}_GetSwapCount(void)
-{
-    return swapCount;
+    gfxIOCTLArg_Value* val;
+    gfxIOCTLArg_DisplaySize* disp;
+    gfxIOCTLArg_LayerRect* rect;
+    
+    switch(request)
+    {
+        case GFX_IOCTL_GET_COLOR_MODE:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_colormode = PIXEL_BUFFER_COLOR_MODE;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_BUFFER_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 1;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_DISPLAY_SIZE:
+        {
+            disp = (gfxIOCTLArg_DisplaySize*)arg;            
+            
+            disp->width = DISPLAY_WIDTH;
+            disp->height = DISPLAY_HEIGHT;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_LAYER_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 1;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_ACTIVE_LAYER:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 0;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_LAYER_RECT:
+        {
+            rect = (gfxIOCTLArg_LayerRect*)arg;
+            
+            rect->base.id = 0;
+            rect->x = 0;
+            rect->y = 0;
+            rect->width = DISPLAY_WIDTH;
+            rect->height = DISPLAY_HEIGHT;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_VSYNC_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = swapCount;
+            
+            return GFX_IOCTL_OK;
+        }
+        default:
+        { }
+    }
+    
+    return GFX_IOCTL_UNSUPPORTED;
 }
 </#if>
 

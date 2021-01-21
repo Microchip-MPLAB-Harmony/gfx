@@ -28,54 +28,37 @@
 #include "gfx/legato/common/legato_math.h"
 
 #include <math.h>
+#include <limits.h>
+
+#define ARC_MAX 50000
 
 /* renderer function use only */
 extern leRenderState _rendererState;
-
-typedef enum 
-{
-    ON_LINE,
-    LEFT_OF_LINE,
-    RIGHT_OF_LINE,
-} POINT_LINE_POS;
 
 typedef struct ArcDrawState
 {
     leRect arcArea;
     int32_t x;
     int32_t y;
-    int32_t endAngle;
-    uint32_t iCirRadSqrd;
-    uint32_t oCirRadSqrd;
-    lePoint arcStartPt0;
-    lePoint arcStartPt1;
-    lePoint arcEndPt0;
-    lePoint arcEndPt1;
+    float fiCirRad;
+    float foCirRad;
     lePoint topRectPt;
     lePoint botRectPt;
-    uint32_t absStartAngle;
-    uint32_t absEndAngle;
-    leArcDir dir;
     uint32_t thickness;
     leColor clr;
     uint32_t alpha;
 } ArcDrawState;
 
 leResult leRenderer_CircleDraw(const leRect* rect,
-                               int32_t x,
-                               int32_t y,
-                               uint32_t radius,
                                uint32_t thickness,
                                leColor clr,
                                uint32_t alpha)
 {
     leRenderer_ArcFill(rect,
-                       x,
-                       y,
-                       radius,
                        0,
                        360,
                        thickness,
+                       LE_FALSE,
                        clr,
                        LE_FALSE,
                        alpha);
@@ -84,38 +67,38 @@ leResult leRenderer_CircleDraw(const leRect* rect,
 }
 
 leResult leRenderer_CircleFill(const leRect* rect,
-                               int32_t x,
-                               int32_t y,
-                               uint32_t radius,
                                uint32_t thickness,
                                leColor borderClr,
                                leColor fillClr,
                                uint32_t alpha)
 {
-    leRenderer_ArcFill(rect,
-                       x,
-                       y,
-                       radius,
+    uint32_t radius = rect->width / 2;
+
+
+
+    leRect fillRect;
+    fillRect.x = rect->x + 1 + rect->width / 4;
+    fillRect.y = rect->y + 1 + rect->height / 4;
+    fillRect.width = radius;
+    fillRect.height = radius;
+
+    leRenderer_ArcFill(&fillRect,
                        0,
                        360,
-                       thickness,
-                       borderClr,
+                       radius,
+                       LE_FALSE,
+                       fillClr,
                        LE_FALSE,
                        alpha);
 
-    if(thickness < radius)
-    {
-        leRenderer_ArcFill(rect,
-                           x,
-                           y,
-                           radius - thickness,
-                           0,
-                           360,
-                           radius - thickness,
-                           fillClr,
-                           LE_FALSE,
-                           alpha);
-    }
+    leRenderer_ArcFill(rect,
+                       0,
+                       360,
+                       thickness,
+                       LE_FALSE,
+                       borderClr,
+                       LE_FALSE,
+                       alpha);
 
     return LE_SUCCESS;
 }
@@ -130,6 +113,7 @@ leResult leRenderer_ArcLine(int32_t x,
 {
     int32_t sa = startAngle;
     lePoint p;
+    (void)a; // unused
 
     while (sa != (startAngle + startAngle))
     {
@@ -158,789 +142,500 @@ leResult leRenderer_ArcLine(int32_t x,
     return LE_SUCCESS;
 }
 
-// This function returns the relative horizontal position of a point from a line.
-// Works only if test point and line are in the same half plane (Q1 & Q2, or Q3 & Q4).
-POINT_LINE_POS pointRelPositionFromLine(const lePoint* linePt0,
-                                        const lePoint* linePt1,
-                                        const lePoint* point)
+static void drawQ1(const ArcDrawState* state,
+                   int32_t startAngle,
+                   int32_t endAngle)
 {
-    int sign = (linePt1->x - linePt0->x) * (point->y - linePt0->y) - 
-               (linePt1->y - linePt0->y) * (point->x - linePt0->x);
+    lePoint testPt;
+    lePoint line0, line1;
+    int32_t x, y;
 
-    if (linePt1->y < 0)
-    {
-        sign = -sign;
-    }
-    
-    if (sign > 0)
-    {
-        return LEFT_OF_LINE;
-    }
-    else if (sign < 0)
-    {
-        return RIGHT_OF_LINE;
-    }
+    int32_t width = state->botRectPt.x;
+    int32_t height = state->botRectPt.y;
 
-    return ON_LINE;
-}
+    int32_t centerX = (state->arcArea.x + state->arcArea.width / 2);
+    int32_t centerY = (state->arcArea.y + state->arcArea.height / 2);
 
-/*
-static leColor getArcSoftEdgeColor(uint32_t oRadSqd, 
-                                   uint32_t iRadSqd, 
-                                   uint32_t thicknessSqd,
-                                   uint32_t ptRadSqd,
-                                   leGradient* gradient)
-{
-    leColor color;
+    leBool partial = !(startAngle <= 0 && endAngle >= 90);
 
-    //test with outer radius
-    if ((oRadSqd - ptRadSqd) < 8)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            20,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    else if ((oRadSqd - ptRadSqd) < 32)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            40,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    else if ((oRadSqd - ptRadSqd) < 50)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            60,
-                            LE_GLOBAL_COLOR_MODE);
-    }    
-    else if ((oRadSqd - ptRadSqd) < 72)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            80,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    //Do not test inner edge if full circle
-    else if (thicknessSqd == oRadSqd)
-    {
-        color = gradient->c1;
-    }
-    else if ((ptRadSqd - iRadSqd) < 8)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            20,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    else if ((ptRadSqd - iRadSqd) < 32)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            40,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    else if ((ptRadSqd - iRadSqd) < 50)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            60,
-                            LE_GLOBAL_COLOR_MODE);
-    }    
-    else if ((ptRadSqd - iRadSqd) < 72)
-    {
-        color = leColorLerp(gradient->c0,
-                            gradient->c1,
-                            80,
-                            LE_GLOBAL_COLOR_MODE);
-    }
-    else
-    {
-        color = gradient->c1;
-    }
+    lePoint pt0Sin;
+    lePoint pt1Sin;
 
-    return color;
-}
-*/
-
-static void drawQ1(const ArcDrawState* state)
-{
-    lePoint drawPt;
-    lePoint scanPt;
-    uint32_t ptRadiusSqrd;
-    
-    for (scanPt.y = state->topRectPt.y; scanPt.y >= 0; scanPt.y--)
+    if(partial == LE_TRUE)
     {
-        for (scanPt.x = 0; scanPt.x < state->botRectPt.x; scanPt.x++)
+        if(startAngle == 0)
         {
-            ptRadiusSqrd = (scanPt.x * scanPt.x) + (scanPt.y * scanPt.y);
+            line0.x = 100;
+            line0.y = 0;
+        }
+        else
+        {
+            lePolarToXY(100, startAngle, &line0);
+        }
 
-            //If point is outside outer circle, skip
-            if (ptRadiusSqrd < state->iCirRadSqrd)
+        if(endAngle >= 90)
+        {
+            line1.x = 0;
+            line1.y = 100;
+        }
+        else
+        {
+            lePolarToXY(100, endAngle, &line1);
+        }
+
+        pt0Sin.x = -ARC_MAX;
+        pt0Sin.y = ARC_MAX;
+        pt1Sin.x = ARC_MAX;
+        pt1Sin.y = -ARC_MAX;
+    }
+
+    for(y = 1; y <= height; y++)
+    {
+        testPt.y = y;
+
+        for(x = 1; x <= width; x++)
+        {
+            int32_t mag = (x * x) + (y * y);
+            float rad = leSqrt((float)mag);
+            rad = leRound(rad);
+
+            // if point is outside outer circle, skip
+            if(!(rad >= state->fiCirRad && rad <= state->foCirRad))
                 continue;
 
-            //If point is outside outer circle, done scanning x
-            if (ptRadiusSqrd > state->oCirRadSqrd)
-                break;
+            testPt.x = x;
 
-            if (state->absStartAngle == state->absEndAngle)
+            if(partial == LE_TRUE)
             {
-                //Circle, do not filter, draw all points
-            }
-            else if ((state->absStartAngle <= 90 && state->absStartAngle >= 0) &&
-                     (state->absEndAngle <= 90 && state->absEndAngle >= 0))
-            {
-                //If both start and end angles are in Q1
-                //If CCW, exclude points RIGHT of start line and LEFT of end line
-                if (state->dir == LE_CCW)
-                {
-                    if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != RIGHT_OF_LINE) &&
-                            (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != LEFT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE) &&
-                            (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-                else
-                {
-                    if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != LEFT_OF_LINE) &&
-                            (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != RIGHT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-            }
-            else if (state->absStartAngle <= 90 && state->absStartAngle >= 0)
-            {
-                //If CCW, exclude points RIGHT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-                //If CW, exclude points LEFT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-            }
-                //If end angle is in Q1, test agains Q1
-            else if (state->absEndAngle <= 90 && state->absEndAngle >= 0)
-            {
-                //If CCW, exclude points LEFT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-                //If CW, exclude points RIGHT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
+                if(lePointOnLineSide(&testPt, &line0, &pt0Sin) == LE_FALSE ||
+                   lePointOnLineSide(&testPt, &line1, &pt1Sin) == LE_FALSE)
+                    continue;
             }
 
-            drawPt.x = state->arcArea.x + state->x + scanPt.x;
-            drawPt.y = state->arcArea.y + state->y - scanPt.y;
-
-            if(leRenderer_CullDrawPoint(&drawPt) == LE_FALSE)
-            {
 #if LE_ALPHA_BLENDING_ENABLED == 1
-                leRenderer_BlendPixel(drawPt.x, drawPt.y, state->clr, state->alpha);
+            leRenderer_BlendPixel_Safe(centerX + x - 1, centerY - y, state->clr, state->alpha);
 #else
-                leRenderer_PutPixel(drawPt.x, drawPt.y, state->clr);
+            leRenderer_PutPixel_Safe(centerX + x - 1, centerY - y, state->clr);
 #endif
-            }
         }
     }
 }
 
-static void drawQ2(const ArcDrawState* state)
+static void drawQ2(const ArcDrawState* state,
+                   int32_t startAngle,
+                   int32_t endAngle)
 {
-    lePoint drawPt;
-    lePoint scanPt;
-    uint32_t ptRadiusSqrd;
+    lePoint testPt;
+    lePoint line0, line1;
+    int32_t x, y;
 
-    for (scanPt.y = state->topRectPt.y; scanPt.y >= 0; scanPt.y--)
+    int32_t width = state->botRectPt.x;
+    int32_t height = state->botRectPt.y;
+
+    int32_t centerX = (state->arcArea.x + state->arcArea.width / 2);
+    int32_t centerY = (state->arcArea.y + state->arcArea.height / 2);
+
+    leBool partial = !(startAngle <= 90 && endAngle >= 180);
+
+    lePoint pt0Sin;
+    lePoint pt1Sin;
+
+    if(partial == LE_TRUE)
     {
-        for (scanPt.x = state->topRectPt.x; scanPt.x < 0; scanPt.x++)
+        if(startAngle <= 90)
         {
-            ptRadiusSqrd = (scanPt.x * scanPt.x) + (scanPt.y * scanPt.y);
+            line0.x = 0;
+            line0.y = 100;
+        }
+        else
+        {
+            lePolarToXY(100, startAngle, &line0);
+        }
 
-            //If point is outside outer circle, skip
-            if (ptRadiusSqrd > state->oCirRadSqrd)
+        if(endAngle >= 180)
+        {
+            line1.x = -100;
+            line1.y = 0;
+        }
+        else
+        {
+            lePolarToXY(100, endAngle, &line1);
+        }
+
+        pt0Sin.x = -ARC_MAX;
+        pt0Sin.y = -ARC_MAX;
+        pt1Sin.x = ARC_MAX;
+        pt1Sin.y = ARC_MAX;
+    }
+
+    for(y = 1; y <= height; y++)
+    {
+        testPt.y = y;
+
+        for(x = -width; x < 0; x++)
+        {
+            int32_t mag = (x * x) + (y * y);
+            float rad = leSqrt((float)mag);
+            rad = leRound(rad);
+
+            // if point is outside outer circle, skip
+            if(!(rad >= state->fiCirRad && rad <= state->foCirRad))
                 continue;
 
-            //If point is outside inner circle, done scanning x
-            if (ptRadiusSqrd < state->iCirRadSqrd)
-                break;
+            testPt.x = x;
 
-            if (state->absStartAngle == state->absEndAngle)
+            if(partial == LE_TRUE)
             {
-                //Circle, do not filter, draw all points
-            }
-            else if ((state->absStartAngle <= 180 && state->absStartAngle > 90) &&
-                     (state->absEndAngle <= 180 && state->absEndAngle > 90))
-            {
-                //If both start and end angles are in Q2
-                //If CCW, exclude points RIGHT of start line and LEFT of end line
-                if(state->dir == LE_CCW)
-                {
-                    if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != LEFT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-                    //If CW, exclude points LEFT of start line and RIGHT of end line
-                else
-                {
-                    if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != RIGHT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-            }
-            else if (state->absStartAngle <= 180 && state->absStartAngle > 90)
-            {
-                //If CCW, exclude points RIGHT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-                    //If CW, exclude points LEFT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-            }
-                //If end angle is in Q2, test agains Q2
-            else if (state->absEndAngle <= 180 && state->absEndAngle > 90)
-            {
-                //If CCW, exclude points LEFT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-                    //If CCW, exclude points RIGHT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
+                if(lePointOnLineSide(&testPt, &line0, &pt0Sin) == LE_FALSE ||
+                   lePointOnLineSide(&testPt, &line1, &pt1Sin) == LE_FALSE)
+                    continue;
             }
 
-            //Soften edge colors if anti-aliased
-
-
-            drawPt.x = state->arcArea.x + state->x + scanPt.x;
-            drawPt.y = state->arcArea.y + state->y - scanPt.y;
-
-            if(leRenderer_CullDrawPoint(&drawPt) == LE_FALSE)
-            {
 #if LE_ALPHA_BLENDING_ENABLED == 1
-                leRenderer_BlendPixel(drawPt.x, drawPt.y, state->clr, state->alpha);
+            leRenderer_BlendPixel_Safe(centerX + x, centerY - y, state->clr, state->alpha);
 #else
-                leRenderer_PutPixel(drawPt.x, drawPt.y, state->clr);
+            leRenderer_PutPixel_Safe(centerX + x, centerY - y, state->clr);
 #endif
-            }
         }
     }
 }
 
-static void drawQ3(const ArcDrawState* state)
+static void drawQ3(const ArcDrawState* state,
+                   int32_t startAngle,
+                   int32_t endAngle)
 {
-    lePoint drawPt;
-    lePoint scanPt;
-    uint32_t ptRadiusSqrd;
-    
-    for (scanPt.y = -1; scanPt.y > state->botRectPt.y; scanPt.y--)
-    {
-        for (scanPt.x = state->topRectPt.x; scanPt.x < 0; scanPt.x++)
-        {
-            ptRadiusSqrd = (scanPt.x * scanPt.x) + (scanPt.y * scanPt.y);
+    lePoint testPt;
+    lePoint line0, line1;
+    int32_t x, y;
 
-            //If point is outside outer circle, skip
-            if (ptRadiusSqrd > state->oCirRadSqrd)
+    int32_t width = state->botRectPt.x;
+    int32_t height = state->botRectPt.y;
+
+    int32_t centerX = (state->arcArea.x + state->arcArea.width / 2);
+    int32_t centerY = (state->arcArea.y + state->arcArea.height / 2);
+
+    leBool partial = !(startAngle <= 180 && endAngle >= 270);
+
+    lePoint pt0Sin;
+    lePoint pt1Sin;
+
+    if(partial == LE_TRUE)
+    {
+        if(startAngle <= 180)
+        {
+            line0.x = -100;
+            line0.y = 0;
+        }
+        else
+        {
+            lePolarToXY(100, startAngle, &line0);
+        }
+
+        if(endAngle >= 270)
+        {
+            line1.x = 0;
+            line1.y = -100;
+        }
+        else
+        {
+            lePolarToXY(100, endAngle, &line1);
+        }
+
+        pt0Sin.x = ARC_MAX;
+        pt0Sin.y = -ARC_MAX;
+        pt1Sin.x = -ARC_MAX;
+        pt1Sin.y = ARC_MAX;
+    }
+
+    for(y = 0; y <= height; y++)
+    {
+        testPt.y = -y;
+
+        for(x = -width; x < 0; x++)
+        {
+            int32_t mag = (x * x) + (y * y);
+            float rad = leSqrt((float)mag);
+            rad = leRound(rad);
+
+            // if point is outside outer circle, skip
+            if(!(rad >= state->fiCirRad && rad <= state->foCirRad))
                 continue;
 
-            //If point is outside inner circle, done scanning x
-            if (ptRadiusSqrd < state->iCirRadSqrd)
-                break;
+            testPt.x = x;
 
-            if (state->absStartAngle == state->absEndAngle)
+            if(partial == LE_TRUE)
             {
-                //Circle, do not filter, draw all points
-            }
-            else if ((state->absStartAngle <= 270 && state->absStartAngle > 180) &&
-                (state->absEndAngle <= 270 && state->absEndAngle > 180))
-            {
-                //If CCW, exclude points RIGHT of start line and LEFT of end line
-                if (state->dir == LE_CCW)
-                {
-                    if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != RIGHT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-                else
-                {
-                    if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != LEFT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-            }
-            else if (state->absStartAngle <= 270 && state->absStartAngle > 180)
-            {
-                //If CCW, exclude points LEFT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-                    //If CW, exclude points RIGHT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-            }
-            else if (state->absEndAngle <= 270 && state->absEndAngle > 180)
-            {
-                //If CCW, exclude points RIGHT of end line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-                    //If CW, exclude points LEFT of end line
-                else
-                {
-                    //corner case: if radius is too small, and end angle is close to 180, 
-                    //the end line approximates to a horizontal line. in this case, 
-                    //just draw all points in the quadrant
-                    if (state->arcEndPt0.y == 0 && state->arcEndPt1.y == 0)
-                    {
-                        //draw all points
-                    }
-                    else if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
+                if(lePointOnLineSide(&testPt, &line0, &pt0Sin) == LE_FALSE ||
+                   lePointOnLineSide(&testPt, &line1, &pt1Sin) == LE_FALSE)
+                    continue;
             }
 
-            drawPt.x = state->arcArea.x + state->x + scanPt.x;
-            drawPt.y = state->arcArea.y + state->y - scanPt.y;
-
-            if(leRenderer_CullDrawPoint(&drawPt) == LE_FALSE)
-            {
 #if LE_ALPHA_BLENDING_ENABLED == 1
-                leRenderer_BlendPixel(drawPt.x, drawPt.y, state->clr, state->alpha);
+            leRenderer_BlendPixel_Safe(centerX + x, centerY + y - 1, state->clr, state->alpha);
 #else
-                leRenderer_PutPixel(drawPt.x, drawPt.y, state->clr);
+            leRenderer_PutPixel_Safe(centerX + x, centerY + y - 1, state->clr);
 #endif
-            }
         }
     }
 }
 
-static void drawQ4(const ArcDrawState* state)
+static void drawQ4(const ArcDrawState* state,
+                   int32_t startAngle,
+                   int32_t endAngle)
 {
-    lePoint drawPt;
-    lePoint scanPt;
-    uint32_t ptRadiusSqrd;
-    
-    for (scanPt.y = -1; scanPt.y > state->botRectPt.y; scanPt.y--)
-    {
-        for (scanPt.x = 0; scanPt.x < state->botRectPt.x; scanPt.x++)
-        {
-            ptRadiusSqrd = (scanPt.x * scanPt.x) + (scanPt.y * scanPt.y);
+    lePoint testPt;
+    lePoint line0, line1;
+    int32_t x, y;
 
-            //If point is outside outer circle, skip
-            if (ptRadiusSqrd < state->iCirRadSqrd)
+    int32_t width = state->botRectPt.x;
+    int32_t height = state->botRectPt.y;
+
+    int32_t centerX = (state->arcArea.x + state->arcArea.width / 2);
+    int32_t centerY = (state->arcArea.y + state->arcArea.height / 2);
+
+    leBool partial = !(startAngle <= 270 && endAngle >= 360);
+
+    lePoint pt0Sin;
+    lePoint pt1Sin;
+
+    if(partial == LE_TRUE)
+    {
+        if(startAngle <= 270)
+        {
+            line0.x = 0;
+            line0.y = -100;
+        }
+        else
+        {
+            lePolarToXY(100, startAngle, &line0);
+        }
+
+        if(endAngle >= 360)
+        {
+            line1.x = 100;
+            line1.y = 0;
+        }
+        else
+        {
+            lePolarToXY(100, endAngle, &line1);
+        }
+
+        pt0Sin.x = ARC_MAX;
+        pt0Sin.y = ARC_MAX;
+        pt1Sin.x = -ARC_MAX;
+        pt1Sin.y = -ARC_MAX;
+    }
+
+    for(y = 1; y <= height; y++)
+    {
+        testPt.y = -y;
+
+        for(x = 1; x <= width; x++)
+        {
+            int32_t mag = (x * x) + (y * y);
+            float rad = leSqrt((float)mag);
+            rad = leRound(rad);
+
+            // if point is outside outer circle, skip
+            if(!(rad >= state->fiCirRad && rad <= state->foCirRad))
                 continue;
 
-            //If point is outside outer circle, done scanning x
-            if (ptRadiusSqrd > state->oCirRadSqrd)
-                break;
+            testPt.x = x;
 
-            if (state->absStartAngle == state->absEndAngle)
+            if(partial == LE_TRUE)
             {
-                //Circle or almost a circle, do not filter, draw all points
-            }
-            else if ((state->absStartAngle < 360 && state->absStartAngle > 270) &&
-                (state->absEndAngle < 360 && state->absEndAngle > 270))
-            {
-                //If CCW, exclude points RIGHT of start line and LEFT of end line
-                if (state->dir == LE_CCW)
-                {
-                    if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != RIGHT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-                else
-                {
-                    if (state->absStartAngle > state->absEndAngle)
-                    {
-                        //Include points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) != LEFT_OF_LINE))
-                        {
-                            //Do nothing
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                    else if (state->absStartAngle < state->absEndAngle)
-                    {
-                        //exclude points between the two angles
-                        if ((pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                            && (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE))
-                            continue;
-                    }
-                    else
-                    {
-                        if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) != ON_LINE)
-                            continue;
-                    }
-                }
-            }
-            else if (state->absStartAngle < 360 && state->absStartAngle > 270)
-            {
-                //If CCW, exclude points LEFT of start line
-                if (state->dir == LE_CCW)
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
-                    //If CW, exclude points RIGHT of start line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcStartPt0, &state->arcStartPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-            }
-            else if (state->absEndAngle < 360 && state->absEndAngle > 270)
-            {
-                //If CCW, exclude points RIGHT of end line
-                if (state->dir == LE_CCW)
-                {
-                    //corner case: if radius is too small, and end angle is close to 360, 
-                    //the end line approximates to a horizontal line. in this case, 
-                    //just draw all points in the quadrant
-                    if (state->arcEndPt0.y == 0 && state->arcEndPt1.y == 0)
-                    {
-                        //draw all points
-                    }
-                    else if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == RIGHT_OF_LINE)
-                        continue;
-                }
-                //If CW, exclude points LEFT of end line
-                else
-                {
-                    if (pointRelPositionFromLine(&state->arcEndPt0, &state->arcEndPt1, &scanPt) == LEFT_OF_LINE)
-                        continue;
-                }
+                if(lePointOnLineSide(&testPt, &line0, &pt0Sin) == LE_FALSE ||
+                   lePointOnLineSide(&testPt, &line1, &pt1Sin) == LE_FALSE)
+                    continue;
             }
 
-            drawPt.x = state->arcArea.x + state->x + scanPt.x;
-            drawPt.y = state->arcArea.y + state->y - scanPt.y;
-
-            if(leRenderer_CullDrawPoint(&drawPt) == LE_FALSE)
-            {
 #if LE_ALPHA_BLENDING_ENABLED == 1
-                leRenderer_BlendPixel(drawPt.x, drawPt.y, state->clr, state->alpha);
+            leRenderer_BlendPixel_Safe(centerX + x - 1, centerY + y - 1, state->clr, state->alpha);
 #else
-                leRenderer_PutPixel(drawPt.x, drawPt.y, state->clr);
+            leRenderer_PutPixel_Safe(centerX + x - 1, centerY + y - 1, state->clr);
 #endif
-            }
         }
     }
 }
 
-//This function does a scan fill from +y -> -y, -x -> +x or
-// Q2, Q1, Q3, Q4 in terms of quadrants. Points outside the 
-// arc fill area are discarded.
 leResult leRenderer_ArcFill(const leRect* drawRect,
-                            int32_t x,
-                            int32_t y,
-                            int32_t r,
                             int32_t startAngle,
-                            int32_t centerAngle,
+                            int32_t spanAngle,
                             uint32_t thickness,
+                            leBool rounded,
                             leColor clr,
                             leBool antialias,
                             uint32_t a)
 {
     ArcDrawState state;
+    int32_t r = drawRect->width / 2;
+    (void)antialias; // unused
 
-    /*lePoint topRectPt, botRectPt; //Top and bottom points of arc rectangle
-    lePoint arcStartPt0, arcStartPt1, arcEndPt0, arcEndPt1; //Points of arc edges
-    lePoint drawPt; //Point to draw
-    lePoint scanPt;
-    int32_t endAngle;
-    uint32_t ptRadiusSqrd, oCirRadSqrd, iCirRadSqrd; //Square of radii
-    uint32_t absStartAngle, absEndAngle; //start and end angles in positive angles
-    leArcDir dir;*/
-    //uint32_t thicknessSqd;
-    
-    if(leRenderer_CullDrawRect(drawRect) == LE_TRUE)
+    leRect arcDrawRect = *drawRect;
+    arcDrawRect.x -= thickness / 2;
+    arcDrawRect.y -= thickness / 2;
+    arcDrawRect.width += thickness;
+    arcDrawRect.height += thickness;
+
+    if(leRenderer_CullDrawRect(&arcDrawRect) == LE_TRUE)
         return LE_FAILURE;
 
     state.arcArea = *drawRect;
 
-    thickness = (thickness < (uint32_t)r) ? thickness : (uint32_t)r;
-    
-    //thicknessSqd = thickness * thickness;
-
-    //Don't care about wrapping 
-    if (centerAngle == 0)
+    // don't care about wrapping
+    if (spanAngle == 0 || thickness == 0)
         return LE_SUCCESS;
 
-    startAngle %= 360;
-    centerAngle %= 360;
+    leResolvedAngleRanges ranges;
 
-    //Determine points of arc edges
-    if (startAngle >= 0)
+    leResolveAngles(startAngle, spanAngle, &ranges);
+
+    // determine bounding rectangle points
+    if(thickness <= 1)
     {
-        state.absStartAngle = startAngle;
+        state.topRectPt.x = -(r);
+        state.topRectPt.y = -(r);
+        state.botRectPt.x = (r);
+        state.botRectPt.y = (r);
+
+        state.foCirRad = r;
+        state.fiCirRad = r;
+    }
+    else if(thickness % 2 > 0)
+    {
+        int32_t adjThick = (thickness / 2) + 1;
+
+        state.topRectPt.x = -(r + adjThick);
+        state.topRectPt.y = -(r + adjThick);
+        state.botRectPt.x = (r + adjThick);
+        state.botRectPt.y = (r + adjThick);
+
+        state.foCirRad = r + adjThick - 1;
+        state.fiCirRad = r - (thickness / 2);
     }
     else
     {
-        state.absStartAngle = 360 + startAngle;
-    }
-    
-    lePolarToXY(r, state.absStartAngle, &state.arcStartPt1);
-    lePolarToXY(r - thickness, state.absStartAngle, &state.arcStartPt0);
+        state.topRectPt.x = -(r + thickness / 2);
+        state.topRectPt.y = -(r + thickness / 2);
+        state.botRectPt.x = (r + thickness / 2);
+        state.botRectPt.y = (r + thickness / 2);
 
-    state.endAngle = startAngle + centerAngle;
-    
-    if (state.endAngle >= 0)
-    {
-        state.absEndAngle = state.endAngle;
-    }
-    else
-    {
-        state.absEndAngle = 360 + state.endAngle;
+        state.foCirRad = r + (thickness / 2) - 1;
+        state.fiCirRad = r - (thickness / 2);
     }
 
-    state.absEndAngle %= 360;
-
-    lePolarToXY(r, state.absEndAngle, &state.arcEndPt1);
-    lePolarToXY(r - thickness, state.absEndAngle, &state.arcEndPt0);
-
-    if (centerAngle > 0)
-    {
-        state.dir  = LE_CCW;
-    }
-    else
-    {
-        state.dir = LE_CW;
-    }
-
-    //Determine bounding rectangle points
-    state.topRectPt.x = - ((int32_t)r);
-    state.topRectPt.y = r;
-    state.botRectPt.x = r;
-    state.botRectPt.y = -((int32_t)r);
-
-    state.oCirRadSqrd = r * r;
-    state.iCirRadSqrd = (r - thickness) * (r - thickness);
-
-    state.x = x;
-    state.y = y;
+    state.x = drawRect->x;
+    state.y = drawRect->y;
     state.clr = clr;
     state.alpha = a;
 
-    //Scan thru the points in arc rectangle, per quadrant and filter points that are outside
-    //Only scan if the arc overlaps with the quadrant
-    if (leArcsOverlapQuadrant(state.absStartAngle,
-                              state.absEndAngle,
-                              state.dir,
-                              LE_Q2) == LE_TRUE)
+    if(ranges.angleCount >= 1)
     {
-        drawQ2(&state);
+        if(ranges.angle0.quadrants.q1 == LE_TRUE)
+        {
+            drawQ1(&state,
+                   ranges.angle0.startAngle,
+                   ranges.angle0.endAngle);
+        }
+
+        if(ranges.angle0.quadrants.q2 == LE_TRUE)
+        {
+            drawQ2(&state,
+                   ranges.angle0.startAngle,
+                   ranges.angle0.endAngle);
+        }
+
+        if(ranges.angle0.quadrants.q3 == LE_TRUE)
+        {
+            drawQ3(&state,
+                   ranges.angle0.startAngle,
+                   ranges.angle0.endAngle);
+        }
+
+        if(ranges.angle0.quadrants.q4 == LE_TRUE)
+        {
+            drawQ4(&state,
+                   ranges.angle0.startAngle,
+                   ranges.angle0.endAngle);
+        }
     }
 
-    //Don't scan thru Q1 points if not needed. Optimize?
-    if(leArcsOverlapQuadrant(state.absStartAngle,
-                             state.absEndAngle,
-                             state.dir, 
-                             LE_Q1) == LE_TRUE)
+    if(ranges.angleCount == 2)
     {
-        drawQ1(&state);
+        if(ranges.angle1.quadrants.q1 == LE_TRUE)
+        {
+            drawQ1(&state,
+                   ranges.angle1.startAngle,
+                   ranges.angle1.endAngle);
+        }
+
+        if(ranges.angle1.quadrants.q2 == LE_TRUE)
+        {
+            drawQ2(&state,
+                   ranges.angle1.startAngle,
+                   ranges.angle1.endAngle);
+        }
+
+        if(ranges.angle1.quadrants.q3 == LE_TRUE)
+        {
+            drawQ3(&state,
+                   ranges.angle1.startAngle,
+                   ranges.angle1.endAngle);
+        }
+
+        if(ranges.angle1.quadrants.q4 == LE_TRUE)
+        {
+            drawQ4(&state,
+                   ranges.angle1.startAngle,
+                   ranges.angle1.endAngle);
+        }
     }
 
-    //Don't scan thru Q3 points if not needed. Optimize?
-    if(leArcsOverlapQuadrant(state.absStartAngle,
-                             state.absEndAngle,
-                             state.dir,
-                             LE_Q3) == LE_TRUE)
+    if(rounded == LE_TRUE)
     {
-        drawQ3(&state);
-    }
+        lePoint point;
+        leRect tipRect;
 
-    //Don't scan thru Q4 points if not needed. Optimize?
-    if(leArcsOverlapQuadrant(state.absStartAngle,
-                             state.absEndAngle,
-                             state.dir,
-                             LE_Q4) == LE_TRUE)
-    {
-        drawQ4(&state);
+        lePointOnCircle((drawRect->width / 2) + 1,
+                        startAngle,
+                        &point);
+
+        point.y *= -1;
+
+        tipRect.x = drawRect->x + (drawRect->width / 2) + point.x;
+        tipRect.y = drawRect->y + (drawRect->height / 2) + point.y;
+
+        tipRect.x -= thickness / 4;
+        tipRect.y -= thickness / 4;
+        tipRect.width = thickness / 2;
+        tipRect.height = thickness / 2;
+
+        leRenderer_CircleFill(&tipRect,
+                              thickness / 2,
+                              clr,
+                              clr,
+                              a);
+
+        lePointOnCircle((drawRect->width / 2) + 1,
+                        startAngle + spanAngle,
+                        &point);
+
+        point.y *= -1;
+
+        tipRect.x = drawRect->x + (drawRect->width / 2) + point.x;
+        tipRect.y = drawRect->y + (drawRect->height / 2) + point.y;
+
+        tipRect.x -= thickness / 4;
+        tipRect.y -= thickness / 4;
+        tipRect.width = thickness / 2;
+        tipRect.height = thickness / 2;
+
+        leRenderer_CircleFill(&tipRect,
+                              thickness / 2,
+                              clr,
+                              clr,
+                              a);
     }
 
     return LE_SUCCESS;
 }
-

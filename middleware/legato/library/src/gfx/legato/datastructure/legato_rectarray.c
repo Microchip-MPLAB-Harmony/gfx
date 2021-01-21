@@ -378,7 +378,9 @@ leResult leRectArray_MergeSimilar(leRectArray* arr)
         {
             if(leRectsAreSimilar(&arr->rects[i], &arr->rects[j]) == LE_TRUE)
             {
-                arr->rects[i] = leRectCombine(&arr->rects[i], &arr->rects[j]);
+                leRectCombine(&arr->rects[i],
+                              &arr->rects[j],
+                              &arr->rects[i]);
                 
                 leRectArray_RemoveAt(arr, j);
                 
@@ -412,6 +414,44 @@ leResult leRectArray_RemoveOverlapping(leRectArray* arr)
     return LE_SUCCESS;
 }
 
+#if LE_SCRATCH_BUFFER_PADDING == 1
+leResult leRectArray_PadRectangles(leRectArray* arr)
+{
+    uint32_t rectItr, mod, oldWidth;
+    leRect splitRect;
+
+    for(rectItr = 0; rectItr < arr->size; rectItr++)
+    {
+        mod = arr->rects[rectItr].width % 4;
+
+        if(mod != 0)
+        {
+            oldWidth = arr->rects[rectItr].width;
+            splitRect = arr->rects[rectItr];
+
+            arr->rects[rectItr].width >>= 1;
+
+            mod = arr->rects[rectItr].width % 4;
+
+            arr->rects[rectItr].width += 4 - mod;
+
+            splitRect.width = oldWidth >> 1;
+            splitRect.x += splitRect.width;
+
+            mod = splitRect.width % 4;
+            splitRect.x -= 4 - mod;
+            splitRect.width += 4 - mod;
+
+            splitRect.x = arr->rects[rectItr].x + oldWidth - splitRect.width;
+
+            leRectArray_PushBack(arr, &splitRect);
+        }
+    }
+
+    return LE_SUCCESS;
+}
+#endif
+
 leResult leRectArray_CropToArea(leRectArray* arr,
                                 uint32_t width,
                                 uint32_t height)
@@ -444,7 +484,8 @@ leResult leRectArray_CropToArea(leRectArray* arr,
     return LE_SUCCESS;
 }
 
-leResult leRectArray_CropToSize(leRectArray* arr, uint32_t size)
+leResult leRectArray_CropToSizeY(leRectArray* arr,
+                                 uint32_t size)
 {
     uint32_t rectItr;
     leRect split;
@@ -460,23 +501,46 @@ leResult leRectArray_CropToSize(leRectArray* arr, uint32_t size)
         {
             split = arr->rects[rectItr];
 
-#if LE_RENDER_LEFTRIGHT == 0
             // split favoring height if possible
             if((uint32_t)arr->rects[rectItr].height <= 2)
             {
                 arr->rects[rectItr].width >>= 1;
-                
+
                 split.width -= arr->rects[rectItr].width;
                 split.x += arr->rects[rectItr].width;
             }
             else
             {
                 arr->rects[rectItr].height >>= 1;
-                
+
                 split.height -= arr->rects[rectItr].height;
                 split.y += arr->rects[rectItr].height;
             }
-#else
+
+            leRectArray_PushBack(arr, &split);
+        }
+    }
+    
+    return LE_SUCCESS;
+}
+
+leResult leRectArray_CropToSizeX(leRectArray* arr,
+                                 uint32_t size)
+{
+    uint32_t rectItr;
+    leRect split;
+
+    /* minimal sane magic number size limit */
+    if(size < 4)
+        return LE_FAILURE;
+
+    for(rectItr = 0; rectItr < arr->size; rectItr++)
+    {
+        while((uint32_t)arr->rects[rectItr].width *
+        (uint32_t)arr->rects[rectItr].height > size)
+        {
+            split = arr->rects[rectItr];
+
             // split favoring width if possible
             if((uint32_t)arr->rects[rectItr].width <= 2)
             {
@@ -492,11 +556,10 @@ leResult leRectArray_CropToSize(leRectArray* arr, uint32_t size)
                 split.width -= arr->rects[rectItr].width;
                 split.x += arr->rects[rectItr].width;
             }
-#endif
 
             leRectArray_PushBack(arr, &split);
         }
     }
-    
+
     return LE_SUCCESS;
 }

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -41,262 +39,263 @@
     Legato user interface library.  
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+
+/** \file legato_array.h
+ * @brief An array implementation for storing pointers.
+ *
+ * @details This is an array implementation that is used internally by the Legato user
+ * interface library.
+ */
 
 #ifndef LEGATO_ARRAY_H
 #define LEGATO_ARRAY_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
 // *****************************************************************************
-/* Structure:
-    leArray
-
-  Summary:
-    Array data structure definition
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a array.
+ * @details An array is used to hold values. It has a size and capacity.
+ */
 typedef struct leArray
 {
-    void** values;
-    uint32_t size;
-    uint32_t capacity;
+    void** values;  /**< Number of values. */
+    uint32_t size; /**< Size of array. */
+    uint32_t capacity; /**< Number of values allowed. */
 } leArray;
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Create(leArray* arr)
-
-   Summary:
-    Initializes a new array.
-
-   Parameters:
-    leArray* arr - pointer to the array to initilaize
-
-  Returns:
-    leResult - the result of the operation
-
-  Remarks:        
-*/
+/**
+ * @brief Create a new array.
+ * @details Creates a new array pointed to by <span class="param">arr</span>.
+ * @code
+ * leArray* arr;
+ * leResult res = leArray_Create(arr)
+ * @endcode
+ * @param arr is array to create.
+ * @return LE_SUCCESS if created, otherwise LE_FAILURE.
+ */
 leResult leArray_Create(leArray* arr);
 
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Resize(leArray* arr)
-
-   Summary:
-    Resizes the capacity of the array.  If the array shrinks, any nodes beyond
-    the new capacity will be discarded.
-
-   Parameters:
-    leArray* arr - pointer to the array to resize
-    uint32_t sz - the desired capacity
-
-  Returns:
-    leResult - the result of the operation
-
-  Remarks:
-*/
+/**
+ * @brief Resize array
+ * @details Expands (or shrinks)
+ * <span class="param">arr</span> to the specified
+ * <span class="param">sz</span>.
+ *
+ * If the array shrinks, any nodes beyond the new capacity will be
+ * discarded.
+ * @code
+ * leArray* arr;
+ * uint32_t sz;
+ * leResult res = leArray_Resize(arr, sz)
+ * @endcode
+ * @param arr is the array to resize.
+ * @param sz is the new size.
+ * @return LE_SUCCESS if resized, otherwise LE_FAILURE.
+ */
 leResult leArray_Resize(leArray* arr, uint32_t sz);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_PushFront(leArray* arr, void* val))
-
-   Summary:
-    Pushes a new value onto the front of the array.  Shuffles all other
-    nodes backward one index.
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-    void* val - the value to store
-    
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Push value on front
+ * @details Pushes <span class="param">val</span> onto the
+ * front of <span class="param">arr</span>.
+ * This function shuffles all other values backward one index.
+ * @code
+ * leArray* arr;
+ * void* val;
+ * leResult res = leArray_PushFront(arr, val)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param val is the value to push.
+ * @return LE_SUCCESS if pushed, otherwise LE_FAILURE.
+ */
 leResult leArray_PushFront(leArray* arr, void* val);
 
 // *****************************************************************************
-/* Function:
-    void leArray_PopFront(leArray* arr)
-
-   Summary:
-    Removes the first value from the array.  Shuffles all other nodes forward
-    one index.
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Pop value from front
+ * @details Removes the first value from the front
+ * of <span class="param">arr</span>.
+ * This function shuffles all other values forward one index.
+ * @code
+ * leArray* arr;
+ * leResult res = leArray_PopFront(arr)
+ * @endcode
+ * @param arr is the array to modify.
+ * @return LE_SUCCESS if removed, otherwise LE_FAILURE.
+ */
 leResult leArray_PopFront(leArray* arr);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_PushBack(leArray* arr, void* val)
-
-   Summary:
-    Pushes a new value onto the back of the array
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-    void* val - the value to store
-    
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Push value on back.
+ * @details Pushes <span class="param">val</span> onto the
+ * back of <span class="param">arr</span>.
+ * @code
+ * leArray* arr;
+ * void* val;
+ * leResult res = leArray_PushBack(arr, val)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param val is the value to push.
+ * @return LE_SUCCESS if pushed, otherwise LE_FAILURE.
+ */
 leResult leArray_PushBack(leArray* arr, void* val);
 
 // *****************************************************************************
-/* Function:
-    void leArray_PopBack(leArray* arr)
-
-   Summary:
-    Removes the last value from the array
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-*/
+/**
+ * @brief Pop value from back
+ * @details Removes the last value from the back
+ * of <span class="param">arr</span>.
+ * @code
+ * leArray* arr;
+ * leResult res = leArray_PopBack(arr)
+ * @endcode
+ * @param arr is the array to modify.
+ * @return LE_SUCCESS if popped, otherwise LE_FAILURE.
+ */
 leResult leArray_PopBack(leArray* arr);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_InsertAt(leArray* arr,
-                              uint32_t idx,
-                              void* val);
-
-   Summary:
-    Inserts a value into an array at a given index.  All existing nodes
-    from index are shifted right one place.
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-    uint32_t idx - the position to insert the value
-    void* val - the value to store
-   
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Insert value at index
+ * @details Inserts <span class="param">val</span> into
+ * <span class="param">arr</span> at
+ * the specified <span class="param">idx</span>.
+ * All existing values from index are shifted right one place.
+ * @code
+ * leArray* arr;
+ * uint32_t idx;
+ * void* val;
+ * leResult res = leArray_InsertAt(arr idx, val)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param idx is the location at which to insert value.
+ * @param val is value to insert.
+ * @return LE_SUCCESS if inserted, otherwise LE_FAILURE.
+ */
 leResult leArray_InsertAt(leArray* arr,
                           uint32_t idx,
                           void* val);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_RemoveAt(leArray* arr, uint32_t idx)
-
-   Summary:
-    Removes a value from the array at an index
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-    uint32_t idx - the index of the value to remove
-   
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Remove value at index
+ * @details Removes <span class="param">val</span> from
+ * <span class="param">arr</span> at
+ * the specified <span class="param">idx</span>.
+ * @code
+ * leArray* arr;
+ * uint32_t idx;
+ * leResult res = leArray_RemoveAt(arr idx)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param idx is the location at which to insert value.
+ * @return LE_SUCCESS if removed, otherwise LE_FAILURE.
+ */
 leResult leArray_RemoveAt(leArray* arr, uint32_t idx);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Remove(leArray* arr, void* val)
-
-   Summary:
-    Removes the first instance of a value from the array and shuffles
-    all values left to fill the gap
-
-   Parameters:
-    leArray* arr - pointer to the array to modify
-    void* val - the value to remove
-   
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Remove value
+ * @details Removes the first instance of <span class="param">val</span>
+ * from <span class="param">arr</span>.
+ * The function shuffles all values left to fill the gap.
+ * @code
+ * leArray* arr;
+ * void* val;
+ * leResult res = leArray_Remove(leArray* arr, void* val)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param val is the value removed.
+ * @return LE_SUCCESS if removed, otherwise LE_FAILURE.
+ */
 leResult leArray_Remove(leArray* arr, void* val);
 
 // *****************************************************************************
-/* Function:
-    void* leArray_Get(const leArray* arr, uint32_t idx);
-
-   Summary:
-    Returns the pointer to the entry at index idx
-
-   Parameters:
-    const leList* list - const pointer to the list to reference
-    uint32_t idx - the index of the entry to get
-   
-   Returns:
-    void* - pointer to the entry at idx
-*/
+/**
+ * @brief Get entry at index
+ * @details Returns the pointer to the entry from
+ * <span class="param">arr</span> at
+ * the specified <span class="param">idx</span>.
+ * @code
+ * leArray* arr;
+ * uint32_t idx;
+ * void* entry = leArray_Get(arr, idx)
+ * @endcode
+ * @param arr is the array of entries.
+ * @param idx is the index at which entry is located.
+ * @return void*  pointer to the entry at idx.
+ */
 void* leArray_Get(const leArray* arr, uint32_t idx);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Set(leArray* arr, uint32_t idx, void* val);
-
-   Summary:
-    Sets the pointer at idx
-
-   Parameters:
-    leList* list - pointer to the list to reference
-    uint32_t idx - the index of the entry to set
-    void* val - the value to set the index to
-   
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set value at index
+ * @details Sets <span class="param">val</span> onto
+ * <span class="param">arr</span> at
+ * the specified <span class="param">idx</span>.
+ * @code
+ * leList* arr;
+ * uint32_t idx;
+ * void* val;
+ * leResult res = leArray_Set(arr, idx, val)
+ * @endcode
+ * @param arr is the array to modify.
+ * @param idx is the index where the value is set.
+ * @param val is the value to set at index.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leArray_Set(leArray* arr, uint32_t idx, void* val);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Find(leArray* arr, void* val)
-
-   Summary:
-    Finds the first index of a value in the array
-
-   Parameters:
-    leArray* arr - pointer to the array to search
-    void* val - the value to remove
-   
-   Returns:
-    int32_t - the first index of the value or -1 if not found
-*/
+/**
+ * @brief Find a first index of value
+ * @details Returns the first index of <span class="param">val</span>
+ * in <span class="param">arr</span>.
+ * @code
+ * leArray* arr;
+ * void* val;
+ * int32_t index = leArray_Find(arr, val)
+ * @endcode
+ * @param arr is the array to search.
+ * @param val is the value to set at index.
+ * @return the first index of the value or -1 if not found.
+ */
 int32_t leArray_Find(const leArray* arr, void* val);
 
 // *****************************************************************************
-/* Function:
-    leResult leArray_Copy(leArray* l, leArray* r)
-
-   Summary:
-    Creates a duplicate of an existing array
-
-   Parameters:
-    leArray* src - the source array
-    leArray* dest - the result array
-   
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Copy array
+ * @details Copies the contents of <span class="param">src</span>
+ * to the array pointed to by <span class="param">dest</span>.
+ * @code
+ * leArray* src;
+ * leArray* dest;
+ * leResult res = leArray_Copy(src, dest)
+ * @endcode
+ * @param src is the source array.
+ * @param dest is the destination array.
+ * @return LE_SUCCESS if copied, otherwise LE_FAILURE.
+ */
 leResult leArray_Copy(leArray* src, leArray* dest);
 
 // *****************************************************************************
-/* Function:
-    void leArray_Clear(leArray* arr)
-
-   Summary:
-    Removes all values from a given array.  Array capacity remains the same.
-
-   Parameters:
-    leArray* arr - the array to modify
-       
-   Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Clear array.
+ * @details Removes all values from <span class="param">arr</span>.
+ * Array capacity remains the same.
+ * @code
+ * leArray* arr;
+ * leResult res = leArray_Clear(arr)
+ * @endcode
+ * @param arr is the array to modify.
+ * @return LE_SUCCESS if cleared, otherwise LE_FAILURE.
+ */
 leResult leArray_Clear(leArray* arr);
 
 #endif /* LEGATO_ARRAY_H */

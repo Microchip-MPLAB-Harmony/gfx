@@ -285,7 +285,8 @@ leResult leArray_Clear(leArray* arr)
     {
         LE_FREE(arr->values);
     }
-    
+
+    arr->values = NULL;
     arr->capacity = 0;
     arr->size = 0;
 

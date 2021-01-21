@@ -48,46 +48,46 @@ leState* leGetState()
 
 #if LE_DYNAMIC_VTABLES == 1
 /* vtable generation functions, make sure child classes come after base ones */
-typedef void (*vtableFn)();
+typedef void (*vtableFn)(void);
 
-void _leString_GenerateVTable();
-void _leDynamicString_GenerateVTable();
-void _leFixedString_GenerateVTable();
-void _leTableString_GenerateVTable();
+void _leString_GenerateVTable(void);
+void _leDynamicString_GenerateVTable(void);
+void _leFixedString_GenerateVTable(void);
+void _leTableString_GenerateVTable(void);
 
-void _leWidget_GenerateVTable();
-void _leEditWidget_GenerateVTable();
+void _leWidget_GenerateVTable(void);
+void _leEditWidget_GenerateVTable(void);
 
-void _leArcWidget_GenerateVTable();
-void _leBarGraphWidget_GenerateVTable();
-void _leButtonWidget_GenerateVTable();
-void _leCheckBoxWidget_GenerateVTable();
-void _leCircleWidget_GenerateVTable();
-void _leCircularGaugeWidget_GenerateVTable();
-void _leCircularSliderWidget_GenerateVTable();
-void _leDrawSurfaceWidget_GenerateVTable();
-void _leGradientWidget_GenerateVTable();
-void _leGroupBoxWidget_GenerateVTable();
-void _leImageWidget_GenerateVTable();
-void _leImageRotateWidget_GenerateVTable();
-void _leImageScaleWidget_GenerateVTable();
-void _leImageSequenceWidget_GenerateVTable();
-void _leKeyPadWidget_GenerateVTable();
-void _leLabelWidget_GenerateVTable();
-void _leLineWidget_GenerateVTable();
-void _leLineGraphWidget_GenerateVTable();
-void _leListWidget_GenerateVTable();
-void _leListWheelWidget_GenerateVTable();
-void _lePieChartWidget_GenerateVTable();
-void _leProgressBarWidget_GenerateVTable();
-void _leRadialMenuWidget_GenerateVTable();
-void _leRadioButtonWidget_GenerateVTable();
-void _leRectangleWidget_GenerateVTable();
-void _leScrollBarWidget_GenerateVTable();
-void _leSliderWidget_GenerateVTable();
-void _leTextFieldWidget_GenerateVTable();
-void _leTouchTestWidget_GenerateVTable();
-void _leWindowWidget_GenerateVTable();
+void _leArcWidget_GenerateVTable(void);
+void _leBarGraphWidget_GenerateVTable(void);
+void _leButtonWidget_GenerateVTable(void);
+void _leCheckBoxWidget_GenerateVTable(void);
+void _leCircleWidget_GenerateVTable(void);
+void _leCircularGaugeWidget_GenerateVTable(void);
+void _leCircularSliderWidget_GenerateVTable(void);
+void _leDrawSurfaceWidget_GenerateVTable(void);
+void _leGradientWidget_GenerateVTable(void);
+void _leGroupBoxWidget_GenerateVTable(void);
+void _leImageWidget_GenerateVTable(void);
+void _leImageRotateWidget_GenerateVTable(void);
+void _leImageScaleWidget_GenerateVTable(void);
+void _leImageSequenceWidget_GenerateVTable(void);
+void _leKeyPadWidget_GenerateVTable(void);
+void _leLabelWidget_GenerateVTable(void);
+void _leLineWidget_GenerateVTable(void);
+void _leLineGraphWidget_GenerateVTable(void);
+void _leListWidget_GenerateVTable(void);
+void _leListWheelWidget_GenerateVTable(void);
+void _lePieChartWidget_GenerateVTable(void);
+void _leProgressBarWidget_GenerateVTable(void);
+void _leRadialMenuWidget_GenerateVTable(void);
+void _leRadioButtonWidget_GenerateVTable(void);
+void _leRectangleWidget_GenerateVTable(void);
+void _leScrollBarWidget_GenerateVTable(void);
+void _leSliderWidget_GenerateVTable(void);
+void _leTextFieldWidget_GenerateVTable(void);
+void _leTouchTestWidget_GenerateVTable(void);
+void _leWindowWidget_GenerateVTable(void);
 
 vtableFn vtableFnTable[] =
 {
@@ -225,20 +225,26 @@ vtableFn vtableFnTable[] =
 };
 #endif
 
-leResult leInitialize(const gfxDisplayDriver* dispDriver)
+leResult leInitialize(const gfxDisplayDriver* dispDriver,
+                      const gfxGraphicsProcessor* gpuDriver)
 {
     uint32_t idx;
     leWidget* root;
+    gfxIOCTLArg_DisplaySize disp;
     
     if(_initialized == LE_TRUE)
         return LE_FAILURE;
         
     memset(&_state, 0, sizeof(leState));
-        
-    if(leMemory_Init() == LE_FAILURE ||
-       leEvent_Init() == LE_FAILURE ||
+
+#if LE_MEMORY_MANAGER_ENABLE == 1
+    if(leMemory_Init() == LE_FAILURE)
+        return LE_FAILURE;
+#endif
+
+    if(leEvent_Init() == LE_FAILURE ||
        leInput_Init() == LE_FAILURE ||
-       leRenderer_Initialize(dispDriver) == LE_FAILURE)
+       leRenderer_Initialize(dispDriver, gpuDriver) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -256,19 +262,29 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver)
 #endif
     
     leImage_InitDecoders();
-    leScheme_Initialize(&_state.defaultScheme, LE_GLOBAL_COLOR_MODE);
 
     for(idx = 0; idx < LE_LAYER_COUNT; idx++)
     {
         root = &_state.rootWidget[idx];
         
         leWidget_Constructor(root);
+
+        disp.width = 0;
+        disp.height = 0;
+
+        dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &disp);
         
-        root->fn->setPosition(root, 0, 0);
-        
-        root->fn->setSize(root,
-                          dispDriver->getDisplayWidth(),
-                          dispDriver->getDisplayHeight());
+        root->rect.x = 0;
+        root->rect.y = 0;
+        root->rect.width = disp.width;
+        root->rect.height = disp.height;
+
+        root->fn->invalidate(root);
+        root->flags |= LE_WIDGET_ISROOT;
+        root->flags |= LE_WIDGET_IGNOREEVENTS;
+        root->flags |= LE_WIDGET_IGNOREPICK;
+
+        _state.layerStates[idx].colorMode = LE_DEFAULT_COLOR_MODE;
     }
     
     _initialized = LE_TRUE;
@@ -331,7 +347,36 @@ static void updateWidgets(uint32_t dt)
 
 leResult leUpdate(uint32_t dt)
 {
+#if LE_DRIVER_LAYER_MODE == 1
+    uint32_t itr;
+    gfxIOCTLArg_LayerRect layerRect;
+#endif
+
     leEvent_ProcessEvents();
+
+#if LE_DRIVER_LAYER_MODE == 1
+    for(itr = 0; itr < LE_LAYER_COUNT; ++itr)
+    {
+        layerRect.base.id = itr;
+        layerRect.x = 0;
+        layerRect.y = 0;
+        layerRect.width = 0;
+        layerRect.height = 0;
+
+        leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_LAYER_RECT, &layerRect);
+
+        _state.layerStates[itr].driverPosition.x = layerRect.x;
+        _state.layerStates[itr].driverPosition.y = layerRect.y;
+
+        _state.rootWidget[itr].fn->setPosition(&_state.rootWidget[itr],
+                                               0,
+                                               0);
+
+        _state.rootWidget[itr].fn->setSize(&_state.rootWidget[itr],
+                                           layerRect.width,
+                                           layerRect.height);
+    }
+#endif
 
 #if LE_STREAMING_ENABLED == 1
     // there is an active stream in progress, service that to completion
@@ -358,15 +403,48 @@ leResult leUpdate(uint32_t dt)
     return LE_SUCCESS;
 }
 
-leColorMode leGetColorMode()
+leColorMode leGetLayerColorMode(uint32_t idx)
 {
-    return LE_GLOBAL_COLOR_MODE;
+    if(idx >= LE_LAYER_COUNT)
+        return LE_COLOR_MODE_GS_8;
+
+    return _state.layerStates[idx].colorMode;
 }
 
-leRect leGetDisplayRect()
+leResult leSetLayerColorMode(uint32_t idx,
+                             leColorMode mode)
+{
+    if(idx >= LE_LAYER_COUNT)
+        return LE_FAILURE;
+
+    _state.layerStates[idx].colorMode = mode;
+
+    return LE_SUCCESS;
+}
+
+leBool leGetLayerRenderHorizontal(uint32_t idx)
+{
+    if(idx >= LE_LAYER_COUNT)
+        return LE_FALSE;
+
+    return _state.layerStates[idx].renderHorizontal;
+}
+
+leResult leSetLayerRenderHorizontal(uint32_t idx,
+                                    leBool horz)
+{
+    if(idx >= LE_LAYER_COUNT)
+        return LE_FAILURE;
+
+    _state.layerStates[idx].renderHorizontal = horz;
+
+    return LE_SUCCESS;
+}
+
+/*leRect leGetDisplayRect()
 {
     return leGetRenderState()->displayRect;
-}
+}*/
 
 leStringTable* leGetStringTable()
 {
@@ -503,7 +581,7 @@ leResult leAddRootWidget(leWidget* wgt,
     if(wgt == NULL || layer > LE_LAYER_COUNT - 1)
         return LE_FAILURE;
         
-    leRenderer_DamageArea(&wgt->rect);
+    leRenderer_DamageArea(&wgt->rect, layer);
         
     return _state.rootWidget[layer].fn->addChild(&_state.rootWidget[layer], wgt);
 }
@@ -519,7 +597,7 @@ leResult leRemoveRootWidget(leWidget* wgt, uint32_t layer)
         
     if(_state.rootWidget[layer].fn->removeChild(&_state.rootWidget[layer], wgt) == LE_SUCCESS)
     {
-        leRenderer_DamageArea(&rect);
+        leRenderer_DamageArea(&rect, layer);
         
         return LE_SUCCESS;
     }
@@ -529,27 +607,32 @@ leResult leRemoveRootWidget(leWidget* wgt, uint32_t layer)
 
 leBool leWidgetIsInScene(const leWidget* wgt)
 {
-    uint32_t layer;
+    return leGetWidgetLayer(wgt) >= 0;
+}
+
+int32_t leGetWidgetLayer(const leWidget* wgt)
+{
+    int32_t layer;
     leWidget* root;
     leWidget* wgtRoot;
-    
+
     if(wgt == NULL)
         return LE_FALSE;
-        
+
     wgtRoot = wgt->fn->getRootWidget(wgt);
-    
+
     if(wgtRoot == NULL)
         return LE_FALSE;
-    
+
     for(layer = 0; layer < LE_LAYER_COUNT; layer++)
     {
         root = &_state.rootWidget[layer];
-        
+
         if(root == wgtRoot)
-            return LE_TRUE;
+            return layer;
     }
-    
-    return LE_FALSE;
+
+    return -1;
 }
 
 #if LE_STREAMING_ENABLED == 1

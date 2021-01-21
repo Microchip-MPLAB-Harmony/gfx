@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['head_1141',['head',['../structleList.html#a8ea22e89cd6bbb3e979f62bebc229319',1,'leList']]],
-  ['header_1142',['header',['../structlePalette.html#ae3a04a78976831e29eff3623c45a1bde',1,'lePalette']]],
-  ['height_1143',['height',['../structleSize.html#a5d8006e753a3e76ff637a4e092bbed71',1,'leSize']]]
+  ['gfxcolorinfotable_1287',['gfxColorInfoTable',['../gfx__driver_8h_8ftl.html#ac6136e14ec5a016f5750c27c71f97b5c',1,'gfx_driver.c.ftl']]],
+  ['gpu_1288',['gpu',['../structn2d__buffer.html#a91a61ad3cbb64d2b3e6c629f6ff92dcb',1,'n2d_buffer']]]
 ];

@@ -85,12 +85,18 @@ leFont* _leTableString_GetFont(const leTableString* _this)
 leResult _leTableString_SetFont(leTableString* _this,
                                 const leFont* font)
 {
+    (void)_this; // unused
+    (void)font; // unused
+
     return LE_FAILURE;
 }
 
 leResult _leTableString_SetFromString(leTableString* _this,
                                       const leString* src)
 {
+    (void)_this; // unused
+    (void)src; // unused
+
     return LE_FAILURE;
 }
 
@@ -98,12 +104,19 @@ leResult _leTableString_SetFromChar(leTableString* _this,
                                     const leChar* buf,
                                     uint32_t size)
 {
+    (void)_this; // unused
+    (void)buf; // unused
+    (void)size; // unused
+
     return LE_FAILURE;
 }
 
 leResult _leTableString_SetFromCStr(leTableString* _this,
                                     const char* cstr)
 {
+    (void)_this; // unused
+    (void)cstr; // unused
+
     return LE_FAILURE;
 }
 
@@ -224,6 +237,9 @@ int32_t _leTableString_Compare(const leTableString* _this,
 leResult _leTableString_Append(leTableString* _this,
                                const leString* val)
 {
+    (void)_this; // unused
+    (void)val; // unused
+
     return LE_FAILURE;
 }
 
@@ -231,6 +247,10 @@ leResult _leTableString_Insert(leTableString* _this,
                                const leString* val,
                                uint32_t idx)
 {
+    (void)_this; // unused
+    (void)val; // unused
+    (void)idx; // unused
+
     return LE_FAILURE;
 }
 
@@ -238,11 +258,16 @@ leResult _leTableString_Remove(leTableString* _this,
                                uint32_t idx,
                                uint32_t count)
 {
+    (void)_this; // unused
+    (void)idx; // unused
+    (void)count; // unused
+
     return LE_FAILURE;
 }
 
 void _leTableString_Clear(leTableString* _this)
 {
+    (void)_this; // unused
 }
 
 uint32_t _leTableString_ToChar(const leTableString* _this, leChar* buf, uint32_t size)
@@ -272,13 +297,6 @@ uint32_t _leTableString_ToChar(const leTableString* _this, leChar* buf, uint32_t
     
     return size;
 }
-
-leResult _leString_Draw(const leString* _this,
-                        int32_t x,
-                        int32_t y,
-                        leHAlignment align,
-                        leColor clr,
-                        uint32_t a);
 
 /*leResult _leTableString_Draw(const leTableString* _this,
                              int32_t x,
@@ -353,7 +371,7 @@ uint32_t _leTableString_SizeInBytes(leTableString* _this)
 #if LE_DYNAMIC_VTABLES == 1
 void _leString_FillVTable(leStringVTable* vt);
 
-void _leTableString_GenerateVTable()
+void _leTableString_GenerateVTable(void)
 {
     _leString_FillVTable((void*)&tableStringVTable);
     
@@ -400,7 +418,6 @@ static const leTableStringVTable tableStringVTable =
     .getLineRect = (void*)_leString_GetLineRect,
     .getLineIndices = (void*)_leString_GetLineIndices,
     .getCharRect = (void*)_leString_GetCharRect,
-    .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     ._draw = (void*)_leString_Draw,
     .preinvalidate = (void*)_leString_PreInvalidate,

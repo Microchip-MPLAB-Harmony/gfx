@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,13 +37,15 @@
     This header file includes all the header files required to use the
     Harmony Graphics Object Library. 
 *******************************************************************************/
-
+/** \file legato.h
+ * @brief The header file joins all header files used in the graphics object library.
+ *
+ * @details This header file includes all the header files required to use
+ * the Harmony Graphics Object Library.
+ */
 
 #ifndef LEGATO_H
-// DOM-IGNORE-BEGIN
 #define LEGATO_H
-// DOM-IGNORE-END
-
 
 ////////////////////////////// INCLUDES //////////////////////////////
 #include "gfx/legato/common/legato_common.h"

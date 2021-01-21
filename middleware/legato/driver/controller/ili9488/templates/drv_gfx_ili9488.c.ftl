@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   ILI9488 Display Top-Level Driver Source File
@@ -294,6 +292,7 @@ static int ILI9488_Init(ILI9488_DRV *drv,
         }
         
     }
+    
     ILI9488_NCSDeassert(intf); 
     
     return returnValue;
@@ -309,26 +308,6 @@ gfxResult DRV_ILI9488_Initialize(void)
         return GFX_FAILURE;
             
     return GFX_SUCCESS;
-}
-
-gfxColorMode DRV_ILI9488_GetColorMode(void)
-{
-    return PIXEL_BUFFER_COLOR_MODE;
-}
-
-uint32_t DRV_ILI9488_GetBufferCount(void)
-{
-    return 1;
-}
-
-uint32_t DRV_ILI9488_GetDisplayWidth(void)
-{
-    return SCREEN_WIDTH;
-}
-
-uint32_t DRV_ILI9488_GetDisplayHeight(void)
-{
-    return SCREEN_HEIGHT;
 }
 
 void DRV_ILI9488_Update(void)
@@ -475,7 +454,7 @@ void DRV_ILI9488_Update(void)
 <#if ParallelInterfaceWidth == "16-bit" && DisplayInterfaceType != "SPI 4-line">
                 GFX_Disp_Intf_WriteData16(intf,
                                         ptr,
-                                        buf->size.width);
+                                        drv.blitParms.buf->size.width);
 <#else>
                 for(col = 0, dataIdx = 0; col < drv.blitParms.buf->size.width; col++)
                 {
@@ -527,25 +506,9 @@ void DRV_ILI9488_Update(void)
     }
 }
 
-uint32_t DRV_ILI9488_GetLayerCount()
-{
-    return 1;
-}
-
-uint32_t DRV_ILI9488_GetActiveLayer()
-{
-    return 0;
-}
-
-gfxResult DRV_ILI9488_SetActiveLayer(uint32_t idx)
-{
-    return GFX_SUCCESS;
-}
-
 gfxResult DRV_ILI9488_BlitBuffer(int32_t x,
                                  int32_t y,
-                                 gfxPixelBuffer* buf,
-                                 gfxBlend gfx)
+                                 gfxPixelBuffer* buf)
 {
     if(drv.state != IDLE)
         return GFX_FAILURE;
@@ -567,12 +530,81 @@ gfxResult DRV_ILI9488_BlitBuffer(int32_t x,
     return GFX_SUCCESS;
 }
 
-void DRV_ILI9488_Swap(void)
+gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req,
+                                         void* arg)
 {
-    swapCount++;
-}
-
-uint32_t DRV_ILI9488_GetSwapCount(void)
-{
-    return swapCount;
+	switch(request)
+	{
+		case GFX_IOCTL_GET_COLOR_MODE:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = PIXEL_BUFFER_COLOR_MODE;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_BUFFER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_DISPLAY_SIZE:
+		{
+			disp = (gfxIOCTLArg_DisplaySize*)arg;			
+			
+			disp->width = SCREEN_WIDTH;
+			disp->height = SCREEN_HEIGHT;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_ACTIVE_LAYER:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 0;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_RECT:
+		{
+			rect = (gfxIOCTLArg_LayerRect*)arg;
+			
+			rect->x = 0;
+			rect->y = 0;
+			rect->width = SCREEN_WIDTH;
+			rect->height = SCREEN_HEIGHT;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_VSYNC_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = swapCount;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_LAYER_SWAP:
+		{
+			swapCount += 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		default:
+		{
+		}
+	}
+	
+	return GFX_IOCTL_UNSUPPORTED;
 }

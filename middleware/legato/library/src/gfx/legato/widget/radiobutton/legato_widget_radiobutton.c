@@ -90,12 +90,16 @@ static void _invalidateContents(const leRadioButtonWidget* _this)
 static void stringPreinvalidate(const leString* str,
                                 leRadioButtonWidget* btn)
 {
+    (void)str; // unused
+
     _invalidateTextRect(btn);
 }
 
 static void stringInvalidate(const leString* str,
                              leRadioButtonWidget* btn)
 {
+    (void)str; // unused
+
     _invalidateTextRect(btn);
 }
 
@@ -121,15 +125,15 @@ void leRadioButtonWidget_Constructor(leRadioButtonWidget* _this)
 
     _this->selected = LE_TRUE;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
 
     _this->string = NULL;
 
     _this->imagePosition = LE_RELATIVE_POSITION_LEFTOF;
     _this->imageMargin = DEFAULT_IMAGE_MARGIN;
 
-    _this->widget.halign = LE_HALIGN_LEFT;
-    _this->widget.valign = LE_VALIGN_MIDDLE;
+    _this->widget.style.halign = LE_HALIGN_LEFT;
+    _this->widget.style.valign = LE_VALIGN_MIDDLE;
     
     _this->selectedImage = NULL;
     _this->unselectedImage = NULL;
@@ -215,7 +219,7 @@ static leResult setSelected(leRadioButtonWidget* _this)
     return res;
 }
 
-static void select(leRadioButtonWidget* _this)
+static void selected(leRadioButtonWidget* _this)
 {
     LE_ASSERT_THIS();
     
@@ -234,7 +238,7 @@ static void select(leRadioButtonWidget* _this)
     _invalidateContents(_this);
 }
 
-static void deselect(leRadioButtonWidget* _this)
+static void deselected(leRadioButtonWidget* _this)
 {
     LE_ASSERT_THIS();
     
@@ -444,13 +448,13 @@ static leResult setCircleButtonSize(leRadioButtonWidget* _this,
     if(size < DEFAULT_CIRCLE_SIZE)
         return LE_FAILURE;
     
-    if((int32_t)size > _this->widget.rect.height)
+    if((int32_t)size > (int32_t)_this->widget.rect.height)
         return LE_FAILURE;
     
-    if((int32_t)size > _this->widget.rect.width)
+    if((int32_t)size > (int32_t)_this->widget.rect.width)
         return LE_FAILURE;
 
-    if((int32_t)size == _this->circleButtonSize)
+    if((int32_t)size == (int32_t)_this->circleButtonSize)
         return LE_SUCCESS;
     
     _this->circleButtonSize = size;
@@ -470,7 +474,7 @@ static void handleTouchDownEvent(leRadioButtonWidget* _this,
     
     _leRadioButtonWidget_GetImageRect(_this, &imgRect, &imgSrcRect);
     
-    widgetRect = _this->fn->rectToScreen(_this);
+    _this->fn->rectToScreen(_this, &widgetRect);
     
     leRectClip(&imgRect, &widgetRect, &clipRect);
     
@@ -494,7 +498,7 @@ static void handleTouchUpEvent(leRadioButtonWidget* _this,
     
     _leRadioButtonWidget_GetImageRect(_this, &imgRect, &imgSrcRect);
     
-    widgetRect = _this->fn->rectToScreen(_this);
+    _this->fn->rectToScreen(_this, &widgetRect);
     
     leRectClip(&imgRect, &widgetRect, &clipRect);
 
@@ -519,8 +523,6 @@ static void handleTouchMovedEvent(leRadioButtonWidget* _this,
     leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
 }
 
-void _leRadioButtonWidget_Paint(leRadioButtonWidget* _this);
-
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
@@ -541,8 +543,8 @@ void _leRadioButtonWidget_GenerateVTable()
     radioButtonWidgetVTable.getGroup = getGroup;
     radioButtonWidgetVTable.getSelected = getSelected;
     radioButtonWidgetVTable.setSelected = setSelected;
-    radioButtonWidgetVTable.select = select;
-    radioButtonWidgetVTable.deselect = deselect;
+    radioButtonWidgetVTable.select = selected;
+    radioButtonWidgetVTable.deselect = deselected;
     radioButtonWidgetVTable.getString = getString;
     radioButtonWidgetVTable.setString = setString;
     radioButtonWidgetVTable.getSelectedImage = getSelectedImage;
@@ -604,7 +606,7 @@ static const leRadioButtonWidgetVTable radioButtonWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -622,20 +624,15 @@ static const leRadioButtonWidgetVTable radioButtonWidgetVTable =
     .hasFocus = (void*)_leWidget_HasFocus,
     .setFocus = (void*)_leWidget_SetFocus,
     .invalidate = (void*)_leWidget_Invalidate,
-    .invalidateContents = (void*)_leWidget_InvalidateContents,
     .installEventFilter = (void*)_leWidget_InstallEventFilter,
     .removeEventFilter = (void*)_leWidget_RemoveEventFilter,
 
     .update = (void*)_leWidget_Update,
 
-    .touchDownEvent = (void*)_leWidget_TouchDownEvent,
-    .touchUpEvent = (void*)_leWidget_TouchUpEvent,
-    .touchMoveEvent = (void*)_leWidget_TouchMoveEvent,
     .moveEvent = (void*)_leWidget_MoveEvent,
     .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,
@@ -658,8 +655,8 @@ static const leRadioButtonWidgetVTable radioButtonWidgetVTable =
     .getGroup = getGroup,
     .getSelected = getSelected,
     .setSelected = setSelected,
-    .select = select,
-    .deselect = deselect,
+    .select = selected,
+    .deselect = deselected,
     .getString = getString,
     .setString = setString,
     .getSelectedImage = getSelectedImage,

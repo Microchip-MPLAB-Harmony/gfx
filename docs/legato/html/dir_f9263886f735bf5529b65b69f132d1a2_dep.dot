@@ -1,0 +1,17 @@
+digraph "C:/harmony3_dev/gfx/middleware/legato" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_89f38898316618d73bea37637642b0a7 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="middleware" fontname="Helvetica", fontsize="10", URL="dir_89f38898316618d73bea37637642b0a7.html"]
+  subgraph clusterdir_f9263886f735bf5529b65b69f132d1a2 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_f9263886f735bf5529b65b69f132d1a2.html"];
+    dir_f9263886f735bf5529b65b69f132d1a2 [shape=plaintext label="legato"];
+    dir_20fe3593f907376e0e3411ea2eb4b9c4 [shape=box label="canvas" color="red" fillcolor="white" style="filled" URL="dir_20fe3593f907376e0e3411ea2eb4b9c4.html"];
+    dir_521fbf188eee555811a6aadaac000620 [shape=box label="composer" color="red" fillcolor="white" style="filled" URL="dir_521fbf188eee555811a6aadaac000620.html"];
+    dir_f6792742576531c8d0dcc3348644119e [shape=box label="driver" color="red" fillcolor="white" style="filled" URL="dir_f6792742576531c8d0dcc3348644119e.html"];
+    dir_5d5e34b98c5503be3d23cd92b724f0b6 [shape=box label="library" color="red" fillcolor="white" style="filled" URL="dir_5d5e34b98c5503be3d23cd92b724f0b6.html"];
+    dir_24f7e9ecd65d7c430b66ca8767a2f9f2 [shape=box label="templates" color="red" fillcolor="white" style="filled" URL="dir_24f7e9ecd65d7c430b66ca8767a2f9f2.html"];
+  }
+  }
+}

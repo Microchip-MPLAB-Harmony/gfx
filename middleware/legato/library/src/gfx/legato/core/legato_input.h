@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -37,11 +35,14 @@
 
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
-
+/** \file legato_input.h
+ * @brief Legato input definitions.
+ *
+ * @details Defines events that are used in the UI library.  Events
+ * are created and stored for later processing during a library context's update loop.
+ */
 #ifndef LEGATO_INPUT_H
 #define LEGATO_INPUT_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 #include "gfx/legato/core/legato_event.h"
@@ -56,25 +57,26 @@
 
 #include "gfx/legato/widget/legato_widget.h"
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  */
 #define LE_INPUT_PRIMARY_ID    0
 #define LE_MAX_TOUCH_STATES    2
-
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
-/* Enumeration:
-    leGestureID
 
-  Summary:
-    Placeholder for eventual gesture support.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This enum represents gesture type IDs.
+ * @details This enum type defines the valid gesture types.
+ */
 typedef enum leGestureID
 {
-    LE_GESTURE_NONE = 0
+    LE_GESTURE_NONE = 0  /**< No event found. */
 } leGestureID;
 
 // *****************************************************************************
@@ -90,6 +92,11 @@ typedef enum leGestureID
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents legato keyboard entry.
+ * @details All values possible for key entry from
+ * the legato keyboard widget
+ */
 typedef enum leKey
 {
     KEY_NULL = 0,
@@ -199,18 +206,11 @@ typedef enum leKey
 } leKey;
 
 // *****************************************************************************
-/* Enumeration:
-    leMouseButton
-
-  Summary:
-    All values possible for mouse key entry from the legato mouse input
-
-  Description:
-    All values possible for mouse key entry from the legato mouse input
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This enum represents key entry for legato mouse input.
+ * @details All values possible for mouse key entry from the legato
+ * mouse input.
+ */
 typedef enum leMouseButton
 {
     BUTTON_NONE = 0,
@@ -226,38 +226,24 @@ typedef enum leMouseButton
 #define NUM_BUTTONS BUTTON_LAST + 1
 
 // *****************************************************************************
-/* Structure:
-    leTouchState
-
-  Summary:
-    Manage the touch input state and track the touch coordinate
-
-  Description:
-    Manage the touch input state and track the touch coordinate
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a touch state.
+ * @details A touch state has valid touch indicator and touch coordinate location.
+ * mouse input.
+ */
 typedef struct leTouchState
 {
-    uint32_t valid;
-    int32_t  x;
-    int32_t  y;
+    uint32_t valid; /**< Valid touch. */
+    int32_t  x; /**< x coordinate location. */
+    int32_t  y; /**< y coordinate location. */
 } leTouchState;
 
 // *****************************************************************************
-/* Structure:
-    leInputState
-
-  Summary:
-    Maintain a history of touch states; currently legato keeps track of the last touch state only.
-
-  Description:
-    Maintain a history of touch states; currently legato keeps track of the last touch state only.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents input state.
+ * @details Input state maintains a history of touch states; currently legato keeps
+ * track of the last touch state only.
+ */
 typedef struct leInputState
 {
     leBool enabled;
@@ -265,18 +251,24 @@ typedef struct leInputState
     leTouchState touch[LE_MAX_TOUCH_STATES];
     //uint8_t keyState[KEY_LAST];  // change to bitset?
     //leMouseState mouse;
-    
+
+    int32_t driverAdjustX;
+    int32_t driverAdjustY;
+
 } leInputState;
 
-// DOM-IGNORE-BEGIN
 /* internal use only */
-leInputState* _leGetInputState();
+/**
+  * @cond INTERNAL
+  */
+leInputState* _leGetInputState(void);
 
-leResult leInput_Init();
-void leInput_Shutdown();
-
-// DOM-IGNORE-END
-
+leResult leInput_Init(void);
+void leInput_Shutdown(void);
+/**
+  * @endcond
+  *
+  */
 
 
 // *****************************************************************************
@@ -304,7 +296,16 @@ void leInput_Shutdown();
   Remarks:
     
 */
-LIB_EXPORT leBool leInput_GetEnabled();
+/**
+ * @brief Get input enabled status.
+ * @details Returns the input enabled status of the current context.
+ * @code
+ * leBool status = leInput_GetEnabled();
+ * @endcode
+ * @param void.
+ * @return LE_TRUE if input is enabled, otherwise LE_FALSE.
+ */
+leBool leInput_GetEnabled(void);
 
 // *****************************************************************************
 /* Function:
@@ -325,7 +326,17 @@ LIB_EXPORT leBool leInput_GetEnabled();
   Remarks:
     
 */
-LIB_EXPORT leResult leInput_SetEnabled(leBool enable);
+/**
+ * @brief Set input enabled status.
+ * @details Sets the input status of the current context to <span class="param">enable</span>.
+ * @code
+ * leBool enable = true;
+ * leResult res = leInput_SetEnabled(enable);
+ * @endcode
+ * @param enable the new status.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leInput_SetEnabled(leBool enable);
 
 // *****************************************************************************
 /* Function:
@@ -348,7 +359,20 @@ LIB_EXPORT leResult leInput_SetEnabled(leBool enable);
   Remarks:
     
 */
-LIB_EXPORT leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y);
+/**
+ * @brief Inject touch down event.
+ * @details Injects a touch down event for <span class="param">id</span>
+ * at location <span class="param">x</span>, <span class="param">y</span>.
+ * @code
+ * leBool enable = true;
+ * leResult res = leInput_InjectTouchDown(id, x, y);
+ * @endcode
+ * @param id is the touch input id.
+ * @param x is the x coordinate.
+ * @param y is the y coordinate.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y);
 
 // *****************************************************************************
 /* Function:
@@ -371,7 +395,20 @@ LIB_EXPORT leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y);
   Remarks:
     
 */
-LIB_EXPORT leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y);
+/**
+ * @brief Inject touch up event.
+ * @details Injects a touch up event for <span class="param">id</span>
+ * at location <span class="param">x</span>, <span class="param">y</span>.
+ * @code
+ * leBool enable = true;
+ * leResult res = leInput_InjectTouchDown(id, x, y);
+ * @endcode
+ * @param id is the touch input id.
+ * @param x is the x coordinate.
+ * @param y is the y coordinate.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y);
 
 // *****************************************************************************
 /* Function:
@@ -394,21 +431,42 @@ LIB_EXPORT leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y);
   Remarks:
     
 */
-LIB_EXPORT leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y);
+/**
+ * @brief Inject touch moved event.
+ * @details Injects a touch moved event for <span class="param">id</span>
+ * at location <span class="param">x</span>, <span class="param">y</span>.
+ * @code
+ * leBool enable = true;
+ * leResult res = leInput_InjectTouchDown(id, x, y);
+ * @endcode
+ * @param id is the touch input id.
+ * @param x is the x coordinate.
+ * @param y is the y coordinate.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y);
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 // alternative input APIs (not yet implemented)
 
 /*
-LIB_EXPORT leResult leInput_InjectGesture(leGesture id, int32_t x, int32_t y);
+leResult leInput_InjectGesture(leGesture id, int32_t x, int32_t y);
 
-LIB_EXPORT leResult leInput_InjectKeyDown(leKey key);
-LIB_EXPORT leResult leInput_InjectKeyUp(leKey key);
+leResult leInput_InjectKeyDown(leKey key);
+leResult leInput_InjectKeyUp(leKey key);
 
-LIB_EXPORT leResult leInput_InjectMouseButtonDown(leMouseButton button);
-LIB_EXPORT leResult leInput_InjectMouseButtonUp(leMouseButton button);
-LIB_EXPORT leResult leInput_InjectMouseMoved(int32_t x, int32_t y);*/
+leResult leInput_InjectMouseButtonDown(leMouseButton button);
+leResult leInput_InjectMouseButtonUp(leMouseButton button);
+leResult leInput_InjectMouseMoved(int32_t x, int32_t y);*/
 
 leEventResult _leInput_HandleInputEvent(leEvent* evt);
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
+
 #endif /* LEGATO_INPUT_H */

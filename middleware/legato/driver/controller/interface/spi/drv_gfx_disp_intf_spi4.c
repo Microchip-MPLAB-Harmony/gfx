@@ -81,7 +81,13 @@ typedef struct
     DRV_SPI_TRANSFER_HANDLE drvSPITransferHandle;
     
     /* SPI transaction status */
-    volatile GFX_DISP_INTF_SPI_TRANS_STATUS drvSPITransStatus;    
+    volatile GFX_DISP_INTF_SPI_TRANS_STATUS drvSPITransStatus;
+    
+    /* SPI interface callback */
+    GFX_Disp_Intf_Callback callback;
+
+    /* SPI interface callback param*/
+    void * callback_parm;
 } GFX_DISP_INTF_SPI;
 
 static GFX_DISP_INTF_SPI spiIntf;
@@ -127,7 +133,14 @@ static void GFX_Disp_Intf_CallBack(DRV_SPI_TRANSFER_EVENT event,
         case DRV_SPI_TRANSFER_EVENT_COMPLETE:
         {
             *status = SPI_TRANS_IDLE;
-        
+
+            if (spiIntf.callback != NULL)
+            {
+                spiIntf.callback((GFX_Disp_Intf) &spiIntf,
+                                       GFX_DISP_INTF_TX_DONE,
+                                       spiIntf.callback_parm);
+            }            
+
             break;
         }
         case DRV_SPI_TRANSFER_EVENT_ERROR:
@@ -143,7 +156,7 @@ static void GFX_Disp_Intf_CallBack(DRV_SPI_TRANSFER_EVENT event,
 
 GFX_Disp_Intf GFX_Disp_Intf_Open(void)
 {   
-    spiIntf.drvSPIHandle = DRV_SPI_Open(DRV_SPI_INDEX, DRV_IO_INTENT_READWRITE);
+    spiIntf.drvSPIHandle = DRV_SPI_Open(${DRV_INTERFACE_SPI_INDEX}, DRV_IO_INTENT_READWRITE);
     
     if (DRV_HANDLE_INVALID == spiIntf.drvSPIHandle)
     {
@@ -159,7 +172,7 @@ GFX_Disp_Intf GFX_Disp_Intf_Open(void)
 
 void GFX_Disp_Intf_Close(GFX_Disp_Intf intf)
 {
-    DRV_SPI_Close(((GFX_DISP_INTF_SPI *)&intf)->drvSPIHandle);
+    DRV_SPI_Close(((GFX_DISP_INTF_SPI *)intf)->drvSPIHandle);
 }
 
 int GFX_Disp_Intf_PinControl(GFX_Disp_Intf intf,
@@ -301,19 +314,19 @@ DRV_GFX_DEPRECATED int GFX_Disp_Intf_WriteCommandParm(GFX_Disp_Intf intf, uint8_
 
 int GFX_Disp_Intf_Write(GFX_Disp_Intf intf, uint8_t * data, int bytes)
 {
-    GFX_DISP_INTF_SPI * spiIntf = (GFX_DISP_INTF_SPI *) intf;
+    GFX_DISP_INTF_SPI * spiIntfPtr = (GFX_DISP_INTF_SPI *) intf;
     
-    if (spiIntf == NULL ||
-        bytes == 0 ||
-        data == NULL)
+    if (spiIntfPtr == NULL || bytes == 0 || data == NULL)
         return -1;
     
-    spiIntf->drvSPITransStatus = SPI_TRANS_CMD_WR_PENDING;
-    DRV_SPI_WriteTransferAdd(spiIntf->drvSPIHandle,
+    spiIntfPtr->drvSPITransStatus = SPI_TRANS_CMD_WR_PENDING;
+    
+    DRV_SPI_WriteTransferAdd(spiIntfPtr->drvSPIHandle,
                             (void *) data,
                             (size_t) bytes,
-                            (void *) &spiIntf->drvSPITransferHandle);
-    if (DRV_SPI_TRANSFER_HANDLE_INVALID == spiIntf->drvSPITransferHandle)
+                            (void *) &spiIntfPtr->drvSPITransferHandle);
+                            
+    if (DRV_SPI_TRANSFER_HANDLE_INVALID == spiIntfPtr->drvSPITransferHandle)
     {
         return -1;
     }
@@ -328,20 +341,20 @@ int GFX_Disp_Intf_Write(GFX_Disp_Intf intf, uint8_t * data, int bytes)
 
 int GFX_Disp_Intf_Read(GFX_Disp_Intf intf, uint8_t * data, int bytes)
 {
-    GFX_DISP_INTF_SPI * spiIntf = (GFX_DISP_INTF_SPI *) intf;
+    GFX_DISP_INTF_SPI * spiIntfPtr = (GFX_DISP_INTF_SPI *) intf;
     
-    if (spiIntf == NULL ||
-        bytes == 0 ||
-        data == NULL)
+    if (spiIntfPtr == NULL || bytes == 0 || data == NULL)
         return -1;
     
     // Read the valid pixels
-    spiIntf->drvSPITransStatus = SPI_TRANS_CMD_RD_PENDING;
-    DRV_SPI_ReadTransferAdd(spiIntf->drvSPIHandle,
+    spiIntfPtr->drvSPITransStatus = SPI_TRANS_CMD_RD_PENDING;
+    
+    DRV_SPI_ReadTransferAdd(spiIntfPtr->drvSPIHandle,
                             (void *) data,
                             bytes,
-                            (void *) &spiIntf->drvSPITransferHandle);
-    if (DRV_SPI_TRANSFER_HANDLE_INVALID == spiIntf->drvSPITransferHandle)
+                            (void *) &spiIntfPtr->drvSPITransferHandle);
+                            
+    if (DRV_SPI_TRANSFER_HANDLE_INVALID == spiIntfPtr->drvSPITransferHandle)
         return -1;
 
 <#if BlockingTransfers == true>
@@ -366,6 +379,17 @@ int GFX_Disp_Intf_ReadData16(GFX_Disp_Intf intf, uint16_t* data, int num)
 int GFX_Disp_Intf_Ready(GFX_Disp_Intf intf)
 {
     return (SPI_TRANS_IDLE == ((GFX_DISP_INTF_SPI *) intf)->drvSPITransStatus);
+}
+
+int GFX_Disp_Intf_Set_Callback(GFX_Disp_Intf intf, GFX_Disp_Intf_Callback cb, void * parm)
+{
+    if (((GFX_DISP_INTF_SPI *) intf) == NULL)
+        return -1;
+
+    ((GFX_DISP_INTF_SPI *) intf)->callback = cb;
+    ((GFX_DISP_INTF_SPI *) intf)->callback_parm = parm;
+
+    return 0;
 }
 
 /* *****************************************************************************

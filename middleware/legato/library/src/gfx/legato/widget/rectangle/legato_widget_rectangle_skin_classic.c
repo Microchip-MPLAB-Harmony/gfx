@@ -60,7 +60,7 @@ void _leRectangleWidget_InvalidateRect(leRectangleWidget* rct)
 	if(rct->thickness == 0)
 	    return;
 	    
-	rect = rct->fn->localRect(rct);
+	rct->fn->localRect(rct, &rect);
 	    
 	if(rect.width <= rct->thickness || rect.height <= rct->thickness)
 	{
@@ -102,7 +102,7 @@ void _leRectangleWidget_InvalidateRect(leRectangleWidget* rct)
 
 static void nextState(leRectangleWidget* rct)
 {
-    switch(rct->widget.drawState)
+    switch(rct->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -115,37 +115,40 @@ static void nextState(leRectangleWidget* rct)
             }
 #endif
             
-            if(rct->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(rct->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                rct->widget.drawState = DRAW_BACKGROUND;
+                rct->widget.status.drawState = DRAW_BACKGROUND;
                 rct->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(rct->thickness > 0)
             {
-                rct->widget.drawState = DRAW_EDGE;
+                rct->widget.status.drawState = DRAW_EDGE;
                 rct->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawEdge;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_EDGE:
         {            
-            if(rct->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(rct->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 rct->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                rct->widget.drawState = DRAW_BORDER;
+                rct->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            rct->widget.drawState = DONE;
+            rct->widget.status.drawState = DONE;
             rct->widget.drawFunc = NULL;
         }
     }
@@ -163,7 +166,7 @@ static void drawEdge(leRectangleWidget* rct)
 {
     leRect widgetRect, edgeRect;
     
-    widgetRect = rct->fn->rectToScreen(rct);
+    rct->fn->rectToScreen(rct, &widgetRect);
 
     // left bar
     edgeRect.x = widgetRect.x;
@@ -171,21 +174,27 @@ static void drawEdge(leRectangleWidget* rct)
     edgeRect.width = rct->thickness;
     edgeRect.height = widgetRect.height;
     
-    leRenderer_RectFill(&edgeRect, rct->widget.scheme->foreground, paintState.alpha);
+    leRenderer_RectFill(&edgeRect,
+                        leScheme_GetRenderColor(rct->widget.scheme, LE_SCHM_FOREGROUND),
+                        paintState.alpha);
                  
     // top bar
     edgeRect.x = widgetRect.x + rct->thickness;
     edgeRect.width = widgetRect.width - (rct->thickness * 2);
     edgeRect.height = rct->thickness; 
                  
-    leRenderer_RectFill(&edgeRect, rct->widget.scheme->foreground, paintState.alpha);
+    leRenderer_RectFill(&edgeRect,
+                        leScheme_GetRenderColor(rct->widget.scheme, LE_SCHM_FOREGROUND),
+                        paintState.alpha);
                  
     // right bar
     edgeRect.x = widgetRect.x + widgetRect.width - rct->thickness;
     edgeRect.width = rct->thickness;
     edgeRect.height = widgetRect.height; 
                  
-    leRenderer_RectFill(&edgeRect, rct->widget.scheme->foreground, paintState.alpha);
+    leRenderer_RectFill(&edgeRect,
+                        leScheme_GetRenderColor(rct->widget.scheme, LE_SCHM_FOREGROUND),
+                        paintState.alpha);
                  
     // bottom bar
     edgeRect.x = widgetRect.x + rct->thickness;
@@ -193,19 +202,21 @@ static void drawEdge(leRectangleWidget* rct)
     edgeRect.width = widgetRect.width - (rct->thickness * 2);
     edgeRect.height = rct->thickness; 
                  
-    leRenderer_RectFill(&edgeRect, rct->widget.scheme->foreground, paintState.alpha);
+    leRenderer_RectFill(&edgeRect,
+                        leScheme_GetRenderColor(rct->widget.scheme, LE_SCHM_FOREGROUND),
+                        paintState.alpha);
     
     nextState(rct);
 }
 
 static void drawBorder(leRectangleWidget* rct)
 {
-    if(rct->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(rct->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)rct,
                                                     paintState.alpha);
     }
-    else if(rct->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(rct->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)rct,
                                                       paintState.alpha);
@@ -216,19 +227,12 @@ static void drawBorder(leRectangleWidget* rct)
 
 void _leRectangleWidget_Paint(leRectangleWidget* rct)
 {
-    if(rct->widget.scheme == NULL)
-    {
-        rct->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(rct->widget.drawState == NOT_STARTED)
+    if(rct->widget.status.drawState == NOT_STARTED)
     {
         nextState(rct);
     }
     
-    while(rct->widget.drawState != DONE)
+    while(rct->widget.status.drawState != DONE)
     {
         rct->widget.drawFunc((leWidget*)rct);
         

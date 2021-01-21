@@ -1,0 +1,27 @@
+var structLodePNGInfo =
+[
+    [ "background_b", "structLodePNGInfo.html#a3dee0c39a3a553fccf1d572bbfd8a00c", null ],
+    [ "background_defined", "structLodePNGInfo.html#a1be2ba2c5294ef18c95d0ff2e3bedd6f", null ],
+    [ "background_g", "structLodePNGInfo.html#ac6588772161141f3eec580204d37db57", null ],
+    [ "background_r", "structLodePNGInfo.html#a586058f396c1e921e02844bd095ce784", null ],
+    [ "color", "structLodePNGInfo.html#aa659ef2958d222436aa9cb7e1c0a45ad", null ],
+    [ "compression_method", "structLodePNGInfo.html#ac35dad302c132ef456d6fd344fd9ac9a", null ],
+    [ "filter_method", "structLodePNGInfo.html#a8725bfa9a75d43a6fdbe074fbdcba029", null ],
+    [ "interlace_method", "structLodePNGInfo.html#a5c5f4b69961b63eea043e26184bd4eee", null ],
+    [ "itext_keys", "structLodePNGInfo.html#af66e8ab9baaae25e87cd15703ee72dd1", null ],
+    [ "itext_langtags", "structLodePNGInfo.html#a97f3c97798fbcc0b252a26aaae8c91da", null ],
+    [ "itext_num", "structLodePNGInfo.html#a8fd1318f2cc154e92a26ffddd12d8b0e", null ],
+    [ "itext_strings", "structLodePNGInfo.html#ac98279c82ac70ebe72c92216a783de84", null ],
+    [ "itext_transkeys", "structLodePNGInfo.html#a79c1119972f385921be9721f25095679", null ],
+    [ "phys_defined", "structLodePNGInfo.html#a1fd1551439c9146aef780c32fc23bfd4", null ],
+    [ "phys_unit", "structLodePNGInfo.html#ada3f187a5948d3858a02af8b5b8c59a2", null ],
+    [ "phys_x", "structLodePNGInfo.html#a965694e43d2d5a34d3a7106a8a0f8cac", null ],
+    [ "phys_y", "structLodePNGInfo.html#a953aa3f25a1465a6b4efd4dd7e75912f", null ],
+    [ "text_keys", "structLodePNGInfo.html#a3c03a0e69144727c034b8cc01d244056", null ],
+    [ "text_num", "structLodePNGInfo.html#a13f66d07779458c371c87e7dbf214102", null ],
+    [ "text_strings", "structLodePNGInfo.html#abe87d61d02d986b1f7e457ccddb2438f", null ],
+    [ "time", "structLodePNGInfo.html#a3ad512c653e342a2834401e20138aed9", null ],
+    [ "time_defined", "structLodePNGInfo.html#a29b00be0e8a659bd04f045dc37de075c", null ],
+    [ "unknown_chunks_data", "structLodePNGInfo.html#a187e4c68eb908eaa9a96851734657fef", null ],
+    [ "unknown_chunks_size", "structLodePNGInfo.html#a0669a0b85578d017abba018d9f105b62", null ]
+];

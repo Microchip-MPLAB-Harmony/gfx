@@ -109,7 +109,7 @@ static void _recalculateScrollBarValues(const leListWidget* _this)
     }
 }
 
-static int32_t _getScrollBarRowLocation(const leListWidget* _this, int idx)
+static int32_t _getScrollBarRowLocation(const leListWidget* _this, uint32_t idx)
 {
     uint32_t row = 0;
     leRect rect;
@@ -139,11 +139,6 @@ static int32_t _getScrollBarRowLocation(const leListWidget* _this, int idx)
         height += rect.height;
     }
     
-    if(y == 0)
-    {
-        y = height;
-    }
-    
     if(height == 0)
         return 0;
     
@@ -159,13 +154,13 @@ static void _scrollBarMoved(leScrollBarWidget* bar)
     _invalidateListArea((leListWidget*)bar->widget.parent);
 }
 
-static uint32_t _getRowAtPoint(const leListWidget* _this,
-                               const lePoint* pnt)
+static int32_t _getRowAtPoint(const leListWidget* _this,
+                              const lePoint* pnt)
 {
-    uint32_t idx;
+    int32_t idx;
     leRect row;
     
-    for(idx = 0; idx < _this->items.size; idx++)
+    for(idx = 0; idx < (int32_t)_this->items.size; idx++)
     {
         _leListWidget_GetRowRect(_this, idx, &row);
         
@@ -188,12 +183,16 @@ static void _invalidateRow(const leListWidget* _this, int32_t row)
 static void stringPreinvalidate(const leString* str,
                                 leListWidget* lst)
 {
+    (void)str; // unused
+
     _invalidateListArea(lst);
 }
 
 static void stringInvalidate(const leString* str,
                              leListWidget* lst)
 {
+    (void)str; // unused
+
     _invalidateListArea(lst);
 }
 
@@ -217,11 +216,11 @@ void leListWidget_Constructor(leListWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_BEVEL;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_FILL;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_BEVEL;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_FILL;
     _this->itemDown = -1;
-    _this->mode = LE_LIST_WIDGET_SELECTION_MODE_CONTIGUOUS;
-    _this->allowEmpty = LE_TRUE;
+    _this->mode = LE_LIST_WIDGET_SELECTION_MODE_SINGLE;
+    _this->allowEmpty = LE_FALSE;
 
     leArray_Create(&_this->items);
     
@@ -244,7 +243,7 @@ void leListWidget_Constructor(leListWidget* _this)
                          
     _recalculateScrollBarValues(_this);
     
-    _this->widget.halign = LE_HALIGN_CENTER;
+    _this->widget.style.halign = LE_HALIGN_CENTER;
     _this->iconMargin = DEFAULT_MARGIN;
     _this->iconPos = LE_RELATIVE_POSITION_LEFTOF;
 
@@ -274,6 +273,8 @@ leListWidget* leListWidget_New()
 
 static void resized(leListWidget* _this, leWidget_ResizeEvent* evt)
 {
+    (void)evt; // unused
+
     _this->scrollbar->fn->setSize(_this->scrollbar,
                                   _this->scrollbar->widget.rect.width,
                                   _this->widget.rect.height);
@@ -397,9 +398,10 @@ static int32_t appendItem(leListWidget* _this)
     
     if(item == NULL)
         return -1;
-        
+
     item->enabled = LE_TRUE;
     item->string = NULL;
+    item->selected = LE_FALSE;
         
     leArray_PushBack(&_this->items, item);
     
@@ -434,6 +436,7 @@ static int32_t insertItem(leListWidget* _this,
         
     item->enabled = LE_TRUE;
     item->string = NULL;
+    item->selected = LE_FALSE;    
         
     leArray_InsertAt(&_this->items, idx, item);
     
@@ -491,7 +494,7 @@ static leResult removeAllItems(leListWidget* _this)
     for(i = 0; i < _this->items.size; i++)
     {
         item = _this->items.values[i];
-    
+        
         if(item != NULL)
         {
             LE_FREE(item);
@@ -502,8 +505,6 @@ static leResult removeAllItems(leListWidget* _this)
     
     _this->fn->invalidate(_this);
         
-    _recalculateScrollBarValues(_this);
-    
     return LE_SUCCESS;
 }
 
@@ -630,7 +631,7 @@ static leResult setItemSelected(leListWidget* _this,
             if(selected == LE_TRUE)
             {
                 // selection is contiguous, add to selection        
-                if(idx == firstIdx - 1 || idx == lastIdx + 1)
+                if((uint32_t)idx == firstIdx - 1 || (uint32_t)idx == lastIdx + 1)
                 {
                     item->selected = selected;
                 
@@ -662,7 +663,7 @@ static leResult setItemSelected(leListWidget* _this,
             else
             {
                 // selection is contiguous, remove from end caps        
-                if(idx == firstIdx || idx == lastIdx)
+                if((uint32_t)idx == firstIdx || (uint32_t)idx == lastIdx)
                 {
                     item->selected = selected;
                 
@@ -1034,7 +1035,7 @@ static void handleTouchDownEvent(leListWidget* _this,
                                  leWidgetEvent_TouchDown* evt)
 {
     lePoint pnt;
-    uint32_t idx;
+    int32_t idx;
     
     LE_ASSERT_THIS();
     
@@ -1043,7 +1044,7 @@ static void handleTouchDownEvent(leListWidget* _this,
     
     idx = _getRowAtPoint(_this, &pnt);
     
-    if(idx >= 0 && idx < _this->items.size)
+    if(idx >= 0 && idx < (int32_t)_this->items.size)
     {
         _this->itemDown = idx;
         
@@ -1063,7 +1064,7 @@ static void handleTouchUpEvent(leListWidget* _this,
                                leWidgetEvent_TouchUp* evt)
 {
     lePoint pnt;
-    uint32_t idx;
+    int32_t idx;
     
     LE_ASSERT_THIS();
     
@@ -1090,7 +1091,7 @@ static void handleTouchMovedEvent(leListWidget* _this,
                                   leWidgetEvent_TouchMove* evt)
 {
     lePoint pnt;
-    uint32_t idx;
+    int32_t idx;
     
     LE_ASSERT_THIS();
     
@@ -1099,7 +1100,7 @@ static void handleTouchMovedEvent(leListWidget* _this,
     
     idx = _getRowAtPoint(_this, &pnt);
     
-    if(idx >= 0 && idx < _this->items.size)
+    if(idx >= 0 && idx < (int32_t)_this->items.size)
     {
         if(_this->itemDown != idx)
         {
@@ -1217,7 +1218,7 @@ static const leListWidgetVTable listWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -1241,14 +1242,9 @@ static const leListWidgetVTable listWidgetVTable =
 
     .update = (void*)_leWidget_Update,
 
-    .touchDownEvent = (void*)_leWidget_TouchDownEvent,
-    .touchUpEvent = (void*)_leWidget_TouchUpEvent,
-    .touchMoveEvent = (void*)_leWidget_TouchMoveEvent,
     .moveEvent = (void*)_leWidget_MoveEvent,
-    .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,

@@ -54,7 +54,9 @@ void _leImageSequenceWidget_GetImageRect(leImageSequenceWidget* img,
                                          leRect* imgRect,
                                          leRect* imgSrcRect)
 {
-    leRect bounds = img->fn->localRect(img);
+    leRect bounds;
+
+    img->fn->localRect(img, &bounds);
     
     imgRect->x = 0;
     imgRect->y = 0;
@@ -85,7 +87,7 @@ void _leImageSequenceWidget_GetImageRect(leImageSequenceWidget* img,
                              img->widget.margin.bottom,
                              0);
         
-    *imgRect = leRectClipAdj(imgRect, &bounds, imgSrcRect);
+    leRectClipAdj(imgRect, &bounds, imgSrcRect, imgRect);
         
     leUtils_RectToScreenSpace((leWidget*)img, imgRect); 
 }
@@ -96,7 +98,7 @@ static void drawBorder(leImageSequenceWidget* img);
 
 static void nextState(leImageSequenceWidget* img)
 {
-    switch(img->widget.drawState)
+    switch(img->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -109,38 +111,41 @@ static void nextState(leImageSequenceWidget* img)
             }
 #endif
             
-            if(img->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(img->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                img->widget.drawState = DRAW_BACKGROUND;
+                img->widget.status.drawState = DRAW_BACKGROUND;
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(img->activeIdx >= 0 && img->activeIdx < (int32_t)img->count &&
                img->images[img->activeIdx].image != NULL)
             {
-                img->widget.drawState = DRAW_IMAGE;
+                img->widget.status.drawState = DRAW_IMAGE;
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawImage;
 
                 return;
             }
         }
+        // fall through
         case DRAW_IMAGE:
         {            
-            if(img->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(img->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                img->widget.drawState = DRAW_BORDER;
+                img->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            img->widget.drawState = DONE;
+            img->widget.status.drawState = DONE;
             img->widget.drawFunc = NULL;
         }
     }
@@ -159,7 +164,7 @@ static void onImageStreamFinished(leStreamManager* dec)
 {
     leImageSequenceWidget* img = (leImageSequenceWidget*)dec->userData;
 
-    img->widget.drawState = DRAW_IMAGE;
+    img->widget.status.drawState = DRAW_IMAGE;
 
     nextState(img);
 }
@@ -187,7 +192,7 @@ static void drawImage(leImageSequenceWidget* img)
         leGetActiveStream()->onDone = onImageStreamFinished;
         leGetActiveStream()->userData = img;
 
-        img->widget.drawState = WAIT_IMAGE;
+        img->widget.status.drawState = WAIT_IMAGE;
 
         return;
     }
@@ -198,12 +203,12 @@ static void drawImage(leImageSequenceWidget* img)
 
 static void drawBorder(leImageSequenceWidget* img)
 {
-    if(img->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(img->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)img,
                                                     paintState.alpha);
     }
-    else if(img->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(img->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)img,
                                                       paintState.alpha);
@@ -214,22 +219,15 @@ static void drawBorder(leImageSequenceWidget* img)
 
 void _leImageSequenceWidget_Paint(leImageSequenceWidget* img)
 {
-    if(img->widget.scheme == NULL)
-    {
-        img->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(img->widget.drawState == NOT_STARTED)
+    if(img->widget.status.drawState == NOT_STARTED)
         nextState(img);
 
 #if LE_STREAMING_ENABLED == 1
-    if(img->widget.drawState == WAIT_IMAGE)
+    if(img->widget.status.drawState == WAIT_IMAGE)
         return;
 #endif
 
-    while(img->widget.drawState != DONE)
+    while(img->widget.status.drawState != DONE)
     {
         img->widget.drawFunc((leWidget*)img);
         
@@ -238,7 +236,7 @@ void _leImageSequenceWidget_Paint(leImageSequenceWidget* img)
 #endif
         
 #if LE_STREAMING_ENABLED == 1
-        if(img->widget.drawState == WAIT_IMAGE)
+        if(img->widget.status.drawState == WAIT_IMAGE)
             break;
 #endif
     }

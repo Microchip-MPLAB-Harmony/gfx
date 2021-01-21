@@ -41,6 +41,13 @@
 
 // DOM-IGNORE-BEGIN
 
+/** \file legato_imagedeocder_jpeg.h
+* @brief JPEG Image decoder
+*
+* @details Internal library use only
+*
+*/
+
 #ifndef LE_IMAGEDECODER_JPEG_H
 #define LE_IMAGEDECODER_JPEG_H
 

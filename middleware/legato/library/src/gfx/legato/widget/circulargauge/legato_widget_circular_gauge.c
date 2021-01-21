@@ -36,21 +36,14 @@
 
 #include "gfx/legato/common/legato_math.h"
 
-#define DEFAULT_WIDTH           101
-#define DEFAULT_HEIGHT          101
+#define DEFAULT_WIDTH           100
+#define DEFAULT_HEIGHT          100
 
-#define DEFAULT_ORIGIN_X        50
-#define DEFAULT_ORIGIN_Y        50
-
-#define DEFAULT_RADIUS          50
-#define DEFAULT_START_ANGLE     225
-#define DEFAULT_CENTER_ANGLE    -270
-#define DEFAULT_START_VALUE     0
-#define DEFAULT_END_VALUE       100
+#define DEFAULT_RADIUS          40
+#define DEFAULT_START_ANGLE     0
+#define DEFAULT_CENTER_ANGLE    180
 #define DEFAULT_VALUE           50
-#define DEFAULT_TICK_VALUE      5
-#define DEFAULT_TICK_LENGTH     5
-#define DEFAULT_HAND_LENGTH     40
+#define DEFAULT_HAND_LENGTH     100
 
 #define DEFAULT_CENTER_CIRCLE_RADIUS 5
 #define DEFAULT_CENTER_CIRCLE_THICKNESS 2
@@ -60,174 +53,6 @@ static
 const
 #endif
 leCircularGaugeWidgetVTable circularGaugeWidgetVTable;
-
-//Invalidates the quadrant where needle is located
-void invalidateHandQuadrant(const leCircularGaugeWidget* gauge)
-{
-    leRect damagedRect;
-    
-    int32_t handAngleOffset = 0, handAbsAngle;
-    int32_t unitOffset = 0;
-    float degPerUnit;
-    lePoint p = {0};
-    
-    leUtils_PointToScreenSpace((leWidget*)gauge, &p);
-
-    unitOffset = gauge->value - gauge->startValue;
-    degPerUnit = (float) gauge->centerAngle / (float) (leAbsoluteValue(gauge->endValue - gauge->startValue));
-    handAngleOffset = (int32_t) ((float) unitOffset * degPerUnit);
-
-    handAbsAngle = gauge->startAngle + handAngleOffset;
-    
-    while(handAbsAngle < 0)
-    {
-        handAbsAngle += 360;
-    }
-
-    if (handAbsAngle >= 360)
-    {
-        handAbsAngle %= 360;
-    }
-    
-    if (handAbsAngle > 270)
-    {
-        //Invalidate Q4
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x + damagedRect.width;
-        damagedRect.y = p.y + damagedRect.height;
-    }
-    else if (handAbsAngle == 270)
-    {
-        //Invalidate Q3 & Q4
-        damagedRect.width = gauge->fn->getWidth(gauge);
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x;
-        damagedRect.y = p.y + damagedRect.height;
-    }
-    else if (handAbsAngle > 180)
-    {
-        //Invalidate Q3
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x;
-        damagedRect.y = p.y + damagedRect.height;
-    }
-    else if (handAbsAngle == 180)
-    {
-        //Invalidate Q2 & Q3
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge);
-        
-        damagedRect.x = p.x;
-        damagedRect.y = p.y;
-    }
-    else if (handAbsAngle > 90)
-    {
-        //Invalidate Q2
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x;
-        damagedRect.y = p.y;
-    }
-    else if (handAbsAngle == 90)
-    {
-        //Invalidate Q1 & Q2
-        damagedRect.width = gauge->fn->getWidth(gauge);
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x;
-        damagedRect.y = p.y;        
-    }
-    else if (handAbsAngle > 0)
-    {
-        //Invalidate Q1
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge) / 2;
-        
-        damagedRect.x = p.x + damagedRect.width;
-        damagedRect.y = p.y;           
-    }
-    else if (handAbsAngle == 0)
-    {
-        //Invalidate Q4 & Q1
-        damagedRect.width = gauge->fn->getWidth(gauge) / 2;
-        damagedRect.height = gauge->fn->getHeight(gauge);
-        
-        damagedRect.x = p.x + damagedRect.width;
-        damagedRect.y = p.y;  
-    }
-        
-    gauge->fn->_damageArea(gauge, &damagedRect);
-}
-
-//Invalidates the needle rectangle
-static void invalidateHandRect(const leCircularGaugeWidget* gauge)
-{
-    leRect drawRect;
-    
-    lePoint outerPoint;
-    int32_t handAngleOffset = 0, handAbsAngle;
-    int32_t unitOffset = 0;
-    float degPerUnit;
-    lePoint p;
-    
-    p.x = gauge->fn->getWidth(gauge) / 2;
-    p.y = gauge->fn->getHeight(gauge) / 2;
-    
-    leUtils_PointToScreenSpace((leWidget*)gauge, &p);
-
-    unitOffset = gauge->value - gauge->startValue;
-    degPerUnit = (float) gauge->centerAngle / (float) (leAbsoluteValue(gauge->endValue - gauge->startValue));
-    handAngleOffset = (int32_t) ((float) unitOffset * degPerUnit);
-
-    handAbsAngle = gauge->startAngle + handAngleOffset;
-    
-    while(handAbsAngle < 0)
-    {
-        handAbsAngle += 360;
-    }
-
-    if (handAbsAngle >= 360)
-    {
-        handAbsAngle %= 360;
-    }
-    
-    lePolarToXY(gauge->handRadius, handAbsAngle, &outerPoint);
-  
-    if (p.x > (outerPoint.x + p.x))
-    {
-        drawRect.x = (outerPoint.x + p.x);
-        drawRect.width = -outerPoint.x;
-    }
-    else 
-    {
-        drawRect.x = p.x;
-        drawRect.width = outerPoint.x;
-    }
-    
-    if (p.y > p.y - outerPoint.y)
-    {
-        drawRect.y = p.y - outerPoint.y;
-        drawRect.height = outerPoint.y;
-    }
-    else 
-    {
-        drawRect.y = p.y;
-        drawRect.height = -outerPoint.y;
-    }
-    
-    drawRect.x -= 2;
-    drawRect.y -= 2;
-    drawRect.width += 4;
-    drawRect.height += 4;
-    
-    gauge->fn->_damageArea(gauge, &drawRect);
-}
 
 void leCircularGaugeWidget_Constructor(leCircularGaugeWidget* _this)
 {
@@ -241,25 +66,14 @@ void leCircularGaugeWidget_Constructor(leCircularGaugeWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
 
     // default gauge values
     _this->value = DEFAULT_VALUE;
     _this->radius = DEFAULT_RADIUS;
-    _this->startValue = DEFAULT_START_VALUE;
-    _this->endValue = DEFAULT_END_VALUE;
     _this->startAngle = DEFAULT_START_ANGLE;
     _this->centerAngle = DEFAULT_CENTER_ANGLE;
-    _this->dir = LE_COUNTER_CLOCKWISE;
-
-    // default tick properties
-    _this->ticksVisible = LE_TRUE;
-    _this->tickValue = DEFAULT_TICK_VALUE;
-    _this->tickLength = DEFAULT_TICK_LENGTH;
-
-    _this->tickLabelsVisible = LE_TRUE;
-    _this->ticksLabelFont = NULL;
 
     // default hand properties
     _this->handVisible = LE_TRUE;
@@ -283,9 +97,9 @@ void _leCircularGaugeWidget_Destructor(leCircularGaugeWidget* _this)
 {
     LE_ASSERT_THIS();
     
-    _this->fn->deleteArcs(_this);
-    _this->fn->deleteMinorTicks(_this);
-    _this->fn->deleteMinorTickLabels(_this);
+    _this->fn->deleteAllArcs(_this);
+    _this->fn->deleteAllTickRanges(_this);
+    _this->fn->deleteAllLabelRanges(_this);
     
     _leWidget_Destructor((leWidget*)_this);
 }
@@ -363,141 +177,122 @@ static leResult setCenterAngle(leCircularGaugeWidget* _this,
 {
     LE_ASSERT_THIS();
 
+    if(angle < -360)
+    {
+        angle = -360;
+    }
+
+    if(angle > 360)
+    {
+        angle = 360;
+    }
+
     if(_this->centerAngle == angle)
         return LE_SUCCESS;
-        
-    if (angle == 0)
-        return LE_FAILURE;
-    
+
     _this->centerAngle = angle;
 
-    if (_this->centerAngle < 0)
-    {
-        _this->dir = LE_CLOCKWISE;
-    }
-    else
-    {
-        _this->dir = LE_COUNTER_CLOCKWISE;
-    }
-    
     _this->fn->invalidate(_this);
         
     return LE_SUCCESS;
 }
 
-#if 0
-static leCircularGaugeWidgetDir getDirection(const leCircularGaugeWidget* _this)
+static uint32_t getValue(const leCircularGaugeWidget* _this)
 {
     LE_ASSERT_THIS();
-        
-    return _this->dir;
+
+    return _this->value;
 }
 
-static leResult setDirection(leCircularGaugeWidget* _this, 
-                             leCircularGaugeWidgetDir dir)
+static leResult setValue(leCircularGaugeWidget* _this,
+                         uint32_t val)
 {
     LE_ASSERT_THIS();
 
-    if(_this->dir == dir)
+    if(val > 100)
+    {
+        val = 100;
+    }
+
+    if(_this->value == val)
         return LE_SUCCESS;
-        
-    _this->dir = dir;
-    
+
+    _this->value = val;
+
     _this->fn->invalidate(_this);
-        
+
     return LE_SUCCESS;
 }
-#endif
 
-static leResult addValueArc(leCircularGaugeWidget* _this, 
-                            int32_t startValue, 
-                            int32_t endValue,
-                            uint32_t radius,
-                            uint32_t thickness,
-                            leScheme* scheme)
+static int32_t addArc(leCircularGaugeWidget* _this,
+                      uint32_t startAngle,
+                      uint32_t endAngle,
+                      int32_t offset,
+                      const leScheme* scheme,
+                      uint32_t thickness)
 {
     leCircularGaugeArc * arc;
     
     LE_ASSERT_THIS();
 
-    if (thickness > radius)
-        return LE_FAILURE;
+    if (startAngle > endAngle)
+        return -1;
 
-    if (startValue > endValue)
-        return LE_FAILURE;
-
-    if (startValue < _this->startValue || endValue > _this->endValue)
-        return LE_FAILURE;
-    
     arc = LE_MALLOC(sizeof(leCircularGaugeArc));
     
     if (arc == NULL)
-        return LE_FAILURE;
+        return -1;
 
-    arc->type = VALUE_ARC;
-    arc->radius = radius;
-    arc->thickness = thickness;
-    arc->scheme = scheme;
-    arc->startValue = startValue;
-    arc->endValue = endValue;
-    arc->startAngle = 0;
-    arc->endAngle = 0;
+    if(startAngle > endAngle)
+    {
+        startAngle = endAngle;
+    }
 
-    leArray_PushBack(&_this->arcsArray, arc);
+    if(endAngle < startAngle)
+    {
+        endAngle = startAngle;
+    }
 
-    _this->fn->invalidate(_this);
-        
-    return LE_SUCCESS;
-}
-
-static leResult addAngularArc(leCircularGaugeWidget* _this, 
-                              int32_t startAngle, 
-                              int32_t endAngle,
-                              uint32_t radius,
-                              uint32_t thickness,
-                              leScheme* scheme)
-{
-    leCircularGaugeArc * arc;
-    
-    LE_ASSERT_THIS();
-
-    if (scheme == NULL)
-        return LE_FAILURE;
-
-    if (radius > _this->radius)
-        return LE_FAILURE;
-
-    if (thickness > radius)
-        return LE_FAILURE;
-/*
-    if (startAngle < 0)
-        return LE_FAILURE;
-
-    if (endAngle > 360)
-        return LE_FAILURE;
-*/
-    arc = LE_MALLOC(sizeof(leCircularGaugeArc));
-    
-    if (arc == NULL)
-        return LE_FAILURE;
-
-    arc->type = ANGLE_ARC;
-    arc->radius = radius;
-    arc->thickness = thickness;
-    arc->scheme = scheme;
+    arc->enabled = LE_TRUE;
     arc->startAngle = startAngle;
     arc->endAngle = endAngle;
-    arc->startValue = 0;
-    arc->endValue = 0;
+    arc->offset = offset;
+    arc->scheme = scheme;
+    arc->thickness = thickness;
 
     leArray_PushBack(&_this->arcsArray, arc);
 
     _this->fn->invalidate(_this);
         
-    return LE_SUCCESS;
+    return (int32_t)_this->arcsArray.size;
 }
 
-static leResult deleteArcs(leCircularGaugeWidget* _this)
+static leResult deleteArc(leCircularGaugeWidget* _this,
+                          uint32_t idx)
+{
+    leResult res;
+    struct leCircularGaugeArc* arc;
+
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FAILURE;
+
+    arc = leArray_Get(&_this->arcsArray, idx);
+
+    res = leArray_RemoveAt(&_this->arcsArray, idx);
+
+    LE_FREE(arc);
+
+    if(res == LE_SUCCESS)
+    {
+        _this->fn->invalidate(_this);
+    }
+
+    return res;
+}
+
+static leResult deleteAllArcs(leCircularGaugeWidget* _this)
 {
     leCircularGaugeArc* arc;
     size_t idx;
@@ -518,295 +313,918 @@ static leResult deleteArcs(leCircularGaugeWidget* _this)
     return LE_SUCCESS;
 }
 
-static leResult addMinorTicks(leCircularGaugeWidget* _this, 
-                              int32_t startValue, 
-                              int32_t endValue,
-                              uint32_t radius,
-                              uint32_t length,
-                              uint32_t interval,
-                              leScheme* scheme)
+static uint32_t arcCount(const leCircularGaugeWidget* _this)
 {
-    leCircularGaugeTick * tick;
+    LE_ASSERT_THIS();
+
+    return _this->arcsArray.size;
+}
+
+static leBool getArcEnabled(const leCircularGaugeWidget* _this,
+                            uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->enabled;
+}
+
+static leResult setArcEnabled(leCircularGaugeWidget* _this,
+                              uint32_t idx,
+                              leBool en)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->enabled == en)
+        return LE_SUCCESS;
+
+    arc->enabled = en;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getArcStartAngle(const leCircularGaugeWidget* _this,
+                                 uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->startAngle;
+}
+
+static leResult setArcStartAngle(leCircularGaugeWidget* _this,
+                                 uint32_t idx,
+                                 uint32_t ang)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->startAngle > arc->endAngle)
+        return LE_FAILURE;
+
+    if(arc->startAngle == ang)
+        return LE_SUCCESS;
+
+    arc->startAngle = ang;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getArcEndAngle(const leCircularGaugeWidget* _this,
+                               uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->endAngle;
+}
+
+static leResult setArcEndAngle(leCircularGaugeWidget* _this,
+                               uint32_t idx,
+                               uint32_t ang)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->endAngle > arc->startAngle)
+        return LE_FAILURE;
+
+    if(arc->endAngle == ang)
+        return LE_SUCCESS;
+
+    arc->endAngle = ang;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static int32_t getArcOffset(const leCircularGaugeWidget* _this,
+                            uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->offset;
+}
+
+static leResult setArcOffset(leCircularGaugeWidget* _this,
+                             uint32_t idx,
+                             int32_t offs)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->offset == offs)
+        return LE_SUCCESS;
+
+    arc->offset = offs;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static const leScheme* getArcScheme(const leCircularGaugeWidget* _this,
+                                    uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->scheme;
+}
+
+static leResult setArcScheme(leCircularGaugeWidget* _this,
+                             uint32_t idx,
+                             const leScheme* schm)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->scheme == schm)
+        return LE_SUCCESS;
+
+    arc->scheme = schm;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getArcThickness(const leCircularGaugeWidget* _this,
+                                uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    return arc->thickness;
+}
+
+static leResult setArcThickness(leCircularGaugeWidget* _this,
+                                uint32_t idx,
+                                uint32_t thk)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
+
+    if(arc->thickness == thk)
+        return LE_SUCCESS;
+
+    arc->thickness = thk;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static int32_t addTickRange(leCircularGaugeWidget* _this,
+                            uint32_t startAngle,
+                            uint32_t endAngle,
+                            int32_t offset,
+                            const leScheme* schm,
+                            uint32_t thickness,
+                            uint32_t div)
+{
+    leCircularGaugeTickRange* tick;
     
     LE_ASSERT_THIS();
 
-    if (radius > _this->radius)
-        return LE_FAILURE;
+    if(startAngle > endAngle)
+    {
+        startAngle = endAngle;
+    }
 
-    if (length > radius)
-        return LE_FAILURE;
+    if(endAngle < startAngle)
+    {
+        endAngle = startAngle;
+    }
 
-    if (startValue < _this->startValue || 
-        startValue > _this->endValue)
-        return LE_FAILURE;
-    
-    if (endValue < _this->startValue || 
-        endValue > _this->endValue)
-        return LE_FAILURE;
-    
-    tick = LE_MALLOC(sizeof(leCircularGaugeTick));
+    if(startAngle > 100)
+    {
+        startAngle = 100;
+    }
+
+    if(endAngle > 100)
+    {
+        endAngle = 100;
+    }
+
+    if(startAngle > endAngle)
+        return -1;
+
+    tick = LE_MALLOC(sizeof(leCircularGaugeTickRange));
     
     if (tick == NULL)
-        return LE_FAILURE;
+        return -1;
 
-    tick->radius = radius;
-    tick->length = length;
-    tick->startValue = startValue;
-    tick->endValue = endValue;
-    tick->interval = interval;
-    tick->scheme = scheme;
+    tick->enabled = LE_TRUE;
+    tick->startAngle = startAngle;
+    tick->endAngle = endAngle;
+    tick->offset = offset;
+    tick->scheme = schm;
+    tick->thickness = thickness;
+    tick->divisions = div;
 
     leArray_PushBack(&_this->ticksArray, tick);
 
     _this->fn->invalidate(_this);
         
-    return LE_SUCCESS;
+    return (int32_t)_this->ticksArray.size;
 }
 
-static leResult deleteMinorTicks(leCircularGaugeWidget* _this)
+static leResult deleteTickRange(leCircularGaugeWidget* _this,
+                                uint32_t idx)
 {
-    leCircularGaugeTick* tick;
-    size_t idx;
-    
+    leResult res;
+    struct leCircularGaugeArc* arc;
+
     LE_ASSERT_THIS();
-    
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FAILURE;
+
+    arc = leArray_Get(&_this->arcsArray, idx);
+
+    res = leArray_RemoveAt(&_this->arcsArray, idx);
+
+    LE_FREE(arc);
+
+    if(res == LE_SUCCESS)
+    {
+        _this->fn->invalidate(_this);
+    }
+
+    return res;
+}
+
+static leResult deleteAllTickRanges(leCircularGaugeWidget* _this)
+{
+    leCircularGaugeTickRange* tick;
+    size_t idx;
+
+    LE_ASSERT_THIS();
+
     for(idx = 0; idx < _this->ticksArray.size; idx++)
     {
-        tick = (leCircularGaugeTick*)_this->ticksArray.values[idx];
-        
+        tick = (leCircularGaugeTickRange*)_this->ticksArray.values[idx];
+
         LE_FREE(tick);
     }
-    
+
     leArray_Clear(&_this->ticksArray);
 
     _this->fn->invalidate(_this);
-        
+
     return LE_SUCCESS;
 }
 
-static leResult addMinorTickLabels(leCircularGaugeWidget* _this, 
-                                   int32_t startValue,
-                                   int32_t endValue,
-                                   uint32_t radius,
-                                   leCircularGaugeWidgetLabelPosition position,
-                                   uint32_t interval,
-                                   leScheme* scheme)
+static uint32_t tickRangeCount(const leCircularGaugeWidget* _this)
 {
-    leCircularGaugeLabel * label;
-    
     LE_ASSERT_THIS();
 
-    if (radius > _this->radius)
+    return _this->ticksArray.size;
+}
+
+static leBool getTickRangeEnabled(const leCircularGaugeWidget* _this,
+                            uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->enabled;
+}
+
+static leResult setTickRangeEnabled(leCircularGaugeWidget* _this,
+                              uint32_t idx,
+                              leBool en)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->enabled == en)
+        return LE_SUCCESS;
+
+    tick->enabled = en;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getTickRangeStartAngle(const leCircularGaugeWidget* _this,
+                                 uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->startAngle;
+}
+
+static leResult setTickRangeStartAngle(leCircularGaugeWidget* _this,
+                                 uint32_t idx,
+                                 uint32_t ang)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->startAngle > tick->endAngle)
         return LE_FAILURE;
 
-    if (position != CIRCULAR_GAUGE_LABEL_OUTSIDE &&
-        position != CIRCULAR_GAUGE_LABEL_INSIDE)
+    if(tick->startAngle == ang)
+        return LE_SUCCESS;
+
+    tick->startAngle = ang;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getTickRangeEndAngle(const leCircularGaugeWidget* _this,
+                               uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->endAngle;
+}
+
+static leResult setTickRangeEndAngle(leCircularGaugeWidget* _this,
+                               uint32_t idx,
+                               uint32_t ang)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->endAngle < tick->startAngle)
         return LE_FAILURE;
 
-    if (startValue < _this->startValue || 
-        startValue > _this->endValue)
-        return LE_FAILURE;
-    
-    if (endValue < _this->startValue || 
-        endValue > _this->endValue)
-        return LE_FAILURE;
-    
-    label = LE_MALLOC(sizeof(leCircularGaugeLabel));
-    
+    if(tick->endAngle == ang)
+        return LE_SUCCESS;
+
+    tick->endAngle = ang;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static int32_t getTickRangeOffset(const leCircularGaugeWidget* _this,
+                            uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->offset;
+}
+
+static leResult setTickRangeOffset(leCircularGaugeWidget* _this,
+                             uint32_t idx,
+                             int32_t offs)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->offset == offs)
+        return LE_SUCCESS;
+
+    tick->offset = offs;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static const leScheme* getTickRangeScheme(const leCircularGaugeWidget* _this,
+                                    uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->scheme;
+}
+
+static leResult setTickRangeScheme(leCircularGaugeWidget* _this,
+                             uint32_t idx,
+                             const leScheme* schm)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->scheme == schm)
+        return LE_SUCCESS;
+
+    tick->scheme = schm;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getTickRangeThickness(const leCircularGaugeWidget* _this,
+                                uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->thickness;
+}
+
+static leResult setTickRangeThickness(leCircularGaugeWidget* _this,
+                                uint32_t idx,
+                                uint32_t thk)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->thickness == thk)
+        return LE_SUCCESS;
+
+    tick->thickness = thk;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getTickRangeDivisions(const leCircularGaugeWidget* _this,
+                                      uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    return tick->divisions;
+}
+
+static leResult setTickRangeDivisions(leCircularGaugeWidget* _this,
+                                      uint32_t idx,
+                                      uint32_t div)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->ticksArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
+
+    if(tick->divisions == div)
+        return LE_SUCCESS;
+
+    tick->divisions = div;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static int32_t addLabelRange(leCircularGaugeWidget* _this,
+                              uint32_t startAngle,
+                              uint32_t endAngle,
+                              int32_t offset,
+                              const leScheme* schm,
+                              const leFont* fnt,
+                              uint32_t div)
+{
+    leCircularGaugeLabelRange* label;
+
+    LE_ASSERT_THIS();
+
+    if(startAngle > 100)
+    {
+        startAngle = 100;
+    }
+
+    if(endAngle > 100)
+    {
+        endAngle = 100;
+    }
+
+    if(startAngle > endAngle)
+    {
+        startAngle = endAngle;
+    }
+
+    if(endAngle < startAngle)
+    {
+        endAngle = startAngle;
+    }
+
+    label = LE_MALLOC(sizeof(leCircularGaugeLabelRange));
+
     if (label == NULL)
-        return LE_FAILURE;
+        return -1;
 
-    label->radius = radius;
-    label->position = position;
-    label->startValue = startValue;
-    label->endValue = endValue;
-    label->interval = interval;
-    label->scheme = scheme;
+    label->enabled = LE_TRUE;
+    label->startAngle = startAngle;
+    label->endAngle = endAngle;
+    label->offset = offset;
+    label->scheme = schm;
+    label->font = fnt;
+    label->divisions = div;
 
     leArray_PushBack(&_this->labelsArray, label);
 
     _this->fn->invalidate(_this);
-        
-    return LE_SUCCESS;
+
+    return (int32_t)_this->labelsArray.size;
 }
 
-static leResult deleteMinorTickLabels(leCircularGaugeWidget* _this)
+static leResult deleteLabelRange(leCircularGaugeWidget* _this,
+                                uint32_t idx)
 {
-    leCircularGaugeLabel* label;
-    size_t idx;
-    
+    leResult res;
+    struct leCircularGaugeArc* arc;
+
     LE_ASSERT_THIS();
-    
+
+    if(idx >= _this->arcsArray.size)
+        return LE_FAILURE;
+
+    arc = leArray_Get(&_this->arcsArray, idx);
+
+    res = leArray_RemoveAt(&_this->arcsArray, idx);
+
+    LE_FREE(arc);
+
+    if(res == LE_SUCCESS)
+    {
+        _this->fn->invalidate(_this);
+    }
+
+    return res;
+}
+
+static leResult deleteAllLabelRanges(leCircularGaugeWidget* _this)
+{
+    leCircularGaugeLabelRange* label;
+    size_t idx;
+
+    LE_ASSERT_THIS();
+
     for(idx = 0; idx < _this->labelsArray.size; idx++)
     {
-        label = (leCircularGaugeLabel*)_this->labelsArray.values[idx];
-        
+        label = (leCircularGaugeLabelRange*)_this->labelsArray.values[idx];
+
         LE_FREE(label);
     }
-    
+
     leArray_Clear(&_this->labelsArray);
 
     _this->fn->invalidate(_this);
-        
+
     return LE_SUCCESS;
 }
 
-static int32_t getValue(const leCircularGaugeWidget* _this)
+static uint32_t labelRangeCount(const leCircularGaugeWidget* _this)
 {
     LE_ASSERT_THIS();
 
-    return _this->value;
+    return _this->labelsArray.size;
 }
 
-static leResult setValue(leCircularGaugeWidget* _this, 
-                         int32_t value)
+static leBool getLabelRangeEnabled(const leCircularGaugeWidget* _this,
+                                   uint32_t idx)
 {
     LE_ASSERT_THIS();
 
-    if (_this->value == value)
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->enabled;
+}
+
+static leResult setLabelRangeEnabled(leCircularGaugeWidget* _this,
+                                     uint32_t idx,
+                                     leBool en)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->enabled == en)
         return LE_SUCCESS;
-    
-    if (value < _this->startValue || value > _this->endValue)
+
+    label->enabled = en;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getLabelRangeStartAngle(const leCircularGaugeWidget* _this,
+                                        uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->startAngle;
+}
+
+static leResult setLabelRangeStartAngle(leCircularGaugeWidget* _this,
+                                        uint32_t idx,
+                                        uint32_t ang)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->startAngle > label->endAngle)
         return LE_FAILURE;
-    
-    invalidateHandRect(_this);
-        
-    _this->value = value;
-        
-    invalidateHandRect(_this);
-    
-    return LE_SUCCESS;
-}
 
-static int32_t getStartValue(const leCircularGaugeWidget* _this)
-{
-    LE_ASSERT_THIS();
-
-    return _this->startValue;
-}
-
-static leResult setStartValue(leCircularGaugeWidget* _this, 
-                              int32_t value)
-{
-    LE_ASSERT_THIS();
-
-    if (_this->startValue == value)
+    if(label->startAngle == ang)
         return LE_SUCCESS;
 
-    _this->startValue = value;
+    label->startAngle = ang;
 
     _this->fn->invalidate(_this);
 
     return LE_SUCCESS;
 }
 
-static int32_t getEndValue(const leCircularGaugeWidget* _this)
+static uint32_t getLabelRangeEndAngle(const leCircularGaugeWidget* _this,
+                                      uint32_t idx)
 {
     LE_ASSERT_THIS();
 
-    return _this->endValue;
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->endAngle;
 }
 
-static leResult setEndValue(leCircularGaugeWidget* _this, 
-                            int32_t value)
+static leResult setLabelRangeEndAngle(leCircularGaugeWidget* _this,
+                                      uint32_t idx,
+                                      uint32_t ang)
 {
     LE_ASSERT_THIS();
 
-    if (_this->endValue == value)
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->endAngle == ang)
         return LE_SUCCESS;
 
-    _this->endValue = value;
+    label->endAngle = ang;
 
     _this->fn->invalidate(_this);
 
     return LE_SUCCESS;
 }
 
-static leBool getTicksVisible(const leCircularGaugeWidget* _this)
+static int32_t getLabelRangeOffset(const leCircularGaugeWidget* _this,
+                                   uint32_t idx)
 {
     LE_ASSERT_THIS();
 
-    return _this->ticksVisible;
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->offset;
 }
 
-static leResult setTicksVisible(leCircularGaugeWidget* _this, 
-                                leBool visible)
+static leResult setLabelRangeOffset(leCircularGaugeWidget* _this,
+                                    uint32_t idx,
+                                    int32_t offs)
 {
     LE_ASSERT_THIS();
 
-    if (_this->ticksVisible == visible)
-        return LE_SUCCESS;
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
 
-    _this->ticksVisible = visible;
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
-    _this->fn->invalidate(_this);
-
-    return LE_SUCCESS;
-}
-
-static int32_t getTickValue(const leCircularGaugeWidget* _this)
-{
-    LE_ASSERT_THIS();
-
-    return _this->tickValue;
-}
-
-static leResult setTickValue(leCircularGaugeWidget* _this, 
-                             int32_t value)
-{
-    LE_ASSERT_THIS();
-
-    if (_this->tickValue == value)
-        return LE_SUCCESS;
-    
-    _this->tickValue = value;
-
-    _this->fn->invalidate(_this);
-
-    return LE_SUCCESS;
-}
-
-static uint32_t getTickLength(const leCircularGaugeWidget* _this)
-{
-    LE_ASSERT_THIS();
-
-    return _this->tickLength;
-}
-
-static leResult setTickLength(leCircularGaugeWidget* _this, 
-                              uint32_t length)
-{
-    LE_ASSERT_THIS();
-
-    if (_this->tickLength == length)
-        return LE_SUCCESS;
-
-    if (length > _this->radius)
+    if(label->endAngle < label->startAngle)
         return LE_FAILURE;
-    
-    _this->tickLength = length;
+
+    if(label->offset == offs)
+        return LE_SUCCESS;
+
+    label->offset = offs;
 
     _this->fn->invalidate(_this);
 
     return LE_SUCCESS;
 }
 
-static leBool getTickLabelsVisible(const leCircularGaugeWidget* _this)
+static const leScheme* getLabelRangeScheme(const leCircularGaugeWidget* _this,
+                                           uint32_t idx)
 {
     LE_ASSERT_THIS();
 
-    return _this->tickLabelsVisible;
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->scheme;
 }
 
-static leResult setTickLabelsVisible(leCircularGaugeWidget* _this, 
-                                     leBool visible)
+static leResult setLabelRangeScheme(leCircularGaugeWidget* _this,
+                                    uint32_t idx,
+                                    const leScheme* schm)
 {
     LE_ASSERT_THIS();
 
-    if (_this->tickLabelsVisible == visible)
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->scheme == schm)
         return LE_SUCCESS;
 
-    _this->tickLabelsVisible = visible;
+    label->scheme = schm;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static const leFont* getLabelRangeFont(const leCircularGaugeWidget* _this,
+                                       uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->font;
+}
+
+static leResult setLabelRangeFont(leCircularGaugeWidget* _this,
+                                  uint32_t idx,
+                                  const leFont* fnt)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->font == fnt)
+        return LE_SUCCESS;
+
+    label->font = fnt;
+
+    _this->fn->invalidate(_this);
+
+    return LE_SUCCESS;
+}
+
+static uint32_t getLabelRangeDivisions(const leCircularGaugeWidget* _this,
+                                       uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    return label->divisions;
+}
+
+static leResult setLabelRangeDivisions(leCircularGaugeWidget* _this,
+                                       uint32_t idx,
+                                       uint32_t div)
+{
+    LE_ASSERT_THIS();
+
+    if(idx >= _this->labelsArray.size)
+        return LE_FALSE;
+
+    leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
+
+    if(label->divisions == div)
+        return LE_SUCCESS;
+
+    label->divisions = div;
 
     _this->fn->invalidate(_this);
 
@@ -932,18 +1350,6 @@ static leResult setCenterCircleThickness(leCircularGaugeWidget* _this,
     return LE_SUCCESS;
 }
 
-static leResult setTickLabelFont(leCircularGaugeWidget* _this,
-                                 const leFont* font)
-{
-    LE_ASSERT_THIS();
-        
-    _this->ticksLabelFont = font;
-    
-    _this->fn->invalidate(_this);
-        
-    return LE_SUCCESS;
-}
-
 static leResult setValueChangedEventCallback(leCircularGaugeWidget* _this,
                                              leCircularGaugeWidget_ValueChangedEvent cb)
 {
@@ -969,47 +1375,78 @@ void _leCircularGaugeWidget_GenerateVTable()
 
     
     /* member functions */
-    circularGaugeWidgetVTable.getRadius = getRadius;
-    circularGaugeWidgetVTable.setRadius = setRadius;
-    circularGaugeWidgetVTable.getStartAngle = getStartAngle;
-    circularGaugeWidgetVTable.setStartAngle = setStartAngle;
-    circularGaugeWidgetVTable.getCenterAngle = getCenterAngle;
-    circularGaugeWidgetVTable.setCenterAngle = setCenterAngle;
-    //circularGaugeWidgetVTable.getDirection = getDirection;
-    //circularGaugeWidgetVTable.setDirection = setDirection;
-    circularGaugeWidgetVTable.addValueArc = addValueArc;
-    circularGaugeWidgetVTable.addAngularArc = addAngularArc;
-    circularGaugeWidgetVTable.deleteArcs = deleteArcs;
-    circularGaugeWidgetVTable.addMinorTicks = addMinorTicks;
-    circularGaugeWidgetVTable.deleteMinorTicks = deleteMinorTicks;
-    circularGaugeWidgetVTable.addMinorTickLabels = addMinorTickLabels;
-    circularGaugeWidgetVTable.deleteMinorTickLabels = deleteMinorTickLabels;
-    circularGaugeWidgetVTable.getValue = getValue;
-    circularGaugeWidgetVTable.setValue = setValue;
-    circularGaugeWidgetVTable.getStartValue = getStartValue;
-    circularGaugeWidgetVTable.setStartValue = setStartValue;
-    circularGaugeWidgetVTable.getEndValue = getEndValue;
-    circularGaugeWidgetVTable.setEndValue = setEndValue;
-    circularGaugeWidgetVTable.getTicksVisible = getTicksVisible;
-    circularGaugeWidgetVTable.setTicksVisible = setTicksVisible;
-    circularGaugeWidgetVTable.getTickValue = getTickValue;
-    circularGaugeWidgetVTable.setTickValue = setTickValue;
-    circularGaugeWidgetVTable.getTickLength = getTickLength;
-    circularGaugeWidgetVTable.setTickLength = setTickLength;
-    circularGaugeWidgetVTable.getTickLabelsVisible = getTickLabelsVisible;
-    circularGaugeWidgetVTable.setTickLabelsVisible = setTickLabelsVisible;
-    circularGaugeWidgetVTable.getHandVisible = getHandVisible;
-    circularGaugeWidgetVTable.setHandVisible = setHandVisible;
-    circularGaugeWidgetVTable.getHandRadius = getHandRadius;
-    circularGaugeWidgetVTable.setHandRadius = setHandRadius;
-    circularGaugeWidgetVTable.getCenterCircleVisible = getCenterCircleVisible;
-    circularGaugeWidgetVTable.setCenterCircleVisible = setCenterCircleVisible;
-    circularGaugeWidgetVTable.getCenterCircleRadius = getCenterCircleRadius;
-    circularGaugeWidgetVTable.setCenterCircleRadius = setCenterCircleRadius;
-    circularGaugeWidgetVTable.getCenterCircleThickness = getCenterCircleThickness;
-    circularGaugeWidgetVTable.setCenterCircleThickness = setCenterCircleThickness;
-    circularGaugeWidgetVTable.setTickLabelFont = setTickLabelFont;
-    circularGaugeWidgetVTable.setValueChangedEventCallback = setValueChangedEventCallback;
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getCenterAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setCenterAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getValue);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setValue);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,addArc);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteArc);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteAllArcs);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,arcCount);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getArcThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,addTickRange);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteTickRange);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteAllTickRanges);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,tickRangeCount);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getTickRangeDivisions);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setTickRangeDivisions);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,addLabelRange);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteLabelRange);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,deleteAllLabelRanges);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,labelRangeCount);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeEnabled);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeStartAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeEndAngle);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeOffset);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setArcThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeScheme);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeFont);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeFont);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getLabelRangeDivisions);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setLabelRangeDivisions);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getHandVisible);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setHandVisible);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getHandRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setHandRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getCenterCircleVisible);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setCenterCircleVisible);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getCenterCircleRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setCenterCircleRadius);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,getCenterCircleThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setCenterCircleThickness);
+    ASSIGN_VTABLE_FUNCTION(circularGaugeWidgetVTable,setValueChangedEventCallback);
 }
 
 void _leCircularGaugeWidget_FillVTable(leCircularGaugeWidgetVTable* tbl)
@@ -1055,7 +1492,7 @@ static const leCircularGaugeWidgetVTable circularGaugeWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -1101,47 +1538,77 @@ static const leCircularGaugeWidgetVTable circularGaugeWidgetVTable =
     ._paint = _leCircularGaugeWidget_Paint,
 
     /* member functions */
-    .getRadius = getRadius,
-    .setRadius = setRadius,
-    .getStartAngle = getStartAngle,
-    .setStartAngle = setStartAngle,
-    .getCenterAngle = getCenterAngle,
-    .setCenterAngle = setCenterAngle,
-    //.getDirection = getDirection,
-    //.setDirection = setDirection,
-    .addValueArc = addValueArc,
-    .addAngularArc = addAngularArc,
-    .deleteArcs = deleteArcs,
-    .addMinorTicks = addMinorTicks,
-    .deleteMinorTicks = deleteMinorTicks,
-    .addMinorTickLabels = addMinorTickLabels,
-    .deleteMinorTickLabels = deleteMinorTickLabels,
-    .getValue = getValue,
-    .setValue = setValue,
-    .getStartValue = getStartValue,
-    .setStartValue = setStartValue,
-    .getEndValue = getEndValue,
-    .setEndValue = setEndValue,
-    .getTicksVisible = getTicksVisible,
-    .setTicksVisible = setTicksVisible,
-    .getTickValue = getTickValue,
-    .setTickValue = setTickValue,
-    .getTickLength = getTickLength,
-    .setTickLength = setTickLength,
-    .getTickLabelsVisible = getTickLabelsVisible,
-    .setTickLabelsVisible = setTickLabelsVisible,
-    .getHandVisible = getHandVisible,
-    .setHandVisible = setHandVisible,
-    .getHandRadius = getHandRadius,
-    .setHandRadius = setHandRadius,
-    .getCenterCircleVisible = getCenterCircleVisible,
-    .setCenterCircleVisible = setCenterCircleVisible,
-    .getCenterCircleRadius = getCenterCircleRadius,
-    .setCenterCircleRadius = setCenterCircleRadius,
-    .getCenterCircleThickness = getCenterCircleThickness,
-    .setCenterCircleThickness = setCenterCircleThickness,
-    .setTickLabelFont = setTickLabelFont,
-    .setValueChangedEventCallback = setValueChangedEventCallback,
+    ASSIGN_VIRTUAL_FUNCTION(getRadius),
+    ASSIGN_VIRTUAL_FUNCTION(setRadius),
+    ASSIGN_VIRTUAL_FUNCTION(getStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getCenterAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setCenterAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getValue),
+    ASSIGN_VIRTUAL_FUNCTION(setValue),
+    ASSIGN_VIRTUAL_FUNCTION(addArc),
+    ASSIGN_VIRTUAL_FUNCTION(deleteArc),
+    ASSIGN_VIRTUAL_FUNCTION(deleteAllArcs),
+    ASSIGN_VIRTUAL_FUNCTION(arcCount),
+    ASSIGN_VIRTUAL_FUNCTION(getArcEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(setArcEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(getArcStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setArcStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getArcEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setArcEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getArcOffset),
+    ASSIGN_VIRTUAL_FUNCTION(setArcOffset),
+    ASSIGN_VIRTUAL_FUNCTION(getArcScheme),
+    ASSIGN_VIRTUAL_FUNCTION(setArcScheme),
+    ASSIGN_VIRTUAL_FUNCTION(getArcThickness),
+    ASSIGN_VIRTUAL_FUNCTION(setArcThickness),
+    ASSIGN_VIRTUAL_FUNCTION(addTickRange),
+    ASSIGN_VIRTUAL_FUNCTION(deleteTickRange),
+    ASSIGN_VIRTUAL_FUNCTION(deleteAllTickRanges),
+    ASSIGN_VIRTUAL_FUNCTION(tickRangeCount),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeOffset),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeOffset),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeScheme),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeScheme),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeThickness),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeThickness),
+    ASSIGN_VIRTUAL_FUNCTION(getTickRangeDivisions),
+    ASSIGN_VIRTUAL_FUNCTION(setTickRangeDivisions),
+    ASSIGN_VIRTUAL_FUNCTION(addLabelRange),
+    ASSIGN_VIRTUAL_FUNCTION(deleteLabelRange),
+    ASSIGN_VIRTUAL_FUNCTION(deleteAllLabelRanges),
+    ASSIGN_VIRTUAL_FUNCTION(labelRangeCount),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeEnabled),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeStartAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeEndAngle),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeOffset),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeOffset),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeScheme),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeScheme),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeFont),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeFont),
+    ASSIGN_VIRTUAL_FUNCTION(getLabelRangeDivisions),
+    ASSIGN_VIRTUAL_FUNCTION(setLabelRangeDivisions),
+    ASSIGN_VIRTUAL_FUNCTION(getHandVisible),
+    ASSIGN_VIRTUAL_FUNCTION(setHandVisible),
+    ASSIGN_VIRTUAL_FUNCTION(getHandRadius),
+    ASSIGN_VIRTUAL_FUNCTION(setHandRadius),
+    ASSIGN_VIRTUAL_FUNCTION(getCenterCircleVisible),
+    ASSIGN_VIRTUAL_FUNCTION(setCenterCircleVisible),
+    ASSIGN_VIRTUAL_FUNCTION(getCenterCircleRadius),
+    ASSIGN_VIRTUAL_FUNCTION(setCenterCircleRadius),
+    ASSIGN_VIRTUAL_FUNCTION(getCenterCircleThickness),
+    ASSIGN_VIRTUAL_FUNCTION(setCenterCircleThickness),
+    ASSIGN_VIRTUAL_FUNCTION(setValueChangedEventCallback),
 };
 #endif
 

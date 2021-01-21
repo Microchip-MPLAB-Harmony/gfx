@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements list wheel (drawing-style list box) widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_listwheel.h
+ * @brief List wheel functions and definitions.
+ *
+ * @details This module implements list wheel (drawing-style list box) widget
+ * functions.
+ */
 #ifndef LEGATO_LISTWHEELWIDGET_H
 #define LEGATO_LISTWHEELWIDGET_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -62,6 +64,10 @@ typedef struct leListWheelWidget leListWheelWidget;
   Summary:
     Selected item changed event function callback type
 */
+/**
+ * @brief Used to define a item changed event callback function.
+ * @details .
+ */
 typedef void (*leListWheelWidget_SelectedItemChangedEvent)(leListWheelWidget*,
                                                            int32_t idx);
 
@@ -78,6 +84,10 @@ typedef void (*leListWheelWidget_SelectedItemChangedEvent)(leListWheelWidget*,
   Summary:
     Indicates the fill type for the listwheel indicator area.
 */
+/**
+ * @brief Defines the fill type for the listwheel indicator area.
+ * @details .
+ */
 typedef enum leListWheelIndicatorFill
 {
     LE_LISTWHEEL_INDICATOR_FILL_NONE,
@@ -92,6 +102,10 @@ typedef enum leListWheelIndicatorFill
   Summary:
     Indicates the zoom effects for the list wheel items.
 */
+/**
+ * @brief Defines the zoom effects for the list wheel items.
+ * @details .
+ */
 typedef enum leListWheelZoomEffects
 {
     LE_LISTWHEEL_ZOOM_EFFECT_NONE,
@@ -113,13 +127,21 @@ typedef enum leListWheelZoomEffects
   Remarks:
     None.
 */
+/**
+ * @brief Defines list wheel item possibilities.
+ * @details .
+ */
 typedef struct leListWheelItem
 {
     const leString* string;
     const leImage* icon;
 } leListWheelItem;
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leListWheelWidget leListWheelWidget;
 
 #define LE_LISTWHEELWIDGET_VTABLE(THIS_TYPE) \
@@ -172,23 +194,18 @@ typedef struct leListWheelWidgetVTable
 	LE_LISTWHEELWIDGET_VTABLE(leListWheelWidget)
 } leListWheelWidgetVTable; 
 
-// DOM-IGNORE-END
+    /**
+      * @endcond
+      *
+      */
 
 // *****************************************************************************
-/* Structure:
-    leListWheelWidget
-
-  Summary:
-    Implementation of a list wheel widget struct
-
-  Description:
-    A list wheel widget is a widget that is similar to a normal list widget
-    but can be dragged up or down to cycle through a single active value.  This
-    widget is also capable of momentum and motion over time.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a listwheel widget
+ * @details A list wheel widget is a widget that is similar to a normal list
+ * widget but can be dragged up or down to cycle through a single active
+ * value. This widget is also capable of momentum and motion over time.
+ */
 typedef struct leListWheelWidget
 {
     leWidget widget; // widget base class
@@ -258,47 +275,34 @@ typedef struct leListWheelWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leListWheelWidget* leListWheelWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leListWheelWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leListWheelWidget* wgt = leListWheelWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leListWheelWidget* leListWheelWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leListWidget <span class="param">wgt</span>.
+ * @code
+ * leListWheelWidget* wgt;
+ * leListWheelWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leListWheelWidget_Constructor(leListWheelWidget* wgt);
 
-  Description:
 
-
-  Parameters:
-
-  Returns:
-    leListWheelWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leListWheelWidget* leListWheelWidget_New();
-
-/* Function:
-    void leListWheelWidget_Constructor(leListWheelWidget* wgt)
-
-  Summary:
-    Initializes an leListWheelWidget widget pointer.
-
-  Description:
-    Initializes an leListWheelWidget widget pointer.
-
-  Parameters:
-    leListWheelWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -341,6 +345,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set visible item count.
+ * @details Sets the visible item count to <span class="param">cnt</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leResult res = _this->fn->setVisibleItemCount(_this, cnt);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param cnt is the item count.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setVisibleItemCount(leListWheelWidget* _this,
+                                     uint32_t cnt);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -383,6 +402,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set image icon position.
+ * @details Sets the image icon position to <span class="param">pos</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leRelativePosition pos;
+ * leResult res = _this->fn->setIconPosition(_this, pos);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param pos is the position value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIconPosition(leListWheelWidget* _this,
+                                 leRelativePosition pos);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -425,6 +459,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set icon margin.
+ * @details Sets the icon margin to <span class="param">mg</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t mg;
+ * leResult res = _this->fn->setIconMargin(_this, mg);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param mg is the margin value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIconMargin(leListWheelWidget* _this,
+                               uint32_t mg);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -445,6 +494,18 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leBool - the setting value
 */
+/**
+ * @brief Get show selection indicators setting.
+ * @details Gets the show selection indicators setting
+ * for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leBool show = _this->fn->getShowIndicators(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if set, otherwise LE_FALSE;
+ */
+virtual leBool getShowIndicators(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -467,6 +528,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set draw indicator setting value.
+ * @details Sets the draw indicator setting value to <span class="param">b</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leBool b;
+ * leResult res = _this->fn->setShowIndicators(_this, b);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param b is the setting value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setShowIndicators(leListWheelWidget* _this,
+                                   leBool b);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -509,6 +585,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set draw indicator setting value.
+ * @details Sets the draw indicator setting value to <span class="param">area</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t area;
+ * leResult res = _this->fn->setIndicatorArea(_this, area);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param area is the area value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIndicatorArea(leListWheelWidget* _this,
+                                  uint32_t area);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -529,6 +620,18 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leBool - the setting value
 */
+/**
+ * @brief Get shaded setting value setting.
+ * @details Gets the shaded setting value setting
+ * for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leBool show = _this->fn->getShaded(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if set, otherwise LE_FALSE;
+ */
+virtual leBool getShaded(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -551,6 +654,22 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set shaded setting value.
+ * @details Sets the shaded setting value to <span class="param">sp</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leBool sp;
+ * leResult res = _this->fn->setShaded(_this, b);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param b is the setting value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setShaded(leListWheelWidget* _this,
+                           leBool sp);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -571,6 +690,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     uint32_t - the speed value
 */
+/**
+ * @brief Get flick init speed.
+ * @details Gets the flick init speed for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t speed = _this->fn->getFlickInitSpeed(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the speed value.
+ */
+virtual uint32_t getFlickInitSpeed(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -593,6 +723,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set flick init speed.
+ * @details Sets the flick init speed to <span class="param">sp</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t sp;
+ * leResult res = _this->fn->setFlickInitSpeed(_this, sp);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param sp is the speed value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFlickInitSpeed(leListWheelWidget* _this,
+                                   uint32_t sp);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -613,6 +758,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     uint32_t - the value
 */
+/**
+ * @brief Get max momentum value.
+ * @details Gets the max momentum value for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t max = _this->fn->getMaxMomentum(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the value.
+ */
+virtual uint32_t getMaxMomentum(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -635,6 +791,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set max momentum value.
+ * @details Sets the max momentum value to <span class="param">max</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t max;
+ * leResult res = _this->fn->setMaxMomentum(_this, max);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param max is the maximum value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setMaxMomentum(leListWheelWidget* _this,
+                                uint32_t max);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -655,6 +826,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     uint32_t - the value
 */
+/**
+ * @brief Get max momentum falloff rate.
+ * @details Gets the momentum falloff rate for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t max = _this->fn->getMomentumFalloffRate(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the value.
+ */
+virtual uint32_t getMomentumFalloffRate(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -677,6 +859,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set momentum falloff rate.
+ * @details Sets the momentum falloff rate to <span class="param">percent</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t percent;
+ * leResult res = _this->fn->setMomentumFalloffRate(_this, percent);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param percent is the value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setMomentumFalloffRate(leListWheelWidget* _this,
+                                        uint32_t percent);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -697,6 +894,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     uint32_t - the value
 */
+/**
+ * @brief Get max rotation update rate.
+ * @details Gets the rotation update rate for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t rate = _this->fn->getRotationUpdateRate(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the value.
+ */
+virtual uint32_t getRotationUpdateRate(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -719,6 +927,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set rotation update rate.
+ * @details Sets the rotation update rate to <span class="param">ms</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t ms;
+ * leResult res = _this->fn->setRotationUpdateRate(_this, ms);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param ms is the value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setRotationUpdateRate(leListWheelWidget* _this,
+                                       uint32_t ms);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -739,6 +962,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     uint32_t - the item count value
 */
+/**
+ * @brief Get total item count.
+ * @details Gets the total item count for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t cnt = _this->fn->getItemCount(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the item count value.
+ */
+virtual uint32_t getItemCount(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -759,6 +993,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     int32_t - the index of the appended item
 */
+/**
+ * @brief Append item to the list.
+ * @details Appends an item to the list using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t cnt = _this->fn->appendItem(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the index of the appended item.
+ */
+virtual int32_t appendItem(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -803,6 +1048,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Remove item from the list.
+ * @details Removes an item from the list at <span class="param">idx</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leResult res = _this->fn->removeItem(_this, idx);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param idx is the index.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult removeItem(leListWheelWidget* _this,
+                            int32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -823,6 +1083,18 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Remove all items from the list.
+ * @details Removes all items from the list
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leResult res = _this->fn->removeAllItems(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult removeAllItems(leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -843,6 +1115,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     int32_t - the index of the selected item
 */
+/**
+ * @brief Get selected item index.
+ * @details Gets the selected item index using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * uint32_t idx = _this->fn->getSelectedItem(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the index of the selected item.
+ */
+virtual int32_t getSelectedItem(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -865,6 +1148,22 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set rotation update rate.
+ * @details Sets the rotation update rate to <span class="param">idx</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leResult res = _this->fn->setSelectedItem(_this, idx);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param idx is the value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setSelectedItem(leListWheelWidget* _this,
+                                 int32_t idx);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -885,6 +1184,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Select previous item.
+ * @details Selects the previous item using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leResult res = _this->fn->selectPreviousItem(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult selectPreviousItem(leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -905,6 +1215,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Select next item.
+ * @details Selects the next item using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leResult res = _this->fn->selectNextItem(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult selectNextItem(leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -927,6 +1248,20 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leString* - the string pointer
 */
+/**
+ * @brief Get string pointer for an item.
+ * @details Gets the string pointer for an item using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leString* str = _this->fn->getItemString(_this, idx);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param idx the index.
+ * @returns the string pointer.
+ */
+virtual leString* getItemString(const leListWheelWidget* _this,
+                              int32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -951,6 +1286,23 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set string pointer for an item.
+ * @details Sets the string pointer to <span class="param">str</span> for an
+ * item at <span class="param">idx</span> using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leResult res = _this->fn->setItemString(_this, idx, str);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param idx is the value.
+ * @param str is the string pointer
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setItemString(leListWheelWidget* _this,
+                               int32_t idx,
+                               const leString* str);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -973,6 +1325,20 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leImage* - the image pointer
 */
+/**
+ * @brief Get image pointer for an item.
+ * @details Gets the image pointer for an item at <span class="param">_this</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leImage* img = _this->fn->getItemIcon(_this, idx);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the string pointer.
+ */
+virtual leImage* getItemIcon(const leListWheelWidget* _this,
+                             int32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -997,48 +1363,56 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set image pointer for an item.
+ * @details Sets the image pointer for an item to <span class="param">img</span> for an
+ * item at <span class="param">idx</span> using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * int32_t idx;
+ * leImage* img;
+ * leResult res = _this->fn->setItemString(_this, idx, img);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param idx is the value.
+ * @param img is the image pointer
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setItemIcon(leListWheelWidget* _this,
+                             int32_t idx,
+                             const leImage* img);
 
-// *****************************************************************************
-/* Virtual Member Function:
-    leListWheelWidget_SelectedItemChangedEvent getSelectedItemChangedEventCallback(const leListWheelWidget* _this)
 
-  Summary:
-     Gets the selected item changed event callback pointer.
+/**
+ * @brief Get selected item changed event callback pointer.
+ * @details Gets the selected item changed event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leListWheelWidget* _this;
+ * leListWheelWidget_SelectedItemChangedEvent cb = _this->fn->getSelectedItemChangedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the callback pointer.
+ */
+virtual leListWheelWidget_SelectedItemChangedEvent getSelectedItemChangedEventCallback
+                                                    (const leListWheelWidget* _this);
 
-  Description:
-     Gets the selected item changed event callback pointer.
+/**
+ * @brief Set selected item changed event callback pointer.
+ * @details Sets the selected item changed event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leListWheelWidget* _this;
+ * leListWheelWidget_SelectedItemChangedEvent cb;
+ * leResult res = _this->fn->setSelectedItemChangedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setSelectedItemChangedEventCallback(leListWheelWidget* _this,
+                                                     leListWheelWidget_SelectedItemChangedEvent cb);
 
-  Parameters:
-    const leListWheelWidget* _this - The list wheel widget to operate on
 
-  Remarks:
-    Usage - _this->fn->getSelectedItemChangedEventCallback(_this);
-
-  Returns:
-    leListWheelWidget_SelectedItemChangedEvent - the callback pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setSelectedItemChangedEventCallback(leListWheelWidget* _this,
-                                                 leListWheelWidget_SelectedItemChangedEvent cb)
-
-  Summary:
-     Sets the selected item changed event callback pointer.
-
-  Description:
-     Sets the selected item changed event callback pointer.
-
-  Parameters:
-    leListWheelWidget* _this - The list wheel widget to operate on
-    leListWheelWidget_SelectedItemChangedEvent cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setSelectedItemChangedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1059,6 +1433,18 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leListWheelIndicatorFill - the setting value
 */
+/**
+ * @brief Get indicator fill setting value.
+ * @details Gets indicator fill setting value
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leListWheelIndicatorFill setting = _this->fn->getIndicatorFill(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the setting value.
+ */
+virtual leListWheelIndicatorFill getIndicatorFill(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1081,6 +1467,22 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set indicator fill setting valuer.
+ * @details Sets the indicator fill setting value to <span class="param">fill</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leListWheelWidget* _this;
+ * leListWheelIndicatorFill fill;
+ * leResult res = _this->fn->setSelectedItemChangedEventCallback(_this, fill);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param fill is the fill setting
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIndicatorFill(leListWheelWidget* _this,
+                                  leListWheelIndicatorFill fill);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1101,6 +1503,18 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leListWheelZoomEffects - the setting value
 */
+/**
+ * @brief Get current zoom effects.
+ * @details Gets the current zoom effects
+ * using <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leListWheelZoomEffects effects = _this->fn->getZoomEffects(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the setting value.
+ */
+virtual leListWheelZoomEffects getZoomEffects(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1123,6 +1537,21 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set zoom effects value.
+ * @details Sets the zoom effects value to <span class="param">fill</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leListWheelWidget* _this;
+ * leListWheelZoomEffects zfx;
+ * leResult res = _this->fn->setZoomEffects(_this, zfx);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param zfx is the setting value
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setZoomEffects(leListWheelWidget* _this,
+                                leListWheelZoomEffects zfx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1143,6 +1572,17 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leBool - the setting value
 */
+/**
+ * @brief Get wheel auto-hide setting.
+ * @details Gets the wheel auto-hide setting for <span class="param">_this</span>.
+ * @code
+ * const leListWheelWidget* _this;
+ * leBool hide = _this->fn->getAutoHideWheel(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if set, otherwise LE_FALSE;
+ */
+virtual leBool getAutoHideWheel(const leListWheelWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1165,7 +1605,24 @@ LIB_EXPORT void leListWheelWidget_Constructor(leListWheelWidget* whl);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set wheel auto-hide setting.
+ * @details Sets the wheel auto-hide setting to <span class="param">fill</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leListWheelWidget* _this;
+ * leBool b;
+ * leResult res = _this->fn->setAutoHideWheel(_this, b);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param b is the setting value
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setAutoHideWheel(leListWheelWidget* _this,
+                                  leBool b);
 
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_LISTWHEEL_WIDGET_ENABLED

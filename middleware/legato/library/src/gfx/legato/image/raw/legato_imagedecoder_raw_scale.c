@@ -46,14 +46,14 @@ static leResult stage_scaledNearestNeighborPreRead(struct ScaleNearestNeighborPr
     // calculate nearest neighbor index
     stage->base.state->readOperation[0].x = (lePercentOf(stage->base.state->referenceX, stage->stretchRatioX) + 50) / 100;
 
-    if(stage->base.state->readOperation[0].x >= stage->base.state->source->buffer.size.width)
+    if(stage->base.state->readOperation[0].x >= (uint32_t)stage->base.state->source->buffer.size.width)
     {
         stage->base.state->readOperation[0].x = stage->base.state->source->buffer.size.width - 1;
     }
 
     stage->base.state->readOperation[0].y = (lePercentOf(stage->base.state->referenceY, stage->stretchRatioY) + 50) / 100;
 
-    if(stage->base.state->readOperation[0].y >= stage->base.state->source->buffer.size.height)
+    if(stage->base.state->readOperation[0].y >= (uint32_t)stage->base.state->source->buffer.size.height)
     {
         stage->base.state->readOperation[0].y = stage->base.state->source->buffer.size.height - 1;
     }
@@ -132,7 +132,7 @@ static leResult stage_bilinearPreRead(struct ScaleBilinearPreReadStage* stage)
     state->readOperation[1].x = pxi;
     state->readOperation[1].y = pyi;
 
-    if(state->readOperation[1].x < stage->base.state->source->buffer.size.width - 1)
+    if(state->readOperation[1].x < (uint32_t)stage->base.state->source->buffer.size.width - 1)
     {
         state->readOperation[1].x += 1;
     }
@@ -145,7 +145,7 @@ static leResult stage_bilinearPreRead(struct ScaleBilinearPreReadStage* stage)
     state->readOperation[2].x = pxi;
     state->readOperation[2].y = pyi;
 
-    if(state->readOperation[2].y < stage->base.state->source->buffer.size.height - 1)
+    if(state->readOperation[2].y < (uint32_t)stage->base.state->source->buffer.size.height - 1)
     {
         state->readOperation[2].y += 1;
     }
@@ -158,12 +158,12 @@ static leResult stage_bilinearPreRead(struct ScaleBilinearPreReadStage* stage)
     state->readOperation[3].x = pxi;
     state->readOperation[3].y = pyi;
 
-    if(state->readOperation[3].x < stage->base.state->source->buffer.size.width - 1)
+    if(state->readOperation[3].x < (uint32_t)stage->base.state->source->buffer.size.width - 1)
     {
         state->readOperation[3].x += 1;
     }
 
-    if(state->readOperation[3].y < stage->base.state->source->buffer.size.height - 1)
+    if(state->readOperation[3].y < (uint32_t)stage->base.state->source->buffer.size.height - 1)
     {
         state->readOperation[3].y += 1;
     }

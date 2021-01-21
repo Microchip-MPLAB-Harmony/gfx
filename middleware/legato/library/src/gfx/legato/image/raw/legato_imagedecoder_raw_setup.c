@@ -98,26 +98,27 @@ static leResult stage_targetIterateSetup(leRawDecodeStage* stage)
     state->referenceX = state->sourceRect.x + state->colIterator;
     state->referenceY = state->sourceRect.y + state->rowIterator;
 
-    if(state->referenceY - state->sourceRect.y >= (uint32_t)state->sourceRect.height)
-    {
-        state->currentStage = 0;
-        state->done = LE_TRUE;
-
-        return LE_SUCCESS;
-    }
-
     // calculate source offset
     state->targetY = stage->state->destRect.y + state->rowIterator;
     state->targetX = stage->state->destRect.x + state->colIterator;
 
-    if(state->referenceX - state->sourceRect.x < (uint32_t)state->destRect.width - 1)
+    if(state->colIterator < (uint32_t)state->destRect.width)
     {
         state->colIterator += 1;
     }
-    else
+
+    if(state->colIterator == (uint32_t)state->destRect.width)
     {
         state->colIterator = 0;
         state->rowIterator += 1;
+
+        if(state->rowIterator >= (uint32_t)state->destRect.height)
+        {
+            state->currentStage = 0;
+            state->done = LE_TRUE;
+
+            return LE_SUCCESS;
+        }
     }
 
     return LE_SUCCESS;
@@ -132,50 +133,6 @@ leResult _leRawImageDecoder_TargetIterateSetupStage(leRawDecodeState* state)
 
     setupStage.base.state = state;
     setupStage.base.exec = stage_targetIterateSetup;
-
-    _leRawImageDecoder_InjectStage(state, (void*)&setupStage);
-
-    return LE_SUCCESS;
-}
-
-static leResult stage_rotatedTargetIterateSetup(leRawDecodeStage* stage)
-{
-    leRawDecodeState* state = stage->state;
-
-    if(state->targetY - state->destRect.y >= (uint32_t)state->destRect.height)
-    {
-        state->currentStage = 0;
-        state->done = LE_TRUE;
-
-        return LE_SUCCESS;
-    }
-
-    // calculate source offset
-    state->targetY = stage->state->destRect.y + state->rowIterator;
-    state->targetX = stage->state->destRect.x + state->colIterator;
-
-    if(state->targetX - state->destRect.x < (uint32_t)state->destRect.width - 1)
-    {
-        state->colIterator += 1;
-    }
-    else
-    {
-        state->colIterator = 0;
-        state->rowIterator += 1;
-    }
-
-    return LE_SUCCESS;
-}
-
-leResult _leRawImageDecoder_RotatedTargetIterateSetupStage(leRawDecodeState* state)
-{
-    memset(&setupStage, 0, sizeof(setupStage));
-
-    state->rowIterator = 0;
-    state->colIterator = 0;
-
-    setupStage.base.state = state;
-    setupStage.base.exec = stage_rotatedTargetIterateSetup;
 
     _leRawImageDecoder_InjectStage(state, (void*)&setupStage);
 

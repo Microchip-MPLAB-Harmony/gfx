@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,7 +36,11 @@
   Description:
     This module implements various string utility functions.
 *******************************************************************************/
-
+/** \file legato_stringutils.h
+ * @brief String utility functions and definitions.
+ *
+ * @details This module implements various string utility functions..
+ */
 
 #ifndef LE_STRINGUTILS_H
 #define LE_STRINGUTILS_H
@@ -46,189 +48,138 @@
 #include "gfx/legato/string/legato_string.h"
 
 // *****************************************************************************
-/* Function:
-    uint32_t leStringUtils_FromCStr(const char* str,
-                                    leChar* buf,
-                                    uint32_t size)
-
-  Summary:
-     Converts a C-style string into a leChar buffer
-
-  Description:
-     Converts a C-style string into a leChar buffer
-
-  Parameters:
-    const char* str - the source C-style string
-    leChar* buf - the destination leChar string
-    uint32_t size - the size of the destination string in leChar
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of codepoints copied
-*/
-LIB_EXPORT uint32_t leStringUtils_FromCStr(const char* str,
-                                           leChar* buf,
-                                           uint32_t size);
+/**
+ * @brief Convert c-style string to leChar.
+ * @details Converts up to <span class="param">size</span> elements of
+ * c-style string <span class="param">str</span>
+ * to <span class="param">buf</span>.
+ * @code
+ * const char* str;
+ * leChar* buf;
+ * uint32_t size;
+ * uint32_t cp = leStringUtils_FromCStr(str, buf, size);
+ * @endcode
+ * @param str is the source C-style string.
+ * @param buf the destination leChar string.
+ * @param size is the size of the destination string in leChar
+ * @return returns the number of codepoints copied.
+ */
+uint32_t leStringUtils_FromCStr(const char* str,
+                                leChar* buf,
+                                uint32_t size);
 
 // *****************************************************************************
-/* Function:
-    uint32_t leStringUtils_ToCStr(const leChar* str,
-                                  uint32_t strSize,
-                                  char* buf,
-                                  uint32_t bufSize)
-
-  Summary:
-     Converts an leChar style buffer to a C-style string
-
-  Description:
-     Converts an leChar style buffer to a C-style string
-
-  Parameters:
-    const leChar* str - the source leChar stringthe leChar string to copy
-    uint32_t strSize - the size of the source leChar string
-    char* buf - the destination C string
-    uint32_t bufSize - the size of the destination buffer
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of chars copied
-*/
-LIB_EXPORT uint32_t leStringUtils_ToCStr(const leChar* str,
-                                         uint32_t strSize,
-                                         char* buf,
-                                         uint32_t bufSize);
+/**
+ * @brief Convert leChar buffer to C-style string.
+ * @details Converts leChar buffer at most <span class="param">strSize</span>
+ * of <span class="param">str</span> to <span class="param">buf</span>
+ * of size <span class="param">bufSize</span>.
+ * @code
+ * const leChar* str;
+ * uint32_t strSize;
+ * char* buf;
+ * uint32_t bufSize;
+ * uint32_t cp = leStringUtils_ToCStr(str, strSize, buf, size, bufSize);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return the number of chars copied
+ */
+uint32_t leStringUtils_ToCStr(const leChar* str,
+                              uint32_t strSize,
+                              char* buf,
+                              uint32_t bufSize);
 
 // *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetRect(const leChar* str,
-                                   uint32_t size,
+/**
+ * @brief Get  bounding rectangle for a leChar style string.
+ * @details Gets the bounding <span class="param">rect</span> for
+ * up to <span class="param">size</span> characters of
+ * <span class="param">str</span> with <span class="param">font</span>.
+ * @code
+ * leResult res = leStringUtils_GetRect(str, size, font, rect);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetRect(const leChar* str,
+                               uint32_t size,
+                               const leFont* font,
+                               leRect* rect);
+
+// *****************************************************************************
+/**
+ * @brief Gets the bounding rectangle for a C-style string.
+ * @details Gets the bounding <span class="param">rect</span>  of
+ * <span class="param">str</span> with <span class="param">font</span>.
+ * @code
+ * const char* str;
+ * const leFont* font;
+ * leRect* rect;
+ * leResult res = leStringUtils_GetRectCStr(str, font, rect);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetRectCStr(const char* str,
                                    const leFont* font,
-                                   leRect* rect)
-
-  Summary:
-     Gets the bounding rectangle for a leChar style string
-
-  Description:
-     Gets the bounding rectangle for a leChar style string
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the leChar string in code points
-    const leFont* font - the font to reference
-    leRect* rect - will contain the bounding information
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
-LIB_EXPORT leResult leStringUtils_GetRect(const leChar* str,
-                                          uint32_t size,
-                                          const leFont* font,
-                                          leRect* rect);
+                                   leRect* rect);
 
 // *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetRectCStr(const char* str,
-                                       const leFont* font,
-                                       leRect* rect)
-
-  Summary:
-     Gets the bounding rectangle for a C-style string
-
-  Description:
-     Gets the bounding rectangle for a C-style string
-
-  Parameters:
-    const char* str - the c string to analyze
-    const leFont* font - the font to reference
-    leRect* rect - will contain the bounding information
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
-LIB_EXPORT leResult leStringUtils_GetRectCStr(const char* str,
-                                              const leFont* font,
-                                              leRect* rect);
+/**
+ * @brief Get  line count for a leChar style string.
+ * @details Gets the line count for <span class="param">str</span> with
+ * <span class="param">size</span>.
+ * @code
+ * const leChar* str;
+ * uint32_t size;
+ * uint32_t res = leStringUtils_GetLineCount(str, size);
+ * @endcode
+ * @param str is an leChar string.
+ * @param size is an integer.
+ * @return the number of lines in the string.
+ */
+uint32_t leStringUtils_GetLineCount(const leChar* str,
+                                    uint32_t size);
 
 // *****************************************************************************
-/* Function:
-    uint32_t leStringUtils_GetLineCount(const leChar* str,
-                                        uint32_t size)
-
-  Summary:
-     Gets the line count for a leChar style string
-
-  Description:
-     Gets the line count for a leChar style string
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the input buffer in code points
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of lines in the string
-*/
-LIB_EXPORT uint32_t leStringUtils_GetLineCount(const leChar* str,
-                                               uint32_t size);
+/**
+ * @brief Get line count for a C-style string.
+ * @details Gets the line count for <span class="param">str</span>.
+ * @code
+ * const char* str;
+ * uint32_t res = leStringUtils_GetLineCountCStr(str);
+ * @endcode
+ * @param str is an integer.
+ * @return the number of lines in the string.
+ */
+uint32_t leStringUtils_GetLineCountCStr(const char* str);
 
 // *****************************************************************************
-/* Function:
-    uint32_t leStringUtils_GetLineCountCStr(const char* str);
-
-  Summary:
-     Gets the line count for a C-style string
-
-  Description:
-     Gets the line count for a C-style string
-
-  Parameters:
-    const char* str - the source C string to analyze
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of lines in the string
-*/
-LIB_EXPORT uint32_t leStringUtils_GetLineCountCStr(const char* str);
-
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetLineIndices(const leChar* str,
-                                          uint32_t size,
-                                          uint32_t line,
-                                          uint32_t* start,
-                                          uint32_t* end)
-
-  Summary:
-     Gets the line indices for a leChar style string
-
-  Description:
-     Gets the line indices for a leChar style string
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the input buffer in code points
-    uint32_t line - the line index to query
-    uint32_t* start - will contain the start index of the line
-    uint32_t* end - will contain the end index of the line
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
-LIB_EXPORT leResult leStringUtils_GetLineIndices(const leChar* str,
-                                                 uint32_t size,
-                                                 uint32_t line,
-                                                 uint32_t* start,
-                                                 uint32_t* end);
+/**
+ * @brief Get line indices for a leChar style string.
+ * @details Gets the line indices for <span class="param">str</span>
+ * with <span class="param">size</span> at <span class="param">line</span>
+ * from <span class="param">start</span> to <span class="param">end</span> .
+ * @code
+ * const leChar* str;
+ * uint32_t size;
+ * uint32_t line;
+ * uint32_t* start;
+ * uint32_t* end;
+ * uint32_t res = leStringUtils_GetLineIndices(str, size, line, start, end);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetLineIndices(const leChar* str,
+                                      uint32_t size,
+                                      uint32_t line,
+                                      uint32_t* start,
+                                      uint32_t* end);
 
 // *****************************************************************************
 /* Function:
@@ -238,13 +189,13 @@ LIB_EXPORT leResult leStringUtils_GetLineIndices(const leChar* str,
                                               uint32_t* end)
 
   Summary:
-     Gets the line indices for a C-style string
+
 
   Description:
      Gets the line indices for a C-style string
 
   Parameters:
-    const char* str - the source C-string to analyze
+    const char* str - the source C-string to aGets the line indices for a C-style stringnalyze
     uint32_t line - the line index to query
     uint32_t* start - will contain the start index of the line
     uint32_t* end - will contain the end index of the line
@@ -254,10 +205,20 @@ LIB_EXPORT leResult leStringUtils_GetLineIndices(const leChar* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetLineIndicesCStr(const char* str,
-                                                     uint32_t line,
-                                                     uint32_t* start,
-                                                     uint32_t* end);
+/**
+ * @brief Gets the line indices for a C-style string.
+ * @details Gets the line indices for a C-style string.
+ * @code
+ * leResult res = leStringUtils_GetLineIndicesCStr(str);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetLineIndicesCStr(const char* str,
+                                          uint32_t line,
+                                          uint32_t* start,
+                                          uint32_t* end);
 
 // *****************************************************************************
 /* Function:
@@ -285,11 +246,21 @@ LIB_EXPORT leResult leStringUtils_GetLineIndicesCStr(const char* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetLineRect(const leChar* str,
-                                              uint32_t size,
-                                              const leFont* font,
-                                              uint32_t line,
-                                              leRect* rect);
+/**
+ * @brief Gets the line bounding rectangle for a leChar style string.
+ * @details Gets the line bounding rectangle for a leChar style string.
+ * @code
+ * leResult res = leStringUtils_GetLineRect(str);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetLineRect(const leChar* str,
+                                   uint32_t size,
+                                   const leFont* font,
+                                   uint32_t line,
+                                   leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -315,10 +286,21 @@ LIB_EXPORT leResult leStringUtils_GetLineRect(const leChar* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetLineRectCStr(const char* str,
-                                                  const leFont* font,
-                                                  uint32_t line,
-                                                  leRect* rect);
+/**
+ * @brief Gets the line bounding rectangle for a C-style string.
+ * @details Gets the line bounding rectangle for a C-style string.
+ * @code
+ * leResult res = leStringUtils_GetLineRectCStr(str);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+
+leResult leStringUtils_GetLineRectCStr(const char* str,
+                                       const leFont* font,
+                                       uint32_t line,
+                                       leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -346,11 +328,21 @@ LIB_EXPORT leResult leStringUtils_GetLineRectCStr(const char* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetCharRect(const leChar* str,
-                                              uint32_t size,
-                                              const leFont* font,
-                                              uint32_t charIdx,
-                                              leRect* rect);
+/**
+ * @brief Gets a glyph bounding rectangle for a leChar style string.
+ * @details Gets a glyph bounding rectangle for a leChar style string.
+ * @code
+ * leResult res = leStringUtils_GetCharRect(str);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetCharRect(const leChar* str,
+                                   uint32_t size,
+                                   const leFont* font,
+                                   uint32_t charIdx,
+                                   leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -376,10 +368,20 @@ LIB_EXPORT leResult leStringUtils_GetCharRect(const leChar* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetCharRectCStr(const char* str,
-                                                  const leFont* font,
-                                                  uint32_t charIdx,
-                                                  leRect* rect);
+/**
+ * @brief Gets a glyph bounding rectangle for a C-style string.
+ * @details Gets a glyph bounding rectangle for a C-style string.
+ * @code
+ * leResult res = leStringUtils_GetCharRectCStr(str);
+ * @endcode
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetCharRectCStr(const char* str,
+                                       const leFont* font,
+                                       uint32_t charIdx,
+                                       leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -407,11 +409,21 @@ LIB_EXPORT leResult leStringUtils_GetCharRectCStr(const char* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetCharIndexAtPoint(const leChar* str,
-                                                      uint32_t size,
-                                                      const leFont* font,
-                                                      const lePoint pt,
-                                                      uint32_t* charIdx);
+/**
+ * @brief Gets the glyph at a point inside a leChar string bounding rectangle.
+ * @details Gets the glyph at a point inside a leChar string bounding rectangle.
+ * @code
+ * leResult res = leStringUtils_GetCharRectCStr(str);
+ * @leStringUtils_GetCharIndexAtPoint
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetCharIndexAtPoint(const leChar* str,
+                                           uint32_t size,
+                                           const leFont* font,
+                                           const lePoint pt,
+                                           uint32_t* charIdx);
 
 // *****************************************************************************
 /* Function:
@@ -437,10 +449,19 @@ LIB_EXPORT leResult leStringUtils_GetCharIndexAtPoint(const leChar* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leStringUtils_GetCharIndexAtPointCStr(const char* str,
-                                                          const leFont* font,
-                                                          const lePoint pt,
-                                                          uint32_t* charIdx);
+/**
+ * @brief Gets the glyph at a point inside a C-style string bounding rectangle.
+ * @details Gets the glyph at a point inside a C-style string bounding rectangle.
+ * @code
+ * leResult res = leStringUtils_GetCharIndexAtPointCStr(str);
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_GetCharIndexAtPointCStr(const char* str,
+                                               const leFont* font,
+                                               const lePoint pt,
+                                               uint32_t* charIdx);
 
 // *****************************************************************************
 /* Function:
@@ -471,10 +492,21 @@ LIB_EXPORT leResult leStringUtils_GetCharIndexAtPointCStr(const char* str,
   Returns:
     leResult - the result of the operation
 */
-LIB_EXPORT leResult leDecodeCodePoint(uint32_t encoding,
-                                      uint8_t* data,
-                                      uint32_t max,
-                                      uint32_t* codePoint,
-                                      uint32_t* offset);
+/**
+ * @brief Given an encoded codepoint (ASCII, UTF-8, or UTF-16) returns the
+ * actual codepoint.
+ * @details Given an encoded codepoint (ASCII, UTF-8, or UTF-16) returns the
+ * actual codepoint.
+ * @code
+ * leResult res = leDecodeCodePoint(str);
+ * @param str is an integer.
+ * @param buf is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leDecodeCodePoint(uint32_t encoding,
+                           uint8_t* data,
+                           uint32_t max,
+                           uint32_t* codePoint,
+                           uint32_t* offset);
 
 #endif /* LE_STRINGUTILS_H */

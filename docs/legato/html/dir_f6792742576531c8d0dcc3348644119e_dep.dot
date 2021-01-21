@@ -1,0 +1,15 @@
+digraph "C:/harmony3_dev/gfx/middleware/legato/driver" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_f9263886f735bf5529b65b69f132d1a2 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="legato" fontname="Helvetica", fontsize="10", URL="dir_f9263886f735bf5529b65b69f132d1a2.html"]
+  subgraph clusterdir_f6792742576531c8d0dcc3348644119e {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_f6792742576531c8d0dcc3348644119e.html"];
+    dir_f6792742576531c8d0dcc3348644119e [shape=plaintext label="driver"];
+    dir_0de3e1ee2919559bd2a42c70100db0e0 [shape=box label="config" color="black" fillcolor="white" style="filled" URL="dir_0de3e1ee2919559bd2a42c70100db0e0.html"];
+    dir_3ad0064d60c3a2f99351286e220b4df5 [shape=box label="controller" color="red" fillcolor="white" style="filled" URL="dir_3ad0064d60c3a2f99351286e220b4df5.html"];
+    dir_61329344a52837c7535ec46632245b37 [shape=box label="processor" color="red" fillcolor="white" style="filled" URL="dir_61329344a52837c7535ec46632245b37.html"];
+  }
+  }
+}

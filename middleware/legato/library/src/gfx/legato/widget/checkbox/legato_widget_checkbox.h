@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements button widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_checkbox.h
+ * @brief Checkbox widget functions and definitions.
+ *
+ * @details This module implements checkbox widget functions.
+ */
+
 #ifndef LEGATO_CHECKBOX_H
 #define LEGATO_CHECKBOX_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -61,6 +63,11 @@ typedef struct leCheckBoxWidget leCheckBoxWidget;
   Summary:
     Checkbox checked event function callback type
 */
+/**
+ * @brief This function represents a checked event callback.
+ * @details Checked event callback is used indicate a check box checked.
+ * @details .
+ */
 typedef void (*leCheckBoxWidget_CheckedEvent)(leCheckBoxWidget*);
 
 // *****************************************************************************
@@ -70,6 +77,11 @@ typedef void (*leCheckBoxWidget_CheckedEvent)(leCheckBoxWidget*);
   Summary:
     Checkbox unchecked event function callback type
 */
+/**
+ * @brief This function represents a unchecked event callback.
+ * @details Checked event callback is used indicate a check box unchecked.
+ * @details .
+ */
 typedef void (*leCheckBoxWidget_UncheckedEvent)(leCheckBoxWidget*);
 
 // *****************************************************************************
@@ -78,7 +90,11 @@ typedef void (*leCheckBoxWidget_UncheckedEvent)(leCheckBoxWidget*);
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leCheckBoxWidget leCheckBoxWidget;
 
 #define LE_CHECKBOXWIDGET_VTABLE(THIS_TYPE) \
@@ -107,7 +123,11 @@ typedef struct leCheckBoxWidgetVTable
 	LE_CHECKBOXWIDGET_VTABLE(leCheckBoxWidget)
 } leCheckBoxWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
+
 
 // *****************************************************************************
 /* Structure:
@@ -153,384 +173,289 @@ typedef struct leCheckBoxWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leCheckBoxWidget* leCheckBoxWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leCheckBoxWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leCheckBoxWidget* _this = leCheckBoxWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leCheckBoxWidget* leCheckBoxWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the managment of this memory until the
-    widget is added to a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leCheckBoxWidget <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leCheckBoxWidget_Constructor(_this);
+ * @endcode
+ * @param _this is the widget to initialize
+ * @return void.
+ */
+void leCheckBoxWidget_Constructor(leCheckBoxWidget* _this);
 
-  Description:
-
-
-  Parameters:
-    void
-
-  Returns:
-    leCheckBoxWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leCheckBoxWidget* leCheckBoxWidget_New();
-
-/* Function:
-    void leCheckBoxWidget_Constructor(leCheckBoxWidget* wgt)
-
-  Summary:
-    Initializes an CheckBox widget pointer.
-
-  Description:
-    Initializes an CheckBox widget pointer.
-
-  Parameters:
-    leCheckBoxWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leCheckBoxWidget_Constructor(leCheckBoxWidget* wgt);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leBool getChecked(const leCheckBoxWidget* _this)
+/**
+ * @brief Get checked state.
+ * @details Gets the checked state using <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * leBool checked = _this->fn->getChecked(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if set, otherwise LE_FALSE;
+ */
+virtual leBool getChecked(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the checked state
-
-  Description:
-     Gets the checked state
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getChecked(_this);
-
-  Returns:
-    leBool - the checked state
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setChecked(leCheckBoxWidget* _this,
-                        leBool toggleable)
+/**
+ * @brief Set checked state.
+ * @details Sets the checked state to <span class="param">toggleable</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leBool toggleable;
+ * leResult res = _this->fn->setToggleable(_this, toggleable);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param toggleable is the toggleable state.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setChecked(leCheckBoxWidget* _this,
+                            leBool toggleable);
 
-  Summary:
-     Sets the checked state
-
-  Description:
-     Sets the checked state
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leBool toggleable - the togglable state
-
-  Remarks:
-    Usage - _this->fn->setChecked(_this, toggleable);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leImage* getCheckedImage(const leCheckBoxWidget* _this)
-
-  Summary:
-     Gets the checked image pointer
-
-  Description:
-     Gets the checked image pointer
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getCheckedImage(_this);
-
-  Returns:
-    leImage* - the image pointer
-*/
+/**
+ * @brief Get checked image pointer.
+ * @details Gets the checked image pointer using <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * leImage* img = _this->fn->getCheckedImage(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the checked image pointer.
+ */
+virtual leImage* getCheckedImage(const leCheckBoxWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setCheckedImage(leCheckBoxWidget* _this,
-                             leImage* img)
+/**
+ * @brief Set checked image pointer.
+ * @details Sets the checked image pointer to
+ * <span class="param">img</span> using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leImage* img;
+ * leResult res = _this->fn->setCheckedImage(_this, img);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param img is the image pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCheckedImage(leCheckBoxWidget* _this,
+                                 leImage* img);
 
-  Summary:
-     Sets the checked image pointer
-
-  Description:
-     Sets the checked image pointer
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leImage* img - the image pointer
-
-  Remarks:
-    Usage - _this->fn->setCheckedImage(_this, img);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leImage* getUncheckedImage(const leCheckBoxWidget* _this)
+/**
+ * @brief Get unchecked image pointer.
+ * @details Gets the unchecked image pointer using <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * leImage* img = _this->fn->getUncheckedImage(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the unchecked image pointer.
+ */
+virtual leImage* getUncheckedImage(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the unchecked image pointer
-
-  Description:
-     Gets the unchecked image pointer
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getUncheckedImage(_this);
-
-  Returns:
-    leImage* - the image pointer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setUncheckedImage(leCheckBoxWidget* _this,
-                               leImage* img)
+/**
+ * @brief Set unchecked image pointer.
+ * @details Sets the unchecked image pointer to
+ * <span class="param">img</span> using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leImage* img;
+ * leResult res = _this->fn->setUncheckedImage(_this, img);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param img is the image pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setUncheckedImage(leCheckBoxWidget* _this,
+                                 leImage* img);
 
-  Summary:
-     Sets the unchecked image pointer
-
-  Description:
-     Sets the unchecked image pointer
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leImage* img - the image pointer
-
-  Remarks:
-    Usage - _this->fn->setUncheckedImage(_this, img);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leRelativePosition getImagePosition(const leCheckBoxWidget* _this)
+/**
+ * @brief Get relative position of the image to the text.
+ * @details Gets the relative position of the image to the text using
+ *  <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * leRelativePosition pos = _this->fn->getImagePosition(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the relative position.
+ */
+virtual leRelativePosition getImagePosition(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the relative position of the image to the text
-
-  Description:
-     Gets the relative position of the image to the text
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getImagePosition(_this);
-
-  Returns:
-    leRelativePosition -
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setImagePosition(leCheckBoxWidget* _this,
-                              leRelativePosition pos)
+/**
+ * @brief Set relative position of the image to the text.
+ * @details Sets the relative position of the image to the text using
+ *  <span class="param">_this</span> to
+ * <span class="param">pos</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leRelativePosition pos;
+ * leResult res = _this->fn->setImagePosition(_this, pos);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param pos the relative position.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual setImagePosition(leCheckBoxWidget* _this,
+                         leRelativePosition pos);
 
-  Summary:
-     Sets the text/image relative position
-
-  Description:
-     Sets the text/image relative position
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leRelativePosition pos - the position value
-
-  Remarks:
-    Usage - _this->fn->setImagePosition(_this, pos);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getImageMargin(const leCheckBoxWidget* _this)
+/**
+ * @brief Get image margin.
+ * @details Gets the image margin using <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * uint32_t margin = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the image margin.
+ */
+virtual uint32_t getImageMargin(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the image margin
-
-  Description:
-     Gets the image margin
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getImageMargin(_this);
-
-  Returns:
-    uint32_t - the margin value
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setImageMargin(leCheckBoxWidget* _this,
-                            uint32_t mg)
+/**
+ * @brief Set image margin.
+ * @details Sets the image margin using <span class="param">_this</span> to
+ * <span class="param">mg</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * uint32_t mg;
+ * leResult res = _this->fn->setImageMargin(_this, mg);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param mg the offset value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setImageMargin(leCheckBoxWidget* _this,
+                                uint32_t mg));
 
-  Summary:
-     Sets the image margin
 
-  Description:
-     Sets the image margin
+/**
+ * @brief Get current string pointer.
+ * @details Gets the current string pointer using <span class="param">_this</span>.
+ * @code
+ * const leCheckBoxWidget* _this;
+ * leString* str = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the current string pointer.
+ */
+virtual leString* getString(const leCheckBoxWidget* _this);
 
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    uint32_t mg - the margin value
-
-  Remarks:
-    Usage - _this->fn->setImageMargin(_this, mg);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leString* getString(const leCheckBoxWidget* _this)
-
-  Summary:
-     Gets the current string pointer
-
-  Description:
-     Gets the current string pointer
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getString(_this);
-
-  Returns:
-    leString* - the string pointer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setString(leCheckBoxWidget* _this,
-                       const leString* str)
+/**
+ * @brief Set string.
+ * @details Sets the string  to <span class="param">str</span> using
+ *  <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * const leString* str;
+ * leResult res = _this->fn->setString(_this, str);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param str is the string pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual setString(leCheckBoxWidget* _this,
+                  const leString* str);
 
-  Summary:
-     Sets the current string pointer
 
-  Description:
-     Sets the current string pointer
+/**
+ * @brief Get checked event callback.
+ * @details Gets the checked event callback pointer pointer
+ * using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leCheckBoxWidget_CheckedEvent cb = _this->fn->getCheckedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the event callback.
+ */
+virtual leCheckBoxWidget_CheckedEvent getCheckedEventCallback(const leCheckBoxWidget* _this);
 
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    const leString* str - the string pointer
 
-  Remarks:
-    Usage - _this->fn->setString(_this, str);
+/**
+ * @brief Set checked event callback.
+ * @details Sets the checked event callback pointer to
+ * <span class="param">cb</span> using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leCheckBoxWidget_CheckedEvent cb;
+ * leResult res = _this->fn->setCheckedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCheckedEventCallback(leCheckBoxWidget* _this,
+                                         leCheckBoxWidget_CheckedEvent cb);
 
-  Returns:
-    leResult - the result of the operation
-*/
 
-// *****************************************************************************
-/* Virtual Member Function:
-    leCheckBoxWidget_CheckedEvent getCheckedEventCallback(const leCheckBoxWidget* _this)
+/**
+ * @brief Get unchecked event callback pointer.
+ * @details Gets the unchecked event callback pointer pointer using
+ * <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leCheckBoxWidget_UncheckedEvent cb = _this->fn->getUncheckedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leCheckBoxWidget_UncheckedEvent getUncheckedEventCallback
+                                                (const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the checked event callback
+/**
+ * @brief Set unchecked event callback pointer.
+ * @details Sets the unchecked event callback pointer to
+ * <span class="param">cb</span>  using <span class="param">_this</span>.
+ * @code
+ * leCheckBoxWidget* _this;
+ * leCheckBoxWidget_UncheckedEvent cb;
+ * leResult res = _this->fn->setUncheckedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setUncheckedEventCallback(leCheckBoxWidget* _this,
+                                           leCheckBoxWidget_UncheckedEvent cb);
 
-  Description:
-     Gets the checked event callback
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getCheckedEventCallback(_this);
-
-  Returns:
-    leCheckBoxWidget_CheckedEvent - the event callback
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setCheckedEventCallback(leCheckBoxWidget* _this,
-                                     leCheckBoxWidget_CheckedEvent cb)
-
-  Summary:
-     Sets the checked event callback
-
-  Description:
-     Sets the checked event callback
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leCheckBoxWidget_CheckedEvent cb - the event callback
-
-  Remarks:
-    Usage - _this->fn->setCheckedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leCheckBoxWidget_UncheckedEvent getUncheckedEventCallback(const leCheckBoxWidget* _this)
-
-  Summary:
-     Gets the unchecked event callback
-
-  Description:
-     Gets the unchecked event callback
-
-  Parameters:
-    const leCheckBoxWidget* _this - The checkbox to operate on
-
-  Remarks:
-    Usage - _this->fn->getUncheckedEventCallback(_this);
-
-  Returns:
-    leCheckBoxWidget_UncheckedEvent - the event callback
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setUncheckedEventCallback(leCheckBoxWidget* _this,
-                                       leCheckBoxWidget_UncheckedEvent cb)
-
-  Summary:
-     Sets the unchecked event callback
-
-  Description:
-     Sets the unchecked event callback
-
-  Parameters:
-    leCheckBoxWidget* _this - The checkbox to operate on
-    leCheckBoxWidget_UncheckedEvent cb - the event callback
-
-  Remarks:
-    Usage - _this->fn->setUncheckedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_CHECKBOX_WIDGET_ENABLED

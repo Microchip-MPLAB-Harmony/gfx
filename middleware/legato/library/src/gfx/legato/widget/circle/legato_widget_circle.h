@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements circle drawing widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_circle.h
+ * @brief Circle widget functions and definitions.
+ *
+ * @details This module implements circle drawing widget functions.
+ */
+
 #ifndef LEGATO_CIRCLE_H
 #define LEGATO_CIRCLE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -56,13 +58,16 @@
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
-typedef struct leCircleWidget leCircleWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leCircleWidget leCircleWidget;
 
 #define LE_CIRCLEWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
-    lePoint          (*getOrigin)(const THIS_TYPE* _this); \
+    leResult         (*getOrigin)(const THIS_TYPE* _this, lePoint* pnt); \
     leResult         (*setOrigin)(THIS_TYPE* _this, const lePoint org); \
     int32_t          (*getOriginX)(const THIS_TYPE* _this); \
     leResult         (*setOriginX)(THIS_TYPE* _this, const int32_t x); \
@@ -80,7 +85,10 @@ typedef struct leCircleWidgetVTable
 	LE_CIRCLEWIDGET_VTABLE(leCircleWidget)
 } leCircleWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Structure:
@@ -107,8 +115,8 @@ typedef struct leCircleWidget
 
     int32_t x; // the origin x cooridnate
     int32_t y; // the origin y coordinate
-    int32_t radius; // the radius of the circle
-    int32_t thickness; // the thickness of the circle outline
+    uint32_t radius; // the radius of the circle
+    uint32_t thickness; // the thickness of the circle outline
     leBool filled; // fills the circle area
 } leCircleWidget;
 
@@ -118,301 +126,228 @@ typedef struct leCircleWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leCircleWidget* leCircleWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leCircleWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leCircleWidget* wgt = leCircleWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leCircleWidget* leCircleWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the managment of this memory until the
-    widget is added to a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leCircleWidget <span class="param">wgt</span>.
+ * @code
+ * leCircleWidget* wgt;
+ * leCircleWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leCircleWidget_Constructor(leCircleWidget* cir);
 
-  Description:
 
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
-  Parameters:
-    void
-
-  Returns:
-    leCircleWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leCircleWidget* leCircleWidget_New();
-
-/* Function:
-    void leCircleWidget_Constructor(leCircleWidget* wgt)
-
-  Summary:
-    Initializes an leCircleWidget widget pointer.
-
-  Description:
-    Initializes an leCircleWidget widget pointer.
-
-  Parameters:
-    leCircleWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leCircleWidget_Constructor(leCircleWidget* cir);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    lePoint getOrigin(const leCircleWidget* _this)
+/**
+ * @brief Get circle origin.
+ * @details Gets the circle origin using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * lePoint point = _this->fn->getOrigin(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the origin.
+ */
+virtual lePoint getOrigin(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the circle origin
-
-  Description:
-     Gets the circle origin
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getOrigin(_this);
-
-  Returns:
-    lePoint - the origin
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setOrigin(leCircleWidget* _this,
-                       const lePoint org)
+/**
+ * @brief Set circle origin.
+ * @details Sets the circle origin to
+ * <span class="param">org</span> using <span class="param">_this</span>.
+ * @code
+ * leCircleWidget* _this;
+ * const lePoint org;
+ * leResult res = _this->fn->setOrigin(_this, org);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param org the circle origin.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setOrigin(leCircleWidget* _this,
+                           const lePoint org);
 
-  Summary:
-     Sets the circle origin
-
-  Description:
-     Sets the circle origin
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    const lePoint org - the origin value
-
-  Remarks:
-    Usage - _this->fn->setOrigin(_this, org);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    int32_t getOriginX(const leCircleWidget* _this)
+/**
+ * @brief Get X origin.
+ * @details Gets the X origin using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * int32_t xOrigin = _this->fn->getOriginX(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the X origin.
+ */
+virtual int32_t getOriginX(const leCheckBoxWidget* _this);
 
-  Summary:
-     Gets the X value of the circle origin
-
-  Description:
-     Gets the X value of the circle origin
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getOriginX(_this);
-
-  Returns:
-    int32_t - the origin X value
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setOriginX(leCircleWidget* _this,
-                        const int32_t x)
+/**
+ * @brief Set X value of the circle origin.
+ * @details Sets the X value of the circle origin to
+ * <span class="param">x</span> using <span class="param">_this</span>.
+ * @code
+ * leCircleWidget* _this;
+ * int32_t x;
+ * leResult res = _this->fn->setRadius(_this, x);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param x the X value of the circle origin.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setOriginY(leCircleWidget* _this,
+                            const int32_t x);
 
-  Summary:
-     Sets the X value of the circle origin
-
-  Description:
-     Sets the X value of the circle origin
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    const int32_t x - the origin X value
-
-  Remarks:
-    Usage - _this->fn->setOriginX(_this, x);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    int32_t getOriginY(const leCircleWidget* _this)
-
-  Summary:
-     Gets the Y value of the circle origin
-
-  Description:
-     Gets the Y value of the circle origin
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getOriginY(_this);
-
-  Returns:
-    int32_t - the origin Y value
-*/
+/**
+ * @brief Get Y value of the circle origin.
+ * @details Gets the Y value of the circle origin using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * int32_t xOrigin = _this->fn->getOriginY(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the Y origin.
+ */
+virtual int32_t getOriginY(const leCircleWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setOriginY(leCircleWidget* _this,
-                        const int32_t y)
+/**
+ * @brief Set Y value of the circle origin.
+ * @details Sets the Y value of the circle origin to
+ * <span class="param">y</span> using <span class="param">_this</span>.
+ * @code
+ * leCircleWidget* _this;
+ * int32_t y;
+ * leResult res = _this->fn->setRadius(_this, y);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param y the Y value of the circle origin.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setOriginY(leCircleWidget* _this,
+                            const int32_t y);
 
-  Summary:
-     Sets the Y value of the circle origin
-
-  Description:
-     Sets the Y value of the circle origin
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    const int32_t y - the origin Y value
-
-  Remarks:
-    Usage - _this->fn->setOriginY(_this, y);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getRadius(const leCircleWidget* _this)
+/**
+ * @brief Get radius.
+ * @details Gets the radius using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * uint32_t radius = _this->fn->getRadius(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the radius.
+ */
+virtual uint32_t getRadius(const leCircleWidget* _this);
 
-  Summary:
-     Gets the circle radius
-
-  Description:
-     Gets the circle radius
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getRadius(_this);
-
-  Returns:
-    uint32_t - the radius value
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setRadius(leCircleWidget* _this,
-                       uint32_t rad)
+/**
+ * @brief Set circle radius.
+ * @details Sets the circle radius to
+ * <span class="param">rad</span> using <span class="param">_this</span>.
+ * @code
+ * leCircleWidget* _this;
+ * uint32_t rad;
+ * leResult res = _this->fn->setRadius(_this, rad);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param rad the circle radius.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setRadius(leCircleWidget* _this,
+                           uint32_t rad);
 
-  Summary:
-     Sets the circle radius
-
-  Description:
-     Sets the circle radius
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    uint32_t rad - the radius value
-
-  Remarks:
-    Usage - _this->fn->setRadius(_this, rad);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getThickness(const leCircleWidget* _this)
+/**
+ * @brief Get thickness.
+ * @details Gets the thickness using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * uint32_t thickness = _this->fn->getThickness(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the thickness.
+ */
+virtual uint32_t getThickness(const leCircleWidget* _this);
 
-  Summary:
-     Gets the circle thickness
-
-  Description:
-     Gets the circle thickness
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getThickness(_this);
-
-  Returns:
-    uint32_t - the thickness value
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setThickness(leCircleWidget* _this,
-                          uint32_t thk)
+/**
+ * @brief Set circle thickness.
+ * @details Sets the circle thickness to
+ * <span class="param">thk</span> using <span class="param">_this</span>.
+ * @code
+ * leCircleWidget* _this;
+ * uint32_t thk;
+ * leResult res = _this->fn->setThickness(_this, thk);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param thk the thickness value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setThickness(leCircleWidget* _this,
+                              uint32_t thk);
 
-  Summary:
-     Sets the circle thickness
-
-  Description:
-     Sets the circle thickness
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    uint32_t thk - the thickness value
-
-  Remarks:
-    Usage - _this->fn->setThickness(_this, thk);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leBool getFilled(const leCircleWidget* _this)
-
-  Summary:
-     Gets the filled setting
-
-  Description:
-     Gets the filled setting
-
-  Parameters:
-    const leCircleWidget* _this - The circle to operate on
-
-  Remarks:
-    Usage - _this->fn->getFilled(_this);
-
-  Returns:
-    leBool - the filled setting
-*/
+/**
+ * @brief Get filled setting.
+ * @details Gets the filled setting using <span class="param">_this</span>.
+ * @code
+ * const leCircleWidget* _this;
+ * leBool filled = _this->fn->getFilled(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if set, otherwise LE_FALSE.
+ */
+virtual leBool getFilled(const leCircleWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFilled(leCircleWidget* _this,
-                       leBool fill)
+/**
+ * @brief Set filled setting.
+ * @details Sets the filled setting using <span class="param">_this</span> to
+ * <span class="param">fill</span>.
+ * @code
+ * leCircleWidget* _this;
+ * leBool fill;
+ * leResult res = _this->fn->setFilled(_this, fill);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param fill the filled setting.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFilled(leCircleWidget* _this,
+                           leBool fill);
 
-  Summary:
-     Sets the filled setting
 
-  Description:
-     Sets the filled setting
-
-  Parameters:
-    leCircleWidget* _this - The circle to operate on
-    leBool fill - the filled setting
-
-  Remarks:
-    Usage - _this->fn->setFilled(_this, fill);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_CIRCLE_WIDGET_ENABLED

@@ -23,12 +23,29 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+/** \file legato_fixedheap.h
+* @brief Fixed Heap function and definitions
+*
+* @details Internal library use only
+*
+*/
+
 #ifndef LEGATO_FIXEDHEAP_H
 #define LEGATO_FIXEDHEAP_H
 
 #include "gfx/legato/common/legato_common.h"
 
+#if LE_MEMORY_MANAGER_ENABLE == 1
+
 #if LE_FIXEDHEAP_ENABLE == 1
+
+#if LE_USE_DEBUG_ALLOCATOR == 1
+#define LE_FHEAP_ALLOC(heap) leFixedHeap_Alloc(heap, __LINE__, __FUNCTION__, __FILE__)
+#define LE_FHEAP_REALLOC(heap, ptr) leFixedHeap_Realloc(heap, ptr, __LINE__, __FUNCTION__, __FILE__)
+#else
+#define LE_FHEAP_ALLOC(heap) leFixedHeap_Alloc(heap)
+#define LE_FHEAP_REALLOC(heap, ptr) leFixedHeap_Realloc(ptr)
+#endif
 
 #if LE_FIXEDHEAP_DEBUG == 1
 #define LE_FIXEDHEAP_HEADER_SIZE   sizeof(leFixedHeapDebugHeader)
@@ -58,16 +75,21 @@
     leBool free - indicates if the block is free
     uint32_t checksum - the block checksum
 */
+/**
+ * @brief This struct represents a fixed heap debug header
+ * @details Used to debug fixed heap memory allocation
+ */
+
 typedef struct leFixedHeapDebugHeader
 {
 #if LE_USE_ALLOCATION_TRACKING == 1
-    uint32_t lineNumber;
-    const char* funcName;
-    const char* fileName;
+    uint32_t lineNumber;    /**< allocation line number. */
+    const char* funcName;   /**< allocation function. */
+    const char* fileName;   /**< allocation filename. */
 #endif
 
-    leBool   free;
-    uint32_t checksum;
+    leBool   free;      /**< indicates if the block is free. */
+    uint32_t checksum;  /**< the block checksum. */
 } leFixedHeapDebugHeader;
 #endif
 
@@ -82,6 +104,10 @@ typedef struct leFixedHeapDebugHeader
     void* data - pointer to the block data, also acts as a linked list
                  pointer to free blocks
 */
+/**
+ * @brief This struct represents a fixed heap block
+ * @details Defines a fixed heap block.
+ */
 typedef struct leFixedHeapBlock
 {
 #if LE_FIXEDHEAP_DEBUG == 1
@@ -106,6 +132,10 @@ typedef struct leFixedHeapBlock
     void* data - pointer to the actual heap data buffer
     void* freeList - pointer to the next free block
 */
+/**
+ * @brief This struct represents a fixed heap.
+ * @details Defines a fixed heap object
+ */
 typedef struct leFixedHeap
 {
     leBool initialized;
@@ -143,6 +173,19 @@ typedef struct leFixedHeap
   Returns:
     leResult
 */
+/**
+ * @brief Initialize a fixed heap.
+ * @details Initialize <span class="param">heap</span> with
+ * <span class="param">size</span> bytes
+ * and <span class="param">count</span> number of blocks
+ * and using the data buffer specified by <span class="param">data</span>.
+ * @code
+ * leFixedHeap* heap;
+ * leResult res = leFixedHeap_Init(heap, size, count, data);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFixedHeap_Init(leFixedHeap* heap,
                           uint32_t size,
                           uint32_t count,
@@ -165,6 +208,17 @@ leResult leFixedHeap_Init(leFixedHeap* heap,
   Returns:
     leResult
 */
+/**
+ * @brief Destroy a fixed heap.
+ * @details Destroys <span class="param">heap</span>.
+ * All pointers that are allocated from this heap should be considered invalid.
+ * @code
+ * leFixedHeap* heap;
+ * leFixedHeap_Destroy(heap);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @return void.
+ */
 void leFixedHeap_Destroy(leFixedHeap* heap);
 
 #if LE_USE_DEBUG_ALLOCATOR == 1
@@ -194,6 +248,22 @@ void leFixedHeap_Destroy(leFixedHeap* heap);
   Returns:
     leResult
 */
+/**
+ * @brief Allocates a block.
+ * @details Allocates a block from the fixed heap <span class="param">heap</span>.
+ * This is the debug version of this function and requires
+ * additional parameters which includes the file number
+ * <span class="param">lineNum</span> the function
+ * name <span class="param">funcName</span> and the
+ * file name <span class="param">fileName</span> where
+ * the allocation took place.
+ * @code
+ * leFixedHeap* heap;
+ * void * block = leFixedHeap_Alloc(heap, lineNum, funcName, fileName);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @return allocated block.
+ */
 void* leFixedHeap_Alloc(leFixedHeap* heap,
                         uint32_t lineNum,
                         const char* funcName,
@@ -218,6 +288,17 @@ void* leFixedHeap_Alloc(leFixedHeap* heap,
   Returns:
     leResult
 */
+
+/**
+ * @brief Allocates a block.
+ * @details Allocates a block from the fixed heap <span class="param">heap</span>.
+ * @code
+ * leFixedHeap* heap;
+ * void * block = leFixedHeap_Alloc(heap);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @return allocated block.
+ */
 void* leFixedHeap_Alloc(leFixedHeap* heap);
 #endif
 
@@ -238,6 +319,18 @@ void* leFixedHeap_Alloc(leFixedHeap* heap);
   Returns:
     leResult
 */
+/**
+ * @brief Free a block from heap.
+ * @details Frees the given block <span class="param">ptr</span> from
+ * the specified <span class="param">heap</span>
+ * @code
+ * leFixedHeap* heap;
+ * leFixedHeap_Free(heap, ptr);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @param ptr is the block ptr to free.
+ * @return void.
+ */
 void leFixedHeap_Free(leFixedHeap* heap, void* ptr);
 
 // *****************************************************************************
@@ -257,6 +350,18 @@ void leFixedHeap_Free(leFixedHeap* heap, void* ptr);
   Returns:
     leResult
 */
+/**
+ * @brief Query a heap.
+ * @details Queries <span class="param">heap</span> to
+ * determine if it contains a block ptr as specified by <span class="param">ptr</span>
+ * @code
+ * leFixedHeap* heap;
+ * leBool hasBlock = leFixedHeap_Contains(heap, ptr);
+ * @endcode
+ * @param heap is the fixed heap to scan.
+ * @param ptr is the block ptr to query.
+ * @return LE_TRUE if block ptr is found, otherwise LE_FALSE.
+ */
 leBool leFixedHeap_Contains(leFixedHeap* heap, void* ptr);
 
 // *****************************************************************************
@@ -279,6 +384,21 @@ leBool leFixedHeap_Contains(leFixedHeap* heap, void* ptr);
   Returns:
     leResult
 */
+/**
+ * @brief Validate a heap.
+ * @details Validates the heap specified by <span class="param">heap</span>.
+ * Validation involves scanning the heap blocks to look
+ * for errors.  The amount of checking is dependent on the heap
+ * debug level. When heap debugging is enabled the heap
+ * will use extra memory to store block checksums.  These
+ * checksums are verified to look for buffer overruns or other errors.
+ * @code
+ * leFixedHeap* heap;
+ * leResult res = leFixedHeap_Validate(heap);
+ * @endcode
+ * @param heap is the fixed heap.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFixedHeap_Validate(leFixedHeap* heap);
 
 #ifdef _WIN32
@@ -299,9 +419,25 @@ leResult leFixedHeap_Validate(leFixedHeap* heap);
   Returns:
     void
 */
+/**
+ * @brief Dump contents of heap
+ * @details Dumps the contents of <span class="param">hea</span>.
+ * If <span class="param">dumpRecords</span> is set
+ * to true the actual block data array will be dumped.
+ * @code
+ * leFixedHeap* heap;
+ * leBool dumpRecords=true;
+ * leFixedHeap_Dump(heap, dumpRecords)
+ * @endcode
+ * @param heap is the fixed heap.
+ * @param dumpRecords determines whether the actual block data is dumped.
+ * @return void.
+ */
 void leFixedHeap_Dump(leFixedHeap* heap, leBool dumpRecords);
 #endif
 
 #endif
+
+#endif // LE_MEMORY_MANAGER_ENABLE
 
 #endif /* LEGATO_FIXEDHEAP_H */

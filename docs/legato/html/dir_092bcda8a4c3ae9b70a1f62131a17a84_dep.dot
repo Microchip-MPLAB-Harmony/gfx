@@ -1,0 +1,13 @@
+digraph "C:/harmony3_dev/gfx" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_5e8cb83d332db38e4e810ab9505f53eb {
+    graph [ bgcolor="#ddddee", pencolor="black", label="harmony3_dev" fontname="Helvetica", fontsize="10", URL="dir_5e8cb83d332db38e4e810ab9505f53eb.html"]
+  subgraph clusterdir_092bcda8a4c3ae9b70a1f62131a17a84 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_092bcda8a4c3ae9b70a1f62131a17a84.html"];
+    dir_092bcda8a4c3ae9b70a1f62131a17a84 [shape=plaintext label="gfx"];
+    dir_89f38898316618d73bea37637642b0a7 [shape=box label="middleware" color="red" fillcolor="white" style="filled" URL="dir_89f38898316618d73bea37637642b0a7.html"];
+  }
+  }
+}

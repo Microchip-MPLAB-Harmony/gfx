@@ -53,12 +53,16 @@ static void invalidateTextRect(const leGroupBoxWidget* _this)
 static void stringPreinvalidate(const leString* str,
                                 leGroupBoxWidget* box)
 {
+    (void)str;
+
     invalidateTextRect(box);
 }
 
 static void stringInvalidate(const leString* str,
                              leGroupBoxWidget* box)
 {
+    (void)str;
+
     invalidateTextRect(box);
 }
 
@@ -90,7 +94,7 @@ void leGroupBoxWidget_Constructor(leGroupBoxWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
 
     _this->string = NULL;
 }
@@ -217,7 +221,7 @@ static const leGroupBoxWidgetVTable groupBoxWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -248,7 +252,6 @@ static const leGroupBoxWidgetVTable groupBoxWidgetVTable =
     .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     This module implements surface container drawing functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_drawsurface.h
+ * @brief Surface widget functions and definitions.
+ *
+ * @details This module implements surface container drawing functions.
+ */
 
 #ifndef LEGATO_DRAWSURFACE_H
 #define LEGATO_DRAWSURFACE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -60,6 +61,11 @@ typedef struct leDrawSurfaceWidget leDrawSurfaceWidget;
   Summary:
     Draw surface draw event function callback type
 */
+/**
+ * @brief This function represents a draw callback.
+ * @details Draw callback is used indicate a draw changed event.
+ * @details .
+ */
 typedef leBool (*leDrawSurfaceWidget_DrawCallback)(leDrawSurfaceWidget* sfc,
                                                    leRect* bounds);
 
@@ -69,7 +75,11 @@ typedef leBool (*leDrawSurfaceWidget_DrawCallback)(leDrawSurfaceWidget* sfc,
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leDrawSurfaceWidget leDrawSurfaceWidget;
 
 #define LE_DRAWSURFACEWIDGET_VTABLE(THIS_TYPE) \
@@ -83,7 +93,10 @@ typedef struct leDrawSurfaceWidgetVTable
 	LE_DRAWSURFACEWIDGET_VTABLE(leDrawSurfaceWidget)
 } leDrawSurfaceWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Structure:
@@ -107,6 +120,18 @@ typedef struct leDrawSurfaceWidgetVTable
   Remarks:
     None.
 */
+
+/**
+  * @brief This struct represents a draw surface widget.
+  * @details A draw surface widget is a special widget that allows an
+  * application to perform custom HAL draw calls during Legato's paint loop.
+  * To use, create and add a draw surface widget to the desired place in the
+  * widget tree. Then register for the callback through the API
+  * 'leDrawSurfaceWidget_SetDrawCallback'.  This callback occurs during the
+  * paint loop.  The application should then be free to adjust the HAL  draw
+  * state and issue draw calls as desired.  The HAL layer, buffer, or
+  *  context state must not be adjusted in any way.
+  */
 typedef struct leDrawSurfaceWidget
 {
     leWidget widget; // the widget base class
@@ -122,90 +147,67 @@ typedef struct leDrawSurfaceWidget
 // *****************************************************************************
 // *****************************************************************************
 
+/**
+ * @brief Create widget.
+ * @details Creates a new leDrawSurfaceWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leDrawSurfaceWidget* wgt = leDrawSurfaceWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leDrawSurfaceWidget* leDrawSurfaceWidget_New(void);
+
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leDrawSurfaceWidget <span class="param">wgt</span>.
+ * @code
+ * leDrawSurfaceWidget* wgt;
+ * leDrawSurfaceWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leDrawSurfaceWidget_Constructor(leDrawSurfaceWidget* sfc);
 // *****************************************************************************
-/* Function:
-    leDrawSurfaceWidget* leDrawSurfaceWidget_New()
 
-  Summary:
-    Allocates memory for a new DrawSurface widget.
-
-  Description:
-    Allocates memory for a new DrawSurface widget.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
-
-  Parameters:
-    void
-
-  Returns:
-    leDrawSurfaceWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leDrawSurfaceWidget* leDrawSurfaceWidget_New();
-
-/* Function:
-    void leDrawSurfaceWidget_Constructor(leCircularSliderWidget* wgt)
-
-  Summary:
-    Initializes an leDrawSurfaceWidget widget pointer.
-
-  Description:
-    Initializes an leDrawSurfaceWidget widget pointer.
-
-  Parameters:
-    leDrawSurfaceWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leDrawSurfaceWidget_Constructor(leDrawSurfaceWidget* sfc);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leDrawSurfaceWidget_DrawCallback getDrawCallback(const leDrawSurfaceWidget* _this)
-
-  Summary:
-     Gets the draw callback pointer
-
-  Description:
-     Gets the draw callback pointer
-
-  Parameters:
-    const leDrawSurfaceWidget* _this - The surface to operate on
-
-  Remarks:
-    Usage - _this->fn->getDrawCallback(_this);
-
-  Returns:
-    leDrawSurfaceWidget_DrawCallback - the callback pointer
-*/
+/**
+ * @brief Get draw callback pointer.
+ * @details Gets the draw callback pointer using <span class="param">_this</span>.
+ * @code
+ * leDrawSurfaceWidget* _this;
+ * leDrawSurfaceWidget_DrawCallback cb = _this->fn->getDrawCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the callback pointer.
+ */
+virtual leDrawSurfaceWidget_DrawCallback getDrawCallback(const leDrawSurfaceWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setDrawCallback(leDrawSurfaceWidget* _this,
-                             leDrawSurfaceWidget_DrawCallback cb)
+/**
+ * @brief Set draw callback pointer.
+ * @details Sets the draw callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leDrawSurfaceWidget* _this;
+ * leDrawSurfaceWidget_DrawCallback cb;
+ * leResult res = _this->fn->setDrawCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setDrawCallback(leDrawSurfaceWidget* _this,
+                                 leDrawSurfaceWidget_DrawCallback cb);
 
-  Summary:
-     Sets the draw callback pointer
-
-  Description:
-     Sets the draw callback pointer
-
-  Parameters:
-    leDrawSurfaceWidget* _this - The surface to operate on
-    leDrawSurfaceWidget_DrawCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setDrawCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
+#undef THIS_TYPE
+#endif
 
 #endif // LE_DRAWSURFACE_WIDGET_ENABLED
 #endif /* LEGATO_DRAWSURFACE_H */

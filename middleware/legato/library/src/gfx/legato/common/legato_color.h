@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,16 +37,23 @@
     Color conversion and color channel management
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_color.h
+ * @brief Color definitions and functions.
+ *
+ * @details Contains functions for color information and manipulation
+ * operations. Color conversion and color channel management.
+ */
 
 #ifndef LE_COLOR_H
 #define LE_COLOR_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
-// DOM-IGNORE-BEGIN
+/**
+  * @cond INTERNAL
+  */
 typedef uint32_t               leColor;
+
 
 #define LE_COLOR_MAX_SIZE      4
 
@@ -84,8 +89,9 @@ typedef uint32_t               leColor;
 #define ARGB_8888_GREEN_MASK   0xFF00
 #define ARGB_8888_BLUE_MASK    0xFF
 #define ARGB_8888_ALPHA_MASK   0xFF000000
-
-//DOM-IGNORE-END
+/**
+  * @endcond
+  */
 
 // *****************************************************************************
 // *****************************************************************************
@@ -101,6 +107,10 @@ typedef uint32_t               leColor;
     Maskable list of color valies.
 
 */
+/**
+ * @brief This enum represents the color masks for color modes.
+ * @details .
+ */
 typedef enum leColorMask
 {
     LE_COLOR_MASK_GS_8      = 0x1,
@@ -127,6 +137,11 @@ typedef enum leColorMask
   Summary:
     List of available color modes.
 */
+/**
+ * @brief This enum represents the supported RGB color formats.
+ * @details The pixels in a graphics buffer or supported display is represented
+ * by the pixel format. For embedded graphics this is limited by memory and hardware.
+ */
 typedef enum leColorMode
 {
     LE_COLOR_MODE_GS_8       = 0x0,
@@ -158,6 +173,12 @@ typedef enum leColorMode
   Summary:
     List of available bits-per-pixel sizes.    
 */
+/**
+ * @brief This enum represents the bits per pixel (bpp) options.
+ * @details The BPP controls the color depth and bit needed to hold
+ * a color. Higher bpp allows for more colours to be represented,
+ * however, more resources are required to store or display.
+ */
 typedef enum leBitsPerPixel
 {
     LE_BPP1,
@@ -184,11 +205,16 @@ typedef enum leBitsPerPixel
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents color mode information.
+ * @details Color mode information keeps track of size, bpp,
+ * color channel mask and color.
+ */
 typedef struct leColorModeInfo
 {
-    uint32_t size;
-    uint32_t bpp;
-    leBitsPerPixel bppOrdinal;
+    uint32_t size;              /**< size in bytes. */
+    uint32_t bpp;               /**< bpp value. */
+    leBitsPerPixel bppOrdinal;  /**< bpp enum value. */
 
     struct
     {
@@ -196,7 +222,7 @@ typedef struct leColorModeInfo
         uint32_t green;
         uint32_t blue;
         uint32_t alpha;
-    } mask;
+    } mask;                     /**< individual color mask. */
     
     struct
     {
@@ -215,6 +241,10 @@ typedef struct leColorModeInfo
   Summary:
     Color information reference table
 */
+/**
+ * @brief This array represents information reference table.
+ * @details The reference table is used to hold color information.
+ */
 extern const leColorModeInfo leColorInfoTable[];
 
 // *****************************************************************************
@@ -224,6 +254,10 @@ extern const leColorModeInfo leColorInfoTable[];
   Summary:
     Color name reference table
 */
+/**
+ * @brief This enum represents predefined color options.
+ * @details
+ */
 typedef enum leColorName
 {
     LE_COLOR_BLACK,
@@ -270,7 +304,20 @@ typedef enum leColorName
   Remarks:
     
 */
-LIB_EXPORT leColor leColorValue(leColorMode mode, leColorName name);
+/**
+ * @brief Get color by name and mode.
+ * @details Gets a color by <span class="param">name</span>
+ * in the format <span class="param">mode</span>.
+ * @code
+ * leColorMode mode;
+ * leColorName name;
+ * leColor color = leColorValue(mode, name);
+ * @endcode
+ * @parammode is the colormode required.
+ * @paramname is the name to query
+ * @return the color value of the given name in the specified format.
+ */
+leColor leColorValue(leColorMode mode, leColorName name);
 
 // *****************************************************************************
 /* Function:
@@ -292,7 +339,20 @@ LIB_EXPORT leColor leColorValue(leColorMode mode, leColorName name);
   Remarks:
     
 */
-LIB_EXPORT uint32_t leColorChannelRed(leColor clr, leColorMode mode);
+/**
+ * @brief Get red color channel.
+ * @details Gets the red color channel from <span class="param">color</span>
+ * in the format <span class="param">mode</span>.
+ * @code
+ * leColor clr;
+ * leColorMode mode;
+ * uint32_t red = leColorChannelRed(clr, mode);
+ * @endcode
+ * @param mode is the colormode required.
+ * @param name is the name to query
+ * @return the red color channel
+ */
+uint32_t leColorChannelRed(leColor clr, leColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -314,7 +374,20 @@ LIB_EXPORT uint32_t leColorChannelRed(leColor clr, leColorMode mode);
   Remarks:
     
 */
-LIB_EXPORT uint32_t leColorChannelGreen(leColor clr, leColorMode mode);
+/**
+ * @brief Get green color channel.
+ * @details Gets the green color channel from <span class="param">color</span>
+ * in the format <span class="param">mode</span>.
+ * @code
+ * leColor clr;
+ * leColorMode mode;
+ * uint32_t green = leColorChannelGreen(clr, mode);
+ * @endcode
+ * @paramclr is the color to query.
+ * @parammode is the format.
+ * @return the green color channel.
+ */
+uint32_t leColorChannelGreen(leColor clr, leColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -336,7 +409,20 @@ LIB_EXPORT uint32_t leColorChannelGreen(leColor clr, leColorMode mode);
   Remarks:
     
 */
-LIB_EXPORT uint32_t leColorChannelBlue(leColor clr, leColorMode mode);
+/**
+ * @brief Get blue color channel.
+ * @details Gets the blue color channel of type <span class="param">mode</span>
+ * for the given <span class="param">color</span>.
+ * @coded
+ * leColor clr;
+ * leColorMode mode;
+ * uint32_t blue = leColorChannelBlue(clr, mode);
+ * @endcode
+ * @param mode is the colormode format.
+ * @param name is the name to query.
+ * @return the blue color channel.
+ */
+uint32_t leColorChannelBlue(leColor clr, leColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -358,7 +444,20 @@ LIB_EXPORT uint32_t leColorChannelBlue(leColor clr, leColorMode mode);
   Remarks:
     
 */
-LIB_EXPORT uint32_t leColorChannelAlpha(leColor clr, leColorMode mode); 
+/**
+ * @brief Get alpha color channel.
+ * @details Gets the alpha color channel of type <span class="param">mode</span>
+ * for the given <span class="param">color</span>.
+ * @code
+ * leColorMode mode;
+ * leColorName name;
+ * uint32_t alpha = leColorChannelAlpha(clr, mode);
+ * @endcode
+ * @param clr is the source color value.
+ * @param mode is the source color mode
+ * @return the alpha color channel.
+ */
+uint32_t leColorChannelAlpha(leColor clr, leColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -381,9 +480,25 @@ LIB_EXPORT uint32_t leColorChannelAlpha(leColor clr, leColorMode mode);
   Remarks:
     
 */
-LIB_EXPORT leColor leColorConvert(leColorMode mode_in,
-                                  leColorMode mode_out,
-                                  leColor color);
+/**
+ * @brief Convert to color value.
+ * @details Converts the color value of <span class="param">color</span>
+ * from <span class="param">mode_in</span> to
+ * <span class="param">mode_out</span>.
+ * @code
+ * leColorMode mode_in;
+ * leColorName mode_out;
+ * leColor color
+ * leColor clr = leColorConvert(mode_in, mode_out, color);
+ * @endcode
+ * @param mode_in is the the source color.
+ * @param mode_out is the source color mode.
+ * @param color is the color to convert.
+ * @return the result color.
+ */
+leColor leColorConvert(leColorMode mode_in,
+                       leColorMode mode_out,
+                       leColor color);
 
 // *****************************************************************************
 /* Function:
@@ -405,7 +520,20 @@ LIB_EXPORT leColor leColorConvert(leColorMode mode_in,
   Remarks:
     
 */    
-LIB_EXPORT leColor leColorBlend_RGBA_8888(leColor fore, leColor back);
+/**
+ * @brief Get color from RGBA blend
+ * @details Gets a color from the blend of RGBA <span class="param">fore</span>
+ * and RGBA <span class="param">back</span>.
+ * @code
+ * leColor fore;
+ * leColor back;
+ * leColor blend = leColorBlend_RGBA_8888(fore, back);
+ * @endcode
+ * @param fore is the foreground color.
+ * @param back is the background color
+ * @return the blended result color.
+ */
+leColor leColorBlend_RGBA_8888(leColor fore, leColor back);
 
 // *****************************************************************************
 /* Function:
@@ -427,7 +555,20 @@ LIB_EXPORT leColor leColorBlend_RGBA_8888(leColor fore, leColor back);
   Remarks:
 
 */
-LIB_EXPORT leColor leColorBlend_ARGB_8888(leColor fore, leColor back);
+/**
+ * @brief Get color from ARGB blend
+ * @details Gets a color from the blend of ARGB <span class="param">fore</span>
+ * and RGBA <span class="param">back</span>.
+ * @code
+ * leColor fore;
+ * leColor back;
+ * leColor blend = leColorBlend_ARGB_8888(fore, back);
+ * @endcode
+ * @param fore is the foreground color.
+ * @param back is the background color
+ * @return the blended result color.
+ */
+leColor leColorBlend_ARGB_8888(leColor fore, leColor back);
 
 // *****************************************************************************
 /* Function:
@@ -451,10 +592,29 @@ LIB_EXPORT leColor leColorBlend_ARGB_8888(leColor fore, leColor back);
   Remarks:
     
 */
-LIB_EXPORT leColor leColorLerp(leColor l,
-                               leColor r,
-                               uint32_t percent,
-                               leColorMode mode);
+/**
+ * @brief Get color from linear interpolate of two colors
+ * @details Gets a color from the linear interpolation of
+ * <span class="param">l</span>
+ * and <span class="param">r</span> with
+ * percentage of interpolation specified by
+ * <span class="param">percent</span> and color format
+ * <span class="param">mode</span>
+ * @code
+ * leColor l;
+ * leColor r;
+ * uint32_t percent;
+ * leColorMode mode;
+ * leColor blend = leColorLerp(l, r, percent, mode);
+ * @endcode
+ * @param fore is the foreground color.
+ * @param back is the background color
+ * @return the result color.
+ */
+leColor leColorLerp(leColor l,
+                    leColor r,
+                    uint32_t percent,
+                    leColorMode mode);
                                    
 // *****************************************************************************
 /* Function:
@@ -484,12 +644,36 @@ LIB_EXPORT leColor leColorLerp(leColor l,
   Remarks:
     
 */
-LIB_EXPORT leColor leColorBilerp(leColor c00,
-                                 leColor c01,
-                                 leColor c10,
-                                 leColor c11,
-                                 uint32_t xper,
-                                 uint32_t yper,
-                                 leColorMode mode);                                   
+/**
+ * @brief Get color from bi-linear interpolation of four colors.
+ * @details Gets a color from the bilinear interpolation of
+ * <span class="param">c00</span>,
+ * <span class="param">c01</span>,
+ * <span class="param">c10</span>, and
+ * <span class="param">c11</span>.  The percentage of interpolation
+ * of x and y is specified by <span class="param">xper</span>
+ * <span class="param">yper</span>. The color format
+ * is <span class="param">mode</span>.
+ * @code
+ * @endcode
+ * @param c00 is the top left color input.
+ * @param c01 is the top right color input.
+ * @param c10 is the bottom left color input.
+ * @param c11 is the bottom right color input.
+ * @param xper is the percentage of interpolation in x [0-100].
+ * @param yper is the percentage of interpolation in y [0-100].
+ * @param mode is the input color mode.
+ * @return the result color.
+ */
+leColor leColorBilerp(leColor c00,
+                      leColor c01,
+                      leColor c10,
+                      leColor c11,
+                      uint32_t xper,
+                      uint32_t yper,
+                      leColorMode mode);
+
+leColor leColorSwap(leColor clr,
+                    leColorMode mode);
 
 #endif /* LE_COLOR_H */

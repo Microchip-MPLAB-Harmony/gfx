@@ -1,0 +1,15 @@
+digraph "C:/harmony3_dev/gfx/middleware/legato/library/src/gfx/legato/datastructure" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_940c51c258b7865068e2af5587097533 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="legato" fontname="Helvetica", fontsize="10", URL="dir_940c51c258b7865068e2af5587097533.html"]
+  dir_b64752b4b0e64ac037ae415bf62ea1c1 [shape=box, label="datastructure", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_b64752b4b0e64ac037ae415bf62ea1c1.html"];
+  }
+  dir_72a68f568b475d355763ee2302e89937 [shape=box label="common" URL="dir_72a68f568b475d355763ee2302e89937.html"];
+  dir_fec4bb45978c83ebaa4efed687323b62 [shape=box label="memory" URL="dir_fec4bb45978c83ebaa4efed687323b62.html"];
+  dir_b64752b4b0e64ac037ae415bf62ea1c1->dir_72a68f568b475d355763ee2302e89937 [headlabel="6", labeldistance=1.5 headhref="dir_000055_000053.html"];
+  dir_b64752b4b0e64ac037ae415bf62ea1c1->dir_fec4bb45978c83ebaa4efed687323b62 [headlabel="3", labeldistance=1.5 headhref="dir_000055_000061.html"];
+  dir_72a68f568b475d355763ee2302e89937->dir_b64752b4b0e64ac037ae415bf62ea1c1 [headlabel="1", labeldistance=1.5 headhref="dir_000053_000055.html"];
+  dir_fec4bb45978c83ebaa4efed687323b62->dir_72a68f568b475d355763ee2302e89937 [headlabel="3", labeldistance=1.5 headhref="dir_000061_000053.html"];
+}

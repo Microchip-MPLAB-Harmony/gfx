@@ -32,18 +32,21 @@
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
                                     leRawDecodeStage* stage);
 
-static struct ConvertStage
+struct ConvertStage
 {
     leRawDecodeStage base;
 
     leColorMode sourceMode;
-} convertStage;
+};
+
+static LE_COHERENT_ATTR struct ConvertStage convertStage;
 
 static leResult stage_convertColor(leRawDecodeStage* stage)
 {
     // convert the pixel to the destination format if necessary
-    stage->state->writeColor = leRenderer_ConvertColor(stage->state->writeColor,
-                                                       convertStage.sourceMode);
+    stage->state->writeColor = leColorConvert(convertStage.sourceMode,
+                                              stage->state->targetMode,
+                                              stage->state->writeColor);
 
     return LE_SUCCESS;
 }
@@ -51,14 +54,14 @@ static leResult stage_convertColor(leRawDecodeStage* stage)
 leResult _leRawImageDecoder_ConvertStage(leRawDecodeState* state)
 {
     // translate the source color mode to the destination color mode
-    if((state->source->palette != NULL && state->source->palette->colorMode != state->targetMode) ||
+    if((state->source->palette != NULL && state->source->palette->buffer.mode != state->targetMode) ||
         (state->source->buffer.mode != state->targetMode))
     {
         memset(&convertStage, 0, sizeof(convertStage));
 
         if(state->source->palette != NULL)
         {
-            convertStage.sourceMode = state->source->palette->colorMode;
+            convertStage.sourceMode = state->source->palette->buffer.mode;
         }
         else
         {

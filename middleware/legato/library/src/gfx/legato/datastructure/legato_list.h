@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -40,11 +38,15 @@
     Legato user interface library.  
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_list.h
+ * @brief A linked list implementation.
+ *
+ * @details This is a linked list implementation that is used internally
+ * by the Legato user interface library.
+ */
 
 #ifndef LEGATO_LIST_H
 #define LEGATO_LIST_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -58,10 +60,15 @@
   Remarks:
     None.
 */
+
+/**
+ * @brief This struct represents a list node .
+ * @details List node is used to hold a list of items.
+ */
 typedef struct leListNode
 {
-    struct leListNode* next;
-    void*  val;
+    struct leListNode* next; /**< The next list node. */
+    void*  val; /**< The value at a node. */
 } leListNode;
 
 
@@ -75,233 +82,245 @@ typedef struct leListNode
   Remarks:
     None.
 */
+
+/**
+ * @brief This struct represents a list.
+ * @details List is used use to hold a size limit of list nodes.
+ */
 typedef struct leList
 {
-    leListNode* head;
-    leListNode* tail;
-    size_t size;
+    leListNode* head; /**< The head list node. */
+    leListNode* tail; /**< The tail list node. */
+    size_t size; /**< The size of the list. */
 } leList;
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Create(leList* list)
-
-   Summary:
-    Initializes a new linked list
-
-   Parameters:
-    leList* list - pointer to the list to initilaize
-
-  Returns:
-    int32_t - 0 if success, -1 if failure
-
-  Remarks:        
-*/
+/**
+ * @brief Create a new list.
+ * @details Creates a new list using <span class="param">list</span>.
+ * @code
+ * leArray* list;
+ * int32_t res = leList_Create(list)
+ * @endcode
+ * @param Pointer to the list to create.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_Create(leList* list);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Assign(leList* list, size_t idx, void* val)
-
-   Summary:
-    Assignes a new pointer to an index in the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    size_t idx - the index to modify
-    void* val - the new value of the node
-    
-  Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Assignes a new pointer.
+ * @details Assigns <span class="param">val</span>
+ * at the specified <span class="param">index</span> for the
+ * specified <span class="param">list</span>.
+ * @code
+ * leList* list;
+ * size_t idx;
+ * void* val;
+ * int32_t res = leList_Assign(list, idx, val);
+ * @endcode
+ * @param list is the array to modify.
+ * @param idx is the location to update.
+ * @param val is the value to assign.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_Assign(leList* list, size_t idx, void* val);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_PushFront(leList* list, void* val)
-
-   Summary:
-    Pushes a new node onto the front of the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    void* val - the new value of the node
-    
-  Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Push value on front
+ * @details Pushes <span class="param">val</span> onto the
+ * front of the specified <span class="param">list</span>.
+ * This function shuffles all other values backward one index.
+ * @code
+ * leList* list;
+ * void* val;
+ * int32_t res = leList_Create(list, idx, val);
+ * @endcode
+ * @param list is the array to modify.
+ * @param val is the value to push.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_PushFront(leList* list, void*);
 
 // *****************************************************************************
-/* Function:
-    void leList_PopFront(leList* list)
-
-   Summary:
-    Removes the first value from the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-*/
+/**
+ * @brief Pop value from front
+ * @details Removes the first value from the front
+ * of <span class="param">list</span>.
+ * This function shuffles all other values forward one index.
+ * @code
+ * leList* list;
+ * leList_PopFront(list);
+ * @endcode
+ * @param list is the array to modify.
+ * @return void.
+ */
 void leList_PopFront(leList* list);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_PushBack(leList* list, void* val)
-
-   Summary:
-    Pushes a new node onto the back of the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    void* val - the new value of the node
-    
-  Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Push value on back.
+ * @details Pushes <span class="param">val</span> onto the
+ * back of <span class="param">list</span>.
+ * @code
+ * leList* list;
+ * void* val;
+ * int32_t res = leList_PushBack(list, val);
+ * @endcode
+ * @param list is the array to modify.
+ * @param val is the value to push.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_PushBack(leList* list, void* val);
 
 // *****************************************************************************
-/* Function:
-    void leList_PopBack(leList* list)
-
-   Summary:
-    Removes the last value from the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-*/
+/**
+ * @brief Pop value from back
+ * @details Pops a value from the back
+ * <span class="param">list</span>. This is the last value from the list.
+ * of the array pointed to by <span class="param">list</span>.
+ * @code
+ * leList* list;
+ * int32_t val = leList_PopBack(list);
+ * @endcode
+ * @param list is the array to modify.
+ * @return last value.
+ */
 int32_t leList_PopBack(leList* list);
 
 // *****************************************************************************
-/* Function:
-    void* leList_Get(leList* list, uint32_t idx)
-
-   Summary:
-    Retrieves a value from the list
-
-   Parameters:
-    leList* list - pointer to the list to reference
-    uint32_t idx - the index of the value to retrieve
-   
-   Returns:
-     void* - the retrieved value
-*/
+/**
+ * @brief Get a value from the list.
+ * @details Gets <span class="param">val</span> from
+ * <span class="param">list</span> at
+ * the specified <span class="param">idx</span>.
+ * All existing values from index are shifted right one place.
+ * @code
+ * leList* list;
+ * void* value = leList_Get(list);
+ * @endcode
+ * @param pointer to the list to reference.
+ * @param the index of the value to retrieve.
+ * @return pointer to the retrieved value.
+ */
 void* leList_Get(const leList* list, uint32_t idx);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Find(leList* list, void* val)
-
-   Summary:
-    Retrieves the index of a value from the list
-
-   Parameters:
-    leList* list - pointer to the list to reference
-    void* val - the value to search for
-   
-   Returns:
-    int32_t - the index of the value searched for
-*/
+/**
+ * @brief Find index of a value.
+ * @details Finds the index of <span class="param">val</span> from
+ * <span class="param">list</span>.
+ * All existing values from index are shifted right one place.
+ * @code
+ * leList* list;
+ * void* val;
+ * int32_t index = leList_Get(list, val);
+ * @endcode
+ * @param pointer to the list to reference.
+ * @param the value to search for.
+ * @return the index of the value searched for.
+ */
 int32_t leList_Find(const leList* list, void* val);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_InsertAt(leList* list,
-                            void* val,
-                            uint32_t idx)
-
-   Summary:
-    Inserts an item into a list at a given index.  All existing from index
-    are shifted right one place.
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    void* val - the value to insert
-    uint32_t idx - the position to insert the value
-   
-   Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Insert value at index
+ * @details Inserts <span class="param">val</span> into
+ * <span class="param">list</span> at
+ * the specified <span class="param">idx</span>.
+ * All existing values from index are shifted right one place.
+ * @code
+ * leList* list;
+ * void* val;
+ * uint32_t idx;
+ * int32_t res = leList_InsertAt(list, val, idx);
+ * @endcode
+ * @param list is the array to modify.
+ * @param val is value to insert.
+ * @param idx is the location at which to insert.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_InsertAt(leList* list,
                         void* val,
                         uint32_t idx);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Remove(leList* list, void*)
-
-   Summary:
-    Removes an item from the list
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    void* val - the value to remove
-   
-   Returns:
-    int32_t - 0 if success, -1 if failure
-*/
-int32_t leList_Remove(leList* list, void*);
+/**
+ * @brief Remove item
+ * @details Removes the first instance of <span class="param">val</span>
+ * from <span class="param">list</span>.
+ * The function shuffles all values left to fill the gap.
+ * @code
+ * leList* list;
+ * void* val;
+ * int32_t index = leList_Remove(list, val);
+ * @endcode
+ * @param list is the array to modify.
+ * @param val is the value removed.
+ * @return 0 if success, -1 if failure.
+ */
+int32_t leList_Remove(leList* list, void* val);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Remove(leList* list, uint32_t idx)
-
-   Summary:
-    Removes an item from the list at an index
-
-   Parameters:
-    leList* list - pointer to the list to modify
-    uint32_t idx - the index of the value to remove
-   
-   Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Remove item at index
+ * @details Removes an item from
+ * <span class="param">list</span> at
+ * the specified <span class="param">idx</span>.
+ * @code
+ * leList* list;
+ * uint32_t idx;
+ * int32_t res = leList_Remove(list, idx);
+ * @endcode
+ * @param list is the array to modify.
+ * @param idx is the location at which to remove.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_RemoveAt(leList* list, uint32_t idx);
 
 // *****************************************************************************
-/* Function:
-    int32_t leList_Copy(leList* l, leList* r)
-
-   Summary:
-    Creates a duplicate of an existing list
-
-   Parameters:
-    leList* l - the source list
-    leList* r - the result list
-   
-   Returns:
-    int32_t - 0 if success, -1 if failure
-*/
+/**
+ * @brief Copy list
+ * @details Copies the contents of <span class="param">l</span>
+ * to the array pointed to by <span class="param">r</span>.
+ * @code
+ * leList* l;
+ * leList* r;
+ * int32_t index = leList_Copy(l, r);
+ * @endcode
+ * @param l the source list.
+ * @param r the result list.
+ * @return 0 if success, -1 if failure.
+ */
 int32_t leList_Copy(leList* l, leList* r);
 
 // *****************************************************************************
-/* Function:
-    void leList_Clear(leList* list)
-
-   Summary:
-    Removes all nodes from a given list
-
-   Parameters:
-    leList* list - the list to modify
-       
-   Returns:
-    void
-*/
+/**
+ * @brief Clear array.
+ * @details Removes all values from <span class="param">list</span>.
+ * The array capacity remains the same.
+ * @code
+ * leList* list;
+ * leList_Clear(list);
+ * @endcode
+ * @param list the list to modify.
+ * @return void.
+ */
 void leList_Clear(leList* list);
 
 // *****************************************************************************
-/* Function:
-    void leList_Destroy(leList* list)
-
-   Summary:
-    Removes all nodes from a given list and frees the data of each node
-
-   Parameters:
-    leList* list - the list to modify
-       
-   Returns:
-    void
-*/
+/**
+ * @brief Remove array.
+ * @details Removes all values from <span class="param">list</span>.
+ * The function frees the data of each node.
+ * @code
+ * leList* list;
+ * leList_Destroy(list);
+ * @endcode
+ * @param list the list to modify.
+ * @return void.
+ */
 void leList_Destroy(leList* list);
 
 #endif /* LEGATO_LIST_H */

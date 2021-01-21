@@ -23,7 +23,10 @@
 ##############################################################################
 
 def loadModule():	
-	component = Module.CreateComponent("le_gfx_intf_parallel_ebi", "LE Parallel (EBI)", "/Graphics/Interface", "config/parallel_ebi.py")
-	component.setDisplayType("<html>Parallel Display Interface <br>via EBI<html>")
-	component.addCapability("le_gfx_intf_parallel_ebi", "Parallel Display Interface", False)
-	component.addDependency("EBI_CS", "EBI_CS", False, True)
+	if ("PIC32" in str(Variables.get("__PROCESSOR"))):
+		component = Module.CreateComponent("le_gfx_intf_parallel_ebi", "LE Parallel (EBI)", "/Graphics/Interface", "config/parallel_ebi.py")
+		component.setDisplayType("<html>Parallel Display Interface <br>via EBI<html>")
+		component.addCapability("le_gfx_intf_parallel_ebi", "Parallel Display Interface", False)
+		component.addDependency("EBI_CS", "EBI_CS", False, True)
+	else:
+		print("LE Parallel (EBI) module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

@@ -145,7 +145,6 @@ def instantiateComponent(comp):
 	PixelClockDivider.setMin(1)
 	PixelClockDivider.setDependencies(onPixelDividerSet, ["PixelClockDivider"])
 
-	
 	clockValue = MasterClockSourceValue.getValue() / PixelClockDivider.getValue()
 
 	PixelClock = comp.createIntegerSymbol("PixelClock", ClockSettingsMenu)
@@ -348,17 +347,29 @@ def instantiateComponent(comp):
 	PaletteMode.setLabel("Use 8-bit Palette?")
 	PaletteMode.setDescription("<html>Enables frame buffer compression.<br>Uses an 8-bit color lookup table to reduce the required<br>frame buffer memory size.  This also reduces the<br>maximum avilable color count to 256 and significantly<br>slows down display refresh speed.</html>")
 	PaletteMode.setDefaultValue(False)
-	PaletteMode.setVisible(True)	
+	PaletteMode.setVisible(True)
 	### End of frame buffer settings
 
 	### Other Timing Settings
 	OtherSettingsMenu = comp.createMenuSymbol("OtherMenu", None)
 	OtherSettingsMenu.setLabel("Other Settings")
+	
+	CanvasModeOnly = comp.createBooleanSymbol("CanvasModeOnly", OtherSettingsMenu)
+	CanvasModeOnly.setLabel("Canvas Mode")
+	CanvasModeOnly.setDefaultValue(False)
+	CanvasModeOnly.setDescription("<html>Enables Canvas Mode in the driver. Only the GFX Canvas interface will be enabled. </html>")
 
 	UseGPU = comp.createBooleanSymbol("UseGPU", OtherSettingsMenu)
 	UseGPU.setLabel("Use GPU for Blits?")
 	UseGPU.setDefaultValue(True)
 	UseGPU.setDescription("<html>Uses the Nano2D GPU for buffer blits.</html>")
+	UseGPU.setDependencies(useGPUChanged, ["UseGPU"])
+
+	VblankBlit = comp.createBooleanSymbol("VblankBlit", UseGPU)
+	VblankBlit.setLabel("Blit on Vblank")
+	VblankBlit.setDefaultValue(False)
+	VblankBlit.setVisible(True)
+	VblankBlit.setDescription("<html>Schedule blits during vblank.</html>")
 	
 	### Unsupported symbols, but may be queried by GFX HAL
 	UnsupportedOptionsMenu = comp.createMenuSymbol("UnsupportedOptionsMenu", None)
@@ -379,11 +390,12 @@ def instantiateComponent(comp):
 	GFX_GLCD_C.setMarkup(True)
 	
 	GFX_GLCD_H = comp.createFileSymbol("GFX_GLCD_H", None)
-	GFX_GLCD_H.setSourcePath("templates/drv_gfx_glcd.h")
+	GFX_GLCD_H.setSourcePath("templates/drv_gfx_glcd.h.ftl")
 	GFX_GLCD_H.setDestPath("gfx/driver/controller/glcd/")
 	GFX_GLCD_H.setOutputName("drv_gfx_glcd.h")
 	GFX_GLCD_H.setProjectPath(projectPath)
 	GFX_GLCD_H.setType("HEADER")
+	GFX_GLCD_H.setMarkup(True)
 	
 	GFX_GLCD_PLIB_C = comp.createFileSymbol("GFX_GLCD_PLIB_C", None)
 	GFX_GLCD_PLIB_C.setDestPath("gfx/driver/controller/glcd/")
@@ -423,11 +435,11 @@ def instantiateComponent(comp):
 ###	Database.setSymbolValue("gfx_hal", "HardwareLayerCountHint", numLayers, 1)
 	
 def onAttachmentConnected(source, target):
-	print("dependency Connected = " + str(target['id']))
+	print("dependency Connected = " + target["component"].getDisplayName())
 	gfxCoreComponentTable = ["gfx_hal_le"]
 	if (Database.getComponentByID("gfx_hal_le") is None):
 		Database.activateComponents(gfxCoreComponentTable)
-	updateDisplayManager(source["component"], target["component"])
+	updateDisplayManager(source["component"], target)
 
 def OnCacheEnabled(cacheEnabled, event):
 	cacheEnabled.getComponent().setSymbolValue("UseCachedFrameBuffer", event["value"] == True, 1)
@@ -455,23 +467,29 @@ def onPixelDividerSet(pixelDividerSet, event):
 def showRTOSMenu(symbol, event):
 	symbol.setVisible(event["value"] != "BareMetal")
 
-def updateDisplayManager(component, source):
+def useGPUChanged(symbol, event):
+	symbol.getComponent().getSymbolByID("VblankBlit").setVisible(event["value"] == True)
+
+def updateDisplayManager(component, target):
 	if (Database.getComponentByID("gfx_hal_le") is not None):
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzPulseWidth", component.getSymbolValue("DisplayHorzPulseWidth"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzBackPorch", component.getSymbolValue("DisplayHorzBackPorch"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzFrontPorch", component.getSymbolValue("DisplayHorzFrontPorch"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertPulseWidth", component.getSymbolValue("DisplayVertPulseWidth"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertBackPorch", component.getSymbolValue("DisplayVertBackPorch"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertFrontPorch", component.getSymbolValue("DisplayVertFrontPorch"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayWidth", component.getSymbolValue("DisplayWidth"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayHeight", component.getSymbolValue("DisplayHeight"), 1)
-		Database.setSymbolValue("gfx_hal_le", "PixelClock", component.getSymbolValue("PixelClock"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayDataEnablePolarity", component.getSymbolValue("DisplayDataEnablePolarity"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayVSYNCNegative", component.getSymbolValue("DisplayVSYNCNegative"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayHSYNCNegative", component.getSymbolValue("DisplayHSYNCNegative"), 1)
+		if target["id"] == "gfx_display":
+			Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzPulseWidth", target["component"].getSymbolValue("HorzPulseWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzBackPorch", target["component"].getSymbolValue("HorzBackPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzFrontPorch", target["component"].getSymbolValue("HorzFrontPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertPulseWidth", target["component"].getSymbolValue("VertPulseWidth"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertBackPorch", target["component"].getSymbolValue("VertBackPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertFrontPorch", target["component"].getSymbolValue("VertFrontPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayDataEnablePolarity", target["component"].getSymbolValue("DataEnablePolarity"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVSYNCNegative", target["component"].getSymbolValue("VSYNCNegative"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHSYNCNegative", target["component"].getSymbolValue("HSYNCNegative"), 1)
+			component.setSymbolValue("DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)
+			component.setSymbolValue("DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
 		Database.setSymbolValue("gfx_hal_le", "gfx_driver", component.getID(), 1)
-		Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
 		Database.setSymbolValue("gfx_hal_le", "DriverName", component.getDisplayName(), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+		Database.setSymbolValue("gfx_hal_le", "PixelClock", component.getSymbolValue("PixelClock"), 1)
 		component.getSymbolByID("DisplaySettingsMenu").setVisible(False)
 		component.getSymbolByID("HALComment").setVisible(True)

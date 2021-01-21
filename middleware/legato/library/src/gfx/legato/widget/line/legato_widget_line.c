@@ -55,8 +55,8 @@ void leLineWidget_Constructor(leLineWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
 
     _this->x1 = 0;
     _this->y1 = 0;
@@ -71,7 +71,7 @@ static void destructor(leLineWidget* _this)
     _leWidget_Destructor((leWidget*)_this);
 }
 
-leLineWidget* leLineWidget_New()
+leLineWidget* leLineWidget_New(void)
 {
     leLineWidget* line = NULL;
 
@@ -85,16 +85,18 @@ leLineWidget* leLineWidget_New()
     return line;
 }
 
-static lePoint getStartPoint(const leLineWidget* _this)
+static leResult getStartPoint(const leLineWidget* _this,
+                              lePoint* pnt)
 {
-    lePoint pnt;
-    
     LE_ASSERT_THIS();
-    
-    pnt.x = _this->x1;
-    pnt.y = _this->y1;
+
+    if(pnt == NULL)
+        return LE_FAILURE;
+
+    pnt->x = _this->x1;
+    pnt->y = _this->y1;
         
-    return pnt;
+    return LE_SUCCESS;
 }
 
 static leResult setStartPoint(leLineWidget* _this,
@@ -114,16 +116,16 @@ static leResult setStartPoint(leLineWidget* _this,
     return LE_SUCCESS;
 }
 
-static lePoint getEndPoint(const leLineWidget* _this)
+static leResult getEndPoint(const leLineWidget* _this,
+                            lePoint* pnt)
 {
-    lePoint pnt;
-    
-    LE_ASSERT_THIS();
-    
-    pnt.x = _this->x2;
-    pnt.y = _this->y2;
-        
-    return pnt;
+    if(pnt == NULL)
+        return LE_FAILURE;
+
+    pnt->x = _this->x2;
+    pnt->y = _this->y2;
+
+    return LE_SUCCESS;
 }
 
 static leResult setEndPoint(leLineWidget* _this,
@@ -148,7 +150,7 @@ void _leLineWidget_Paint(leLineWidget* _this);
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
-void _leLineWidget_GenerateVTable()
+void _leLineWidget_GenerateVTable(void)
 {
     _leWidget_FillVTable((void*)&lineWidgetVTable);
     
@@ -206,7 +208,7 @@ static const leLineWidgetVTable lineWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

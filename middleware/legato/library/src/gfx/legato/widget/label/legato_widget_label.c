@@ -60,12 +60,16 @@ static void invalidateContents(const leLabelWidget* lbl)
 static void stringPreinvalidate(const leString* str,
                                 leLabelWidget* lbl)
 {
+    (void)str; // unused
+
     invalidateContents(lbl);
 }
 
 static void stringInvalidate(const leString* str,
                              leLabelWidget* lbl)
 {
+    (void)str; // unused
+
     invalidateContents(lbl);
 }
 
@@ -91,8 +95,8 @@ void leLabelWidget_Constructor(leLabelWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.halign = LE_HALIGN_LEFT;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.halign = LE_HALIGN_LEFT;
      
     _this->string = NULL;
 }
@@ -230,7 +234,7 @@ static const leLabelWidgetVTable labelWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -260,7 +264,6 @@ static const leLabelWidgetVTable labelWidgetVTable =
     .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,

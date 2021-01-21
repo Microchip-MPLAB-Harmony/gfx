@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,13 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+
+/** \file legato_string_renderer.h
+ * @brief String Renderer.
+ *
+ * @details String Renderer functions and definitions
+ *
+ */
 
 #ifndef LE_STRING_RENDERER_H
 #define LE_STRING_RENDERER_H
@@ -46,6 +51,10 @@
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a string render request.
+ * @details Defines the arguments necessary to perform an leString draw operation
+ */
 typedef struct leStringRenderRequest
 {
     const leString* str;
@@ -76,6 +85,10 @@ typedef struct leStringRenderRequest
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a lechar string render request.
+ * @details Defines the arguments necessary to perform an leChar string draw operation
+ */
 typedef struct leUStringRenderRequest
 {
     const leChar* str;
@@ -107,6 +120,10 @@ typedef struct leUStringRenderRequest
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a c-style string render request.
+ * @details Defines the arguments necessary to perform a C-style string draw operation.
+ */
 typedef struct leCStringRenderRequest
 {
     const char* str;
@@ -119,63 +136,42 @@ typedef struct leCStringRenderRequest
 } leCStringRenderRequest;
 
 // *****************************************************************************
-/* Function:
-    leResult  leStringRenderer_DrawString(leStringRenderRequest* req)
-
-  Summary:
-    draws an leString
-
-  Description:
-    draws an leString
-
-  Parameters:
-    leStringRenderRequest* req - the render request details
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Draw an leString.
+ * @details Draws an leString using <span class="param">req</span>.
+ * @code
+ * leStringRenderRequest* req;
+ * leResult res = leStringRenderer_DrawString(req);
+ * @endcode
+ * @param req the render request details.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leStringRenderer_DrawString(leStringRenderRequest* req);
 
 // *****************************************************************************
-/* Function:
-    leResult  leStringRenderer_DrawCString(leCStringRenderRequest* req)
-
-  Summary:
-    draws a leChar string buffer
-
-  Description:
-    draws a leChar string buffer
-
-  Parameters:
-    leCStringRenderRequest* req - the render request details
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Draw leChar string.
+ * @details Draws a leChar string using <span class="param">req</span>.
+ * @code
+ * leStringRenderRequest* req;
+ * leResult res = leStringRenderer_DrawCString(req);
+ * @endcode
+ * @param req the result of the operation.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leStringRenderer_DrawCString(leCStringRenderRequest* req);
 
 // *****************************************************************************
-/* Function:
-    leResult  leStringRenderer_DrawUString(leUStringRenderRequest* req)
-
-  Summary:
-    draws a C-style string buffer
-
-  Description:
-    draws a C-style string buffer
-
-  Parameters:
-    leUStringRenderRequest* req - the render request details
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Draw C-Style string.
+ * @details Draws a C-Style string using <span class="param">req</span>.
+ * @code
+ * leStringRenderRequest* req;
+ * leResult res = leStringRenderer_DrawCString(req);
+ * @endcode
+ * @param req is an integer.
+ * @return the result of the operation.
+ */
 leResult leStringRenderer_DrawUString(leUStringRenderRequest* req);
 
 #endif /* LE_STRING_RENDERER_H */

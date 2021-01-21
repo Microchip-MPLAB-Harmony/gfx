@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['val_1169',['val',['../structleListNode.html#ab03f36f103bdec81305fd301f1f93885',1,'leListNode']]],
-  ['valid_1170',['valid',['../structleTouchState.html#a2508f82318bdac6b715d548091b03055',1,'leTouchState']]],
-  ['values_1171',['values',['../structleArray.html#a6ee6b4f00a02c40d6f7d4b3bf0a21980',1,'leArray']]]
+  ['size_1317',['size',['../structleColorModeInfo.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leColorModeInfo::size()'],['../structleStreamDescriptor.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leStreamDescriptor::size()'],['../structleArray.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leArray::size()'],['../structleList.html#a854352f53b148adc24983a58a1866d66',1,'leList::size()'],['../structleRectArray.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leRectArray::size()']]],
+  ['startangle_1318',['startAngle',['../structleArcWidget.html#a9955df53e11cd767651fa1b9c703bf45',1,'leArcWidget']]],
+  ['stride_1319',['stride',['../structn2d__buffer.html#a935cbecbc093426caa4fcd247773ae4b',1,'n2d_buffer']]],
+  ['stringtable_1320',['stringTable',['../structleState.html#a9b5fb1a36ceceb0f944ebe6b621385bc',1,'leState']]]
 ];

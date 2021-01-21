@@ -37,13 +37,11 @@
 
 #if LE_STREAMING_ENABLED == 1
 
-#if LE_ASSET_DECODER_USE_PIXEL_CACHE == 1
-uint8_t leJPEGImageDecoderScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
+LE_COHERENT_ATTR uint8_t leJPEGImageDecoderScratchBuffer[LE_JPEG_DECODER_CACHE_SIZE];
 
 #endif
 
-static leImageDecoder decoder;
+static LE_COHERENT_ATTR leImageDecoder decoder;
 
 static leBool _supportsImage(const leImage* img)
 {
@@ -55,37 +53,34 @@ static leBool _supportsImage(const leImage* img)
     return img->format == LE_IMAGE_FORMAT_JPEG;
 }
 
-static uint32_t internalMemoryRead(void* ptr, uint32_t size, uint32_t n, JPEGDECODER* decoder)
+static uint32_t internalMemoryRead(void* ptr, uint32_t size, uint32_t n, JPEGDECODER* dcd)
 {
     uint32_t count = 0;
     uint8_t* pFile;
     uint8_t* bptr;
 
-    pFile = (uint8_t*)decoder->pImageFile->header.address;
+    pFile = (uint8_t*)dcd->pImageFile->header.address;
     bptr = (uint8_t *)ptr;
 
     for(count = 0; count < size * n; ++count)
     {
-        bptr[count] = (uint8_t) pFile[decoder->fileIndex];
-        ++decoder->fileIndex;
+        bptr[count] = (uint8_t) pFile[dcd->fileIndex];
+        ++dcd->fileIndex;
     }
 
     return count;
 }
 
 #if LE_STREAMING_ENABLED == 1
-static uint32_t externalMemoryRead(void* ptr, uint32_t size, uint32_t n, JPEGDECODER* decoder)
+static uint32_t externalMemoryRead(void* ptr, uint32_t size, uint32_t n, JPEGDECODER* dcd)
 {
     uint32_t count = size * n;
-    uint32_t addr = (uint32_t)decoder->pImageFile->header.address + decoder->fileIndex;
+    uint32_t addr = (uint32_t)dcd->pImageFile->header.address + dcd->fileIndex;
 
-    leStream_Read(&decoder->stream,
-                  addr,
-                  count,
-                  ptr,
-                  NULL);
+    while(leStream_Read(&dcd->stream, addr, count, ptr, NULL) != LE_SUCCESS)
+    { }
 
-    decoder->fileIndex += count;
+    dcd->fileIndex += count;
 
     return count;
 }
@@ -188,13 +183,8 @@ static leResult _draw(const leImage* img,
     {
        leStream_Init(&JPEG_JpegDecoder.stream,
                      &img->header,
-#if LE_ASSET_DECODER_USE_PIXEL_CACHE == 1
-                     LE_ASSET_DECODER_CACHE_SIZE,
+                     LE_JPEG_DECODER_CACHE_SIZE,
                      leJPEGImageDecoderScratchBuffer,
-#else
-                     0,
-                     NULL,
-#endif
                      NULL);
 
         if(leStream_Open(&JPEG_JpegDecoder.stream) == LE_FAILURE)
@@ -206,23 +196,22 @@ static leResult _draw(const leImage* img,
 
     JPEG_JpegDecoder.pImageFile = img;
 
-#if LE_STREAMING_ENABLED == 1
     if(img->header.location != LE_STREAM_LOCATION_ID_INTERNAL)
     {
+#if LE_STREAMING_ENABLED == 1
         JPEG_JpegDecoder.readPtr = externalMemoryRead;
+#else
+        return LE_FAILURE;
+#endif
     }
     else
     {
-#else
         JPEG_JpegDecoder.readPtr = internalMemoryRead;
-#endif
-#if LE_STREAMING_ENABLED == 1
     }
-#endif
 
     JPEG_JpegDecoder.blitPtr = blitToFrameBuffer;
     JPEG_JpegDecoder.globalAlpha = a;
-    JPEG_JpegDecoder.clipRect = leRenderer_GetDrawRect();
+    leRenderer_GetDrawRect(&JPEG_JpegDecoder.clipRect);
     JPEG_JpegDecoder.wStartY = 0;
     JPEG_JpegDecoder.wStartX = 0;
     JPEG_JpegDecoder.wDrawWidth = img->buffer.size.width;
@@ -324,13 +313,8 @@ static leResult _render(const leImage* src,
     {
         leStream_Init(&JPEG_JpegDecoder.stream,
                       &src->header,
-#if LE_ASSET_DECODER_USE_PIXEL_CACHE == 1
-                      LE_ASSET_DECODER_CACHE_SIZE,
+                      LE_JPEG_DECODER_CACHE_SIZE,
                       leJPEGImageDecoderScratchBuffer,
-#else
-                      0,
-                      NULL,
-#endif
                       NULL);
 
         if(leStream_Open(&JPEG_JpegDecoder.stream) == LE_FAILURE)
@@ -344,7 +328,7 @@ static leResult _render(const leImage* src,
     JPEG_JpegDecoder.imageWriteBuffer = &dst->buffer;
     JPEG_JpegDecoder.readPtr = &internalMemoryRead;
     JPEG_JpegDecoder.blitPtr = blitToImage;
-    JPEG_JpegDecoder.clipRect = leRenderer_GetDrawRect();
+    leRenderer_GetDrawRect(&JPEG_JpegDecoder.clipRect);
     JPEG_JpegDecoder.wStartY = 0;
     JPEG_JpegDecoder.wStartX = 0;
     JPEG_JpegDecoder.wDrawWidth = src->buffer.size.width;
@@ -422,7 +406,7 @@ static leResult _render(const leImage* src,
     return LE_SUCCESS;
 }
 
-static leResult exec()
+static leResult exec(void)
 {
     return LE_SUCCESS;
 }

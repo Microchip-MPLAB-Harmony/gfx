@@ -54,14 +54,14 @@ static leResult stage_FrameBufferWrite(leRawDecodeStage* stage)
     return LE_SUCCESS;
 }
 #else
-static void stage_FrameBufferWrite(leRawDecodeStage* stage)
+static leResult stage_FrameBufferWrite(leRawDecodeStage* stage)
 {
     // write color
-    leRenderer_PutPixel(stage->state->drawX,
-                        stage->state->drawY,
-                        stage->state->sourceColor);
+    leRenderer_PutPixel(stage->state->targetX,
+                        stage->state->targetY,
+                        stage->state->writeColor);
 
-    stage->state->currentStage = stage->state->readStage;
+    return LE_SUCCESS;
 }
 #endif
 

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['widgetdefault_733',['WidgetDefault',['../classwidget_1_1WidgetDefault.html',1,'widget']]]
+  ['palettedef_832',['PaletteDef',['../classassetheader_1_1PaletteDef.html',1,'assetheader']]]
 ];

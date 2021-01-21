@@ -32,7 +32,7 @@ sam9x60_ek_AutoConnectList = [["le_gfx_lcdc", "LCDC", "lcdc", "LCDC_LCDC"],
 						["gfx_maxtouch_controller", "i2c", "drv_i2c_0", "drv_i2c"],
 						["sys_time", "sys_time_TMR_dependency", "tc0", "TC0_TMR"],
 						["le_gfx_gfx2d", "GFX2D", "plib_gfx2d", "GFX2D"],
-						["gfx_legato", "gpu_driver", "le_gfx_gfx2d", "le_gfx_driver_gfx2d"]]
+						["gfx_legato", "gpu_driver", "le_gfx_gfx2d", "LE GPU Driver"]]
 
 sam9x60_ek_PinConfig = [{"pin": 162, "name": "LCDC_LCDDAT0", "type": "LCDC_LCDDAT0", "direction": "", "latch": "", "abcd": "A"}, #PC0, M4
 				{"pin": 187, "name": "LCDC_LCDDAT1", "type": "LCDC_LCDDAT1", "direction": "", "latch": "", "abcd": "A"}, #PC1, P4

@@ -473,7 +473,7 @@ uint32_t _leDynamicString_ToChar(const leDynamicString* _this,
 #if LE_DYNAMIC_VTABLES == 1
 void _leString_FillVTable(leStringVTable* vt);
 
-void _leDynamicString_GenerateVTable()
+void _leDynamicString_GenerateVTable(void)
 {
     _leString_FillVTable((void*)&dynamicStringVTable);
     
@@ -517,7 +517,6 @@ static const leDynamicStringVTable dynamicStringVTable =
     .getLineRect = (void*)_leString_GetLineRect,
     .getLineIndices = (void*)_leString_GetLineIndices,
     .getCharRect = (void*)_leString_GetCharRect,
-    .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     ._draw = (void*)_leString_Draw,
     .preinvalidate = (void*)_leString_PreInvalidate,

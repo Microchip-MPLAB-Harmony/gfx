@@ -75,8 +75,8 @@ void _leBarGraphWidget_Constructor(leBarGraphWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
     
     _this->tickLength = DEFAULT_TICK_LENGTH;
     _this->fillGraphArea = LE_TRUE;
@@ -134,7 +134,7 @@ static void getCategoryLabelMaxDrawRect(const leBarGraphWidget* _this,
 {
     uint32_t categoryIndex;
     leRect textRect;
-    leString* category;
+    leBarGraphCategory* category;
     
     *rect = leRect_Zero;
     
@@ -142,12 +142,12 @@ static void getCategoryLabelMaxDrawRect(const leBarGraphWidget* _this,
         (categoryIndex < _this->categories.size); 
          categoryIndex++)
     {
-        category = leArray_Get(&_this->categories, categoryIndex);
+        category = (leBarGraphCategory*)leArray_Get(&_this->categories, categoryIndex);
         
-        if(category == NULL)
+        if(category == NULL || category->str == NULL)
             return;
         
-        category->fn->getRect(category, &textRect);
+        category->str->fn->getRect(category->str, &textRect);
         
         if(textRect.height > rect->height)
         {
@@ -225,98 +225,95 @@ static void getValueLabelMaxDrawRect(const leBarGraphWidget* _this,
 void _leBarGraphWidget_GetGraphRect(const leBarGraphWidget* _this,
                                     leRect* graphRect)
 {
-    lePoint p;
-    leMargin margin;
-    leRect widgetRect, valueLabelMaxRect, categoryLabelMaxRect;
- 
-    LE_ASSERT_THIS();
-       
-    widgetRect = _this->fn->localRect(_this);
-    leUtils_RectToScreenSpace((leWidget*)_this, &widgetRect);
+    leRect categoryLabelMaxRect;
+    leRect valueLabelMaxRect;
 
-    p.x = widgetRect.x;
-    p.y = widgetRect.y;
-    
-    valueLabelMaxRect = leRect_Zero;
-    *graphRect = leRect_Zero;
-    categoryLabelMaxRect = leRect_Zero;
-    
-    margin = _this->widget.margin;
-    graphRect->x = p.x + margin.left;
-    graphRect->width = widgetRect.width - margin.left - margin.right;
+    graphRect->x = _this->widget.rect.x;
+    graphRect->y = _this->widget.rect.y;
+    graphRect->width = _this->widget.rect.width;
+    graphRect->height = _this->widget.rect.height;
 
-    if(_this->valueAxisTicksVisible)
+    graphRect->x += _this->widget.margin.left;
+    graphRect->y += _this->widget.margin.top;
+    graphRect->width -= _this->widget.margin.left + _this->widget.margin.right;
+    graphRect->height -= _this->widget.margin.top + _this->widget.margin.bottom;
+
+    // adjust for value tick position
+    if(_this->valueAxisTicksVisible == LE_TRUE)
     {
-        switch (_this->valueAxisTicksPosition)
+        switch(_this->valueAxisTicksPosition)
         {
             case BAR_GRAPH_TICK_OUT:
             {
                 graphRect->x += _this->tickLength;
                 graphRect->width -= _this->tickLength;
+
                 break;
             }
             case BAR_GRAPH_TICK_CENTER:
             {
-                graphRect->x += _this->tickLength/2;
-                graphRect->width -= _this->tickLength/2;
+                graphRect->x += _this->tickLength / 2;
+                graphRect->width -= _this->tickLength / 2;
+
                 break;
             }
-            default:
-                break;
+            default: { }
         }
     }
 
-    graphRect->y = p.y + margin.top;
-    graphRect->height = widgetRect.height - margin.top - margin.bottom;
-
-    if(_this->valueAxisLabelsVisible)
+    // adjust for value labels
+    if(_this->valueAxisLabelsVisible == LE_TRUE && _this->ticksLabelFont != NULL)
     {
         getValueLabelMaxDrawRect(_this, &valueLabelMaxRect);
 
-        if(valueLabelMaxRect.width != 0)
+        //graphRect.adjust(0, valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX, 0, 0);
+
+        if(valueLabelMaxRect.width < LABEL_OFFSET_MIN_PIX)
         {
-            graphRect->x += (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
-            graphRect->width -= (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
+            valueLabelMaxRect.width = LABEL_OFFSET_MIN_PIX;
         }
 
-        if(valueLabelMaxRect.height != 0)
+        if(valueLabelMaxRect.height < LABEL_OFFSET_MIN_PIX)
         {
-            graphRect->y += valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX;
-            graphRect->height -= valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX;
+            valueLabelMaxRect.height = LABEL_OFFSET_MIN_PIX;
         }
+
+        graphRect->x += valueLabelMaxRect.width;
+        graphRect->width -= valueLabelMaxRect.width;
+
+        graphRect->y += valueLabelMaxRect.height;
+        graphRect->height -= valueLabelMaxRect.height;
     }
 
-    if(_this->categAxisTicksVisible)
+    if(_this->categories.size > 0)
     {
-        switch (_this->categAxisTicksPosition)
+        // adjust for category ticks
+        if(_this->categAxisTicksVisible == LE_TRUE)
         {
-            case BAR_GRAPH_TICK_OUT:
+            switch(_this->categAxisTicksPosition)
             {
-                graphRect->height -= _this->tickLength;
-                break;
+                case BAR_GRAPH_TICK_OUT:
+                {
+                    graphRect->height -= _this->tickLength;
+
+                    break;
+                }
+                case BAR_GRAPH_TICK_CENTER:
+                {
+                    graphRect->height -= _this->tickLength / 2;
+
+                    break;
+                }
+                default: { }
             }
-            case BAR_GRAPH_TICK_CENTER:
-            {
-                graphRect->height -= _this->tickLength/2;
-                break;
-            }
-            default:
-                break;
         }
-    }
 
-    if(_this->categAxisLabelsVisible)
-    {
-        getCategoryLabelMaxDrawRect(_this, &categoryLabelMaxRect);
-    }
+        if(_this->categAxisLabelsVisible == LE_TRUE)
+        {
+            getCategoryLabelMaxDrawRect(_this, &categoryLabelMaxRect);
 
-    if(categoryLabelMaxRect.height > (valueLabelMaxRect.height / 2))
-    {
-        graphRect->height -= (categoryLabelMaxRect.height +  LABEL_OFFSET_MIN_PIX);
-    }
-    else if(valueLabelMaxRect.height != 0)
-    {
-        graphRect->height -= (valueLabelMaxRect.height / 2 +  LABEL_OFFSET_MIN_PIX);
+            graphRect->height -= categoryLabelMaxRect.height;
+        }
     }
 }
 
@@ -408,6 +405,8 @@ static leBool getGridLinesVisible(const leBarGraphWidget* _this,
                                   leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->valueGridLinesVisible;
 }
@@ -417,6 +416,8 @@ static leResult setGridLinesVisible(leBarGraphWidget* _this,
                                     leBool vis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueGridLinesVisible == vis)
         return LE_SUCCESS;
@@ -454,7 +455,9 @@ static uint32_t getMaxValue(const leBarGraphWidget* _this,
                             leBarGraphValueAxis axis)
 {   
     LE_ASSERT_THIS();
-    
+
+    (void)axis; // void
+
     return _this->maxValue;
 }
 
@@ -463,6 +466,8 @@ static leResult setMaxValue(leBarGraphWidget* _this,
                             int32_t value)
 {   
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(value <= _this->minValue)
         return LE_FAILURE;
@@ -481,6 +486,8 @@ static uint32_t getMinValue(const leBarGraphWidget* _this,
                             leBarGraphValueAxis axis)
 {   
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->minValue;
 }
@@ -490,6 +497,8 @@ static leResult setMinValue(leBarGraphWidget* _this,
                             int32_t value)
 {   
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(value >= _this->maxValue)
         return LE_FAILURE;
@@ -508,6 +517,8 @@ static leBool getValueAxisLabelsVisible(const leBarGraphWidget* _this,
                                         leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->valueAxisLabelsVisible;
 }
@@ -517,6 +528,8 @@ static leResult setValueAxisLabelsVisible(leBarGraphWidget* _this,
                                           leBool vis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueAxisLabelsVisible == vis)
         return LE_SUCCESS;
@@ -532,6 +545,8 @@ static leBool getValueAxisTicksVisible(const leBarGraphWidget* _this,
                                        leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->valueAxisTicksVisible;
 }
@@ -541,6 +556,8 @@ static leResult setValueAxisTicksVisible(leBarGraphWidget* _this,
                                          leBool vis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueAxisTicksVisible == vis)
         return LE_SUCCESS;
@@ -556,6 +573,8 @@ static uint32_t getValueAxisTicksInterval(const leBarGraphWidget* _this,
                                           leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->tickInterval;
 }
@@ -565,6 +584,8 @@ static leResult setValueAxisTicksInterval(leBarGraphWidget* _this,
                                           uint32_t itv)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->tickInterval == itv)
         return LE_SUCCESS;
@@ -581,6 +602,8 @@ static leBarGraphTickPosition getValueAxisTicksPosition(const leBarGraphWidget* 
                                                         leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->valueAxisTicksPosition;
 }
@@ -590,6 +613,8 @@ static leResult setValueAxisTicksPosition(leBarGraphWidget* _this,
                                           leBarGraphTickPosition pos)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueAxisTicksPosition == pos)
         return LE_SUCCESS;
@@ -605,6 +630,8 @@ static leBool getValueAxisSubticksVisible(const leBarGraphWidget* _this,
                                           leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->valueAxisSubticksVisible;
 }
@@ -614,6 +641,8 @@ static leResult setValueAxisSubticksVisible(leBarGraphWidget* _this,
                                             leBool vis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueAxisSubticksVisible == vis)
         return LE_SUCCESS;
@@ -629,6 +658,8 @@ static uint32_t getValueAxisSubticksInterval(const leBarGraphWidget* _this,
                                              leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     return _this->subtickInterval;
 }
@@ -638,6 +669,8 @@ static leResult setValueAxisSubticksInterval(leBarGraphWidget* _this,
                                              uint32_t itv)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->subtickInterval == itv)
         return LE_SUCCESS;
@@ -653,7 +686,9 @@ static leBarGraphTickPosition getValueAxisSubticksPosition(const leBarGraphWidge
                                                            leBarGraphValueAxis axis)
 {
     LE_ASSERT_THIS();
-    
+
+    (void)axis; // void
+
     return _this->valueAxisSubticksPosition;
 }
 
@@ -662,6 +697,8 @@ static leResult setValueAxisSubticksPosition(leBarGraphWidget* _this,
                                              leBarGraphTickPosition pos)
 {
     LE_ASSERT_THIS();
+
+    (void)axis; // void
     
     if(_this->valueAxisSubticksPosition == pos)
         return LE_SUCCESS;
@@ -862,7 +899,7 @@ static leResult setDataInSeries(leBarGraphWidget* _this,
                                  &damagedRect);
 
 
-    leRenderer_DamageArea(&damagedRect);
+    _leWidget_DamageArea((leWidget*)_this, &damagedRect);
     
     return LE_SUCCESS;
 }
@@ -896,11 +933,8 @@ static leResult setSeriesScheme(leBarGraphWidget* _this,
     if(scheme == NULL)
         return LE_FAILURE;
     
-    if(seriesID >= (int32_t) _this->dataSeriesArray.size)
+    if(seriesID >= _this->dataSeriesArray.size)
         return LE_FAILURE;
-    
-    if(seriesID < 0)
-        seriesID = _this->dataSeriesArray.size - 1;
     
     series = leArray_Get(&_this->dataSeriesArray, seriesID);
     
@@ -917,9 +951,19 @@ static leResult setSeriesScheme(leBarGraphWidget* _this,
 static leResult addCategory(leBarGraphWidget* _this,
                             uint32_t* id)
 {
+    leBarGraphCategory* cat;
+
     LE_ASSERT_THIS();
 
-    leArray_PushBack(&_this->categories, NULL);
+    cat = LE_MALLOC(sizeof(leBarGraphCategory));
+
+    if(cat == NULL)
+        return LE_FAILURE;
+
+    cat->str = NULL;
+    cat->drawX = 0;
+
+    leArray_PushBack(&_this->categories, cat);
 
     if(id != NULL)
     {
@@ -934,37 +978,35 @@ static leResult addCategory(leBarGraphWidget* _this,
 static leString* getCategoryString(const leBarGraphWidget* _this,
                                    uint32_t categoryID)
 {
-    leString* category;
+    leBarGraphCategory* cat;
     
     LE_ASSERT_THIS();
     
     if(categoryID >= _this->categories.size)
         return NULL;
     
-    category = leArray_Get(&_this->categories, categoryID);
+    cat = leArray_Get(&_this->categories, categoryID);
     
-    if(category == NULL)
+    if(cat == NULL)
         return NULL;
         
-    return category;
+    return (leString*)cat->str;
 }
 
 static leResult setCategoryString(leBarGraphWidget* _this,
                                   uint32_t categoryID,
                                   const leString* str)
 {
-    if(categoryID >= (int32_t)_this->categories.size)
+    leBarGraphCategory* cat;
+
+    if(categoryID >= _this->categories.size)
         return LE_FAILURE;
     
     LE_ASSERT_THIS();
-    
-    if(categoryID < 0)
-    {
-        categoryID = _this->categories.size - 1;
-    }
-    
-    if(leArray_Set(&_this->categories, categoryID, (void*)str) == LE_FAILURE)
-        return LE_FAILURE;
+
+    cat = leArray_Get(&_this->categories, categoryID);
+
+    cat->str = str;
     
     _this->fn->invalidate(_this);
     
@@ -973,12 +1015,24 @@ static leResult setCategoryString(leBarGraphWidget* _this,
 
 static leResult clearData(leBarGraphWidget* _this)
 {
+    leBarGraphCategory* cat;
     leBarGraphDataSeries* seriesArray;
+
     uint32_t i;
     
     LE_ASSERT_THIS();
     
     // free the category array
+    for(i = 0; i < _this->categories.size; i++)
+    {
+        cat = leArray_Get(&_this->categories, i);
+
+        if(cat != NULL)
+        {
+            LE_FREE(cat);
+        }
+    }
+
     leArray_Clear(&_this->categories);
     
     // free category string data
@@ -1113,7 +1167,7 @@ static const leBarGraphWidgetVTable barGraphWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -1144,7 +1198,6 @@ static const leBarGraphWidgetVTable barGraphWidgetVTable =
     .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,

@@ -39,6 +39,13 @@
     Internal library use only
 *******************************************************************************/
 
+/** \file legato_imagedeocder_raw.h
+* @brief RAW Image decoder
+*
+* @details Internal library use only
+*
+*/
+
 // DOM-IGNORE-BEGIN
 
 #ifndef LE_IMAGEDECODER_RAW_H
@@ -51,29 +58,15 @@
 #define LE_IMAGEDECODER_BLOCK_READ_SIZE 4
 
 #if LE_STREAMING_ENABLED == 1
-#ifndef LE_ASSET_DECODER_CACHE_SIZE
-#define LE_ASSET_DECODER_CACHE_SIZE 128
-#endif
 
-#if LE_ASSET_DECODER_USE_PIXEL_CACHE == 1
 // the cache used for streaming image source data
-extern uint8_t leRawImageDecoderScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_MASK_CACHE == 1
+extern uint8_t leRawImageDecoderScratchBuffer[LE_ASSET_DECODER_PIXEL_CACHE_SIZE];
 // the cache used for streaming mask lookup data
-extern uint8_t leRawImageDecoderMaskScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_PALETTE_CACHE == 1
+extern uint8_t leRawImageDecoderMaskScratchBuffer[LE_ASSET_DECODER_PALETTE_CACHE_SIZE];
 // the cache used for streaming palette lookup data
-extern uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_BLEND_CACHE == 1
+extern uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_MASK_CACHE_SIZE];
 // the cache used for streaming blend mask lookup data
-extern uint8_t leRawImageDecoderBlendBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
+extern uint8_t leRawImageDecoderBlendBuffer[LE_ASSET_DECODER_BLEND_CACHE_SIZE];
 
 #endif
 
@@ -161,7 +154,8 @@ typedef struct leRawDecodeState
     uint32_t sizeY; // the size in Y of the new data
 
     int32_t angle; // rotation angle
-    lePoint origin; // rotation origin
+    lePoint sourceOrigin; // rotation origin
+    lePoint targetOrigin; // rotation origin
 
     uint32_t rowIterator; // the row iterator
     uint32_t colIterator; // the column iterator

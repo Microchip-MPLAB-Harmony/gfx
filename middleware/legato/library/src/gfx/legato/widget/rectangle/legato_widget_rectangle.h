@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,12 +36,14 @@
   Description:
     This module implements rectangle drawing widget functions.
 *******************************************************************************/
-
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_rectangle.h
+ * @brief Rectangle widget functions and definitions.
+ *
+ * @details This module implements rectangle widget functions.
+ */
 
 #ifndef LEGATO_RECTANGLE_H
 #define LEGATO_RECTANGLE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -71,19 +71,11 @@ typedef struct leRectangleWidgetVTable
 } leRectangleWidgetVTable; 
 
 // *****************************************************************************
-/* Enumeration:
-    leRectangleWidget
-
-  Summary:
-    Implementation of a rectangle widget struct
-
-  Description:
-    A rectangle widget draws a basic rectangle of a given thickness using the
-    widget's bounding box as the dimensions.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a rectangle widget.
+ * @details A rectangle widget draws a basic rectangle of a given
+ * thickness using the widget's bounding box as the dimensions.
+ */
 typedef struct leRectangleWidget
 {
     leWidget widget; // widget base class
@@ -99,47 +91,34 @@ typedef struct leRectangleWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leRectangleWidget* leRectangleWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leRectangleWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leRectangleWidget* wgt = leRectangleWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leRectangleWidget* leRectangleWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leRectangleWidget <span class="param">wgt</span>.
+ * @code
+ * leRectangleWidget* wgt;
+ * leRectangleWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leRectangleWidget_Constructor(leRectangleWidget* wgt);
 
-  Description:
-    
 
-  Parameters:
-    
-  Returns:
-    leRectangleWidget*
-    
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leRectangleWidget* leRectangleWidget_New();
-
-/* Function:
-    void leRectangleWidget_Constructor(leRectangleWidget* wgt)
-
-  Summary:
-    Initializes an leRectangleWidget widget pointer.
-
-  Description:
-    Initializes an leRectangleWidget widget pointer.
-
-  Parameters:
-    leRectangleWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-void leRectangleWidget_Constructor(leRectangleWidget* _this);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -160,6 +139,17 @@ void leRectangleWidget_Constructor(leRectangleWidget* _this);
   Returns:
     int32_t - the thickness value
 */
+/**
+ * @brief Get rectangle border thickness.
+ * @details Gets the rectangle border thickness using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leResult res = wgt->fn->getThickness(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the thickness value.
+ */
+virtual int32_t getThickness(const leRectangleWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -182,8 +172,24 @@ void leRectangleWidget_Constructor(leRectangleWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set rectangle border thickness.
+ * @details Sets the rectangle border thickness to <span class="param">thk</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * int32_t thk;
+ * leResult res = wgt->fn->setThickness(_this, thk);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param thk the thickness.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setThickness(leRectangleWidget* _this,
+                              int32_t thk);
 
-
+#undef THIS_TYPE
+#endif
 
 #endif // LE_RECTANGLE_WIDGET_ENABLED
 #endif /* LEGATO_RECTANGLE_H */

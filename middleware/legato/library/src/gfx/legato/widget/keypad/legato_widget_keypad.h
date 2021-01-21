@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements keypad widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_keypad.h
+ * @brief Keypad widget functions and definitions.
+ *
+ * @details This module implements keypad widget functions.
+ */
+
 #ifndef LEGATO_KEYPAD_H
 #define LEGATO_KEYPAD_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -138,8 +140,11 @@ typedef struct leKeyPadCell
     const leString* value; // the value that is passed to the edit event system
 } leKeyPadCell;
 
-// DOM-IGNORE-BEGIN
-
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 #define LE_KEYPADWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
@@ -147,7 +152,6 @@ typedef struct leKeyPadCell
     leResult              (*setKeyPadActionTrigger)(THIS_TYPE* _this, leKeyPadActionTrigger trg); \
     leKeyPadWidget_KeyClickEvent (*getKeyClickEventCallback)(const THIS_TYPE* _this); \
     leResult              (*setKeyClickEventCallback)(THIS_TYPE* _this, leKeyPadWidget_KeyClickEvent cb); \
-    leBool                (*getKeyEnabled)(const THIS_TYPE* _this, uint32_t row, uint32_t col); \
     leResult              (*setKeyVisible)(THIS_TYPE* _this, uint32_t row, uint32_t col, leBool b); \
     leKeyPadCellAction    (*getKeyAction)(const THIS_TYPE* _this, uint32_t row, uint32_t col); \
     leResult              (*setKeyAction)(THIS_TYPE* _this, uint32_t row, uint32_t col, leKeyPadCellAction action); \
@@ -160,24 +164,19 @@ typedef struct leKeyPadWidgetVTable
 	LE_KEYPADWIDGET_VTABLE(leKeyPadWidget)
 } leKeyPadWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
-/* Structure:
-    leKeyPadCell
-
-  Summary:
-    Defines a key pad widget struct
-
-  Description:
-    A key pad is a widget that is comprised of an array of leButtonWidgets.
-    This widget serves to issue edit events based on application or input
-    interaction.  Receptor edit widgets can then receive these edit events
-    and react accordingly.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a key pad widget
+ * @details A key pad is a widget that is comprised of an array of
+ * leButtonWidgets. This widget serves to issue edit events based on
+ * application or input interaction.  Receptor edit widgets can then
+ * receive these edit events and react accordingly.
+ */
 typedef struct leKeyPadWidget
 {
     leWidget widget; // widget base class
@@ -200,56 +199,40 @@ typedef struct leKeyPadWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leKeyPadWidget* leKeyPadWidget_New(uint32_t rows, uint32_t cols)
+/**
+ * @brief Create widget.
+ * @details Creates a new leKeyPadWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leKeyPadWidget* wgt = leKeyPadWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leKeyPadWidget* leKeyPadWidget_New(uint32_t rows,
+                                   uint32_t cols);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leKeyPadWidget <span class="param">wgt</span>.
+ * @code
+ * leKeyPadWidget* wgt;
+ * uint32_t rows;
+ * uint32_t cols;
+ * leKeyPadWidget_Constructor(wgt, rows, cols);
+ * @endcode
+ * @param wgt is the widget to initialize.
+ * @param rows is the number of rows.
+ * @param cols is the number of columns.
+ * @return void.
+ */
+void leKeyPadWidget_Constructor(leKeyPadWidget* wgt,
+                                uint32_t rows,
+                                uint32_t cols);
 
-  Description:
-
-
-  Parameters:
-    uint32_t - number of rows to create
-    uint32_t - number of columns to create
-
-  Returns:
-    leKeyPadWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leKeyPadWidget* leKeyPadWidget_New(uint32_t rows,
-                                              uint32_t cols);
-
-/* Function:
-    void leKeyPadWidget_Constructor(leKeyPadWidget* pad,
-                                    uint32_t rows,
-                                    uint32_t cols)
-
-  Summary:
-    Initializes an leKeyPadWidget widget pointer.
-
-  Description:
-    Initializes an leKeyPadWidget widget pointer.
-
-  Parameters:
-    leKeyPadWidget* wgt - the pointer to initialize
-    uint32_t rows - the number of rows in the keypad
-    uint32_t cols - the number of columns in the keypad
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leKeyPadWidget_Constructor(leKeyPadWidget* pad,
-                                           uint32_t rows,
-                                           uint32_t cols);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -293,25 +276,33 @@ LIB_EXPORT void leKeyPadWidget_Constructor(leKeyPadWidget* pad,
     leResult - the result of the operation
 */
 
-// *****************************************************************************
-/* Virtual Member Function:
-    leKeyPadWidget_KeyClickEvent getKeyClickEventCallback(const leKeyPadWidget* _this)
+/**
+ * @brief Get key click event callback pointer.
+ * @details Gets the key click event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leKeyPadWidget* _this;
+ * leKeyPadWidget_KeyClickEvent cb = _this->fn->getKeyClickEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the callback pointer.
+ */
+virtual leKeyPadWidget_KeyClickEvent getKeyClickEventCallback(const leKeyPadWidget* _this);
 
-  Summary:
-     Gets the key click event callback
-
-  Description:
-     Gets the key click event callback
-
-  Parameters:
-    const leKeyPadWidget* _this - The keypad widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getKeyClickEventCallback(_this);
-
-  Returns:
-    leKeyPadWidget_KeyClickEvent - the callback pointer
-*/
+/**
+ * @brief Set key click event callback pointer.
+ * @details Sets the key click event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leKeyPadWidget* _this;
+ * leKeyPadWidget_KeyClickEvent cb;
+ * leResult res = _this->fn->setKeyClickEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setKeyClickEventCallback(leKeyPadWidget* _this,
+                                          leKeyPadWidget_KeyClickEvent cb);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -333,30 +324,6 @@ LIB_EXPORT void leKeyPadWidget_Constructor(leKeyPadWidget* pad,
 
   Returns:
     leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leBool getKeyEnabled(const leKeyPadWidget* _this,
-                         uint32_t row,
-                         uint32_t col)
-
-  Summary:
-     Gets the enabled state of a key
-
-  Description:
-     Gets the enabled state of a key
-
-  Parameters:
-    const leKeyPadWidget* _this - The keypad widget to operate on
-    uint32_t row - the row index
-    uint32_t col - the column index
-
-  Remarks:
-    Usage - _this->fn->getKeyEnabled(_this, row, col);
-
-  Returns:
-    leBool -
 */
 
 // *****************************************************************************
@@ -509,6 +476,8 @@ LIB_EXPORT void leKeyPadWidget_Constructor(leKeyPadWidget* pad,
     leButtonWidget* - pointer to the button widget
 */
 
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_WIDGET_KEYPAD_ENABLED && LE_WIDGET_BUTTON_ENABLED

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     Defines library assert macros.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_error.h
+ * @brief Error functions, macros and definitions
+ *
+ * @details Defines library assert macros.
+ */
+
 #ifndef LE_ERROR_H
 #define LE_ERROR_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -80,7 +82,16 @@
 
 #if LE_ASSERT_ENABLE == 1
 
-void leAssert();
+/**
+ * @brief Exits the application.
+ * @details Exits the application by calling exit().
+ * @code
+ * LE_ASSERT(val);
+ * @endcode
+ * @param param1 val is not used.
+ * @return void.
+ */
+void leAssert(void) __attribute__ ((noreturn));;
 
 // *****************************************************************************
 /* Function:
@@ -100,8 +111,16 @@ void leAssert();
   Remarks:
 
 */
-
-const char* leGetErrorMessage();
+/**
+ * @brief Get global error message.
+ * @details Gets the global error message set.
+ * @see leSetErrorMessage()
+ * @code
+ * char* msg = leGetErrorMessage();
+ * @endcode
+ * @return pointer the global error message.
+ */
+const char* leGetErrorMessage(void);
 
 // *****************************************************************************
 /* Function:
@@ -121,6 +140,17 @@ const char* leGetErrorMessage();
   Remarks:
 
 */
+/**
+ * @brief Set global error message.
+ * @details Sets the global error message to be used for debugging.
+ * @see leGetErrorMessage()
+ * @code
+ * const char* msg =  "a message";
+ * leSetErrorMessage(msg);
+ * @endcode
+ * @param param1 msg is the message to print.
+ * @return void.
+ */
 void leSetErrorMessage(const char* msg);
 
 // *****************************************************************************
@@ -142,7 +172,19 @@ void leSetErrorMessage(const char* msg);
   Remarks:
 
 */
-void leSprintfErrorMessage(const char* fmt, ...);
+/**
+ * @brief Set formatted global error message.
+ * @details Sets a sprintf style formatted global error message to be used for debugging.
+ * @see leGetErrorMessage()
+ * @see sprintf()
+ * @code
+ * const char* msg =  "Error: %d message";
+ * leSprintfErrorMessage(fmt);
+ * @endcode
+ * @param param1 msg is the message to print.
+ * @return void.
+ */
+void leSprintfErrorMessage(const char* fmt, ...) __attribute__ ((noreturn));;
 
 #endif
 

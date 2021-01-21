@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,132 +20,116 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
+/** \file legato_dynamicstring.h
+ * @brief Dynamic string functions and definitions.
+ * @details
+ */
 #ifndef LEGATO_DYNAMICSTRING_H
 #define LEGATO_DYNAMICSTRING_H
 
 #include "gfx/legato/string/legato_string.h"
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  */
 struct leDynamicString;
 
 #define LE_DYNAMICSTRING_VTABLE(THIS_TYPE) \
     LE_STRING_VTABLE(THIS_TYPE) \
     \
-	uint32_t (*getCapacity)(THIS_TYPE* str); \
-	leResult (*setCapacity)(THIS_TYPE* str, uint32_t cap); \
+        uint32_t (*getCapacity)(THIS_TYPE* str); \
+        leResult (*setCapacity)(THIS_TYPE* str, uint32_t cap); \
 
 typedef struct leDynamicStringVTable
 {
 	LE_DYNAMICSTRING_VTABLE(struct leDynamicString)
 } leDynamicStringVTable;
-// DOM-IGNORE-END
+/**
+  * @endcond
+  */
 
 // *****************************************************************************
-/* Structure:
-    leDynamicString
-
-  Summary:
-    String type that dynamically allocates internal memory to accommodate dynamic
-    string operations.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a dynamic string.
+ * @details String type that dynamically allocates internal memory to accommodate
+ * dynamic string operations
+ */
 typedef struct leDynamicString
 {
-    leString base; // string base data
-
-	const leDynamicStringVTable* fn; // function table
-    
-    leChar*     data;     // local string data storage
-    
-    uint16_t    capacity; // actual memory capacity of the string
-    uint16_t    length;   // actual length of the string
-                          
-    const leFont*  font; // the font used for this string 
+    leString base;                      /**< base data */
+    const leDynamicStringVTable* fn;    /**< function table */
+    leChar*     data;                   /**< data storage */
+    uint16_t    capacity;               /**< string capacity */
+    uint16_t    length;                 /**< string length */
+    const leFont*  font;                /**< string font */
 } leDynamicString;
 
 // *****************************************************************************
-/* Function:
-    leDynamicString* leDynamicString_New()
-
-   Summary:
-    Allocates a memory for a new dynamic string and automatically calls its
-    constructor function
-
-   Parameters:
-    
-
-  Returns:
-    leDynamicString* - pointer to the newly allocated string
-
-  Remarks:
-    Caller is responsible for freeing the memory allocated by this function
-    using leDynamicString_Delete()
-*/
-LIB_EXPORT leDynamicString* leDynamicString_New();
+/**
+ * @brief Create a new dynamic string.
+ * @details Creates a new leDynamicString and automatically calls
+ * its constructor function.
+ * @remark Caller is responsible for freeing the memory allocated by
+ * this function.
+ * @see leDynamicString_Delete()
+ * @code
+ * leDynamicString * str = leDynamicString_New(void);
+ * @endcode
+ * @return pointer to the newly allocated string
+ */
+leDynamicString* leDynamicString_New(void);
 
 // *****************************************************************************
-/* Function:
-    void leDynamicString_Constructor(leDynamicString* str)
+/**
+ * @brief Consructs a dynamic string.
+ * @details Allocates a memory for an existing <span style="color: #820a32"><em>str</em></span>.
+ * @remark It is assumed that the pointer provided is being managed by the caller.
+ * Use the destructor member function to destroy the string.
+ * @code
+ * leDynamicString* str;
+ * leDynamicString_Constructor(str);
+ * @endcode
+ * @param str the string to construct.
+ * @return void
+ */
+void leDynamicString_Constructor(leDynamicString* str);
 
-   Summary:
-    Constructs a new dynamic string at the given pointer
 
-   Parameters:
-    leDynamicString* str - the string to construct
-
-  Returns:
-    
-  Remarks:
-    It is assumed that the pointer provided is being managed by the caller.  Use
-    the destructor member function to clean properly clean this object up.
-*/
-LIB_EXPORT void leDynamicString_Constructor(leDynamicString* str);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getCapacity(leDynamicString* str)
-
-  Summary:
-    Gets the capacity of the dynamic string
-
-  Description:
-    Gets the capacity of the dynamic string
-
-  Parameters:
-    leDynamicString* str - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->getCapacity(_this);
-
-  Returns:
-    uint32_t - the current string capacity
-*/
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setCapacity(leDynamicString* str,
-                         uint32_t cap)
+/**
+ * @brief Get capacity of the dynamic string.
+ * @details Gets the capacity of <span class="param">_this</span>.
+ * @code
+ * leDynamicString* _this;
+ * uint32_t cap = _this->fn->getCapacity(_this);
+ * @endcode
+ * @param  str is the string to operate on
+ * @return the current string capacity.
+ */
+virtual uint32_t getCapacity(leDynamicString* _this);
 
-  Summary:
-    Sets the capacity of the dynamic string
+// *****************************************************************************
+/**
+ * @brief Set capacity of the dynamic string.
+ * @details Sets capacity of <span class="param">_this</span> to <span class="param">cap</span>.
+ * @code
+ * leDynamicString* _this;
+ * uint32_t cap;
+ * leResult res = _this->fn->setCapacity(_this, cap);
+ * @endcode
+ * @param  _this is the string to operate on;
+ * @param cap is the desired capacity;
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCapacity(leDynamicString* _this,
+                             uint32_t cap);
 
-  Description:
-    Sets the capacity of the dynamic string
-
-  Parameters:
-    leDynamicString* str - The string to operate on
-    uint32_t cap - the desired capacity
-
-  Remarks:
-    Usage - _this->fn->setCapacity(_this, cap);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
+#undef THIS_TYPE
+#endif
 
 #endif /* LEGATO_DYNAMICSTRING_H */

@@ -27,7 +27,7 @@
   MPLAB Harmony Generated Driver Implementation File
 
   File Name:
-    drv_gfx_intf_spi4.c
+    drv_gfx_intf_parallel_ebi.c
 
   Summary:
     Implements the parallel display interface driver over SMC
@@ -101,7 +101,7 @@ typedef struct
 
 GFX_DISP_INTF_EBI ebiIntf = {.cmdAddr  = NULL, .dataAddr = NULL, .locked = 0};
 
-static inline void GFX_Disp_Intf_DelayNOP()
+static inline void GFX_Disp_Intf_DelayNOP(void)
 {
     unsigned int i;
 
@@ -527,6 +527,12 @@ int GFX_Disp_Intf_Read(GFX_Disp_Intf intf, uint8_t * data, int bytes)
 int GFX_Disp_Intf_Ready(GFX_Disp_Intf intf)
 {
     return 1;
+}
+
+int GFX_Disp_Intf_Set_Callback(GFX_Disp_Intf intf, GFX_Disp_Intf_Callback cb, void * parm)
+{
+    //Not supported
+    return -1;
 }
 
 

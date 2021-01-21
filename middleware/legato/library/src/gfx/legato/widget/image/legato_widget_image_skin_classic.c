@@ -37,10 +37,6 @@
 
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
-#if LE_IMAGE_WIDGET_DEBUG == 1
-uint8_t startCounting = 0;
-#endif
-
 enum
 {
     NOT_STARTED = LE_WIDGET_DRAW_STATE_READY,
@@ -63,7 +59,9 @@ static struct
 void _leImageWidget_GetImageRect(leImageWidget* img,
                                  leRect* imgRect)
 {
-    leRect bounds = img->fn->localRect(img);
+    leRect bounds;
+
+    img->fn->localRect(img, &bounds);
 
     imgRect->x = 0;
     imgRect->y = 0;
@@ -83,8 +81,8 @@ void _leImageWidget_GetImageRect(leImageWidget* img,
     leUtils_ArrangeRectangle(imgRect,
                              leRect_Zero,
                              bounds,
-                             img->widget.halign,
-                             img->widget.valign,
+                             img->widget.style.halign,
+                             img->widget.style.valign,
                              0,
                              img->widget.margin.left,
                              img->widget.margin.top,
@@ -101,7 +99,7 @@ static void drawBorder(leImageWidget* img);
 
 static void nextState(leImageWidget* img)
 {
-    switch(img->widget.drawState)
+    switch(img->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -114,38 +112,41 @@ static void nextState(leImageWidget* img)
             }
 #endif
             
-            if(img->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE)
+            if(img->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                img->widget.drawState = DRAW_BACKGROUND;
+                img->widget.status.drawState = DRAW_BACKGROUND;
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(img->image != NULL)
             {
-                img->widget.drawState = DRAW_IMAGE;
+                img->widget.status.drawState = DRAW_IMAGE;
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawImage;
 
                 return;
             }
         }
+        // fall through
         case DRAW_IMAGE:
         {
-            if(img->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(img->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 img->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                img->widget.drawState = DRAW_BORDER;
+                img->widget.status.drawState = DRAW_BORDER;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
 
-            img->widget.drawState = DONE;
+            img->widget.status.drawState = DONE;
             img->widget.drawFunc = NULL;
         }
     }
@@ -164,7 +165,7 @@ static void onImageStreamFinished(leStreamManager* dec)
 {
     leImageWidget* img = (leImageWidget*)dec->userData;
 
-    img->widget.drawState = DRAW_IMAGE;
+    img->widget.status.drawState = DRAW_IMAGE;
 
     nextState(img);
 
@@ -180,14 +181,6 @@ static void onImageStreamFinished(leStreamManager* dec)
 static void drawImage(leImageWidget* img)
 {
     leRect imgRect, imgSrcRect;
-
-#if LE_IMAGE_WIDGET_DEBUG == 1
-    if(img->ImageDrawStart != NULL && startCounting == 0)
-    {
-        img->debugDrawStart(img);
-        startCounting = 1;
-    }
-#endif
 
     imgSrcRect.x = 0;
     imgSrcRect.y = 0;
@@ -210,7 +203,7 @@ static void drawImage(leImageWidget* img)
         leGetActiveStream()->onDone = onImageStreamFinished;
         leGetActiveStream()->userData = img;
 
-        img->widget.drawState = WAIT_IMAGE;
+        img->widget.status.drawState = WAIT_IMAGE;
 
         return;
     }
@@ -227,12 +220,12 @@ static void drawImage(leImageWidget* img)
 
 static void drawBorder(leImageWidget* img)
 {
-    if(img->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(img->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)img,
                                                     paintState.alpha);
     }
-    else if(img->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(img->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)img,
                                                       paintState.alpha);
@@ -243,24 +236,17 @@ static void drawBorder(leImageWidget* img)
 
 void _leImageWidget_Paint(leImageWidget* img)
 {
-    if(img->widget.scheme == NULL)
-    {
-        img->widget.drawState = DONE;
-
-        return;
-    }
-
-    if(img->widget.drawState == NOT_STARTED)
+    if(img->widget.status.drawState == NOT_STARTED)
     {
         nextState(img);
     }
 
 #if LE_STREAMING_ENABLED == 1
-    if(img->widget.drawState == WAIT_IMAGE)
+    if(img->widget.status.drawState == WAIT_IMAGE)
         return;
 #endif
     
-    while(img->widget.drawState != DONE)
+    while(img->widget.status.drawState != DONE)
     {
         img->widget.drawFunc((leWidget*)img);
 
@@ -269,7 +255,7 @@ void _leImageWidget_Paint(leImageWidget* img)
 #endif
 
 #if LE_STREAMING_ENABLED == 1
-        if(img->widget.drawState == WAIT_IMAGE)
+        if(img->widget.status.drawState == WAIT_IMAGE)
             break;
 #endif
     }

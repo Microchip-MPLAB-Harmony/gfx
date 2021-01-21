@@ -59,11 +59,19 @@ def instantiateComponent(component):
 	LE_SYS_RTOS_TASK_C.setSourcePath("templates/le_rtos_tasks.c.ftl")
 	LE_SYS_RTOS_TASK_C.setMarkup(True)
 
+	LeGPUConnected = component.createBooleanSymbol("LeGPUConnected", None)
+	LeGPUConnected.setDescription("Hints if a GPU module is connected to Legato")
+	LeGPUConnected.setDefaultValue(False)
+	LeGPUConnected.setVisible(False)
+
 def onAttachmentConnected(source, target):
 	if source["id"] == "gfx_driver":
 		driverName = target["component"].getSymbolValue("DriverInitName")
 		source["component"].setSymbolValue("driverInitName", driverName)
-		
+
+	if source["id"] == "gpu_driver":
+		source["component"].setSymbolValue("LeGPUConnected", True)
+        
 	#if source["id"] == "gfx_hal":
 	#	target["component"].setSymbolValue("GlobalPaletteModeHint", source["component"].getSymbolValue("useGlobalPalette"), 1)
 	#	target["component"].setSymbolValue("DisableGlobalPaletteModeHint", True, 1)
@@ -72,7 +80,10 @@ def onAttachmentDisconnected(source, target):
 	if source["id"] == "gfx_driver":
 		source["component"].clearSymbolValue("driverInitName")
 
-	#if source["id"] == "gfx_hal":
+	if source["id"] == "gpu_driver":
+		source["component"].setSymbolValue("LeGPUConnected", False)
+
+    #if source["id"] == "gfx_hal":
 	#	target["component"].clearSymbolValue("GlobalPaletteModeHint")
 	#	target["component"].clearSymbolValue("DisableGlobalPaletteModeHint")
 	

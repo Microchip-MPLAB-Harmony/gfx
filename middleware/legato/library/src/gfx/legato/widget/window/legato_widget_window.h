@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements window container widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_window.h
+ * @brief Window Widget functions and definitions.
+ *
+ * @details This module implements window container widget functions.
+ */
+
 #ifndef LEGATO_WINDOW_H
 #define LEGATO_WINDOW_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -60,12 +62,14 @@
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
-typedef struct leWindowWidget leWindowWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leWindowWidget leWindowWidget;
 
 #define LE_WINDOWWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
-    \
     uint32_t  (*getTitleHeight)(const THIS_TYPE* _this); \
     leResult  (*setTitleHeight)(THIS_TYPE* this, uint32_t ht); \
     leString* (*getString)(const THIS_TYPE* _this); \
@@ -80,7 +84,10 @@ typedef struct leWindowWidgetVTable
 	LE_WINDOWWIDGET_VTABLE(leWindowWidget)
 } leWindowWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Structure:
@@ -96,6 +103,11 @@ typedef struct leWindowWidgetVTable
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a window widget.
+ * @details A window widget is an extension of a basic panel.  It adds a title
+ * bar with text and an icon.
+ */
 typedef struct leWindowWidget
 {
     leWidget widget; // base widget class
@@ -116,217 +128,153 @@ typedef struct leWindowWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leWindowWidget* leWindowWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leWindowWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leWindowWidget* wgt = leWindowWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leWindowWidget* leWindowWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leWindowWidget <span class="param">wgt</span>.
+ * @code
+ * leWindowWidget* _this;
+ * leWindowWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leWindowWidget_Constructor(leWindowWidget* wgt);
 
-  Description:
-
-
-  Parameters:
-
-  Returns:
-    leWindowWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leWindowWidget* leWindowWidget_New();
-
-/* Function:
-    void leWindowWidget_Constructor(leWindowWidget* wgt)
-
-  Summary:
-    Initializes an leWindowWidget widget pointer.
-
-  Description:
-    Initializes an leWindowWidget widget pointer.
-
-  Parameters:
-    leWindowWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leWindowWidget_Constructor(leWindowWidget* win);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getTitleHeight(const leWindowWidget* _this)
-
-  Summary:
-     Get the title bar height
-
-  Description:
-     Get the title bar height
-
-  Parameters:
-    const leWindowWidget* _this - The window widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getTitleHeight(_this);
-
-  Returns:
-    uint32_t - the height value
-*/
+/**
+ * @brief Get title bar height.
+ * @details Returns the title bar height using <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * leString * title = _this->fn->getTitleHeight(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the height value.
+ */
+virtual uint32_t getTitleHeight(const leWindowWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setTitleHeight(leWindowWidget* this,
-                            uint32_t ht)
-
-  Summary:
-     Set the title bar height
-
-  Description:
-     Set the title bar height
-
-  Parameters:
-    leWindowWidget* this - The window widget to operate on
-    uint32_t ht - the height value
-
-  Remarks:
-    Usage - _this->fn->setTitleHeight(_this, ht);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set title height.
+ * @details Sets the title height using <span class="param">wgt</span>.
+ * @code
+ * leWindowWidget* _this;
+ * uint32_t ht;
+ * leResult res = _this->fn->setTitleHeight(wgt, ht);
+ * @endcode
+ * @param  wgt is the widget to modify;
+ * @param ht is the string pointer;
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setTitleHeight(leWindowWidget* _this,
+                        uint32_t ht);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leString* getString(const leWindowWidget* _this)
-
-  Summary:
-     Get the title bar string
-
-  Description:
-     Get the title bar string
-
-  Parameters:
-    const leWindowWidget* _this - The window widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getString(_this);
-
-  Returns:
-    leString* - the string pointer
-*/
+/**
+ * @brief Get title bar string.
+ * @details Gets the title bar string using <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * leResult res = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @return title bar string.
+ */
+virtual leString* getString(const leWindowWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setString(leWindowWidget* _this,
-                       const leString* str)
+/**
+ * @brief Set title bar string.
+ * @details Sets the title bar string to <span class="param">str</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * const leString* str;
+ * leResult res = _this->fn->setString(_this, str);
+ * @endcode
+ * @param  _this is the widget to modify
+ * @param str is the string pointer;
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setString(leWindowWidget* _this,
+                           const leString* str);
 
-  Summary:
-     Set the title bar string
-
-  Description:
-     Set the title bar string
-
-  Parameters:
-    leWindowWidget* _this - The window widget to operate on
-    const leString* str - the string pointer
-
-  Remarks:
-    Usage - _this->fn->setString(_this, str);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leImage* getIcon(const leWindowWidget* _this)
-
-  Summary:
-     Get the title bar icon
-
-  Description:
-     Get the title bar icon
-
-  Parameters:
-    const leWindowWidget* _this - The window widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getIcon(_this);
-
-  Returns:
-    leImage* - the image pointer
-*/
+/**
+ * @brief Get title icon.
+ * @details Gets the title icon from <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * leImage * icon = _this->fn->getIcon(_this);
+ * @endcode
+ * @param _this is the widget to query
+ * @return returns the title icon.
+ */
+virtual leImage* getIcon(const leWindowWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setIcon(leWindowWidget* _this,
-                     const leImage* img)
-
-  Summary:
-     Set the title bar icon
-
-  Description:
-     Set the title bar icon
-
-  Parameters:
-    leWindowWidget* _this - The window widget to operate on
-    const leImage* img - the image pointer
-
-  Remarks:
-    Usage - _this->fn->setIcon(_this, img);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set title bar icon.
+ * @details Sets the title bar icon for <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * leImage* img;
+ * leResult res = _this->fn->setIcon(_this, img);
+ * @endcode
+ * @param  _this is the widget to modify
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIcon(leWindowWidget* _this,
+                         const leImage* img);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getIconMargin(const leWindowWidget* this)
-
-  Summary:
-     Get the title bar icon margin
-
-  Description:
-     Get the title bar icon margin
-
-  Parameters:
-    const leWindowWidget* this - The window widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getIconMargin(_this);
-
-  Returns:
-    uint32_t - the margin value
-*/
+/**
+ * @brief Get title bar icon margin.
+ * @details Gets the title bar icon margin from <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * uint32_t margin = _this->fn->getIconMargin(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the title bar icon margin.
+ */
+virtual uint32_t getIconMargin(const leWindowWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setIconMargin(leWindowWidget* this,
-                           uint32_t mg)
-
-  Summary:
-     Set the title bar icon margin
-
-  Description:
-     Set the title bar icon margin
-
-  Parameters:
-    leWindowWidget* this - The window widget to operate on
-    uint32_t mg - the margin value
-
-  Remarks:
-    Usage - _this->fn->setIconMargin(_this, mg);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set title icon margin.
+ * @details Sets the title icon margin to <span class="param">mg</span> for
+ * <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * uint32_t mg;
+ * leResult res = _this->fn->setIconMargin(_this, mg);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setIconMargin(const leWindowWidget* this, uint32_t mg);
 
 
+#undef THIS_TYPE
+#endif
 
 #endif // LE_WINDOW_WIDGET_ENABLED
 #endif /* LEGATO_WINDOW_H */

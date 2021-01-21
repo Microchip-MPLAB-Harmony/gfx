@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,15 @@
     This module implements top level widget control functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget.h
+ * @brief Legato widget definitions.
+ *
+ * @details Defines the widget that are used in the UI library.  Widgets
+ * are created and stored for later processing during a library context's update loop.
+ */
 
 #ifndef LEGATO_WIDGET_H
 #define LEGATO_WIDGET_H
-//DOM-IGNORE-END
 
 
 #include "gfx/legato/common/legato_common.h"
@@ -52,10 +54,15 @@
 #include "gfx/legato/core/legato_scheme.h"
 #include "gfx/legato/datastructure/legato_array.h"
 
-// DOM-IGNORE-BEGIN
-#define DEFAULT_BORDER_MARGIN   4
-// DOM-IGNORE-END
-
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */#define DEFAULT_BORDER_MARGIN   4
+/**
+  * @endcond
+  *
+  */
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types and Constants
@@ -76,6 +83,10 @@ Enumeration:
     Remarks:
         None.
  */
+/**
+ * @brief Used to define widget types.
+ * @details Used to define widget types.
+ */
 typedef enum leWidgetType
 {
     LE_WIDGET_WIDGET,
@@ -88,7 +99,7 @@ typedef enum leWidgetType
 #if LE_BUTTON_WIDGET_ENABLED == 1
     LE_WIDGET_BUTTON,
 #endif
-#if LE_BUTTON_WIDGET_ENABLED == 1
+#if LE_CHECKBOX_WIDGET_ENABLED == 1
     LE_WIDGET_CHECKBOX,
 #endif
 #if LE_CIRCLE_WIDGET_ENABLED == 1
@@ -133,7 +144,7 @@ typedef enum leWidgetType
 #if LE_LINEGRAPH_WIDGET_ENABLED == 1
     LE_WIDGET_LINE_GRAPH,
 #endif
-#if LE_LIST_WIDGET_ENABLED && LE_SCROLLBAR_WIDGET_ENABLED == 1
+#if LE_LIST_WIDGET_ENABLED == 1 && LE_SCROLLBAR_WIDGET_ENABLED == 1
     LE_WIDGET_LIST,
 #endif
 #if LE_LISTWHEEL_WIDGET_ENABLED == 1
@@ -199,11 +210,21 @@ Enumeration:
     Remarks:
         None.
  */
+/**
+ * @brief Used to define widget background types.
+ * @details Specifies the different background types used for the widgets in the library.
+ * None - No background fill.  Widget must defer to its parent to erase dirty
+ * pixels.  This may cause additional overhead as clean pixels may be repainted as well.
+ * Fill - a scheme color is used to fill the widget rectangle.
+ * Cache - a local framebuffer cache is maintained by the widget and used to
+ * clean up dirty pixels.  Will not cause a parent repaint event but will use additional
+ *  memory to contain the cache.
+ */
 typedef enum leBackgroundType
 {
-    LE_WIDGET_BACKGROUND_NONE,
-    LE_WIDGET_BACKGROUND_FILL,
-    LE_WIDGET_BACKGROUND_LAST = LE_WIDGET_BACKGROUND_FILL
+    LE_WIDGET_BACKGROUND_NONE,      /**< No background fill. */
+    LE_WIDGET_BACKGROUND_FILL,      /**< Uses scheme color. */
+    LE_WIDGET_BACKGROUND_LAST = LE_WIDGET_BACKGROUND_FILL /**< Uses Cache. */
 } leBackgroundType;
 
 /*
@@ -218,6 +239,10 @@ Enumeration:
 
     Remarks:
         None.
+ */
+/**
+ * @brief Used to define widget border types.
+ * @details Specifies the different background types used for the widgets in the library.
  */
 typedef enum leBorderType
 {
@@ -242,6 +267,12 @@ Enumeration:
     Remarks:
         None.
  */
+/**
+ * @brief Used to define widget dirty state.
+ * @details Specifies the different dirty states the widget can be assigned.
+ * This decides whether the particular widget would be re-drawn or not. Dirty widget
+ * are re-drawn and clean are not painted over.
+ */
 typedef enum leWidgetDirtyState
 {
     LE_WIDGET_DIRTY_STATE_CLEAN,
@@ -262,6 +293,12 @@ Enumeration:
     Remarks:
         None.
  */
+/**
+ * @brief Used to define widget dirty state.
+ * @details Specifies the different dirty states the widget can be assigned.
+ * This decides whether the particular widget would be re-drawn or not. Dirty widget
+ * are re-drawn and clean are not painted over.
+ */
 typedef enum leWidgetDrawState
 {
     LE_WIDGET_DRAW_STATE_READY,
@@ -270,6 +307,10 @@ typedef enum leWidgetDrawState
     // widget-specific draw states start here
 } leWidgetDrawState;
 
+/**
+ * @brief Used to define widget move event.
+ * @details Specifies the old a new position of a widget..
+ */
 typedef struct leWidget_MoveEvent
 {
     leEvent evt;
@@ -280,6 +321,10 @@ typedef struct leWidget_MoveEvent
     int32_t newY;
 } leWidget_MoveEvent;
 
+/**
+ * @brief Used to define widget resize event.
+ * @details Specifies the old a new size of a widget.
+ */
 typedef struct leWidget_ResizeEvent
 {
     leEvent evt;
@@ -290,6 +335,8 @@ typedef struct leWidget_ResizeEvent
     uint32_t newHeight;
 } leWidget_ResizeEvent;
 
+typedef struct leWidget leWidget;
+
 // *****************************************************************************
 /* Structure:
     leWidgetEvent
@@ -297,6 +344,10 @@ typedef struct leWidget_ResizeEvent
   Summary:
     Basic widget event definition
 */
+/**
+ * @brief Used to define widget event.
+ * @details
+ */
 typedef struct leWidgetEvent
 {
     leEventID id;
@@ -318,6 +369,10 @@ typedef struct leWidgetEvent
   Remarks:
     None.
 */
+/**
+ * @brief Used to define widget touch down event.
+ * @details Specifies event, id and location.
+ */
 typedef struct leWidgetEvent_TouchDown
 {
     leWidgetEvent event;
@@ -340,6 +395,10 @@ typedef struct leWidgetEvent_TouchDown
   Remarks:
     None.
 */
+/**
+ * @brief Used to define widget touch up event.
+ * @details Specifies event, id and location.
+ */
 typedef struct leWidgetEvent_TouchUp
 {
     leWidgetEvent event;
@@ -362,6 +421,10 @@ typedef struct leWidgetEvent_TouchUp
   Remarks:
     None.
 */
+/**
+ * @brief Used to define widget touch move event.
+ * @details Specifies event, id and location.
+ */
 typedef struct leWidgetEvent_TouchMove
 {
     leWidgetEvent event;
@@ -383,13 +446,32 @@ void leWidgetEvent_Accept(leWidgetEvent* evt, leWidget* owner);
     Struct that defines an event filter.  Event filters allow a
     receiver to discard undesirable events
 */
+/**
+ * @brief Used to define widget touch event filter.
+ * @details Event filters allow a receiver to discard undesirable events.
+ */
 typedef struct
 {
+    /**
+     * @brief Virtual function - Filter Event.
+     * @details Sets an event filter with the value <span style="color: #820a32"><em>evt</em></span> and
+     * data arguments <span style="color: #820a32"><em>data</em></span> for the specified widget
+     * <span style="color: #820a32"><em>target</em></span>.
+     * @code
+     * leResult res = leImage_Create();
+     * @endcode
+     * @param param1 void.
+     * @return number of events.
+     */
     leBool (*filterEvent)(leWidget* target, leWidgetEvent* evt, void* data);
     void* data;
 } leWidgetEventFilter;
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leWidget leWidget;
 
 #define LE_WIDGET_VTABLE(THIS_TYPE) \
@@ -417,20 +499,22 @@ typedef struct leWidget leWidget;
     leResult           (*setEnabled)(THIS_TYPE* _this, leBool enbl); \
     leBool             (*getVisible)(const THIS_TYPE* _this); \
     leResult           (*setVisible)(THIS_TYPE* _this, leBool vis); \
-    leRect             (*localRect)(const THIS_TYPE* _this); \
-    leRect             (*rectToParent)(const THIS_TYPE* _this); \
-    leRect             (*rectToScreen)(const THIS_TYPE* _this); \
+    void               (*localRect)(const THIS_TYPE* _this, leRect* res); \
+    void               (*rectToParent)(const THIS_TYPE* _this, leRect* res); \
+    void               (*rectToScreen)(const THIS_TYPE* _this, leRect* res); \
     leResult           (*addChild)(THIS_TYPE* _this, leWidget* chld); \
+    leResult           (*insertChild)(THIS_TYPE* _this, leWidget* chld, uint32_t idx); \
     leResult           (*removeChild)(THIS_TYPE* _this, leWidget* chld); \
+    leResult           (*removeChildAt)(THIS_TYPE* _this, uint32_t idx); \
     void               (*removeAllChildren)(THIS_TYPE* _this); \
     leWidget*          (*getRootWidget)(const THIS_TYPE* _this); \
     leResult           (*setParent)(THIS_TYPE* _this, leWidget* pnt); \
     uint32_t           (*getChildCount)(const THIS_TYPE* _this); \
     leWidget*          (*getChildAtIndex)(const THIS_TYPE* _this, uint32_t idx); \
     uint32_t           (*getIndexOfChild)(const THIS_TYPE* _this, const leWidget* chld); \
-    leBool             (*containsDescendent)(const THIS_TYPE* _this, const leWidget* wgt); \
+    leBool             (*containsDescendant)(const THIS_TYPE* _this, const leWidget* wgt); \
     leScheme*          (*getScheme)(const THIS_TYPE* _this); \
-    leResult           (*setScheme)(THIS_TYPE* _this, leScheme* schm); \
+    leResult           (*setScheme)(THIS_TYPE* _this, const leScheme* schm); \
     leBorderType       (*getBorderType)(const THIS_TYPE* _this); \
     leResult           (*setBorderType)(THIS_TYPE* _this, leBorderType type); \
     leBackgroundType   (*getBackgroundType)(const THIS_TYPE* _this); \
@@ -439,7 +523,7 @@ typedef struct leWidget leWidget;
     leResult           (*setHAlignment)(THIS_TYPE* _this, leHAlignment halgn); \
     leVAlignment       (*getVAlignment)(const THIS_TYPE* _this); \
     leResult           (*setVAlignment)(THIS_TYPE* _this, leVAlignment valgn); \
-    leMargin           (*getMargins)(const THIS_TYPE* _this); \
+    leResult           (*getMargins)(const THIS_TYPE* _this, leMargin* mg); \
     leResult           (*setMargins)(THIS_TYPE* _this, uint32_t l, uint32_t t, uint32_t r, uint32_t b); \
     uint32_t           (*getCornerRadius)(const THIS_TYPE* _this); \
     leResult           (*setCornerRadius)(THIS_TYPE* _this, uint32_t rad); \
@@ -483,7 +567,38 @@ typedef struct leRectArray leRectArray;
 
 typedef void (*leWidget_DrawFunction_FnPtr)(void*);
 
-// DOM-IGNORE-END
+enum leWidgetFlags
+{
+    LE_WIDGET_ENABLED      = 0x1,  // indicates that the widget is enabled
+    LE_WIDGET_VISIBLE      = 0x2,  // indicates that the widget is visible
+    LE_WIDGET_ALPHAENABLED = 0x4,  // indicates that the widget is using alpha blending
+    LE_WIDGET_ISROOT       = 0x8,  // indicates that this widget is a root widget
+    LE_WIDGET_IGNOREEVENTS = 0x10, // indicates that the widget should ignore input/focus events
+    LE_WIDGET_IGNOREPICK   = 0x20  // indicates that the widget should be ignored for pick tests
+};
+
+typedef struct leWidgetStyle
+{
+    uint8_t backgroundType;  // the widget background type
+    uint8_t borderType;      // the widget border type
+    uint8_t halign;          // horizontal alignment of the widget
+    uint8_t valign;          // vertical alignment of the widget
+    uint8_t alphaAmount;     // the global alpha amount to apply to this widget (cumulative with parent widgets)
+    uint8_t cornerRadius;    //corner radius, draws round corners if > 0
+} leWidgetStyle;
+
+typedef struct leWidgetStatus
+{
+    uint8_t dirtyState;
+    uint8_t drawState;
+
+} leWidgetStatus;
+
+/**
+  * @endcond
+  *
+  */
+
 
 /* Structure:
         leWidget
@@ -500,6 +615,10 @@ typedef void (*leWidget_DrawFunction_FnPtr)(void*);
         None.
 
 */
+/**
+ * @brief Used to define a widget.
+ * @details .
+ */
 typedef struct leWidget
 {
     const leWidgetVTable* fn;
@@ -507,42 +626,23 @@ typedef struct leWidget
     uint32_t id;  // the id of the widget
     leWidgetType type; // the type of the widget
 
-    leBool visible; // the widget visible flag
-    leBool enabled; // the widget enabled flag
-
     leRect rect; // the bounding rectangle of the widget
-    uint32_t cornerRadius; //corner radius, draws round corners if > 0
-    
-    leHAlignment halign; // horizontal alignment of the widget
-    leVAlignment valign; // vertical alignment of the widget
+
+    uint32_t flags;        // widget state flags
+    leWidgetStyle style;   // widget style values
+    leWidgetStatus status; // widget status values
 
     leMargin margin; // the margin settings for the widget
 
-    leBorderType borderType; // the widget border type
-    leBackgroundType backgroundType; // the widget background type
-
-    uint32_t optimizationFlags; // optimization flags
-
     uint32_t drawCount; // number of times this widget has been drawn
                         // for the active screen
-
-    leBool alphaEnabled;    // indicates that the global alpha blending
-                            // setting is enabled for this widget
-    uint32_t alphaAmount;   // the global alpha amount to apply to this
-                            // widget (cumulative with parent widgets)
-
-    uint32_t dirtyState;    // the widget's dirty state
-    uint32_t drawState;     // the widget's draw state
 
     leWidget_DrawFunction_FnPtr drawFunc; // the next draw function to call
 
     const leScheme* scheme; // the widget's color scheme
 
-    //leWidgetInputHandler externalHandler;
-
     leWidgetEventFilter eventFilters[LE_WIDGET_MAX_EVENT_FILTERS];
 
-    leBool root;      // indicates if this widget is a root widget
     leWidget* parent; // pointer to the widget's parent
     leArray children;  // pointers for the widget's children
 } leWidget;
@@ -573,27 +673,29 @@ typedef struct leWidget
         lawidget*
 
 */
-LIB_EXPORT leWidget* leWidget_New();
+/**
+ * @brief Create widget.
+ * @details Creates a new widget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @code
+ * leWidget* wgt = leWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leWidget* leWidget_New(void);
 
-/* Function:
-    void leWidget_Constructor(leWidget* wgt)
-
-  Summary:
-    Initializes an leWidget widget pointer.
-
-  Description:
-    Initializes an leWidget widget pointer.
-
-  Parameters:
-    leWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leWidget_Constructor(leWidget* wgt);
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leWidget* wgt;
+ * leWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leWidget_Constructor(leWidget* wgt);
 
 /*    Function:
         void leWidget_Delete(leWidget* wgt)
@@ -618,7 +720,17 @@ LIB_EXPORT void leWidget_Constructor(leWidget* wgt);
         destructors are properly called.
 
 */
-LIB_EXPORT void leWidget_Delete(leWidget* wgt);
+/**
+ * @brief Delete widget.
+ * @details Deletes <span style="color: #820a32"><em>wgt</em></span>.
+ * @code
+ * leWidget* wgt;
+ * leWidget_Delete(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to delete
+ * @return void.
+ */
+void leWidget_Delete(leWidget* wgt);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -639,6 +751,17 @@ LIB_EXPORT void leWidget_Delete(leWidget* wgt);
   Returns:
     leWidgetType - the type
 */
+/**
+ * @brief Get widget type.
+ * @details Returns the widget type from  <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidgetType type = wgt->fn->getType(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return return leWidgetType.
+ */
 leWidgetType _leWidget_GetType(const leWidget* _this);
 
 // *****************************************************************************
@@ -660,6 +783,17 @@ leWidgetType _leWidget_GetType(const leWidget* _this);
   Returns:
     int32_t - the x value
 */
+/**
+ * @brief Get widget x position.
+ * @details Returns the widget x position from  <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidgetType type = wgt->fn->getX(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leWidgetType.
+ */
 int32_t _leWidget_GetX(const leWidget* _this);
 
 // *****************************************************************************
@@ -683,6 +817,19 @@ int32_t _leWidget_GetX(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget x position.
+ * @details Sets the widget x position of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>x</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->setX(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 x is the new x position
+ * @return returns leResult.
+ */
 leResult _leWidget_SetX(leWidget* _this,
                         int32_t x);
 
@@ -705,6 +852,17 @@ leResult _leWidget_SetX(leWidget* _this,
   Returns:
     int32_t - the y value
 */
+/**
+ * @brief Get widget y position
+ * @details Returns the y position from  <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidgetType type = wgt->fn->getY(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leWidgetType.
+ */
 int32_t _leWidget_GetY(const leWidget* _this);
 
 // *****************************************************************************
@@ -728,6 +886,19 @@ int32_t _leWidget_GetY(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget y position.
+ * @details Sets the y position of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>y</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->setY(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 y is the new y position
+ * @return returns leResult.
+ */
 leResult _leWidget_SetY(leWidget* _this,
                         int32_t y);
 
@@ -754,6 +925,20 @@ leResult _leWidget_SetY(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget x and y position.
+ * @details Sets the x and y position of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>x</em></span> and <span style="color: #820a32"><em>y</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->setPosition(wgt, x, y);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 x is the new x position
+ * @param param1 y is the new y position
+ * @return returns leResult.
+ */
 leResult _leWidget_SetPosition(leWidget* _this,
                                int32_t x,
                                int32_t y);
@@ -781,6 +966,20 @@ leResult _leWidget_SetPosition(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Translate widget x and y position.
+ * @details Translates the x and y position of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>x</em></span> and <span style="color: #820a32"><em>y</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->translate(wgt, x, y);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 x is the new x position
+ * @param param1 y is the new y position
+ * @return returns leResult.
+ */
 leResult _leWidget_Translate(leWidget* _this,
                              int32_t x,
                              int32_t y);
@@ -804,6 +1003,17 @@ leResult _leWidget_Translate(leWidget* _this,
   Returns:
     uint32_t - the width value
 */
+/**
+ * @brief Get widget width.
+ * @details Gets the width of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t width = wgt->fn->getWidth(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns leResult.
+ */
 uint32_t _leWidget_GetWidth(const leWidget* _this);
 
 // *****************************************************************************
@@ -827,6 +1037,20 @@ uint32_t _leWidget_GetWidth(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set the widget width.
+ * @details Sets the width of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>width</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t width;
+ * leResult res = wgt->fn->setWidth(wgt, width);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 width is the new width of widget
+ * @return returns leResult.
+ */
 leResult _leWidget_SetWidth(leWidget* _this,
                             uint32_t width);
 
@@ -849,6 +1073,17 @@ leResult _leWidget_SetWidth(leWidget* _this,
   Returns:
     uint32_t - the height value
 */
+/**
+ * @brief Get widget height.
+ * @details Gets the height of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t height = wgt->fn->getHeight(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns leResult.
+ */
 uint32_t _leWidget_GetHeight(const leWidget* _this);
 
 // *****************************************************************************
@@ -872,6 +1107,20 @@ uint32_t _leWidget_GetHeight(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget height.
+ * @details Sets the widget height of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>width</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t height;
+ * leResult res = wgt->fn->getHeight(wgt, height);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 height is the new height of widget
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetHeight(leWidget* _this,
                              uint32_t height);
 
@@ -898,6 +1147,20 @@ leResult _leWidget_SetHeight(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget height.
+ * @details Sets the widget height of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>width</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t height;
+ * leResult res = wgt->fn->getHeight(wgt, height);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 height is the new height of widget
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetSize(leWidget* _this,
                            uint32_t width,
                            uint32_t height);
@@ -925,6 +1188,22 @@ leResult _leWidget_SetSize(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Resize widget.
+ * @details Resizes the size of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>width</em></span> and <span style="color: #820a32"><em>height</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * int32_t width;
+ * uint32_t height;
+ * leResult res = wgt->fn->resize(wgt, width, height);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 width is the new width of widget
+ * @param param3 height is the new height of widget
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_Resize(leWidget* _this,
                           int32_t width,
                           int32_t height);
@@ -948,6 +1227,17 @@ leResult _leWidget_Resize(leWidget* _this,
   Returns:
     leBool - true if alpha blending is enabled
 */
+/**
+ * @brief Get alpha enable status.
+ * @details Gets the alpha enable status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enabled = wgt->fn->getAlphaEnabled(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns leBool.
+ */
 leBool _leWidget_GetAlphaEnabled(const leWidget* _this);
 
 // *****************************************************************************
@@ -971,6 +1261,17 @@ leBool _leWidget_GetAlphaEnabled(const leWidget* _this);
   Returns:
     leBool - true if alpha blending is enabled
 */
+/**
+ * @brief Get cumulative alpha enable status.
+ * @details Gets the cumulative alpha enable status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enabled = wgt->fn->getCumulativeAlphaEnabled(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns leBool.
+ */
 leBool _leWidget_GetCumulativeAlphaEnabled(const leWidget* _this);
 
 // *****************************************************************************
@@ -994,6 +1295,18 @@ leBool _leWidget_GetCumulativeAlphaEnabled(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set cumulative alpha enable status.
+ * @details Sets the cumulative alpha enable status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enable;
+ * leResult res = wgt->fn->setAlphaEnabled(wgt, enable);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns leBool.
+ */
 leResult _leWidget_SetAlphaEnabled(leWidget* _this,
                                    leBool enable);
 
@@ -1016,6 +1329,17 @@ leResult _leWidget_SetAlphaEnabled(leWidget* _this,
   Returns:
     uint32_t - the alpha amount
 */
+/**
+ * @brief Get alpha amount.
+ * @details Gets the alpha amount of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t amount = wgt->fn->getAlphaAmount(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns the alpha amount.
+ */
 uint32_t _leWidget_GetAlphaAmount(const leWidget* _this);
 
 // *****************************************************************************
@@ -1037,6 +1361,17 @@ uint32_t _leWidget_GetAlphaAmount(const leWidget* _this);
   Returns:
     uint32_t - the alpha amount
 */
+/**
+ * @brief Get cumulative alpha amount.
+ * @details Gets the cumulative alpha amount of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t amount = wgt->fn->getCumulativeAlphaAmount(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns the alpha amount.
+ */
 uint32_t _leWidget_GetCumulativeAlphaAmount(const leWidget* _this);
 
 // *****************************************************************************
@@ -1060,6 +1395,18 @@ uint32_t _leWidget_GetCumulativeAlphaAmount(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set alpha amount.
+ * @details Sets the alpha amount of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t alpha;
+ * leResult res = wgt->fn->setAlphaAmount(wgt, alpha);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetAlphaAmount(leWidget* _this,
                                   uint32_t alpha);
 
@@ -1082,6 +1429,17 @@ leResult _leWidget_SetAlphaAmount(leWidget* _this,
   Returns:
     leBool - true if opaque
 */
+/**
+ * @brief Determine is widget is opaque.
+ * @details Returns the opaque status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool opaque = wgt->fn->isOpaque(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns true is widget is opaque, otherwise false.
+ */
 leBool _leWidget_IsOpaque(const leWidget* _this);
 
 // *****************************************************************************
@@ -1103,6 +1461,17 @@ leBool _leWidget_IsOpaque(const leWidget* _this);
   Returns:
     leBool - the setting value
 */
+/**
+ * @brief Get widget enabled flag.
+ * @details Gets the enabled status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enabled = wgt->fn->getEnabled(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns true if widget is enabled, otherwise false.
+ */
 leBool _leWidget_GetEnabled(const leWidget* _this);
 
 // *****************************************************************************
@@ -1126,6 +1495,19 @@ leBool _leWidget_GetEnabled(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget enabled flag.
+ * @details Sets the enabled status of <span style="color: #820a32"><em>wgt</em></span> to
+ * the value of <span style="color: #820a32"><em>enable</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enable;
+ * leResult res = wgt->fn->setEnabled(wgt, enable);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns true if widget is enabled, otherwise false.
+ */
 leResult _leWidget_SetEnabled(leWidget* _this, leBool enable);
 
 // *****************************************************************************
@@ -1147,6 +1529,17 @@ leResult _leWidget_SetEnabled(leWidget* _this, leBool enable);
   Returns:
     leBool - the visibility setting
 */
+/**
+ * @brief Get widget visible status.
+ * @details Gets the visible status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool visible = wgt->fn->getVisible(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns true if widget is enabled, otherwise false.
+ */
 leBool _leWidget_GetVisible(const leWidget* _this);
 
 // *****************************************************************************
@@ -1170,6 +1563,20 @@ leBool _leWidget_GetVisible(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget visible status.
+ * @details Sets the visible status of <span style="color: #820a32"><em>wgt</em></span> to
+ * the value of <span style="color: #820a32"><em>visible</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBool enable;
+ * leResult res = wgt->fn->setVisible(wgt, visible);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param1 visible is the new flag status
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetVisible(leWidget* _this, leBool visible);
 
 // *****************************************************************************
@@ -1191,7 +1598,20 @@ leResult _leWidget_SetVisible(leWidget* _this, leBool visible);
   Returns:
     leRect - the bounding rectangle
 */
-leRect _leWidget_LocalRect(const leWidget* _this);
+/**
+ * @brief Get widget rectangle.
+ * @details Gets the bounding rectangle of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leRect rec = wgt->fn->localRect(wgt);
+ * @endcode
+ * @param wgt the widget to query
+ * @param res the resultant rectangle
+ * @return returns void.
+ */
+void _leWidget_LocalRect(const leWidget* _this,
+                         leRect* res);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1212,11 +1632,25 @@ leRect _leWidget_LocalRect(const leWidget* _this);
   Returns:
     leRect - the bounding rectangle
 */
-leRect _leWidget_RectToParentSpace(const leWidget* _this);
+/**
+ * @brief Get widget rectangle.
+ * @details Gets the bounding rectangle of <span style="color: #820a32"><em>wgt</em></span>
+ * relative to parent.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leRect rec = wgt->fn->rectToParent(wgt);
+ * @endcode
+ * @param wgt the widget to query
+ * @param res the resultant rectangle
+ * @return returns void.
+ */
+void _leWidget_RectToParentSpace(const leWidget* _this,
+                                 leRect* res);
 
 // *****************************************************************************
 /* Virtual Member Function:
-    leRect rectToScreen(const leWidgetWidget* _this)
+    void rectToScreen(const leWidgetWidget* _this, leRect* res)
 
   Summary:
      Gets the widget's bounding rectangle in screen space
@@ -1226,14 +1660,29 @@ leRect _leWidget_RectToParentSpace(const leWidget* _this);
 
   Parameters:
     const leWidgetWidget* _this - The widget to operate on
+    leRect* res - the resultant rectangle
 
   Remarks:
     Usage - _this->fn->rectToScreen(_this);
 
   Returns:
-    leRect - the bounding rectangle
+    void
 */
-leRect _leWidget_RectToScreenSpace(const leWidget* _this);
+/**
+ * @brief Get widget rectangle.
+ * @details Gets the bounding rectangle of <span style="color: #820a32"><em>wgt</em></span>
+ * relative to screen.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leRect rec = wgt->fn->rectToScreen(wgt);
+ * @endcode
+ * @param wgt the widget to query
+ * @param res the resultant rectangle
+ * @return returns void.
+ */
+void _leWidget_RectToScreenSpace(const leWidget* _this,
+                                 leRect* res);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1256,8 +1705,39 @@ leRect _leWidget_RectToScreenSpace(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Add child to widget.
+ * @details Adds <span style="color: #820a32"><em>child</em></span> widget
+ * to <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->addChild(wgt, child);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param2 child is the widget to add
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_AddChild(leWidget* _this,
                             leWidget* child);
+
+/**
+ * @brief Adds child to widget at index.
+ * @details Adds <span style="color: #820a32"><em>child</em></span> widget
+ * to <span style="color: #820a32"><em>wgt</em></span> at the given index.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->addChild(wgt, child, 0);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 child is the widget to add
+ * @param param3 idx is the index to insert at
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult _leWidget_InsertChild(leWidget* _this,
+                               leWidget* child,
+                               uint32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1280,8 +1760,37 @@ leResult _leWidget_AddChild(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Remove child from widget.
+ * @details Remove <span style="color: #820a32"><em>child</em></span> widget
+ * from <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->removeChild(wgt, child);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param2 child is the widget to remove
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_RemoveChild(leWidget* _this,
                                leWidget* child);
+
+/**
+ * @brief Remove child from widget at index.
+ * @details Remove <span style="color: #820a32"><em>child</em></span> widget
+ * from <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->removeChild(wgt, idx);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param2 idx is the index of the child to remove
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult _leWidget_RemoveChildAt(leWidget* _this,
+                                 uint32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1302,6 +1811,17 @@ leResult _leWidget_RemoveChild(leWidget* _this,
   Returns:
     void
 */
+/**
+ * @brief Remove all children from widget.
+ * @details Removes all children from <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * wgt->fn->removeAllChildren(wgt, child);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns void.
+ */
 void _leWidget_RemoveAllChildren(leWidget* _this);
 
 // *****************************************************************************
@@ -1323,6 +1843,17 @@ void _leWidget_RemoveAllChildren(leWidget* _this);
   Returns:
     leWidget* - the root widget
 */
+/**
+ * @brief Get root widget.
+ * @details Gets root widget of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidget* root = wgt->fn->getRootWidget(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leWidget.
+ */
 leWidget* _leWidget_GetRootWidget(const leWidget* _this);
 
 // *****************************************************************************
@@ -1346,6 +1877,19 @@ leWidget* _leWidget_GetRootWidget(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set parent widget.
+ * @details Sets the parent widget of <span style="color: #820a32"><em>wgt</em></span>
+ * to <span style="color: #820a32"><em>parent</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->setParent(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 parent is the new parent widget
+ * @return returns leWidget.
+ */
 leResult _leWidget_SetParent(leWidget* _this,
                              leWidget* parent);
 
@@ -1368,6 +1912,17 @@ leResult _leWidget_SetParent(leWidget* _this,
   Returns:
     uint32_t - the child count
 */
+/**
+ * @brief Get child count.
+ * @details Gets the number of children in <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t cnt = wgt->fn->getChildCount(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leWidget.
+ */
 uint32_t _leWidget_GetChildCount(const leWidget* _this);
 
 // *****************************************************************************
@@ -1391,6 +1946,18 @@ uint32_t _leWidget_GetChildCount(const leWidget* _this);
   Returns:
     leWidget* - the child widget
 */
+/**
+ * @brief Get child at index.
+ * @details Returns the child widget at <span style="color: #820a32"><em>idx</em></span>
+ * in <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidget * child = wgt->fn->getChildAtIndex(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leWidget.
+ */
 leWidget* _leWidget_GetChildAtIndex(const leWidget* _this,
                                     uint32_t idx);
 
@@ -1415,31 +1982,58 @@ leWidget* _leWidget_GetChildAtIndex(const leWidget* _this,
   Returns:
     uint32_t -
 */
+/**
+ * @brief Get index of child.
+ * @details Returns the index of <span style="color: #820a32"><em>child</em></span>
+ * in <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidget * child = wgt->fn->getIndexOfChild(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param2 child is the child to get index
+ * @return returns leWidget.
+ */
 uint32_t _leWidget_GetIndexOfChild(const leWidget* _this,
                                    const leWidget* child);
 
 // *****************************************************************************
 /* Virtual Member Function:
-    leBool containsDescendent(const leWidgetWidget* _this,
+    leBool containsDescendant(const leWidgetWidget* _this,
                               const leWidget* wgt)
 
   Summary:
-     Determines of a widget's descendent tree contains a given widget
+     Determines of a widget's descendant tree contains a given widget
 
   Description:
-     Determines of a widget's descendent tree contains a given widget
+     Determines of a widget's descendant tree contains a given widget
 
   Parameters:
     const leWidgetWidget* _this - The widget to operate on
     const leWidget* wgt - the widget
 
   Remarks:
-    Usage - _this->fn->containsDescendent(_this, wgt);
+    Usage - _this->fn->containsDescendant(_this, wgt);
 
   Returns:
     leBool - LE_TRUE if the widget is a descentdent of this
 */
-leBool _leWidget_ContainsDescendent(const leWidget* _this,
+/**
+ * @brief Determine widget exists.
+ * @details Returns the existence status of <span style="color: #820a32"><em>wgt</em></span>
+ * in <span style="color: #820a32"><em>_this</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidget* descendent;
+ * leBool exists = wgt->fn->getIndexOfChild(wgt, descendent);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @param param2 child is the child to get index
+ * @return returns true if widget is a decendent, otherwise false.
+ */
+leBool _leWidget_ContainsDescendant(const leWidget* _this,
                                     const leWidget* wgt);
 
 // *****************************************************************************
@@ -1461,11 +2055,22 @@ leBool _leWidget_ContainsDescendent(const leWidget* _this,
   Returns:
     leScheme* - the scheme pointer
 */
+/**
+ * @brief Get widget scheme.
+ * @details Returns the scheme of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme * sch = wgt->fn->getScheme(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leScheme.
+ */
 leScheme* _leWidget_GetScheme(const leWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
-    leResult setScheme(leWidgetWidget* _this,
+    leResult setScheme(const leWidgetWidget* _this,
                        leScheme* schm)
 
   Summary:
@@ -1476,7 +2081,7 @@ leScheme* _leWidget_GetScheme(const leWidget* _this);
 
   Parameters:
     leWidgetWidget* _this - The widget to operate on
-    leScheme* schm - the scheme pointer
+    const leScheme* schm - the scheme pointer
 
   Remarks:
     Usage - _this->fn->setScheme(_this, schm);
@@ -1484,8 +2089,22 @@ leScheme* _leWidget_GetScheme(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetScheme(leWidget* _this,
-                             leScheme* scheme);
+                             const leScheme* scheme);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1506,6 +2125,17 @@ leResult _leWidget_SetScheme(leWidget* _this,
   Returns:
     leBorderType - the type
 */
+/**
+ * @brief Get widget bordertype.
+ * @details Returns the border type of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBorderType type = wgt->fn->getBorderType(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leBorderType.
+ */
 leBorderType _leWidget_GetBorderType(const leWidget* _this);
 
 // *****************************************************************************
@@ -1529,6 +2159,20 @@ leBorderType _leWidget_GetBorderType(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetBorderType(leWidget* _this,
                                  leBorderType type);
 
@@ -1551,6 +2195,17 @@ leResult _leWidget_SetBorderType(leWidget* _this,
   Returns:
     leBackgroundType - the type
 */
+/**
+ * @brief Get widget background type.
+ * @details Returns the background type of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leBackgroundType type = wgt->fn->getBorderType(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leBackgroundType.
+ */
 leBackgroundType _leWidget_GetBackgroundType(const leWidget* _this);
 
 // *****************************************************************************
@@ -1574,6 +2229,20 @@ leBackgroundType _leWidget_GetBackgroundType(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetBackgroundType(leWidget* _this,
                                      leBackgroundType type);
 
@@ -1596,6 +2265,17 @@ leResult _leWidget_SetBackgroundType(leWidget* _this,
   Returns:
     leHAlignment - the horizontal alignment
 */
+/**
+ * @brief Get widget horizontal alignment.
+ * @details Returns the horizontal alignment of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leHAlignment ha = wgt->fn->getHAlignment(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leHAlignment.
+ */
 leHAlignment _leWidget_GetHAlignment(const leWidget* _this);
 
 // *****************************************************************************
@@ -1619,6 +2299,20 @@ leHAlignment _leWidget_GetHAlignment(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetHAlignment(leWidget* _this,
                                  leHAlignment align);
 
@@ -1641,6 +2335,17 @@ leResult _leWidget_SetHAlignment(leWidget* _this,
   Returns:
     leVAlignment - the vertical alignment
 */
+/**
+ * @brief Get widget vertical alignment.
+ * @details Returns the horizontal alignment of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leHAlignment ha = wgt->fn->getVAlignment(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns leVAlignment.
+ */
 leVAlignment _leWidget_GetVAlignment(const leWidget* _this);
 
 // *****************************************************************************
@@ -1664,6 +2369,20 @@ leVAlignment _leWidget_GetVAlignment(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget vertical alignment.
+ * @details Sets the vertical alignment of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leVAlignment align;
+ * leResult res = wgt->fn->setVAlignment(wgt, align);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the alignment to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetVAlignment(leWidget* _this,
                                  leVAlignment align);
 
@@ -1686,7 +2405,19 @@ leResult _leWidget_SetVAlignment(leWidget* _this,
   Returns:
     leMargin - the margin value
 */
-leMargin _leWidget_GetMargins(const leWidget* _this);
+/**
+ * @brief Get widget margins.
+ * @details Returns the margins of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leMargin margin = wgt->fn->getMargins(wgt);
+ * @endcode
+ * @param wgt the widget to query
+ * @param mg the margins
+ * @return returns leResult.
+ */
+leResult _leWidget_GetMargins(const leWidget* _this, leMargin* mg);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -1715,6 +2446,22 @@ leMargin _leWidget_GetMargins(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget margins.
+ * @details Sets the margins for <span style="color: #820a32"><em>wgt</em></span> to
+ * the specified values <span style="color: #820a32"><em>left</em></span>
+ * <span style="color: #820a32"><em>top</em></span>
+ * <span style="color: #820a32"><em>right</em></span>
+ * <span style="color: #820a32"><em>bottom</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, l, t, r,b );
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetMargins(leWidget* _this,
                               uint32_t l,
                               uint32_t t,
@@ -1740,6 +2487,17 @@ leResult _leWidget_SetMargins(leWidget* _this,
   Returns:
     uint32_t - the radius value
 */
+/**
+ * @brief Get widget corner radius.
+ * @details Returns the corner radius of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t radius = wgt->fn->getMargins(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to query
+ * @return returns uint32_t.
+ */
 uint32_t _leWidget_GetCornerRadius(const leWidget* _this);
 
 // *****************************************************************************
@@ -1763,6 +2521,20 @@ uint32_t _leWidget_GetCornerRadius(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetCornerRadius(leWidget* _this,
                                    uint32_t radius);
 
@@ -1785,6 +2557,17 @@ leResult _leWidget_SetCornerRadius(leWidget* _this,
   Returns:
     leBool - true if focused
 */
+/**
+ * @brief Determines the focus status.
+ * @details Returns the focus status of <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leResult res = wgt->fn->setScheme(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @return returns true if widget has focus, otherwise false.
+ */
 leBool _leWidget_HasFocus(const leWidget* _this);
 
 // *****************************************************************************
@@ -1806,6 +2589,20 @@ leBool _leWidget_HasFocus(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set widget scheme.
+ * @details Sets the scheme of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>scheme</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leScheme* scheme
+ * leResult res = wgt->fn->setScheme(wgt, scheme);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param1 scheme is the scheme to set
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_SetFocus(leWidget* _this);
 
 // *****************************************************************************
@@ -1827,6 +2624,18 @@ leResult _leWidget_SetFocus(leWidget* _this);
   Returns:
     void
 */
+/**
+ * @brief Invalidate widget.
+ * @details Invalidate <span style="color: #820a32"><em>wgt</em></span>. The invalidation
+ * will cause the widget to be redrawn.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * wgt->fn->invalidate(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to invalidate
+ * @return returns void.
+ */
 void _leWidget_Invalidate(const leWidget* _this);
 
 // *****************************************************************************
@@ -1848,6 +2657,17 @@ void _leWidget_Invalidate(const leWidget* _this);
   Returns:
     void
 */
+/**
+ * @brief Invalidate widget contents.
+ * @details Invalidate contents of <span style="color: #820a32"><em>wgt</em></span> contents.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * wgt->fn->invalidateContents(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to invalidate
+ * @return returns void.
+ */
 void _leWidget_InvalidateContents(const leWidget* _this);
 
 // *****************************************************************************
@@ -1871,6 +2691,20 @@ void _leWidget_InvalidateContents(const leWidget* _this);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Install event filter.
+ * @details Sets the event filter of <span style="color: #820a32"><em>wgt</em></span> to
+ * <span style="color: #820a32"><em>fltr</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidgetEventFilter fltr;
+ * leResult res = wgt->fn->invalidateContents(wgt, fltr);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 fltr is the filter to install
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_InstallEventFilter(leWidget* _this,
                                       leWidgetEventFilter fltr);
 
@@ -1895,6 +2729,20 @@ leResult _leWidget_InstallEventFilter(leWidget* _this,
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Remove event filter.
+ * @details Removes the event filter <span style="color: #820a32"><em>fltr</em></span> from
+ * <span style="color: #820a32"><em>wgt</em></span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * leWidgetEventFilter fltr;
+ * leResult res = wgt->fn->removeEventFilter(wgt, fltr);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 fltr is the filter to install
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult _leWidget_RemoveEventFilter(leWidget* _this,
                                      leWidgetEventFilter fltr);
 
@@ -1919,6 +2767,20 @@ leResult _leWidget_RemoveEventFilter(leWidget* _this,
   Returns:
     void
 */
+/**
+ * @brief Update widget.
+ * @details Updates <span style="color: #820a32"><em>wgt</em></span>. This is automatically
+ * called from the task machine.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leWidget* wgt;
+ * uint32_t dt;
+ * wgt->fn->update(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to modify
+ * @param param2 dt is
+ * @return returns void.
+ */
 void _leWidget_Update(leWidget* _this, uint32_t dt);
 
 void _leWidget_HandleEvent(leWidget*, leEvent*);

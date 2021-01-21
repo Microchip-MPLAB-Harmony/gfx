@@ -54,7 +54,9 @@ static struct
 void _leSliderWidget_GetSlideAreaRect(leSliderWidget* sld, leRect* rect)
 {
     leRect scrollRect;
-    leRect widgetRect = sld->fn->localRect(sld);
+    leRect widgetRect;
+
+    sld->fn->localRect(sld, &widgetRect);
     
     if(sld->alignment == LE_ORIENTATION_VERTICAL)
     {
@@ -78,7 +80,9 @@ void _leSliderWidget_GetHandleRect(leSliderWidget* sld, leRect* rect)
 {
     leRect scrollRect;
     uint32_t val, max, percent;
-    leRect widgetRect = sld->fn->localRect(sld);
+    leRect widgetRect;
+
+    sld->fn->localRect(sld, &widgetRect);
     
     val = sld->value - sld->min;
     max = sld->max - sld->min;
@@ -119,7 +123,7 @@ static void drawHandle(leSliderWidget* sld);
 
 static void nextState(leSliderWidget* sld)
 {
-    switch(sld->widget.drawState)
+    switch(sld->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -132,44 +136,46 @@ static void nextState(leSliderWidget* sld)
             }
 #endif
            
-            if(sld->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(sld->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                sld->widget.drawState = DRAW_BACKGROUND;
+                sld->widget.status.drawState = DRAW_BACKGROUND;
                 sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            sld->widget.drawState = DRAW_BAR;
+            sld->widget.status.drawState = DRAW_BAR;
             sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBar;
             
             return;
         }
         case DRAW_BAR:
         {
-            sld->widget.drawState = DRAW_HANDLE;
+            sld->widget.status.drawState = DRAW_HANDLE;
             sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawHandle;
             
             return;
         }
         case DRAW_HANDLE:
         {
-            /*if(sld->widget.borderType != LE_WIDGET_BORDER_NONE)
+            /*if(sld->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                sld->widget.drawState = DRAW_BORDER;
+                sld->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }*/
             
-            sld->widget.drawState = DONE;
+            sld->widget.status.drawState = DONE;
             sld->widget.drawFunc = NULL;
         }
+        // fall through
         /*case DRAW_BORDER:
         {
-            sld->widget.drawState = DONE;
+            sld->widget.status.drawState = DONE;
             sld->widget.drawFunc = NULL;
         }*/
     }
@@ -192,23 +198,23 @@ static void drawBar(leSliderWidget* sld)
 
     // fill bar area
     leRenderer_RectFill(&barRect,
-                        sld->widget.scheme->background,
+                        leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BACKGROUND),
                         paintState.alpha);
                  
     // draw border
-    if(sld->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(sld->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawLineBorder(&barRect,
-                                            sld->widget.scheme->shadowDark,
+                                            leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOWDARK),
                                             paintState.alpha);
     }
-    else if(sld->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(sld->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_Draw2x2BeveledBorder(&barRect,
-                                                  sld->widget.scheme->shadow,
-                                                  sld->widget.scheme->shadowDark,
-                                                  sld->widget.scheme->highlightLight,
-                                                  sld->widget.scheme->highlightLight,
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOW),
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
                                                   paintState.alpha);
     }
     
@@ -224,22 +230,22 @@ static void drawHandle(leSliderWidget* sld)
 
     // fill handle area
     leRenderer_RectFill(&handleRect,
-                        sld->widget.scheme->base,
+                        leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BASE),
                         paintState.alpha);
     
     // draw handle border
-    if(sld->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(sld->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawLineBorder(&handleRect,
-                                            sld->widget.scheme->shadowDark,
+                                            leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOWDARK),
                                             paintState.alpha);
     }
-    else if(sld->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(sld->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_Draw1x2BeveledBorder(&handleRect,
-                                                  sld->widget.scheme->highlightLight,
-                                                  sld->widget.scheme->shadowDark,
-                                                  sld->widget.scheme->shadow,
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                  leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOW),
                                                   paintState.alpha);
     }
     
@@ -255,19 +261,12 @@ static void drawHandle(leSliderWidget* sld)
 
 void _leSliderWidget_Paint(leSliderWidget* sld)
 {
-    if(sld->widget.scheme == NULL)
-    {
-        sld->widget.drawState = DONE;
-        
-        return;
-    }
-
-    if(sld->widget.drawState == NOT_STARTED)
+    if(sld->widget.status.drawState == NOT_STARTED)
     {
         nextState(sld);
     }
     
-    while(sld->widget.drawState != DONE)
+    while(sld->widget.status.drawState != DONE)
     {
         sld->widget.drawFunc((leWidget*)sld);
         

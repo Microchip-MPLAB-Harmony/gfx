@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -44,29 +42,37 @@
     support international character code points and Unicode encoding standards.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_string.h
+ * @brief Fixed string functions and definitions.
+ *
+ * @details This is a string library implementation that is used internally by
+ * the Legato user interface library.
+ *
+ * This implementation relies on the leChar definition for characters. This chararcter
+ * definition is 16 bits in size and allows the library to support international character
+ * code points and Unicode encoding standards
+ */
 
 #ifndef LEGATO_STRING_H
 #define LEGATO_STRING_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
 #include "gfx/legato/font/legato_font.h"
 #include "gfx/legato/common/legato_error.h"
 
-//DOM-IGNORE-BEGIN
+/* internal use only */
 struct leString;
 
 typedef void (*leString_InvalidateCallback)(const struct leString* str, void* userData);
 
 #define LE_STRING_VTABLE(THIS_TYPE) \
     void        (*destructor)(THIS_TYPE* _this); \
-	leFont*     (*getFont)(const THIS_TYPE* _this); \
-	leResult    (*setFont)(THIS_TYPE* _this, const leFont* font); \
-	leResult    (*setFromString)(THIS_TYPE* _this, const struct leString* src); \
-	leResult    (*setFromChar)(THIS_TYPE* _this, const leChar* buf, uint32_t size); \
-	leResult    (*setFromCStr)(THIS_TYPE* _this, const char* cstr); \
+    leFont*     (*getFont)(const THIS_TYPE* _this); \
+    leResult    (*setFont)(THIS_TYPE* _this, const leFont* font); \
+    leResult    (*setFromString)(THIS_TYPE* _this, const struct leString* src); \
+    leResult    (*setFromChar)(THIS_TYPE* _this, const leChar* buf, uint32_t size); \
+    leResult    (*setFromCStr)(THIS_TYPE* _this, const char* cstr); \
     leChar      (*charAt)(const THIS_TYPE* _this, uint32_t idx); \
     uint32_t    (*length)(const THIS_TYPE* _this); \
     leBool      (*isEmpty)(const THIS_TYPE* _this); \
@@ -86,643 +92,504 @@ typedef void (*leString_InvalidateCallback)(const struct leString* str, void* us
     void        (*preinvalidate)(THIS_TYPE* _this); \
     void        (*invalidate)(THIS_TYPE* _this); \
     leResult    (*setPreInvalidateCallback)(THIS_TYPE* _this, leString_InvalidateCallback, void* userData); \
-    leResult    (*setInvalidateCallback)(THIS_TYPE* _this, leString_InvalidateCallback, void* userData);
+    leResult    (*setInvalidateCallback)(THIS_TYPE* _this, leString_InvalidateCallback, void* userData); \
 
 typedef struct leStringVTable
 {
 	LE_STRING_VTABLE(struct leString)
 } leStringVTable;
-//DOM-IGNORE-END
 
 // *****************************************************************************
-/* Structure:
-    leString
-
-  Summary:
-    Generic string definition
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a string.
+ * @details Generic string definition
+ */
 typedef struct leString
 {
-    const leStringVTable* fn; // function table
+    const leStringVTable* fn;                   /**< function table */
 
-    leString_InvalidateCallback preInvCallback; // pre-invalidate callback
-    void* preCBUserData; // pre-invalidate callback user data
+    leString_InvalidateCallback preInvCallback; /**< pre invalidate callback */
+    void* preCBUserData;                        /**< pre invalidate callback data */
 
-    leString_InvalidateCallback invCallback; // nvalidate callback
-    void* invCBUserData; // invalidate callback user data
+    leString_InvalidateCallback invCallback;    /**< invalidate callback */
+    void* invCBUserData;                        /**< invalidate callback data */
 } leString;
 
 // *****************************************************************************
-/* Function:
-    void leString_Delete(leString* str)
+/**
+ * @brief Delete string.
+ * @details Deletes <span class="param">str</span>. Frees the memory that was
+ * allocated using the la{TYPE}String_New type allocator functions.  This
+ * function is used to delete all string-type objects that were allocated
+ * with their class-specific new functions.
+ * @see leString_New().
+ * @code
+ * leString * str;
+ * leString_Delete(str);
+ * @endcode
+ * @param str is the string to delete.
+ * @return void.
+ */
+void leString_Delete(leString* str);
 
-   Summary:
-    Frees the memory that was allocated using the la{TYPE}String_New type
-    allocator functions
-
-   Parameters:
-
-   Returns:
-
-   Remarks:
-    Used in conjunction with the la{TYPE}String_New type allocator functions
-*/
-LIB_EXPORT void leString_Delete(leString* str);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    void destructor(leString* _this)
-
-  Summary:
-    The generic destructor
-
-  Description:
-    The generic destructor
-
-  Parameters:
-    leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->destructor(_this);
-
-  Returns:
-    void
-*/
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leFont* getFont(const leString* _this)
 
-  Summary:
-    Gets the string font
-
-  Description:
-    Gets the string font
-
-  Parameters:
-    const leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->getFont(_this);
-
-  Returns:
-    leFont* - the font assigned to the string
-*/
+/**
+ * @brief Destruct string.
+ * @details Destruct the string <span class="param">_this</span>.
+ * @code
+ * leString*  _this;
+ * str->fn->destructor(str);
+ * @endcode
+ * @param _this is the string to destruct.
+ * @return void.
+ */
+virtual void destructor(leString* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFont(leString* _this,
-                     const leFont* font)
+/**
+ * @brief Get font.
+ * @details Gets font using <span class="param">_this</span>.
+ * @code
+ * leString*  _this;
+ * str->fn->getFont(_this);
+ * @endcode
+ * @param _this is the string to query.
+ * @return the font assigned to the string.
+ */
+virtual leFont* getFont(const leString* _this);
 
-  Summary:
-    Sets the string font
-
-  Description:
-    Sets the string font
-
-  Parameters:
-    leString* _this - The string to operate on
-    const leFont* font - the font to assign to the string
-
-  Remarks:
-    Usage - _this->fn->setFont(_this, font);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFromString(leString* _this,
-                           const struct leString* src)
+/**
+ * @brief Set font.
+ * @details Sets the font using <span class="param">_this</span> to <span class="param">font</span>.
+ * @code
+ * leString*  _this;
+ * leResult res = _this->fn->setFont(font);
+ * @endcode
+ * @param font is the font to set.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFont(leString* _this,
+                         const leFont* font);
 
-  Summary:
-    Sets the string value from another string
-
-  Description:
-    Sets the string value from another string
-
-  Parameters:
-    leString* _this - The string to operate on
-    const struct leString* src - the string to copy
-
-  Remarks:
-    Usage - _this->fn->setFromString(_this, src);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFromChar(leString* _this,
-                         const leChar* buf,
-                         uint32_t size)
-
-  Summary:
-    Sets the string value from a leChar buffer
-
-  Description:
-    Sets the string value from a leChar buffer
-
-  Parameters:
-    leString* _this - The string to operate on
-    const leChar* buf - the buffer to copy
-    uint32_t size - the size of the buffer in leChar values
-
-  Remarks:
-    Usage - _this->fn->setFromChar(_this, buf, size);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set string value from another string.
+ * @details Sets the string value from <span class="param">src</span>.
+ * @code
+ * leString* _this;
+ * struct leString* src;
+ * leResult res =_this->fn->setFromString(_this, src);
+ * @endcode
+ * @param src is the string to set.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFromString(leString* _this,
+                               const struct leString* src);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFromCStr(leString* _this,
-                         const char* cstr)
+/**
+ * @brief Set string value from a leChar buffer.
+ * @details Sets the string value from <span class="param">buf</span> using the
+ * first <span class="param">size</span> bytes.
+ * @code
+ * leString* _this;
+ * leChar* buf;
+ * uint32_t size;
+ * leResult res = str->fn->setFromString(str, buf, size);
+ * @endcode
+ * @param buf is the string to set.
+ * @param size is the number of chars to set.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFromChar(leString* _this,
+                             const leChar* buf,
+                             uint32_t size);
 
-  Summary:
-    Sets the string value from a C string buffer
-
-  Description:
-    Sets the string value from a C string buffer
-
-  Parameters:
-    leString* _this - The string to operate on
-    const char* cstr - the size of the buffer in bytes
-
-  Remarks:
-    Usage - _this->fn->setFromCStr(_this, cstr);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leChar charAt(const leString* _this,
-                  uint32_t idx)
+/**
+ * @brief Set string value from a C string buffer.
+ * @details Sets the string value from <span class="param">cstr</span>.
+ * @code
+ * leString*  _this;
+ * const char* cstr;
+ * leResult res = str->fn->setFromString(_this, cstr);
+ * @endcode
+ * @param cstr is the string to set.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFromCStr(leString* _this,
+                             const char* cstr);
 
-  Summary:
-    Gets a codepoint at the given index
-
-  Description:
-    Gets a codepoint at the given index
-
-  Parameters:
-    const leString* _this - The string to operate on
-    uint32_t idx - the index to query
-
-  Remarks:
-    Usage - _this->fn->charAt(_this, idx);
-
-  Returns:
-    leChar - the leChar contained at the index or -1
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t length(const leString* _this)
-
-  Summary:
-    Gets the length of the string
-
-  Description:
-    Gets the length of the string
-
-  Parameters:
-    const leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->length(_this);
-
-  Returns:
-    uint32_t - the length of the string
-*/
+/**
+ * @brief Get codepoint at the given index.
+ * @details Gets the codepoint at <span class="param">index</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leString*  str;
+ * uint32_t idx;
+ * leChar chr = str->fn->charAt(str, idx);
+ * @endcode
+ * @param str is the string to query.
+ * @param idx is the location within the str.
+ * @return the leChar contained at the index or -1.
+ */
+virtual leChar charAt(const leString* _this,
+                      uint32_t idx);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leBool isEmpty(const leString* _this)
-
-  Summary:
-    Test to see if a string is empty
-
-  Description:
-    Test to see if a string is empty
-
-  Parameters:
-    const leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->isEmpty(_this);
-
-  Returns:
-    leBool - LE_TRUE if the string is empty
-*/
+/**
+ * @brief Get length of the string.
+ * @details Gets length of string at
+ * <span class="param">idx</span> using <span class="param">_this</span>.
+ * @code
+ * leString*  _this;
+ * uint32_t idx;
+ * uint32_t length = str->fn->charAt(_this, idx);
+ * @endcode
+ * @param _this is the string to query.
+ * @param idx is the location within the str.
+ * @return length of the string.
+ */
+virtual uint32_t length(const leString* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    int32_t compare(const leString* _this,
-                    const struct leString* tgt)
+/**
+ * @brief Determine if string is empty.
+ * @details Checks if string is empty using <span class="param">_this</span>.
+ * @code
+ * leString*  _this;
+ * leBool empty = str->fn->isEmpty(_this);
+ * @endcode
+ * @param _this is the string to query.
+ * @return returns LE_TRUE if string is empty, otherwise LE_FALSE.
+ */
+virtual leBool isEmpty(const leString* _this);
 
-  Summary:
-    Compare a string to another string
-
-  Description:
-    Compare a string to another string
-
-  Parameters:
-    const leString* _this - The string to operate on
-    const struct leString* tgt -
-
-  Remarks:
-    Usage - _this->fn->compare(_this, tgt);
-
-  Returns:
-    int32_t - (< 0) the first character that does not match has a lower value in
-                    this than tgt
-
-              0 the contents of both strings are equal
-
-              (> 0)	the first character that does not match has a greater value
-                    this than tgt
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult append(leString* _this,
-                    const struct leString* val)
+/**
+ * @brief Compare string to another string.
+ * @details Compares the string to <span class="param">tgt</span>.
+ * @code
+ * leString*  _this;
+ * const struct leString* tgt;
+ * int32_t res = str->fn->compare(str, tgt);
+ * @endcode
+ * @param str is the string to compare against.
+ * @param tgt is the string to compare with.
+ * @return returns an integer indicating the result of the comparison. It returns 0, if
+ * both strings are the same.
+ */
+virtual int32_t compare(const leString* _this,
+                        const struct leString* tgt);
 
-  Summary:
-    Appends a string to this string
-
-  Description:
-    Appends a string to this string
-
-  Parameters:
-    leString* _this - The string to operate on
-    const struct leString* val - the string to append
-
-  Remarks:
-    Usage - _this->fn->append(_this, val);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult insert(leString* _this,
-                    const struct leString* val,
-                    uint32_t idx)
-
-  Summary:
-    Inserts a string into this one at a given index
-
-  Description:
-    Inserts a string into this one at a given index
-
-  Parameters:
-    leString* _this - The string to operate on
-    const struct leString* val - the string to insert
-    uint32_t idx - the insertion index
-
-  Remarks:
-    Usage - _this->fn->insert(_this, val, idx);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Append string.
+ * @details Appends a string <span class="param">val</span> using <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * leString* val;
+ * leResult res = str->fn->append(_this, val);
+ * @endcode
+ * @param _this is the string to append to.
+ * @param val is the string to append with.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult append(leString* _this,
+                        const struct leString* val);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult remove(leString* _this,
+/**
+ * @brief Insert string at a given index.
+ * @details Inserts a string <span class="param">val</span> at
+ *  <span class="param">idx</span> using
+ * <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * leString* val;
+ * uint32_t idx;
+ * leResult res = str->fn->append(_this, val, idx);
+ * @endcode
+ * @param str is the string to append to.
+ * @param val is the string to append with.
+ * @param idx is the string to append with.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult insert(leString* _this,
+                        const struct leString* val,
+                        uint32_t idx);
+
+// *****************************************************************************
+/**
+ * @brief Remove substring.
+ * @details Removes a substring at <span class="param">idx</span> for up to
+ * <span class="param">count</span> characters using <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * leString* idx;
+ * uint32_t count;
+ * leResult res = str->fn->remove(_this, idx, count);
+ * @endcode
+ * @param _this is the string to append to.
+ * @param idx is the string to append with.
+ * @param count is the number of chars
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ *
+ */
+ virtual leResult remove(leString* _this,
                     uint32_t idx,
-                    uint32_t count)
-
-  Summary:
-    Removes a part of this string
-
-  Description:
-    Removes a part of this string
-
-  Parameters:
-    leString* _this - The string to operate on
-    uint32_t idx - the removal index
-    uint32_t count - the number of leChars to remove
-
-  Remarks:
-    Usage - _this->fn->remove(_this, idx, count);
-
-  Returns:
-    leResult - the result of the operation
-*/
+                    uint32_t count);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    void clear(leString* _this)
-
-  Summary:
-    Clears the string data
-
-  Description:
-    Clears the string data
-
-  Parameters:
-    leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->clear(_this);
-
-  Returns:
-    void
-*/
+/**
+ * @brief Clear string.
+ * @details Clears the contents of string using <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * leString* val;
+ * str->fn->clear(_this);
+ * @endcode
+ * @param _this is the string to append to.
+ * @return void.
+ */
+virtual void clear(leString* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t toChar(const leString* _this,
-                    leChar* buf,
-                    uint32_t size)
+/**
+ * @brief Convert string to a C-style string.
+ * @details Converts the string to <span class="param">buf</span> for up to
+ * <span class="param">size</span> characters using <span class="param">_this</span>.
+ * @code
+ * const leString* _this;
+ * leChar*  buf;
+ * uint32_t size;
+ * uint32_t nbr = str->fn->toChar(_this, buf, size);
+ * @endcode
+ * @param _this is the string to convert.
+ * @param buf is the new string.
+ * @param size is the number of chars to convert.
+ * @return the number of leChar written to the buffer.
+ */
+virtual uint32_t toChar(const leString* _this,
+                   leChar* buf,
+                   uint32_t size);
+virtual
+// *****************************************************************************
+/**
+ * @brief Get rectangle of the rendered string in pixels.
+ * @details Gets the rectangle of the rendered string to
+ * pixels <span class="param">rect</span> using <span class="param">_this</span>.
+ * @code
+ * leString* str;
+ * leRect* rect;
+ * leResult res = str->fn->getRect(str, rect);
+ * @endcode
+ * @param str is the string to examine.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult getRect(const leString* _this,
+                         leRect* rect);
 
-  Summary:
-    Converts the string to a C-style string
-
-  Description:
-    Converts the string to a C-style string
-
-  Parameters:
-    const leString* _this - The string to operate on
-    leChar* buf - the buffer to fill
-    uint32_t size - the size of the input buffer
-
-  Remarks:
-    Usage - _this->fn->toChar(_this, buf, size);
-
-  Returns:
-    uint32_t - the number of leChar written to the buffer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult getRect(const leString* _this,
-                     leRect* rect)
+/**
+ * @brief Get number of lines in the string.
+ * @details Gets the number of lines using <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * uint32_t count = str->fn->getLineCount(_this);
+ * @endcode
+ * @param _this is the string to examine.
+ * @return the number of lines in string.
+ */
+uint32_t getLineCount(const leString* _this);
 
-  Summary:
-    Gets the rectangle of the rendered string in pixels
-
-  Description:
-    Gets the rectangle of the rendered string in pixels
-
-  Parameters:
-    const leString* _this - The string to operate on
-    leRect* rect - will contain the result of the query
-
-  Remarks:
-    Usage - _this->fn->getRect(_this, rect);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getLineCount(const leString* _this)
+/**
+ * @brief Get rectangle of a string line.
+ * @details Gets the <span class="param">rect</span> of
+ * <span class="param">_this</span> at <span class="param">line</span>.
+ * @code
+ * uint32_t line;
+ * leRect* rect;
+ * leResult res = str->fn->getLineCount(_this, line, rect);
+ * @endcode
+ * @param _this is the string to examine.
+ * @param line
+ * @param rect
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult getLineRect(const leString* _this,
+                             uint32_t line,
+                             leRect* rect);
 
-  Summary:
-    Gets the number of lines in the string
-
-  Description:
-    Gets the number of lines in the string
-
-  Parameters:
-    const leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->getLineCount(_this);
-
-  Returns:
-    uint32_t - the number of lines in the string
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult getLineRect(const leString* _this,
-                         uint32_t line,
-                         leRect* rect)
-
-  Summary:
-    Gets the rectangle of a string line
-
-  Description:
-    Gets the rectangle of a string line
-
-  Parameters:
-    const leString* _this - The string to operate on
-    uint32_t line - the line to query
-    leRect* rect - will contain the result of the query
-
-  Remarks:
-    Usage - _this->fn->getLineRect(_this, line, rect);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult getLineIndices(const leString* _this,
-                            uint32_t line,
-                            uint32_t* start,
-                            uint32_t* end)
+/**
+ * @brief Get indices of a string line.
+ * @details Gets the indices of <span class="param">line</span> from
+ * <span class="param">start</span> to <span class="param">end</span>.
+ * @code
+ * leString* _this;
+ * uint32_t* start;
+ * uint32_t* end;
+ * leResult res = str->fn->getLineIndices(_this, line, start, end);
+ * @endcode
+ * @param _this is the string to examine.
+ * @param line the line to query
+ * @param start the starting offset of the line in the string
+ * @param end the ending offset of the line in the string
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult getLineIndices(const leString* _this,
+                                uint32_t line,
+                                uint32_t* start,
+                                uint32_t* end);
 
-  Summary:
-    Gets the indices of a string line
-
-  Description:
-    Gets the indices of a string line
-
-  Parameters:
-    const leString* _this - The string to operate on
-    uint32_t line - the line to query
-    uint32_t* start - the starting offset of the line in the string
-    uint32_t* end - the ending offset of the line in the string
-
-  Remarks:
-    Usage - _this->fn->getLineIndices(_this, line, start, end);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult getCharRect(const leString* _this,
-                         uint32_t idx,
-                         leRect* rect)
-
-  Summary:
-    Gets the rendered rectangle of a string codepoint
-
-  Description:
-    Gets the rendered rectangle of a string codepoint
-
-  Parameters:
-    const leString* _this - The string to operate on
-    uint32_t idx - the leChar index to query
-    leRect* rect - will contain the leChar bounding rectangle
-
-  Remarks:
-    Usage - _this->fn->getCharRect(_this, idx, rect);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Get rendered rectangle of a string codepoint.
+ * @details Gets the rendered <span class="param">rect</span> of a char
+ * at <span class="param">index</span>.
+ * @code
+ * leString* _this;
+ * uint32_t idx;
+ * leRect* rect;
+ * leResult res = str->fn->getCharRect(_this, idx, rect);
+ * @endcode
+ * @param str is the string to examine.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult getCharRect(const leString* _this,
+                     uint32_t idx,
+                     leRect* rect);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult getCharIndexAtPoint(const leString* _this,
-                                 const lePoint* pt,
-                                 uint32_t* idx)
+/**
+ * @brief Get character index at point.
+ * @details Gets a character <span class="param">idx</span> at
+ * <span class="param">pt</span>.
+ * @code
+ * leString* _this;
+ * uint32_t idx;
+ * lePoint* pt;
+ * leResult res = str->fn->getCharIndexAtPoint(_this, pt, idx);
+ * @endcode
+ * @param str is the string to examine.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult getCharIndexAtPoint(const leString* _this,
+                                     const lePoint* pt,
+                                     uint32_t* idx);
 
-  Summary:
-    Given a point, gets a character index in the string
-
-  Description:
-    Given a point, gets a character index in the string
-
-  Parameters:
-    const leString* _this - The string to operate on
-    const lePoint* pt - the point to query
-    uint32_t* idx - will contain the string index
-
-  Remarks:
-    Usage - _this->fn->getCharIndexAtPoint(_this, pt, idx);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult _draw(const leString* _this,
-                   int32_t x,
-                   int32_t y,
-                   leHAlignment align,
-                   leColor clr,
-                   uint32_t a)
+/**
+ * @brief Draw.
+ * @details Draws string at location <span class="param">x</span> and
+ * <span class="param">y</span> with the specified
+ * <span class="param">align</span>
+ * <span class="param">clr</span>
+ * <span class="param">a</span>.
+ * @code
+ * leString* _this;
+ * uint32_t idx;
+ * lePoint* pt;
+ * leResult res = str->fn->_draw(_this, x, y, align, clr, a);
+ * @endcode
+ * @param str is the string to examine.
+ * @return leResult.
+ */
+virtual leResult _draw(const leString* _this,
+                       int32_t x,
+                       int32_t y,
+                       leHAlignment align,
+                       leColor clr,
+                       uint32_t a);
 
-  Summary:
-    Draw the string
-
-  Description:
-    Draw the string
-
-  Parameters:
-    const leString* _this - The string to operate on
-    int32_t x - the X draw position (screen space)
-    int32_t y - the Y draw position (screen space)
-    leHAlignment align - the alignment of the string
-    leColor clr - the color to write
-    uint32_t a - a global alpha value to apply
-
-  Remarks:
-    Usage - _this->fn->_draw(_this, x, y, align, clr, a);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    void preinvalidate(leString* _this)
-
-  Summary:
-    Raise a string pre-invalidate event
-
-  Description:
-    Raise a string pre-invalidate event
-
-  Parameters:
-    leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->preinvalidate(_this);
-
-  Returns:
-    void
-*/
+/**
+ * @brief Raise pre-invalidate event.
+ * @details Raises a pre-invalidate event for <span class="param">_this</span>.
+ * @code
+ * leString* _this;
+ * str->fn->preinvalidate(_this);
+ * @endcode
+ * @param str is the string to examine.
+ * @return leResult.
+ */
+virtual void preinvalidate(leString* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    void invalidate(leString* _this)
-
-  Summary:
-    Sets a string pre-invalidate event
-
-  Description:
-    Sets a string pre-invalidate event
-
-  Parameters:
-    leString* _this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->invalidate(_this);
-
-  Returns:
-    void
-*/
+/**
+ * @brief Invalidate.
+ * @details Sets the pre invalidate callback to <span class="param">func</span> with
+ * <span class="param">userData</span> arguments.
+ * @code
+ * leString* _this;
+ * str->fn->setPreInvalidateCallback(_this, func, userData);
+ * @endcode
+ * @param str is the string to examine.
+ * @param func is of type leString_InvalidateCallback.
+ * @param userData is arguments to receive.
+ * @return leResult.
+ */
+virtual void invalidate(leString* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setPreInvalidateCallback(leString* _this,
-                                      leString_InvalidateCallback,
-                                      void* userData)
-
-  Summary:
-    Raise a string invalidate event
-
-  Description:
-    Raise a string invalidate event
-
-  Parameters:
-    leString* _this - The string to operate on
-    leString_InvalidateCallback - the callback pointer to set
-    void* userData - a user data pointer to pass to the callback
-
-  Remarks:
-    Usage - _this->fn->setPreInvalidateCallback(_this, leString_InvalidateCallback, userData);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set string invalidate event.
+ * @details Sets the string invalidate event to <span class="param">cb</span>
+ * using <span class="param">_this</span> with <span class="param">userData</span>.
+ * @code
+ * leString* _this;
+ * leString_InvalidateCallback cb;
+ * leResult res = _this->fn->setPreInvalidateCallback(_this, cb, userData);
+ * @endcode
+ * @param _this is the string to modify
+ * @param cb is the callback func
+ * @param is the  user data pointer to pass to the callback
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setPreInvalidateCallback(leString* _this,
+                                          leString_InvalidateCallback,
+                                          void* userData);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setInvalidateCallback(leString* _this,
-                                   leString_InvalidateCallback,
-                                   void* userData)
+/**
+ * @brief Set string invalidate event.
+ * @details Sets the string invalidate event to <span class="param">cb</span>
+ * using <span class="param">_this</span> with <span class="param">userData</span>.
+ * @code
+ * leString* _this;
+ * leString_InvalidateCallback cb;
+ * leResult res = _this->fn->setInvalidateCallback(_this, cb, userData);
+ * @endcode
+ * @param _this is the string to modify
+ * @param cb is the callback func
+ * @param is the  user data pointer to pass to the callback
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setInvalidateCallback(leString* _this,
+                                       leString_InvalidateCallback cb,
+                                       void* userData);
 
-  Summary:
-    Sets a string invalidate event
-
-  Description:
-    Sets a string invalidate event
-
-  Parameters:
-    leString* _this - The string to operate on
-    leString_InvalidateCallback - the callback pointer to set
-    vvoid* userData - a user data pointer to pass to the callback
-
-  Remarks:
-    Usage - _this->fn->setInvalidateCallback(_this, leString_InvalidateCallback, userData);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
+#undef THIS_TYPE
+#endif
 
 #endif /* LE_STRING_H */

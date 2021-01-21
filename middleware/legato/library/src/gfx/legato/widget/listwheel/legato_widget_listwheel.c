@@ -134,84 +134,19 @@ static int32_t calculateSelectedItem(leListWheelWidget* _this)
     return item;
 }
 
-//int32_t last;
-
-#if 0
-static void invalidateContents(leListWheelWidget* _this)
-{
-    uint32_t idx;
-    int32_t y = -1;
-    leRect itemRect, widgetRect, clipRect;
-    leLayer* layer;
-    leListWheelItem* item;
-    
-    if(_this->items.size == 0)
-        return;
-    
-    widgetRect = leUtils_WidgetLayerRect((leWidget*)_this);
-    layer = leUtils_GetLayer((leWidget*)_this);
-    idx = _this->topItem;
-    
-    for(y = -1; y < _this->visibleItems + 1; y++)
-    {
-        //if(y != 2)
-        //    continue;
-            
-        item = _this->items.values[idx];
-        
-        if(item->icon != NULL)
-        {
-            _leListWheelWidget_GetItemIconRect(_this, idx, y, &itemRect, &clipRect);
-            
-            if(leRectIntersects(&itemRect, &widgetRect) == LE_TRUE)
-            {
-                leRectClip(&itemRect, &widgetRect, &clipRect);
-                
-                leRenderer_DamageArea(layer, &clipRect, LE_FALSE);
-                
-                last = clipRect.y;
-                
-                if(last == clipRect.y)
-                {
-                    last = last;
-                }
-                
-                /*printf("damaging %i, %i, %i, %i\n", clipRect.x,
-                     clipRect.y,
-                     clipRect.width,
-                     clipRect.height);*/
-            }
-        }
-        
-        if(leString_IsEmpty(&item->string) == LE_FALSE)
-        {
-            _leListWheelWidget_GetItemTextRect(_this, idx, y, &clipRect, &itemRect);
-            
-            if(leRectIntersects(&itemRect, &widgetRect) == LE_TRUE)
-            {
-                leRectClip(&itemRect, &widgetRect, &clipRect);
-                
-                leRenderer_DamageArea(layer, &clipRect, LE_FALSE);
-            }
-        }
-      
-        idx++;
-          
-        if(idx >= _this->items.size)
-            idx = 0;
-    } 
-}
-#endif
-
 static void stringPreinvalidate(const leString* str,
                                 leListWheelWidget* lst)
 {
+    (void)str; // unused
+
     lst->fn->invalidate(lst);
 }
 
 static void stringInvalidate(const leString* str,
                              leListWheelWidget* lst)
 {
+    (void)str; // unused
+
     lst->fn->invalidate(lst);
 }
 
@@ -234,11 +169,11 @@ void leListWheelWidget_Constructor(leListWheelWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_BEVEL;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_FILL;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_BEVEL;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_FILL;
     
-    _this->borderTypeCache = _this->widget.borderType;
-    _this->backgroundTypeCache = _this->widget.backgroundType;
+    _this->borderTypeCache = _this->widget.style.borderType;
+    _this->backgroundTypeCache = _this->widget.style.backgroundType;
     //_this->allowEmpty = LE_TRUE;
     
 
@@ -246,7 +181,7 @@ void leListWheelWidget_Constructor(leListWheelWidget* _this)
     
     leArray_Create(&_this->items);
     
-    _this->widget.halign = LE_HALIGN_CENTER;
+    _this->widget.style.halign = LE_HALIGN_CENTER;
     _this->iconPos = LE_RELATIVE_POSITION_LEFTOF;
     _this->iconMargin = DEFAULT_MARGIN;
     _this->visibleItems = DEFAULT_VISIBLE_COUNT;
@@ -310,52 +245,6 @@ leListWheelWidget* leListWheelWidget_New()
 
     return whl;
 }
-
-#if 0
-static void setRotation(leListWheelWidget* _this, int32_t rot)
-{
-    uint32_t rem, dist;
-    
-    _this->rotation = rot;
-    
-    //printf("y=%i, rot=%i\n", _this->touchY, _this->rotation);
-    
-    if(rot == 0)
-        return;
-    
-    rem = leAbsoluteValue(_this->rotation);
-    dist = (uint32_t)_this->cycleDistance / 2;
-    
-    if(rem < dist)
-        return;
-       
-    // adjust top item as necessary
-    if(rot < 0)
-    {
-        //printf("old top item: %i\n", _this->topItem);
-        _this->topItem = nextItem(_this->items.size, _this->topItem);
-        //printf("new top item: %i\n", _this->topItem);
-        
-        _this->touchY -= _this->cycleDistance;
-            
-        _this->rotation += _this->cycleDistance;
-        
-        //printf("adj %i, %i\n", _this->rotation, _this->touchY);
-    }
-    else
-    {
-        //printf("old top item: %i\n", _this->topItem);
-        _this->topItem = previousItem(_this->items.size, _this->topItem);
-        //printf("new top item: %i\n", _this->topItem);
-        
-        _this->touchY += _this->cycleDistance;
-            
-        _this->rotation -= _this->cycleDistance;
-        
-        //printf("adj %i, %i\n", _this->rotation, _this->touchY);
-    } 
-}
-#endif
 
 static void adjustRotation(leListWheelWidget* _this,
                            int32_t rot)
@@ -425,7 +314,7 @@ static void snapRotation(leListWheelWidget* _this)
     }
     
     // reset draw state on invalidate in case the wheel is partially redrawn
-    //_this->widget.drawState = LE_WIDGET_DRAW_STATE_READY;
+    //_this->widget.status.drawState = LE_WIDGET_DRAW_STATE_READY;
         
     //printf("snap, %i, %i, %i\n", _this->rotation, _this->momentum, _this->paintState.offs);
 }
@@ -549,6 +438,8 @@ static void update(leListWheelWidget* _this,
 static void handleResizedEvent(leListWheelWidget* _this,
                                leWidget_ResizeEvent* evt)
 {
+    (void)evt; // unused
+
     _this->cycleDistance = leDivideRounding(_this->widget.rect.height, _this->visibleItems - 1);
 }
 
@@ -678,7 +569,7 @@ static leResult setVisibleItemCount(leListWheelWidget* _this,
 {
     LE_ASSERT_THIS();
         
-    if(_this->visibleItems == cnt)
+    if(_this->visibleItems == (int32_t)cnt)
         return LE_SUCCESS;
     
     //invalidateContents(_this);
@@ -1129,7 +1020,7 @@ static leResult selectNextItem(leListWheelWidget* _this)
         
     idx = _this->selectedItem;
     
-    if(idx == _this->items.size - 1)
+    if(idx == (int32_t)_this->items.size - 1)
     {
         idx = 0;
     }
@@ -1360,7 +1251,7 @@ void _leListWheelWidget_Paint(leListWheelWidget* _this);
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
-void _leListWheelWidget_GenerateVTable()
+void _leListWheelWidget_GenerateVTable(void)
 {
     _leWidget_FillVTable((void*)&listWheelWidgetVTable);
     
@@ -1461,7 +1352,7 @@ static const leListWheelWidgetVTable listWheelWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -1483,16 +1374,9 @@ static const leListWheelWidgetVTable listWheelWidgetVTable =
     .installEventFilter = (void*)_leWidget_InstallEventFilter,
     .removeEventFilter = (void*)_leWidget_RemoveEventFilter,
 
-    .update = (void*)_leWidget_Update,
-
-    .touchDownEvent = (void*)_leWidget_TouchDownEvent,
-    .touchUpEvent = (void*)_leWidget_TouchUpEvent,
-    .touchMoveEvent = (void*)_leWidget_TouchMoveEvent,
     .moveEvent = (void*)_leWidget_MoveEvent,
-    .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
     .focusGainedEvent = (void*)_leWidget_FocusGainedEvent,
-    .languageChangeEvent = (void*)_leWidget_LanguageChangeEvent,
 
     ._handleEvent = (void*)_leWidget_HandleEvent,
     ._validateChildren = (void*)_leWidget_ValidateChildren,

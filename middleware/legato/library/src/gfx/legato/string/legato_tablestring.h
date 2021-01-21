@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,31 +20,43 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+
+/** \file legato_tablestring.h
+* @brief Definition for the table string feature.
+*
+* @details .
+*/
 
 #ifndef LEGATO_TABLESTRING_H
 #define LEGATO_TABLESTRING_H
 
 #include "gfx/legato/string/legato_string.h"
 
-// DOM-IGNORE-BEGIN
 #define LE_STRING_NULLIDX -1
 
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 struct leTableString;
 
 #define LE_TABLESTRING_VTABLE(THIS_TYPE) \
     LE_STRING_VTABLE(THIS_TYPE) \
     \
     uint32_t (*getID)(const THIS_TYPE* this); \
-	leResult (*setID)(THIS_TYPE* this, uint32_t id); \
-	uint32_t (*sizeInBytes)(const THIS_TYPE* this); \
+    leResult (*setID)(THIS_TYPE* this, uint32_t id); \
+    uint32_t (*sizeInBytes)(const THIS_TYPE* this); \
 
 typedef struct leTableStringVTable
 {
 	LE_TABLESTRING_VTABLE(struct leTableString)
 } leTableStringVTable;
-// DOM-IGNORE-END
 
+/**
+  * @endcond
+  *
+  */
 // *****************************************************************************
 /* Structure:
     leTableString
@@ -56,6 +67,11 @@ typedef struct leTableStringVTable
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a table string.
+ * @details Color mode information keeps track of size, bpp,
+ * color channel mask and color.
+ */
 typedef struct leTableString
 {
     leString base;
@@ -82,11 +98,22 @@ typedef struct leTableString
     Caller is responsible for freeing the memory allocated by this function
     using leString_Delete()
 */
-LIB_EXPORT leTableString* leTableString_New(uint32_t idx);
+/**
+ * @brief Constructs a new table string.
+ * @details Creates a new table in table  <span class="param">idx</span>.
+ * @see leString_New().
+ * @code
+ * uint32_t idx;
+ * leTableString* tstr = leTableString_New(idx);
+ * @endcode
+ * @param  idx is the table from which to create
+ * @return returns a new table string.
+ */
+leTableString* leTableString_New(uint32_t idx);
 
 // *****************************************************************************
 /* Function:
-    void leTableString_PNew(leTableString* str, uint32_t idx)
+    void leTableString_New(leTableString* str, uint32_t idx)
 
    Summary:
     Constructs a new table string at the given pointer
@@ -100,72 +127,82 @@ LIB_EXPORT leTableString* leTableString_New(uint32_t idx);
     It is assumed that the pointer provided is being managed by the caller.  Use
     leString_PDelete() to properly destruct this pointer.
 */
-LIB_EXPORT void leTableString_Constructor(leTableString* str,
-                                          uint32_t idx);
+/**
+ * @brief Constructs a new table string.
+ * @details Creates a new table in table  <span class="param">idx</span>.
+ * @see leString_New().
+ * @code
+ * uint32_t idx;
+ * leTableString* tstr = leTableString_New(idx);
+ * @endcode
+ * @param  idx is the table from which to create
+ * @return returns a new table string.
+ */
+/**
+ * @brief Initialize table string.
+ * @details Initializes the leTableString <span class="param">str</span>
+ * at <span class="param">idx</span>.
+ * @code
+ * leTableString* str;
+ * leTableString_Constructor(str, idx);
+ * @endcode
+ * @param str is the string to initialize
+ * @param idx is the index location
+ * @return void.
+ */
+void leTableString_Constructor(leTableString* str,
+                               uint32_t idx);
+
+
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
+
+// *****************************************************************************
+/**
+ * @brief Get id.
+ * @details Gets the ID from <span class="param">_this</span>.
+ * @code
+ * leTableString* _this;
+ * uint32_t id = _this->fn->getID(str);
+ * @endcode
+ * @param  _this is the string to examine.
+ * @return returns the id of the string.
+ */
+virtual uint32_t getID(const leTableString* _this);
 
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getID(const leFixedString* this)
+/**
+ * @brief Set string table ID.
+ * @details Sets the ID to <span class="param">id</span>.
+ * @code
+ * leTableString* str;
+ * leResult res = _this->fn->setID(_this, id);
+ * @endcode
+ * @param  _this is the string to examine.
+ * @param id is the string table ID to use.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setID(leTableString* this,
+                       uint32_t id);
 
-  Summary:
-     Gets the current string table ID of this string
-
-  Description:
-     Gets the current string table ID of this string
-
-  Parameters:
-    const leFixedString* this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->getID(_this);
-
-  Returns:
-    uint32_t - the string table ID
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setID(leFixedString* this,
-                   uint32_t id)
+/**
+ * @brief Get size of this string in bytes.
+ * @details Gets the size of this string in bytes.
+ * @code
+ * leTableString* str;
+ * uint32_t size = str->fn->sizeInBytes(str);
+ * @endcode
+ * @param  str is the string to examine.
+ * @return returns the size of the string table.
+ */
+virtual uint32_t sizeInBytes(const leTableString* this);
 
-  Summary:
-     Sets the string table ID of this string
 
-  Description:
-     Sets the string table ID of this string
-
-  Parameters:
-    leFixedString* this - The string to operate on
-    uint32_t id - the string table ID to use
-
-  Remarks:
-    Usage - _this->fn->setID(_this, id);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    uint32_t sizeInBytes(const leFixedString* this)
-
-  Summary:
-     Gets the size of this string in bytes
-
-  Description:
-     Gets the size of this string in bytes
-
-  Parameters:
-    const leFixedString* this - The string to operate on
-
-  Remarks:
-    Usage - _this->fn->sizeInBytes(_this);
-
-  Returns:
-    uint32_t - the string size in bytes
-*/
-
+#undef THIS_TYPE
+#endif
 
 
 #endif /* LEGATO_TABLESTRING_H */

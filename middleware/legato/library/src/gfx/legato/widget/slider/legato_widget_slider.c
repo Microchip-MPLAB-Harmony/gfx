@@ -78,7 +78,7 @@ static void invalidateHandle(const leSliderWidget* _this)
     _this->fn->_damageArea(_this, &rect);
 }
 
-const uint32_t _getPercentFromPoint(const leSliderWidget* _this,
+uint32_t _getPercentFromPoint(const leSliderWidget* _this,
                                     const lePoint* pnt)
 {
     leRect scrollRect;
@@ -127,7 +127,7 @@ static uint32_t _getValueFromPercent(const leSliderWidget* _this,
                                      uint32_t per)
 {
     int32_t max, val;
-    
+
     if(per == 0)
     {
         return _this->min;
@@ -136,12 +136,12 @@ static uint32_t _getValueFromPercent(const leSliderWidget* _this,
     {
         return _this->max;
     }
-    
+
     // zero based range
     max = _this->max - _this->min;
-    
+
     val = lePercentOf(max, per);
-        
+
     return val - _this->min;
 }
 
@@ -159,8 +159,8 @@ void leSliderWidget_Constructor(leSliderWidget* _this)
 
     _this->state = LE_SLIDER_STATE_NONE;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_BEVEL;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_FILL;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_BEVEL;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_FILL;
 
     _this->alignment = LE_ORIENTATION_VERTICAL;
     
@@ -251,36 +251,36 @@ static leResult setGripSize(leSliderWidget* _this,
 static uint32_t getMininumValue(const leSliderWidget* _this)
 {
     LE_ASSERT_THIS();
-        
+
     return _this->min;
 }
 
-static leResult setMinimumValue(leSliderWidget* _this, 
+static leResult setMinimumValue(leSliderWidget* _this,
                                 uint32_t val)
 {
     LE_ASSERT_THIS();
-        
-    if(_this->min == val)
+
+    if(_this->min == (int32_t)val)
         return LE_SUCCESS;
-        
+
     invalidateHandle(_this);
-        
+
     _this->min = val;
-    
+
     invalidateHandle(_this);
-    
+
     if(_this->valueChangedEvent != NULL)
     {
         _this->valueChangedEvent(_this);
     }
-        
+
     return LE_SUCCESS;
 }
-                                                      
+
 static uint32_t getMaximumValue(const leSliderWidget* _this)
 {
     LE_ASSERT_THIS();
-        
+
     return _this->max;
 }
 
@@ -288,28 +288,28 @@ static leResult setMaximumValue(leSliderWidget* _this,
                                 uint32_t val)
 {
     LE_ASSERT_THIS();
-        
-    if(_this->max == val)
+
+    if(_this->max == (int32_t)val)
         return LE_SUCCESS;
-    
+
     invalidateHandle(_this);
-   
+
     _this->max = val;
-    
+
     invalidateHandle(_this);
-        
+
     if(_this->valueChangedEvent != NULL)
     {
         _this->valueChangedEvent(_this);
     }
-        
+
     return LE_SUCCESS;
-}                                                 
+}
 
 static uint32_t getPercentage(const leSliderWidget* _this)
 {
     LE_ASSERT_THIS();
-        
+
     return lePercentWholeRounded(_this->value, _this->max - _this->min);
 }
 
@@ -322,7 +322,7 @@ static leResult setPercentage(leSliderWidget* _this,
 
     value = lePercentOf(_this->max - _this->min, val) + _this->min;
 
-    if(_this->value == value)
+    if(_this->value == (int32_t)value)
         return LE_SUCCESS;
 
     invalidateHandle(_this);
@@ -335,10 +335,10 @@ static leResult setPercentage(leSliderWidget* _this,
     {
         _this->valueChangedEvent(_this);
     }
-    
+
     return LE_SUCCESS;
-} 
-                                                                                                               
+}
+
 static int32_t getValue(const leSliderWidget* _this)
 {
     LE_ASSERT_THIS();
@@ -347,7 +347,7 @@ static int32_t getValue(const leSliderWidget* _this)
 }
 
 static leResult setValue(leSliderWidget* _this,
-                         int32_t val) 
+                         int32_t val)
 {
     LE_ASSERT_THIS();
         
@@ -363,8 +363,8 @@ static leResult setValue(leSliderWidget* _this,
     {
         val = _this->min;
     }
-        
-    invalidateHandle(_this); 
+
+    invalidateHandle(_this);
    
     _this->value = val;
     
@@ -446,7 +446,7 @@ static void handleTouchDownEvent(leSliderWidget* _this,
     lePoint pnt;
     uint32_t percent;
     uint32_t value;
-    
+
     LE_ASSERT_THIS();
 
     pnt.x = evt->x;
@@ -472,8 +472,8 @@ static void handleTouchDownEvent(leSliderWidget* _this,
         percent = _getPercentFromPoint(_this, &pnt);
         
         value = _getValueFromPercent(_this, percent);
-        
-        if(_this->value != value)
+
+        if(_this->value != (int32_t)value)
         {
             invalidateHandle(_this);
             
@@ -529,7 +529,7 @@ static void handleTouchMovedEvent(leSliderWidget* _this,
         
         //printf("    %u, %u\n", percent, i);
         
-        if(percent != _this->value)
+        if((int32_t)percent != _this->value)
         {
             invalidateHandle(_this);
             
@@ -623,7 +623,7 @@ static const leSliderWidgetVTable sliderWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

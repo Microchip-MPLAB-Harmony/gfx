@@ -976,9 +976,11 @@ uint8_t JPEG_bPaintOneBlock(JPEGDECODER *pJpegDecoder)
     return 0;
 }
 
+static LE_COHERENT_ATTR JPEGDECODER JPEG_JpegDecoder;
+
 int8_t JPEG_bInterpretResourceHeader(leImage* img)
 {
-    JPEGDECODER JPEG_JpegDecoder;
+
 
     if (img == NULL)
         return -1;

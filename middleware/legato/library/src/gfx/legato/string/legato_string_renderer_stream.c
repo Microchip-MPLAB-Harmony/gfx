@@ -132,7 +132,7 @@ static void drawDone_blocking(uint32_t codepoint)
     }
 }
 
-static leResult draw()
+static leResult draw(void)
 {
     renderState.state = SS_WAITING;
 
@@ -157,7 +157,7 @@ static leResult draw()
     return LE_SUCCESS;
 }
 
-static leResult draw_blocking()
+static leResult draw_blocking(void)
 {
     if(renderState.glyphInfo.codePoint == LE_STRING_SPACE ||
        renderState.glyphInfo.codePoint == LE_STRING_LINEBREAK)
@@ -179,7 +179,7 @@ static leResult draw_blocking()
     return LE_SUCCESS;
 }
 
-static void getLineMetrics()
+static void getLineMetrics(void)
 {
     uint32_t codepoint;
 
@@ -212,7 +212,7 @@ static void getLineMetrics()
     leFont_GetGlyphInfo((leFont *) renderState.font, codepoint, &renderState.glyphInfo);
 }
 
-static leResult newline()
+static leResult newline(void)
 {
     renderState.lineItr += 1;
 
@@ -232,7 +232,7 @@ static leResult newline()
     return LE_SUCCESS;
 }
 
-static void cleanup()
+static void cleanup(void)
 {
     leGetState()->activeStream = NULL;
 
@@ -248,6 +248,8 @@ static void cleanup()
 
 static leResult exec(leStreamManager* man)
 {
+    (void)man; // unused
+
     while(renderState.state != SS_DONE)
     {
         switch(renderState.state)
@@ -285,6 +287,8 @@ static leResult exec(leStreamManager* man)
 
 static leResult exec_blocking(leStreamManager* man)
 {
+    (void)man; // unused
+
     while(renderState.state != SS_DONE)
     {
         switch(renderState.state)
@@ -319,11 +323,15 @@ static leResult exec_blocking(leStreamManager* man)
 
 static leBool isDone(leStreamManager* man)
 {
+    (void)man; // unused
+
     return renderState.state == SS_DONE;
 }
 
 static void abortDraw(leStreamManager* man)
 {
+    (void)man; // unused
+
     renderState.state = SS_CLEANUP;
 }
 

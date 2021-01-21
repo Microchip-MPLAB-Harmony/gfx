@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements label (text) widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_label.h
+ * @brief label widget functions and definitions.
+ *
+ * @details This module implements label (text) widget functions.
+ */
+
 #ifndef LEGATO_LABEL_H
 #define LEGATO_LABEL_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -57,7 +59,11 @@
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leLabelWidget leLabelWidget;
 
 #define LE_LABELWIDGET_VTABLE(THIS_TYPE) \
@@ -71,21 +77,16 @@ typedef struct leLabelWidgetVTable
 	LE_LABELWIDGET_VTABLE(leLabelWidget)
 } leLabelWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
-/* Structure:
-    leLabelWidget
-
-  Summary:
-    Implementation of a label widget struct
-
-  Description:
-    A label widget is a simple widget that draws a string of text.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a label widget
+ * @details A label widget is a simple widget that draws a string of text.
+ */
 typedef struct leLabelWidget
 {
     leWidget widget; // widget base class
@@ -102,91 +103,65 @@ typedef struct leLabelWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leLabelWidget* leLabelWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leLabelWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leLabelWidget* wgt = leLabelWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leLabelWidget* leLabelWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leLabelWidget <span class="param">wgt</span>.
+ * @code
+ * leLabelWidget* wgt;
+ * leImageScaleWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leLabelWidget_Constructor(leLabelWidget* wgt);
 
-  Description:
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
-
-  Parameters:
-
-  Returns:
-    leLabelWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leLabelWidget* leLabelWidget_New();
-
-/* Function:
-    void leLabelWidget_Constructor(leLabelWidget* wgt)
-
-  Summary:
-    Initializes an leLabelWidget widget pointer.
-
-  Description:
-    Initializes an leLabelWidget widget pointer.
-
-  Parameters:
-    leLabelWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leLabelWidget_Constructor(leLabelWidget* lbl);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leString* getString(const leLabelWidget* _this)
-
-  Summary:
-     Gets the label string
-
-  Description:
-     Gets the label string
-
-  Parameters:
-    const leLabelWidget* _this - The label widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getString(_this);
-
-  Returns:
-    leString* - the string pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setString(leLabelWidget* _this,
-                       leString* str)
-
-  Summary:
-     Sets the label string
-
-  Description:
-     Sets the label string
-
-  Parameters:
-    leLabelWidget* _this - The label widget to operate on
-    leString* str - the string pointer
-
-  Remarks:
-    Usage - _this->fn->setString(_this, str);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Get string assigned.
+ * @details Gets the string assigned for <span class="param">_this</span>.
+ * @code
+ * const leLabelWidget* _this;
+ * leString* str = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the string pointer.
+ */
+virtual leString* getString(const leLabelWidget* _this);
 
 
+/**
+ * @brief Set string.
+ * @details Sets the string for <span class="param">_this</span> to
+ * <span class="param">str</span>.
+ * @code
+ * leLabelWidget* _this;
+ * const leString* str;
+ * leResult res = _this->fn->setString(_this, str);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param str is the string pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setString(leLabelWidget* _this,
+                           const leString* str);
+
+#undef THIS_TYPE
+#endif
 
 #endif // LE_LABEL_WIDGET_ENABLED
 #endif /* LEGATO_LABEL_H */

@@ -29,10 +29,12 @@
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
                                     leRawDecodeStage* stage);
 
-static struct InternalMaskStage
+struct InternalMaskStage
 {
     leRawDecodeStage base;
-} maskStage;
+};
+
+struct LE_COHERENT_ATTR InternalMaskStage maskStage;
 
 static leResult stage_rejectMaskedColor(leRawDecodeStage* stage)
 {

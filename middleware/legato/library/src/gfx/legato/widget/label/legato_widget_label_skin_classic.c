@@ -68,14 +68,14 @@ void _leLabelWidget_GetTextRect(leLabelWidget* lbl,
     lbl->string->fn->getRect(lbl->string,
                              textRect);
     
-    bounds = lbl->fn->localRect(lbl);
+    lbl->fn->localRect(lbl, &bounds);
     
     // arrange relative to image rect
     leUtils_ArrangeRectangleRelative(textRect,
                                      leRect_Zero,
                                      bounds,
-                                     lbl->widget.halign,
-                                     lbl->widget.valign,
+                                     lbl->widget.style.halign,
+                                     lbl->widget.style.valign,
                                      0,
                                      lbl->widget.margin.left,
                                      lbl->widget.margin.top,
@@ -97,7 +97,7 @@ static void drawBorder(leLabelWidget* lbl);
 
 static void nextState(leLabelWidget* lbl)
 {
-    switch(lbl->widget.drawState)
+    switch(lbl->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -110,37 +110,42 @@ static void nextState(leLabelWidget* lbl)
             }
 #endif
             
-            if(lbl->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(lbl->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                lbl->widget.drawState = DRAW_BACKGROUND;
+                lbl->widget.status.drawState = DRAW_BACKGROUND;
                 lbl->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(lbl->string != NULL && lbl->string->fn->isEmpty(lbl->string) == LE_FALSE)
             {
-                lbl->widget.drawState = DRAW_STRING;
+                lbl->widget.status.drawState = DRAW_STRING;
                 lbl->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
 
                 return;
             }
         }
+        // fall through
         case DRAW_STRING:
         {
-            if(lbl->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(lbl->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 lbl->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                lbl->widget.drawState = DRAW_BORDER;
+                lbl->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
+
+
         }
+        // fall through
         case DRAW_BORDER:
         {
-            lbl->widget.drawState = DONE;
+            lbl->widget.status.drawState = DONE;
             lbl->widget.drawFunc = NULL;
         }
     }
@@ -159,7 +164,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 {
     leLabelWidget* lbl = (leLabelWidget*)strm->userData;
 
-    lbl->widget.drawState = DRAW_STRING;
+    lbl->widget.status.drawState = DRAW_STRING;
 
     nextState(lbl);
 }
@@ -176,8 +181,8 @@ static void drawString(leLabelWidget* lbl)
     lbl->string->fn->_draw(lbl->string,
                           textRect.x,
                           textRect.y,
-                          lbl->widget.halign,
-                          lbl->widget.scheme->text,
+                          lbl->widget.style.halign,
+                          leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_TEXT),
                           paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
@@ -186,7 +191,7 @@ static void drawString(leLabelWidget* lbl)
         leGetActiveStream()->onDone = onStringStreamFinished;
         leGetActiveStream()->userData = lbl;
 
-        lbl->widget.drawState = WAIT_STRING;
+        lbl->widget.status.drawState = WAIT_STRING;
 
         return;
     }
@@ -197,12 +202,12 @@ static void drawString(leLabelWidget* lbl)
 
 static void drawBorder(leLabelWidget* lbl)
 {
-    if(lbl->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(lbl->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)lbl,
                                                     paintState.alpha);
     }
-    else if(lbl->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(lbl->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)lbl,
                                                       paintState.alpha);
@@ -213,22 +218,15 @@ static void drawBorder(leLabelWidget* lbl)
 
 void _leLabelWidget_Paint(leLabelWidget* lbl)
 {
-    if(lbl->widget.scheme == NULL)
-    {
-        lbl->widget.drawState = DONE;
-        
-        return;
-    }
-
-    if(lbl->widget.drawState == NOT_STARTED)
+    if(lbl->widget.status.drawState == NOT_STARTED)
         nextState(lbl);
 
 #if LE_STREAMING_ENABLED == 1
-    if(lbl->widget.drawState == WAIT_STRING)
+    if(lbl->widget.status.drawState == WAIT_STRING)
         return;
 #endif
 
-    while(lbl->widget.drawState != DONE)
+    while(lbl->widget.status.drawState != DONE)
     {
         lbl->widget.drawFunc((leWidget*)lbl);
         
@@ -237,7 +235,7 @@ void _leLabelWidget_Paint(leLabelWidget* lbl)
 #endif
         
 #if LE_STREAMING_ENABLED == 1
-        if(lbl->widget.drawState == WAIT_STRING)
+        if(lbl->widget.status.drawState == WAIT_STRING)
             break;
 #endif
     }

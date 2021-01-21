@@ -296,6 +296,28 @@ def instantiateComponent(comp):
 	TCChannelCompare.setDefaultValue("A")
 	### End of Backlight config options
 
+### Start of Blit config
+	BlitSettings = comp.createMenuSymbol("BlitSettings", None)
+	BlitSettings.setLabel("Buffer Blit Settings")
+
+	BlitMode = comp.createComboSymbol("BlitMode", BlitSettings, ["CPU", "DMA"])
+	BlitMode.setLabel("Blit Mode")
+	BlitMode.setDescription("Peripheral used for scratch buffer blit.")
+	BlitMode.setDefaultValue("CPU")
+	BlitMode.setDependencies(onBlitModeSet, ["BlitMode"])
+
+	DMABlitChannel = comp.createIntegerSymbol("DMABlitChannel", BlitMode)
+	DMABlitChannel.setLabel("DMA Channel")
+	DMABlitChannel.setDescription("DMA channel for DMA blit. Please enable and configure DMA separately")
+	DMABlitChannel.setDefaultValue(1)
+	DMABlitChannel.setMin(0)
+	DMABlitChannel.setMax(15)
+	DMABlitChannel.setVisible(False)
+	
+	BlitModeComment = comp.createCommentSymbol("BlitModeComment", BlitMode)
+	BlitModeComment.setLabel('Please enable and configure selected DMAC channel')
+	BlitModeComment.setVisible(False)
+
 	# generated code files
 	GFX_LCC_C = comp.createFileSymbol("GFX_LCC_C", None)
 	GFX_LCC_C.setSourcePath("templates/drv_gfx_lcc.c.ftl")
@@ -411,11 +433,11 @@ def resetDisplayTiming(lccComponent, displayComponent):
 	lccComponent.clearSymbolValue("DisplayVertFrontPorch")
 
 def onAttachmentConnected(source, target):
-	print("dependency Connected = " + str(target['id']))
+	print("dependency Connected = " + target["component"].getDisplayName())
 	gfxCoreComponentTable = ["gfx_hal_le"]
 	if (Database.getComponentByID("gfx_hal_le") is None):
 		Database.activateComponents(gfxCoreComponentTable)
-	updateDisplayManager(source["component"], target["component"])
+	updateDisplayManager(source["component"], target)
 	#### test for SMC dependency
 	if (source["id"] == "SMC_CS"):
 		sub = re.search('smc_cs(.*)', str(target["id"]))
@@ -457,24 +479,30 @@ def onBacklightPeripheralSelected(symbol, event):
 def showRTOSMenu(symbol, event):
 	symbol.setVisible(event["value"] != "BareMetal")
    
-def updateDisplayManager(component, source):
+def updateDisplayManager(component, target):
 	if (Database.getComponentByID("gfx_hal_le") is not None):
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzPulseWidth", component.getSymbolValue("DisplayHorzPulseWidth"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzBackPorch", component.getSymbolValue("DisplayHorzBackPorch"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayHorzFrontPorch", component.getSymbolValue("DisplayHorzFrontPorch"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertPulseWidth", component.getSymbolValue("DisplayVertPulseWidth"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertBackPorch", component.getSymbolValue("DisplayVertBackPorch"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayVertFrontPorch", component.getSymbolValue("DisplayVertFrontPorch"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayWidth", component.getSymbolValue("DisplayWidth"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayHeight", component.getSymbolValue("DisplayHeight"), 1)
-		Database.setSymbolValue("gfx_hal_le", "PixelClock", component.getSymbolValue("PixelClock"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayDataEnablePolarity", component.getSymbolValue("DisplayDataEnablePolarity"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayVSYNCNegative", component.getSymbolValue("DisplayVSYNCNegative"), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayHSYNCNegative", component.getSymbolValue("DisplayHSYNCNegative"), 1)
+		if target["id"] == "gfx_display":
+			Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzPulseWidth", target["component"].getSymbolValue("HorzPulseWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzBackPorch", target["component"].getSymbolValue("HorzBackPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzFrontPorch", target["component"].getSymbolValue("HorzFrontPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertPulseWidth", target["component"].getSymbolValue("VertPulseWidth"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertBackPorch", target["component"].getSymbolValue("VertBackPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertFrontPorch", target["component"].getSymbolValue("VertFrontPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayDataEnablePolarity", target["component"].getSymbolValue("DataEnablePolarity"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVSYNCNegative", target["component"].getSymbolValue("VSYNCNegative"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHSYNCNegative", target["component"].getSymbolValue("HSYNCNegative"), 1)
+			component.setSymbolValue("DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)
+			component.setSymbolValue("DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
 		Database.setSymbolValue("gfx_hal_le", "gfx_driver", component.getID(), 1)
-		Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
 		Database.setSymbolValue("gfx_hal_le", "DriverName", component.getDisplayName(), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+		Database.setSymbolValue("gfx_hal_le", "PixelClock", component.getSymbolValue("PixelClock"), 1)
 		component.getSymbolByID("DisplaySettingsMenu").setVisible(False)
 		component.getSymbolByID("HALComment").setVisible(True)
 
+def onBlitModeSet(symbol, event):
+	symbol.getComponent().getSymbolByID("DMABlitChannel").setVisible(event["value"] == "DMA")
+	symbol.getComponent().getSymbolByID("BlitModeComment").setVisible(event["value"] == "DMA")

@@ -39,6 +39,13 @@
     Internal library use only
 *******************************************************************************/
 
+/** \file legato_image_utils.h
+* @brief Image return utilities
+*
+* @details Internal library use only
+*
+*/
+
 // DOM-IGNORE-BEGIN
 #ifndef LE_IMAGE_UTILS_H
 #define LE_IMAGE_UTILS_H

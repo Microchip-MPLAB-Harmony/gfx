@@ -1,0 +1,10 @@
+digraph "C:/harmony3_dev" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_5e8cb83d332db38e4e810ab9505f53eb {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_5e8cb83d332db38e4e810ab9505f53eb.html"];
+    dir_5e8cb83d332db38e4e810ab9505f53eb [shape=plaintext label="harmony3_dev"];
+    dir_092bcda8a4c3ae9b70a1f62131a17a84 [shape=box label="gfx" color="red" fillcolor="white" style="filled" URL="dir_092bcda8a4c3ae9b70a1f62131a17a84.html"];
+  }
+}

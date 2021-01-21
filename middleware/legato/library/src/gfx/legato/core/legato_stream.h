@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,11 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+/** \file legato_stream.h
+ * @brief Defines a common header for all stream operations.
+ *
+ * @details .
+ */
 
 #ifndef LE_STREAM_H
 #define LE_STREAM_H
@@ -46,15 +49,27 @@
 
     dataSize     - the size of the data in bytes
 */
+/**
+ * @brief This struct represents a stream descriptor
+ * @details A stream descriptor contains data location, address and size.
+ */
 typedef struct leStreamDescriptor
 {
-    uint32_t location;
-    void* address;
-    uint32_t size;
+    uint32_t location; /**< indicates the location of the data. */
+    void* address; /**<  the address at which the data resides. */
+    uint32_t size; /**<  the size of the data in bytes */
 } leStreamDescriptor;
 
+/**
+ * @brief leEventResult
+ * @details Defines the string location id.
+ */
 #define LE_STREAM_LOCATION_ID_INTERNAL 0
 
+/**
+  * @cond INTERNAL
+  *
+  */
 #if LE_STREAMING_ENABLED == 1
 
 // *****************************************************************************
@@ -128,7 +143,7 @@ enum leStreamFlag
 */
 typedef struct leStream
 {
-    leStreamDescriptor* desc;
+    const leStreamDescriptor* desc;
 
     enum leStreamState state;
 
@@ -157,7 +172,7 @@ typedef struct leStream
 // *****************************************************************************
 /* Function:
     void leStream_Init(leStream* stream,
-                       leStreamDescriptor* desc,
+                       const leStreamDescriptor* desc,
                        uint32_t cacheSize,
                        uint8_t* cacheBuf,
                        void* userData)
@@ -176,7 +191,7 @@ typedef struct leStream
 
   Parameters:
     leStream* stream - the stream struct to initialize
-    leStreamDescriptor* desc - the stream descriptor to read from
+    const leStreamDescriptor* desc - the stream descriptor to read from
     uint32_t cacheSize - the size of the cache being passed in
     uint8_t* cacheBuf - a buffer to use as a local cache
     void* userData - a user data pointer for general purpose use
@@ -188,7 +203,7 @@ typedef struct leStream
 
 */
 void leStream_Init(leStream* stream,
-                   leStreamDescriptor* desc,
+                   const leStreamDescriptor* desc,
                    uint32_t cacheSize,
                    uint8_t* cacheBuf,
                    void* userData);
@@ -214,6 +229,27 @@ void leStream_Init(leStream* stream,
 
 */
 leResult leStream_Open(leStream* stream);
+
+// *****************************************************************************
+/* Function:
+    void leStream_IsOpen(leStream* stream)
+
+  Summary:
+    Tests a stream to see if it is open
+
+  Description:
+    Tests a stream to see if it is open
+
+  Parameters:
+    leStream* stream - the stream to test
+
+  Returns:
+    leBool - true if open
+
+  Remarks:
+
+*/
+leBool leStream_IsOpen(leStream* stream);
 
 // *****************************************************************************
 /* Function:
@@ -429,4 +465,8 @@ void leApplication_MediaCloseRequest(leStream* stream);
 
 #endif /* LE_STREAMING_ENABLED */
 
+/**
+ * @endcond
+ *
+ */
 #endif /* LE_STREAM_H */

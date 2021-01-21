@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,7 +36,11 @@
   Description:
     This module implements line graph drawing widget functions.
 *******************************************************************************/
-
+/** \file legato_widget_line_graph.h
+ * @brief Line graph functions and definitions.
+ *
+ * @details This module implements line graph drawing widget functions.
+ */
 
 #ifndef LEGATO_WIDGET_LINE_GRAPH_H
 #define LEGATO_WIDGET_LINE_GRAPH_H
@@ -138,10 +140,14 @@ typedef struct leLineGraphCategory
 {
     const leString* text;
     int32_t stackValue;
+    int32_t drawX;
 } leLineGraphCategory;
 
-// DOM-IGNORE-BEGIN
-
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leLineGraphWidget leLineGraphWidget;
 
 #define LE_LINEGRAPHWIDGET_VTABLE(THIS_TYPE) \
@@ -205,24 +211,18 @@ typedef struct leLineGraphWidgetVTable
 	LE_LINEGRAPHWIDGET_VTABLE(leLineGraphWidget)
 } leLineGraphWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
-/* Structure:
-    leLineGraphWidget
-
-  Summary:
-    Implementation of a line graph widget.
-
-  Description:
-    A line graph widget draws a line graph. All coordinates are expressed in local widget space.
-
-    The color of the graph is determined by the widget scheme's 'foreground'
-    color.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a line graph widget
+ * @details A line graph widget draws a line graph. All coordinates are
+ * expressed in local widget space. The color of the graph is determined by
+ * the widget scheme's 'foreground' color..
+ */
 typedef struct leLineGraphWidget
 {
     leWidget widget; // base widget header
@@ -261,47 +261,30 @@ typedef struct leLineGraphWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leLineGraphWidget* leLineGraphWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leLineGraphWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leLineGraphWidget* wgt = leLineGraphWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leLineGraphWidget* leLineGraphWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the management of this memory until the
-    widget is added to a widget tree.
-
-  Description:
-
-  Parameters:
-    void
-
-  Returns:
-    leLineGraphWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leLineGraphWidget* leLineGraphWidget_New();
-
-/* Function:
-    void leLineGraphWidget_Constructor(leLineGraphWidget* wgt)
-
-  Summary:
-    Initializes an leLineGraphWidget widget pointer.
-
-  Description:
-    Initializes an leLineGraphWidget widget pointer.
-
-  Parameters:
-    leLineGraphWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leLineGraphWidget_Constructor(leLineGraphWidget* graph);
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leLineGraphWidget <span class="param">wgt</span>.
+ * @code
+ * leLineGraphWidget* wgt;
+ * leLineGraphWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leLineGraphWidget_Constructor(leLineGraphWidget* wgt);
 
 // *****************************************************************************
 /* Virtual Member Function:

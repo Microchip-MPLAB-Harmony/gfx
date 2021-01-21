@@ -560,7 +560,7 @@ static void _RegRead(struct DEVICE_OBJECT *pDrvObject, void* val, size_t size, D
 bool MXT_INTERRUPT_PIN_VALUE_GET(void)
 {
 #ifndef BSP_MAXTOUCH_CHG_Get
-#error "MAXTOUCH_INT_Get is not defined. Please use Pin Settings Tab in MHC to define the Touch Interrupt pin with the name 'MAXTOUCH_INT' as GPIO_IN"   
+#error "BSP_MAXTOUCH_CHG_Get is not defined. Please use Pin Settings Tab in MHC to define the Touch Interrupt pin with the name 'BSP_MAXTOUCH_CHG' as GPIO_IN"   
 #else
 return(BSP_MAXTOUCH_CHG_Get());
 #endif
@@ -590,7 +590,6 @@ static bool mxt_parse_object_table(struct DEVICE_OBJECT* pDeviceObject,
 				  struct mxt_object *object_table);
 static int mxt_upload_cfg_mem(struct DEVICE_OBJECT* pDeviceObject);
 static bool mxt_proc_message(struct mxt_data *data, uint8_t *message);
-static bool mxt_load_xcfg_file(struct DEVICE_OBJECT *pDrvObject, const char *filename);
 
 
 #ifdef MESSAGE_CHECKSUM_ENABLED
@@ -897,7 +896,7 @@ DRV_HANDLE DRV_MAXTOUCH_Open(const SYS_MODULE_INDEX index,
     
     if(pDrvInstance->drvI2CHandle == DRV_HANDLE_INVALID)
     {
-        pDrvInstance->drvI2CHandle = pDrvInstance->drvOpen(DRV_I2C_INDEX_0,
+        pDrvInstance->drvI2CHandle = pDrvInstance->drvOpen(${DRV_MAXTOUCH_I2C_INDEX},
                                                            DRV_IO_INTENT_READWRITE);
     }
     
@@ -1326,17 +1325,17 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
         
         case DEVICE_STATE_WRITE_RESET:
         {
-            uint8_t buf[3];
+            uint8_t tbuf[3];
             uint16_t reg;
             uint8_t val = MXT_RESET_VALUE;
 
             reg = pDrvObject->data.T6_address + MXT_COMMAND_RESET;
             
-            buf[0] = reg & 0xff;
-            buf[1] = (reg >> 8) & 0xff;
-            memcpy(&buf[2], &val, 1);
+            tbuf[0] = reg & 0xff;
+            tbuf[1] = (reg >> 8) & 0xff;
+            memcpy(&tbuf[2], &val, 1);
 
-            DRV_I2C_WriteTransferAdd(pDrvObject->drvI2CHandle, I2C_MASTER_WRITE_ID, buf, 3, &pDrvObject->hResetWrite); 
+            DRV_I2C_WriteTransferAdd(pDrvObject->drvI2CHandle, I2C_MASTER_WRITE_ID, tbuf, 3, &pDrvObject->hResetWrite); 
 
             pDrvObject->deviceState = DEVICE_STATE_WAIT;
             break;

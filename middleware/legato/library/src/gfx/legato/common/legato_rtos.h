@@ -47,7 +47,7 @@
     void laUpdate_RTOS()
 
   Summary:
-    RTOS version of the Aria library update (tasks) function.
+    RTOS version of the Legato library update (tasks) function.
 
   Description:
     This function updates the active Aria library context state.  It performs
@@ -60,5 +60,13 @@
     None 
 
 */
-LIB_EXPORT void laUpdate_RTOS(laBool fullBlock, uint32_t dt);
+
+/** \file legato_rtos.h
+* @brief RTOS version of the Legato library update (tasks) function.
+*
+* @details This header file contains prototypes of the RTOS extensions of the aria library top level APIs.
+*
+*/
+
+void laUpdate_RTOS(laBool fullBlock, uint32_t dt);
     

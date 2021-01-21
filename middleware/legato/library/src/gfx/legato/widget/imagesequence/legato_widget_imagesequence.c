@@ -60,8 +60,8 @@ void leImageSequenceWidget_Constructor(leImageSequenceWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_FILL;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_FILL;
 
     _this->count = 0;
     _this->images = NULL;
@@ -149,7 +149,7 @@ static void update(leImageSequenceWidget* _this,
     }
 }
 
-leImageSequenceWidget* leImageSequenceWidget_New()
+leImageSequenceWidget* leImageSequenceWidget_New(void)
 {
     leImageSequenceWidget* img = LE_MALLOC(sizeof(leImageSequenceWidget));
     
@@ -222,7 +222,7 @@ static leResult setImage(leImageSequenceWidget* _this,
         
     _this->images[idx].image = imgAst;
         
-    if(_this->activeIdx == idx)
+    if(_this->activeIdx == (int32_t)idx)
     {
         _this->fn->invalidate(_this);
     }
@@ -280,7 +280,7 @@ static leResult setImageHAlignment(leImageSequenceWidget* _this,
         
     _this->images[idx].halign = align;
         
-    if(_this->activeIdx == idx)
+    if(_this->activeIdx == (int32_t)idx)
     {
         _this->fn->invalidate(_this);
     }
@@ -313,8 +313,10 @@ static leResult setImageVAlignment(leImageSequenceWidget* _this,
         
     _this->images[idx].valign = align;
         
-    if(_this->activeIdx == idx)
+    if(_this->activeIdx == (int32_t)idx)
+    {
         _this->fn->invalidate(_this);
+    }
         
     return LE_SUCCESS;
 }
@@ -396,7 +398,7 @@ static leResult showNextImage(leImageSequenceWidget* _this)
 {
     LE_ASSERT_THIS();
         
-    if(_this->activeIdx == _this->count - 1)
+    if(_this->activeIdx == (int32_t)_this->count - 1)
     {
         if(_this->repeat == LE_TRUE)
         {
@@ -528,7 +530,7 @@ static const leImageSequenceWidgetVTable imageSequenceWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -549,8 +551,6 @@ static const leImageSequenceWidgetVTable imageSequenceWidgetVTable =
     .invalidateContents = (void*)_leWidget_InvalidateContents,
     .installEventFilter = (void*)_leWidget_InstallEventFilter,
     .removeEventFilter = (void*)_leWidget_RemoveEventFilter,
-
-    .update = (void*)_leWidget_Update,
 
     .touchDownEvent = (void*)_leWidget_TouchDownEvent,
     .touchUpEvent = (void*)_leWidget_TouchUpEvent,

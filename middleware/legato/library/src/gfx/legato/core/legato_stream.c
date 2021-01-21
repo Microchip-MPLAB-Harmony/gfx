@@ -29,7 +29,7 @@
 #if LE_STREAMING_ENABLED == 1
 
 void leStream_Init(leStream* stream,
-                   leStreamDescriptor* desc,
+                   const leStreamDescriptor* desc,
                    uint32_t cacheSize,
                    uint8_t* cacheBuf,
                    void* userData)
@@ -66,6 +66,18 @@ leResult leStream_Open(leStream* stream)
     return LE_SUCCESS;
 }
 
+leBool leStream_IsOpen(leStream* stream)
+{
+    if(stream == NULL ||
+      stream->desc == NULL ||
+      stream->state == LE_STREAM_CLOSED)
+    {
+        return LE_FALSE;
+    }
+
+    return LE_TRUE;
+}
+
 leResult leStream_Read(leStream* stream,
                        uint32_t addr,
                        uint32_t size,
@@ -73,6 +85,7 @@ leResult leStream_Read(leStream* stream,
                        leStream_DataReadyCallback cb)
 {
     uint32_t remaining;
+    uint32_t copyOffs;
 
     if(stream == NULL ||
         buf == NULL ||
@@ -99,8 +112,10 @@ leResult leStream_Read(leStream* stream,
             if((uint32_t)addr >= stream->cache.baseAddress &&
                (uint32_t)addr - stream->cache.baseAddress + size < stream->cache.logicalSize)
             {
+                copyOffs = (uint32_t)addr - stream->cache.baseAddress;
+
                 memcpy(buf,
-                       stream->cache.baseAddress + (uint8_t*)addr - stream->cache.baseAddress,
+                       &stream->cache.ptr[copyOffs],
                        size);
 
                 if(cb != NULL)

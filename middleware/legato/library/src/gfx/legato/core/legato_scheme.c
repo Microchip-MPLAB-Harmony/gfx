@@ -25,26 +25,55 @@
 
 
 #include "gfx/legato/core/legato_scheme.h"
+#include "gfx/legato/renderer/legato_renderer.h"
 
-void leScheme_Initialize(leScheme* scheme, leColorMode mode)
+const leScheme leDefaultScheme =
+{
+    {
+        { { 0xCF, 0xCF, 0xFF, 0x80, 0x40, 0x0, 0xE1, 0x80, 0xFF, 0xE1, 0xCF, 0x0, 0x12, 0xFF, 0xE1, 0x91 } }, // GS_8
+        { { 0xBA, 0xBA, 0xFF, 0x92, 0x49, 0x0, 0xDB, 0x92, 0xFF, 0xDB, 0xBA, 0x0, 0x3, 0xFF, 0xDB, 0x92 } }, // RGB_332
+        { { 0xC67A, 0xC67A, 0xFFFF, 0x8410, 0x4208, 0x0, 0xD71C, 0x8410, 0xFFFF, 0xD71C, 0xC67A, 0x0, 0x1F, 0xFFFF, 0xD71C, 0x8C92 } }, // RGB_565
+        { { 0xC675, 0xC675, 0xFFFF, 0x8421, 0x4211, 0x1, 0xD739, 0x8421, 0xFFFF, 0xD739, 0xC675, 0x1, 0x3F, 0xFFFF, 0xD739, 0x8CA5 } }, // RGBA_5551
+        { { 0xC8D0D4, 0xC8D0D4, 0xFFFFFF, 0x808080, 0x404040, 0x0, 0xD6E3E7, 0x808080, 0xFFFFFF, 0xD6E3E7, 0xC8D0D4, 0x0, 0xFF, 0xFFFFFF, 0xD6E3E7, 0x8C9294 } }, // RGB_888
+        { { 0xC8D0D4FF, 0xC8D0D4FF, 0xFFFFFFFF, 0x808080FF, 0x404040FF, 0xFF, 0xD6E3E7FF, 0x808080FF, 0xFFFFFFFF, 0xD6E3E7FF, 0xC8D0D4FF, 0xFF, 0xFFFF, 0xFFFFFFFF, 0xD6E3E7FF, 0x8C9294FF } }, // RGBA_8888
+        { { 0xFFC8D0D4, 0xFFC8D0D4, 0xFFFFFFFF, 0xFF808080, 0xFF404040, 0xFF000000, 0xFFD6E3E7, 0xFF808080, 0xFFFFFFFF, 0xFFD6E3E7, 0xFFC8D0D4, 0xFF000000, 0xFF0000FF, 0xFFFFFFFF, 0xFFD6E3E7, 0xFF8C9294 } }, // ARGB_8888
+        { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // index 1,
+        { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // index 4
+        { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // index 8
+    },
+};
+
+void leScheme_Initialize(leScheme* scheme)
 {
     if(scheme == NULL)
         return;
 
-    scheme->base = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xC8D0D4);
-    scheme->highlight = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xC8D0D4);
-    scheme->highlightLight = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xFFFFFF);
-    scheme->shadow = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x808080);
-    scheme->shadowDark = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x404040);
-    scheme->foreground = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x000000);
-    scheme->foregroundInactive = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xD6E3F5);
-    scheme->foregroundDisabled = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x808080);
-    scheme->background = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xFFFFFF);
-    scheme->backgroundInactive = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xD6E3F5);
-    scheme->backgroundDisabled = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xC8D0D4);
-    scheme->text = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x000000);
-    scheme->textHighlight = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x0000FF);
-    scheme->textHighlightText = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xFFFFFF);
-    scheme->textInactive = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0xD6E3F5);
-    scheme->textDisabled = leColorConvert(LE_COLOR_MODE_RGB_888, mode, 0x8C9294);
+    *scheme = leDefaultScheme;
+}
+
+leColor leScheme_GetColor(const leScheme* schm,
+                          enum leSchemeColor clr,
+                          leColorMode mode)
+{
+    if(schm != NULL)
+    {
+        return schm->tables[mode].values[clr];
+    }
+    else
+    {
+        return leDefaultScheme.tables[mode].values[clr];
+    }
+}
+
+leColor leScheme_GetRenderColor(const leScheme* schm,
+                                enum leSchemeColor clr)
+{
+    if(schm != NULL)
+    {
+        return schm->tables[leRenderer_CurrentColorMode()].values[clr];
+    }
+    else
+    {
+        return leDefaultScheme.tables[leRenderer_CurrentColorMode()].values[clr];
+    }
 }

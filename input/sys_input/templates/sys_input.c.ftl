@@ -28,6 +28,9 @@
 #include "osal/osal.h"
 </#if>
 #include "system/input/sys_input.h"
+<#if enableDemoMode == true>
+#include "system/input/sys_input_demo_mode.h"
+</#if>
 
 #include <string.h>
 
@@ -98,7 +101,7 @@ OSAL_MUTEX_HANDLE_TYPE eventsLock;
     return 0;
 }*/
 
-int32_t SYS_INP_Init()
+int32_t SYS_INP_Init(void)
 {
     eventCount = 0;
 
@@ -114,10 +117,14 @@ int32_t SYS_INP_Init()
     return 0;
 }
 
-void SYS_INP_Tasks()
+void SYS_INP_Tasks(void)
 {
     uint32_t i, j;
-    
+
+<#if enableDemoMode == true>
+    SYS_INP_DemoModeProcessEvents();
+</#if>
+
     // no events?  nothing to do
     if(eventCount == 0)
         return;

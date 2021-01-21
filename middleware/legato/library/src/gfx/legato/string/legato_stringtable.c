@@ -202,7 +202,6 @@ leResult leStringTable_StringLookup(const leStringTable* table,
     entry.length = ptr[0];
     entry.length |= ptr[1] << 8;
 
-    //memcpy(&entry.length, (uint8_t*)table->stringTableData + info->offset, 2);
     entry.data = (uint8_t*)table->stringTableData + info->offset + 2;
 
     info->data = entry.data;

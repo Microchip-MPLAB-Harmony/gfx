@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,25 +37,27 @@
     Type definitions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_font.h
+ * @brief Font functions and definitions.
+ *
+ * @details Describes font assets and type definitions.
+ */
+
 #ifndef LE_FONT_H
 #define LE_FONT_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/core/legato_stream.h"
 
 // *****************************************************************************
-/* Enumeration:
-    leFontBPP
-
-  Summary:
-    Indicates the bits per pixel mode of a font
-*/
+/**
+ * @brief This enum represents a font.
+ * @details This is used to provide possible font types either standard or antialized.
+ */
 typedef enum leFontBPP
 {
-    LE_FONT_BPP_1, // standard
-    LE_FONT_BPP_8  // antialiased
+    LE_FONT_BPP_1,  /**< standard */
+    LE_FONT_BPP_8   /**< antialiased */
 } leFontBPP;
 
 // *****************************************************************************
@@ -80,6 +80,12 @@ typedef enum leFontBPP
     uint16_t dataRowWidth - the width of one row of glyph data in bytes
     uint32_t dataOffset - the offset of this glyph in the font glyph table
 */
+/**
+ * @brief This struct represents a font glyph.
+ * @details This is used describe a individual character of a font. Each glyph contains
+ * kerning data and options unique to itself. This data is used for proper glyph
+ * positioning when rendering text.
+ */
 typedef struct leFontGlyph
 {
     leChar codePoint;
@@ -101,6 +107,11 @@ typedef struct leFontGlyph
     Defines font types.  Currently only raster fonts are supported but this
     differentiation will allow for future expansion into vector font support.
 */
+/**
+ * @brief This enum represents a font type.
+ * @details Currently only raster fonts are supported but this differentiation
+ * will allow for future expansion into vector font support.
+ */
 typedef enum leFontType
 {
     LE_RASTER_FONT,
@@ -117,6 +128,10 @@ typedef enum leFontType
     leStreamDescriptor header - describes where the font data is located
     leFontType type - indicates the type of font
 */
+/**
+ * @brief This struct represents a font object.
+ * @details All fonts have a header and font type.
+ */
 typedef struct leFont
 {
     leStreamDescriptor header;
@@ -140,6 +155,14 @@ typedef struct leFont
     leFontBPP bpp - the bits per pixel value of this font.
     const uint8_t* glyphTable - pointer to the font's glyph data table
 */
+/**
+ * @brief This struct represents a rasterized font object.
+ * @details A raster font asset is a series of raster images that represent
+ * linguistic characters.  These characters are referenced by an index called
+ * a 'code point'.  This code point is 1-2 bytes in length.  Code points may
+ * be encoded to save space.  Fonts also contain general kerning data that
+ * describes character positioning data.
+ */
 typedef struct leRasterFont
 {
     struct leFont base;
@@ -151,13 +174,10 @@ typedef struct leRasterFont
 
 #if LE_STREAMING_ENABLED == 1
 // *****************************************************************************
-/* Type:
-    leFontStream_DrawCompleteFn
-
-  Summary:
-    Defines a callback to indicate that a font stream has finished decoding
-    a glyph.
-*/
+/**
+ * @brief This function type represents draw complete function callback.
+ * @details Draw complete callback is used to indicate when a font draw has completed.
+ */
 typedef void (*leFontStream_DrawCompleteFn)(uint32_t codepoint);
 
 // *****************************************************************************
@@ -186,14 +206,18 @@ typedef void (*leFontStream_DrawCompleteFn)(uint32_t codepoint);
 
     leFontStream_DrawCompleteFn cb - callback that indicates when the stream has finished a particular code point
 */
+/**
+ * @brief This struct represents a font stream.
+ * @details A font stream is used to stream and render font glyph data.
+ */
 typedef struct leFontStream
 {
     leStream stream;
 
-    leResult (*open)();
+    leResult (*open)(void);
     leResult (*drawGlyph)(const leFontGlyph* glyph, int32_t x, int32_t y, leColor clr, uint32_t alpha, leFontStream_DrawCompleteFn cb);
-    leBool (*isDone)();
-    void (*close)();
+    leBool (*isDone)(void);
+    void (*close)(void);
 
     leFontStream_DrawCompleteFn cb;
 } leFontStream;
@@ -208,7 +232,7 @@ typedef struct leFontStream
     A pre-defined 12 point monospaced 1bpp font that includes the standard
     ASCII range of characters.
 */
-LIB_EXPORT extern leRasterFont LiberationMono1;
+extern leRasterFont LiberationMono1;
 #endif
 
 #if LE_INCLUDE_DEFAULT_8BPP_FONT == 1
@@ -220,7 +244,7 @@ LIB_EXPORT extern leRasterFont LiberationMono1;
     A pre-defined 12 point monospaced 8bpp font that includes the standard
     ASCII range of characters.
 */
-LIB_EXPORT extern leRasterFont LiberationMono8;
+extern leRasterFont LiberationMono8;
 #endif
 
 // *****************************************************************************
@@ -242,6 +266,19 @@ LIB_EXPORT extern leRasterFont LiberationMono8;
 
   Remarks:
 */
+/**
+ * @brief Get glyph info.
+ * @details Get glyph info <span class="param">glyph</span> by
+ *  <span class="param">fnt</span> and
+ * <span class="param">codepoint</span>.
+ * @code
+ * uint32_t lessor = leFont_GetGlyphInfo(fnt, codepoint, glyph);
+ * @endcode
+ * @param fnt the font to query
+ * @param codepoint the codepoint to lookup
+ * @param glyph the glyph data that was retrieved.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFont_GetGlyphInfo(const leFont* fnt,
                              uint32_t codepoint,
                              leFontGlyph* glyph);
@@ -262,6 +299,19 @@ leResult leFont_GetGlyphInfo(const leFont* fnt,
 
   Remarks:
 */
+/**
+ * @brief Get glyph rectangle.
+ * @details Gets a glyph rectangle <span class="param">rect</span> by
+ * <span class="param">glyph</span>.
+ * @code
+ * leFontGlyph* glyph;
+ * leRect* rect;
+ * leResult res = leFont_GetGlyphRect(glyph, rect);
+ * @endcode
+ * @param glyph is an integer.
+ * @param rect is an integer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFont_GetGlyphRect(const leFontGlyph* glyph,
                              leRect* rect);
 
@@ -287,6 +337,21 @@ leResult leFont_GetGlyphRect(const leFontGlyph* glyph,
 
   Remarks:
 */
+/**
+ * @brief Drawn unknown glyph.
+ * @details Draws the 'unknown glyph' <span class="param">glyph</span>
+ * to location <span class="param">x</span>, <span class="param">y</span>
+ * with color <span class="param">clr</span> and alpha <span class="param">a</span>.
+ * @code
+ * leResult res = leFont_DrawUnknownGlyph(x, y, glyph, clr, a);
+ * @endcode
+ * @param x the screen x location to draw
+ * @param y the screen y location to draw
+ * @param glyph the glyph kerning information
+ * @param clr the glyph render color
+ * @param a  global alpha value to apply
+ * @return void.
+ */
 void leFont_DrawUnknownGlyph(int32_t x,
                              int32_t y,
                              const leFontGlyph* glyph,
@@ -317,6 +382,21 @@ void leFont_DrawUnknownGlyph(int32_t x,
 
   Remarks:
 */
+/**
+ * @brief Draws a glyph.
+ * @details Draws a glyph <span class="param">glyph</span>
+ * to location <span class="param">x</span>, <span class="param">y</span>
+ * with color <span class="param">clr</span> and alpha <span class="param">a</span>.
+ * @code
+ * leResult res = leFont_DrawGlyph(x, y, glyph, clr, a);
+ * @endcode
+ * @param x the screen x location to draw
+ * @param y the screen y location to draw
+ * @param glyph the glyph kerning information
+ * @param clr the glyph render color
+ * @param a global alpha value to apply
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFont_DrawGlyph(const leFont* fnt,
                           const leFontGlyph* glyph,
                           int32_t x,
@@ -350,6 +430,21 @@ leResult leFont_DrawGlyph(const leFont* fnt,
 
   Remarks:
 */
+/**
+ * @brief Draws a glyph.
+ * @details Draws a glyph <span class="param">glyph</span> from <span class="param">data</span>
+ * to location <span class="param">x</span>, <span class="param">y</span>
+ * with color <span class="param">clr</span> and alpha <span class="param">a</span>.
+ * @code
+ * leResult res = leFont_DrawGlyphData(fnt, glyph, data, x, y, clr, a);
+ * @endcode
+ * @param x the screen x location to draw
+ * @param y the screen y location to draw
+ * @param glyph the glyph kerning information
+ * @param clr the glyph render color
+ * @param a  global alpha value to apply
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leFont_DrawGlyphData(const leFont* fnt,
                               const leFontGlyph* glyph,
                               const uint8_t* data,
@@ -386,6 +481,19 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
 
   Remarks:
 */
+/**
+ * @brief Draws a glyph from a raw data buffer.
+ * @details Draws a glyph from a raw data buffer.
+ * @code
+ * leResult res = leFont_DrawGlyphRow(bpp, data, x, y, colStart, colEnd, clr, a);
+ * @endcode
+ * @param x the screen x location to draw
+ * @param y the screen y location to draw
+ * @param glyph the glyph kerning information
+ * @param clr the glyph render color
+ * @param a global alpha value to apply
+ * @return void.
+ */
 void leFont_DrawGlyphRow(leFontBPP bpp,
                          const uint8_t* data,
                          int32_t x,
@@ -410,6 +518,16 @@ void leFont_DrawGlyphRow(leFontBPP bpp,
 
   Remarks:
 */
+/**
+ * @brief Get font stream for a font.
+ * @details Gets a font stream for <span class="param">fnt</span>.
+ * @code
+ * leFont* fnt;
+ * leFontStream* stream = leFont_GetStream(fnt);
+ * @endcode
+ * @param fnt the font to stream
+ * @return pointer to leFontStream.
+ */
 leFontStream* leFont_GetStream(const leFont* fnt);
 #endif
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Package name="gfx">
     <Dependencies>
-        <Dependency name="core" version="3.5.0"/>
-        <Dependency name="bsp" version="3.5.0"/>
-        <Dependency name="usb" version="3.4.0"/>
+        <Dependency name="core" version="v3.8.1"/>
+        <Dependency name="bsp" version="v3.8.1"/>
+        <Dependency name="usb" version="v3.6.0"/>
+        <Dependency name="mhc" version="v3.5.1"/>
     </Dependencies>
 </Package>

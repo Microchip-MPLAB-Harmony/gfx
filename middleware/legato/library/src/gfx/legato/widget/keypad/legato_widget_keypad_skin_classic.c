@@ -58,7 +58,7 @@ static void drawBorder(leKeyPadWidget* pad);
 
 static void nextState(leKeyPadWidget* pad)
 {
-    switch(pad->widget.drawState)
+    switch(pad->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -71,27 +71,29 @@ static void nextState(leKeyPadWidget* pad)
             }
 #endif
             
-            if(pad->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(pad->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                pad->widget.drawState = DRAW_BACKGROUND;
+                pad->widget.status.drawState = DRAW_BACKGROUND;
                 pad->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            if(pad->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(pad->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 pad->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                pad->widget.drawState = DRAW_BORDER;
+                pad->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            pad->widget.drawState = DONE;
+            pad->widget.status.drawState = DONE;
             pad->widget.drawFunc = NULL;
         }
     }
@@ -107,12 +109,12 @@ static void drawBackground(leKeyPadWidget* pad)
 
 static void drawBorder(leKeyPadWidget* pad)
 {
-    if(pad->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(pad->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)pad,
                                                     paintState.alpha);
     }
-    else if(pad->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(pad->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)pad,
                                                       paintState.alpha);
@@ -131,23 +133,16 @@ void _leKeyPadWidget_Paint(leKeyPadWidget* pad)
     {
         child = pad->widget.children.values[i];
         
-        child->borderType = pad->widget.borderType;
+        child->style.borderType = pad->widget.style.borderType;
         child->scheme = pad->widget.scheme;
     }
     
-    if(pad->widget.scheme == NULL)
-    {
-        pad->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(pad->widget.drawState == NOT_STARTED)
+    if(pad->widget.status.drawState == NOT_STARTED)
     {
         nextState(pad);
     }
     
-    while(pad->widget.drawState != DONE)
+    while(pad->widget.status.drawState != DONE)
     {
         pad->widget.drawFunc((leWidget*)pad);
         

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,12 +36,14 @@
   Description:
     This module implements gradient drawing widget functions.
 *******************************************************************************/
-
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_gradient.h
+ * @brief Gradien drawing widget functions and definitions.
+ *
+ * @details This module implements gradient drawing widget functions.
+ */
 
 #ifndef LEGATO_GRADIENT_H
 #define LEGATO_GRADIENT_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -59,8 +59,11 @@
 
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
-
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leGradientWidget leGradientWidget;
 
 #define LE_GRADIENTWIDGET_VTABLE(THIS_TYPE) \
@@ -74,21 +77,15 @@ typedef struct leGradientWidgetVTable
 	LE_GRADIENTWIDGET_VTABLE(leGradientWidget)
 } leGradientWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
-// *****************************************************************************
-/* Enumeration:
-    leGradientWidget
-
-  Summary:
-    Gradient widget struct definition.
-
-  Description:
-
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a gradient widget.
+ * @details It is used to define gradientwidget
+ */
 typedef struct leGradientWidget
 {
     leWidget widget; // widget base class
@@ -104,91 +101,70 @@ typedef struct leGradientWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leGradientWidget* leGradientWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leGradientWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leGradientWidget* wgt = leGradientWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leGradientWidget* leGradientWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the managment of this memory until the
-    widget is added to a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leGradientWidget <span class="param">wgt</span>.
+ * @code
+ * leGradientWidget* wgt;
+ * leGradientWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leGradientWidget_Constructor(leGradientWidget* grad);
 
-  Description:
+
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 
-  Parameters:
-    void
+// *****************************************************************************/
+/**
+ * @brief Get gradient direction.
+ * @details Gets the gradient direction to
+ * <span class="param">dir</span> using <span class="param">_this</span>.
+ * @code
+ * leGradientWidget* _this;
+ * leDirection dir = _this->fn->getDirection(_this);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @returns the direction.
+ */
+virtual leDirection getDirection(leGradientWidget* _this);
 
-  Returns:
-    leGradientWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leGradientWidget* leGradientWidget_New();
-
-/* Function:
-    void leGradientWidget_Constructor(leGradientWidget* wgt)
-
-  Summary:
-    Initializes an leGradientWidget widget pointer.
-
-  Description:
-    Initializes an leGradientWidget widget pointer.
-
-  Parameters:
-    leGradientWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leGradientWidget_Constructor(leGradientWidget* grad);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leDirection getDirection(const leGradientWidget* _this)
-
-  Summary:
-     Gets the gradient direction
-
-  Description:
-     Gets the gradient direction
-
-  Parameters:
-    const leGradientWidget* _this - The gradient to operate on
-
-  Remarks:
-    Usage - _this->fn->getDirection(_this);
-
-  Returns:
-    leDirection - the direction
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setDirection(leGradientWidget* _this,
-                          leDirection dir)
+/**
+ * @brief Set gradient direction.
+ * @details Sets the gradient direction for <span class="param">_this</span> to
+ * <span class="param">dir</span>.
+ * @code
+ * leGradientWidget* _this;
+ * leDirection dir;
+ * leResult res = _this->fn->setDirection(_this, dir);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param dir the direction.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setDirection(leGradientWidget* _this,
+                              leDirection dir);
 
-  Summary:
-     Sets the gradient direction
-
-  Description:
-     Sets the gradient direction
-
-  Parameters:
-    leGradientWidget* _this - The gradient to operate on
-    leDirection dir - the direction
-
-  Remarks:
-    Usage - _this->fn->setDirection(_this, dir);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_GRADIENT_WIDGET_ENABLED

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     Get palette color
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_palette.h
+ * @brief Palette functions and definitions.
+ *
+ * @details Defines palette assets and get palette color.
+ */
 
 #ifndef LE_PALETTE_H
 #define LE_PALETTE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/core/legato_stream.h"
@@ -60,11 +61,16 @@
     colorCount - the number of colors contained in the palette
     colorMode - the color mode of the image
 */
+/**
+ * @brief This struct represents a palette asset.
+ * @details A palette is a lookup table for unique colors. Given in an index, a color
+ * can be retrieved.
+ */
 typedef struct lePalette
 {
-    leStreamDescriptor header;
-    uint32_t colorCount;
-    leColorMode colorMode;
+    leStreamDescriptor header;  /**< standard asset header */
+    uint32_t colorCount;        /**< number of colors in the palatte */
+    leColorMode colorMode;      /**< color mode of the image */
 } lePalette;
 
 // *****************************************************************************
@@ -82,6 +88,19 @@ typedef struct lePalette
   Returns:
     leColor - the color that was retrieved
 */
+/**
+ * @brief Get color from a palette.
+ * @details Gets a color from <span class="param">pal</span>
+ * at <span class="param">idx</span>.
+ * @code
+ * lePalette * pal;
+ * uint32_t idx;
+ * leColor color = leColorValue(pal, idx);
+ * @endcode
+ * @param pal is a color palatte.
+ * @param idx is the location of the color
+ * @return leColor.
+ */
 leColor lePalette_GetColor(lePalette* pal, uint32_t idx);
 
 

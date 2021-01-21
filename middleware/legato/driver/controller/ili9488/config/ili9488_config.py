@@ -30,13 +30,13 @@ DriverInitName.setDefaultValue("ili9488DisplayDriver")
 DisplayInterfaceType = comp.createComboSymbol("DisplayInterfaceType", None, ["Parallel", "SPI 4-line"])
 DisplayInterfaceType.setLabel("Display Interface Type")
 DisplayInterfaceType.setVisible(True)
+DisplayInterfaceType.setDependencies(onDisplayInterfaceTypeSelected, ["DisplayInterfaceType"])
 
 ### Parallel mode specific options
 ParallelInterfaceWidth = comp.createComboSymbol("ParallelInterfaceWidth", DisplayInterfaceType, ["16-bit", "8-bit"])
 ParallelInterfaceWidth.setLabel("Data Width")
 ParallelInterfaceWidth.setDescription("Data Width")
 ParallelInterfaceWidth.setDefaultValue("16-bit")
-ParallelInterfaceWidth.setVisible(False)
 
 # these two symbols are read by the HAL for initialization purposes
 # they must match the function names in the actual driver code

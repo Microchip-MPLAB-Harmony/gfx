@@ -97,122 +97,16 @@
  */
 void DRV_GLCD_Initialize(void);
 
-/**
- * @brief Get color mode.
- * @details Returns the current color mode.
- * @code
- * gfxDisplayDriver*  drv;
- * gfxColorMode mode = drv->getColorMode();
- * @endcode
- * @return RGB color mode.
- */
-gfxColorMode DRV_GLCD_GetColorMode(void);
-
-/**
- * @brief Get buffer count.
- * @details Returns the number of configured buffers. In a single buffer system
- * count will be 1. In a double buffered system, the count would be at least 2.
- * @code
- * gfxDisplayDriver*  drv;
- * uint32_t cnt = drv->getBufferCount();
- * @endcode
- * @return number of configured buffers.
- */
-uint32_t DRV_GLCD_GetBufferCount(void);
-
-/**
- * @brief Get display width.
- * @details Returns the max number of horizontal pixels. This is the horizonal portion
- * of the screen resolution.
- * @see DRV_LCC_GetDisplayHeight()
- * @code
- * gfxDisplayDriver*  drv;
- * uint32_t width = drv->getDisplayWidth();
- * @endcode
- * @return horizontal display width.
- */
-uint32_t DRV_GLCD_GetDisplayWidth(void);
-
-/**
- * @brief Get display height.
- * @details Returns the max number vertical pixels. This is the vertical portion
- * of the screen resolution.
- * @see DRV_LCC_GetDisplayWidth()
- * @code
- * gfxDisplayDriver*  drv;
- * uint32_t width = drv->getDisplayHeight();
- * @endcode
- * @return vertical display height.
- */
-uint32_t DRV_GLCD_GetDisplayHeight(void);
 
 /**
  * @brief Execute update task.
  * @details Performs a driver task update.
  * @code
- * DRV_LCC_Update();
+ * DRV_GLCD_Update();
  * @endcode
  * @return void.
  */
 void DRV_GLCD_Update(void);
-
-/**
- * @brief Get layer count.
- * @details Returns the number of display layers configured.
- * @code
- * gfxDisplayDriver*  drv;
- * uint32_t cnt = drv->getLayerCount();
- * @endcode
- * @return number of display layers.
- */
-uint32_t DRV_GLCD_GetLayerCount();
-
-/**
- * @brief Get active layer.
- * @details Returns the index of the active layer.
- * @code
- * gfxDisplayDriver*  drv;
- * uint32_t layer = drv->getActiveLayer();
- * @endcode
- * @return layer index.
- */
-uint32_t DRV_GLCD_GetActiveLayer();
-
-/**
- * @brief Get layer state.
- * @details Returns the state of the specified display layer.
- * @code
- * gfxDisplayDriver*  drv;
- * gfxLayerState state = drv->getLayerState();
- * @endcode
- * @return gfxLayerState structure
- */
-gfxLayerState DRV_GLCD_GetLayerState(uint32_t idx);
-
-/**
- * @brief Set the display controller palette.
- * @details Sets palette for the display controller
- * @code
- * gfxDisplayDriver* drv;
- * gfxResult res = drv->setPalette(palette, mode, colorCount);
- * @endcode
- * @return GFX_SUCCESS set is successful, otherwise GFX_FAILURE.
- */
-gfxResult DRV_GLCD_SetPalette(gfxBuffer* palette,
-                              gfxColorMode mode,
-                              uint32_t colorCount);
-
-/**
- * @brief Set active layer.
- * @details Sets active the layer at <span class="param">idx</span> position.
- * @code
- * gfxDisplayDriver* drv;
- * uint32_t idx;
- * gfxResult res = drv->setActiveLayer(idx);
- * @endcode
- * @return GFX_SUCCESS if layer at idx is active, otherwise GFX_FAILURE.
- */
-gfxResult DRV_GLCD_SetActiveLayer(uint32_t idx);
 
 /**
  * @brief Blit buffer.
@@ -228,63 +122,23 @@ gfxResult DRV_GLCD_SetActiveLayer(uint32_t idx);
  */
 gfxResult DRV_GLCD_BlitBuffer(int32_t x, int32_t y, gfxPixelBuffer* buf);
 
-/**
- * @brief Swap buffer.
- * @details Swaps the rendering buffer with the display buffer. The display buffer now
- * becomes the rendering buffer. Swapping support double buffering technology.
- * @code
- * gfxDisplayDriver* drv;
- * drv->swap();
- * @endcode
- */
-void DRV_GLCD_Swap(void);
+
 
 /**
- * @brief Get VSYNC count.
- * @details Returns the vertical pulse count. This can be used
- * as an interrupt to indicate the end of a frame or start of a new frame.
- * This value can also be used to do frame rate calculations.
+ * @brief Graphics driver generic IOCTL interface.
+ * @details Sends an IOCTL message to the driver.
  * @code
- * gfxDisplayDriver* drv;
- * drv->getVSYNCCount();
+ * gfxIOCTLArg_Value val;
+ * val.value.v_uint = 1;
+ * DRV_GLCD_IOCTL(GFX_IOCTL_FRAME_START, &val);
  * @endcode
- * @return VSYNC count.
+ * @return gfxDriverIOCTLResponse the IOCTL handler response
  */
-uint32_t DRV_GLCD_GetVSYNCCount(void);
+ gfxDriverIOCTLResponse DRV_GLCD_IOCTL(gfxDriverIOCTLRequest req,
+                                       void* arg);
 
 /**
- * @brief Get framebuffer.
- * @details Returns the framebuffer (display buffer) located at
- * <span class="param">idx</span> position.
- * @code
- * gfxDisplayDriver* drv;
- * int32_t idx;
- * gfxPixelBuffer * buf = drv->getFrameBuffer(idx);
- * @endcode
- * @param idx is the framebuffer location identifier
- * @return void.
- */
-gfxPixelBuffer * DRV_GLCD_GetFrameBuffer(int32_t idx);
-
-/**
- * @brief Perform control config request.
- * @details Performs control configuration request specified by
- * <span class="param">request</span> with the given
- * arguments <span class="param">arg</span>
- * @code
- * ctlrCfg request;
- * void * arg;
- * gfxDisplayDriver* drv;
- * gfxPixelBuffer * buf = drv->ctrlrConfig(request, arg);
- * @param request is the request to perform
- * @endcode
- * @param arg is the arguments for the request
- * @return GFX_SUCCESS if configuration was performed, otherwise GFX_FAILURE
- */
-gfxResult DRV_GLCD_CtrlrConfig(ctlrCfg request, void * arg);
-
-/**
- * @brief Defines the LCC interface functions.
+ * @brief Defines the GLCD interface functions.
  * @details Establishes the driver abstract interface functions between the driver
  * and client. The client is either a graphics library middleware or application which
  * interfaces with the driver through these functions.
@@ -295,21 +149,9 @@ static const gfxDisplayDriver glcdDisplayDriver =
 static const gfxDisplayDriver gfxDriverInterface =
 </#if>
 {
-    DRV_GLCD_GetColorMode,	/**< implements getColorMode */
-    DRV_GLCD_GetBufferCount,	/**< implements getBufferCount */
-    DRV_GLCD_GetDisplayWidth,   /**< implements getDisplayWidth */
-    DRV_GLCD_GetDisplayHeight,	/**< implements getDisplayHeight */
-    DRV_GLCD_Update,            /**< implements update */
-    DRV_GLCD_GetLayerCount,	/**< implements layerCount */
-    DRV_GLCD_GetActiveLayer,	/**< implements activeLayer */
-    DRV_GLCD_SetActiveLayer,	/**< implements setActive */
-    DRV_GLCD_GetLayerState, /**< implements getLayerState */    
-    DRV_GLCD_BlitBuffer,	/**< implements blitbuffer */
-    DRV_GLCD_Swap,		/**< implements swap */
-    DRV_GLCD_GetVSYNCCount,	/**< implements getVSYNCCount */
-    DRV_GLCD_GetFrameBuffer,	/**< implements getFrameBuffer */
-    DRV_GLCD_SetPalette,        /**< implements setPalette */
-    DRV_GLCD_CtrlrConfig        /**< implements ctrlrConfig */
+    .update = DRV_GLCD_Update,
+    .blitBuffer = DRV_GLCD_BlitBuffer,
+	.ioctl = DRV_GLCD_IOCTL
 };
 
 #ifdef __cplusplus

@@ -45,13 +45,23 @@ static leResult stage_rotateNearestNeighborPreRead(struct RotateNearestNeighborP
 
     stage->base.state->readCount = 1;
 
-    // calculate rotated nearest neighbor index
-    pnt.x = stage->base.state->targetX - stage->base.state->sourceRect.x;
-    pnt.y = stage->base.state->targetY - stage->base.state->sourceRect.y;
+    pnt.x = stage->base.state->colIterator;
+    pnt.y = stage->base.state->rowIterator;
 
-    pnt = leRotatePoint(pnt,
-                        stage->base.state->origin,
-                        -stage->base.state->angle);
+    // transform into cartesian space
+    pnt.x -= stage->base.state->destRect.width / 2;
+    pnt.y -= stage->base.state->destRect.height / 2;
+    pnt.y *= -1;
+
+    leRotatePoint(pnt,
+                  lePoint_Zero,
+                  stage->base.state->angle,
+                  &pnt);
+
+    // transform into source image space
+    pnt.y *= -1;
+    pnt.x += (stage->base.state->source->buffer.size.width / 2) - 1;
+    pnt.y += (stage->base.state->source->buffer.size.height / 2) - 1;
 
     /*if(stage->base.state->referenceX == 0 && stage->base.state->referenceY == 0)
     {
@@ -102,13 +112,23 @@ static leResult stage_bilinearPreRead(struct RotateBilinearPreReadStage* stage)
     leRawDecodeState* state = stage->base.state;
     lePoint readPoint, filterPoint;
 
-    // calculate rotated nearest neighbor index
-    readPoint.x = stage->base.state->targetX - stage->base.state->sourceRect.x;
-    readPoint.y = stage->base.state->targetY - stage->base.state->sourceRect.y;
+    readPoint.x = stage->base.state->colIterator;
+    readPoint.y = stage->base.state->rowIterator;
 
-    readPoint = leRotatePoint(readPoint,
-                              stage->base.state->origin,
-                             -stage->base.state->angle);
+    // transform into cartesian space
+    readPoint.x -= stage->base.state->destRect.width / 2;
+    readPoint.y -= stage->base.state->destRect.height / 2;
+    readPoint.y *= -1;
+
+    leRotatePoint(readPoint,
+                  lePoint_Zero,
+                  stage->base.state->angle,
+                  &readPoint);
+
+    // transform into source image space
+    readPoint.y *= -1;
+    readPoint.x += (stage->base.state->source->buffer.size.width / 2) - 1;
+    readPoint.y += (stage->base.state->source->buffer.size.height / 2) - 1;
 
     if(readPoint.x < 0 || readPoint.x >= stage->base.state->source->buffer.size.width ||
        readPoint.y < 0 || readPoint.y >= stage->base.state->source->buffer.size.height)

@@ -1,5 +1,5 @@
 <#if HarmonyCore.SELECT_RTOS == "FreeRTOS">
-    <#lt>void _SSD1963_Tasks(  void *pvParameters  )
+    <#lt>void _ILI9488_Tasks(  void *pvParameters  )
     <#lt>{
     <#lt>    while(1)
     <#lt>    {

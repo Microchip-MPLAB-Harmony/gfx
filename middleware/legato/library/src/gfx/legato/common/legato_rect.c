@@ -58,70 +58,72 @@ leBool leRectIntersects(const leRect* l_rect, const leRect* r_rect)
     return LE_FALSE;
 }
 
-leRect leRectCombine(const leRect* l_rect, 
-                     const leRect* r_rect)
+void leRectCombine(const leRect* l_rect,
+                   const leRect* r_rect,
+                   leRect* res)
 {
-    leRect rect;
+    leRect result;
 
-    rect.x = leMini(l_rect->x, r_rect->x);
-    rect.y = leMini(l_rect->y, r_rect->y);
+    result.x = leMini(l_rect->x, r_rect->x);
+    result.y = leMini(l_rect->y, r_rect->y);
 
-    rect.width = leMaxi(l_rect->x + l_rect->width, r_rect->x + r_rect->width) - rect.x;
-    rect.height = leMaxi(l_rect->y + l_rect->height, r_rect->y + r_rect->height) - rect.y;
+    result.width = leMaxi(l_rect->x + l_rect->width, r_rect->x + r_rect->width) - result.x;
+    result.height = leMaxi(l_rect->y + l_rect->height, r_rect->y + r_rect->height) - result.y;
 
-    return rect;
+    *res = result;
 }
 
-leRect leRectClipAdj(const leRect* l_rect,
-                         const leRect* r_rect, 
-                         leRect* adj)
+void leRectClipAdj(const leRect* l_rect,
+                   const leRect* r_rect,
+                   leRect* adj,
+                   leRect* res)
 {
-    leRect res;
+    *res = *l_rect;
 
-    res = *l_rect;
-
-    if(res.x < r_rect->x)
+    if(res->x < r_rect->x)
     {
-        adj->x += r_rect->x - res.x;
-        adj->width -= r_rect->x - res.x;
+        adj->x += r_rect->x - res->x;
+        adj->width -= r_rect->x - res->x;
         
-        res.x = r_rect->x;
-        res.width -= res.x - l_rect->x;
+        res->x = r_rect->x;
+        res->width -= res->x - l_rect->x;
     }
     else
-        res.x = l_rect->x;
-    
-    if(res.x + res.width > r_rect->x + r_rect->width)
     {
-        adj->width -= res.width - (r_rect->x + r_rect->width - res.x);
+        res->x = l_rect->x;
+    }
+    
+    if(res->x + res->width > r_rect->x + r_rect->width)
+    {
+        adj->width -= res->width - (r_rect->x + r_rect->width - res->x);
         
-        res.width = r_rect->x + r_rect->width - res.x;
+        res->width = r_rect->x + r_rect->width - res->x;
     }
        
-    if(res.y < r_rect->y)
+    if(res->y < r_rect->y)
     {
-        adj->y += r_rect->y - res.y;
-        adj->height -= r_rect->y - res.y;
+        adj->y += r_rect->y - res->y;
+        adj->height -= r_rect->y - res->y;
         
-        res.y = r_rect->y;
-        res.height -= res.y - l_rect->y;
+        res->y = r_rect->y;
+        res->height -= res->y - l_rect->y;
     }
     else
-        res.y = l_rect->y;
-    
-    if(res.y + res.height > r_rect->y + r_rect->height)
     {
-        adj->height -= res.height - (r_rect->y + r_rect->height - res.y);
-        
-        res.height = r_rect->y + r_rect->height - res.y;
+        res->y = l_rect->y;
     }
+    
+    if(res->y + res->height > r_rect->y + r_rect->height)
+    {
+        adj->height -= res->height - (r_rect->y + r_rect->height - res->y);
         
-    return res;
+        res->height = r_rect->y + r_rect->height - res->y;
+    }
 }
 
 void leRectClip(const leRect* l_rect,
-                  const leRect* r_rect, 
-                  leRect* result)
+                const leRect* r_rect,
+                leRect* result)
 {
     leRect res;
 
@@ -148,10 +150,10 @@ void leRectClip(const leRect* l_rect,
     *result = res;
 }
 
-leRect leRectFromPoints(const lePoint* p1,
-                            const lePoint* p2)
+void leRectFromPoints(const lePoint* p1,
+                      const lePoint* p2,
+                      leRect* res)
 {
-    leRect res;
     int32_t minx, miny, maxx, maxy;
     
     if(p1->x < p2->x)
@@ -176,18 +178,16 @@ leRect leRectFromPoints(const lePoint* p1,
         maxy = p1->y;
     }
     
-    res.x = minx;
-    res.y = miny;
+    res->x = minx;
+    res->y = miny;
     
-    res.width = maxx - minx + 1;
-    res.height = maxy - miny + 1;
-    
-    return res;
+    res->width = maxx - minx + 1;
+    res->height = maxy - miny + 1;
 }
                                        
 void leRectToPoints(const leRect* rect,
-                      lePoint* p1,
-                      lePoint* p2)
+                    lePoint* p1,
+                    lePoint* p2)
 {
     p1->x = rect->x;
     p1->y = rect->y;

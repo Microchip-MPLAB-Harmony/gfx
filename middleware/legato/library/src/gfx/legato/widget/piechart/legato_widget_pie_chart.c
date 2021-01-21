@@ -24,10 +24,11 @@
 // DOM-IGNORE-END
 
 
-#include <gfx/legato/legato.h>
 #include "gfx/legato/widget/piechart/legato_widget_pie_chart.h"
 
 #if LE_PIECHART_WIDGET_ENABLED == 1
+
+#include <math.h>
 
 #include "gfx/legato/common/legato_error.h"
 #include "gfx/legato/common/legato_math.h"
@@ -40,10 +41,10 @@
 #define DEFAULT_WIDTH           101
 #define DEFAULT_HEIGHT          101
 
-#define DEFAULT_RADIUS          50
-#define DEFAULT_LABEL_OFFSET    40
+#define DEFAULT_RADIUS          40
+#define DEFAULT_LABEL_OFFSET    20
 #define DEFAULT_START_ANGLE     0
-#define DEFAULT_CENTER_ANGLE    180
+#define DEFAULT_CENTER_ANGLE    360
 #define DEFAULT_VALUE           10
 
 static
@@ -59,13 +60,13 @@ void lePieChartWidget_Constructor(lePieChartWidget* _this)
     _this->widget.fn = (void*)&pieChartWidgetVTable;
     _this->fn = &pieChartWidgetVTable;
 
-    _this->widget.type = LE_WIDGET_ARC;
+    _this->widget.type = LE_WIDGET_PIE_CHART;
     
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
 
     _this->startAngle = DEFAULT_START_ANGLE;
     _this->centerAngle = DEFAULT_CENTER_ANGLE;
@@ -103,6 +104,67 @@ lePieChartWidget* lePieChartWidget_New()
     return chart;
 }
 
+static void _recalculateSliceAngles(const lePieChartWidget* _this)
+{
+    lePieChartPie* pie;
+    uint32_t lastPercent = 0;
+    uint32_t totalValue = 0;
+
+    uint32_t itr;
+
+    if(_this->pieArray.size == 0)
+        return;
+
+    // calculate total chart value
+    for(itr = 0; itr < _this->pieArray.size; itr++)
+    {
+        pie = (lePieChartPie*)_this->pieArray.values[itr];
+
+        totalValue += pie->value;
+    }
+
+    // calculate slice percentages
+    for(itr = 0; itr < _this->pieArray.size; itr++)
+    {
+        pie = (lePieChartPie*)_this->pieArray.values[itr];
+
+        pie->percentOffset = lastPercent;
+        pie->percentValue = lePercentWholeRounded(pie->value, totalValue);
+
+        lastPercent = pie->percentOffset + pie->percentValue;
+
+        if(itr == _this->pieArray.size - 1)
+        {
+            if(pie->percentOffset + pie->percentValue != 100)
+            {
+                pie->percentValue = 100 - pie->percentOffset;
+            }
+        }
+    }
+
+    // calculate slice angles
+    for(itr = 0; itr < _this->pieArray.size; itr++)
+    {
+        pie = (lePieChartPie*)_this->pieArray.values[itr];
+
+        pie->startAngle = leDegreesFromPercent(pie->percentOffset,
+                                               _this->centerAngle,
+                                               _this->startAngle);
+
+        pie->spanAngle = leDegreesFromPercent(pie->percentValue,
+                                              _this->centerAngle,
+                                              0);
+
+        if(itr == _this->pieArray.size - 1)
+        {
+            if(pie->startAngle + pie->spanAngle != _this->startAngle + _this->centerAngle)
+            {
+                pie->spanAngle = _this->startAngle + _this->centerAngle - pie->startAngle;
+            }
+        }
+    }
+}
+
 static int32_t getStartAngle(const lePieChartWidget* _this)
 {
     LE_ASSERT_THIS();
@@ -115,11 +177,16 @@ static leResult setStartAngle(lePieChartWidget* _this,
 {
     LE_ASSERT_THIS();
         
-    if(_this->startAngle == angle)
+    if((int32_t)_this->startAngle == angle)
         return LE_SUCCESS;
+
+    if(angle < -360 || angle > 360)
+        return LE_FAILURE;
         
     _this->startAngle = angle;
-    
+
+    _recalculateSliceAngles(_this);
+
     _this->fn->invalidate(_this);
         
     return LE_SUCCESS;
@@ -139,8 +206,13 @@ static leResult setCenterAngle(lePieChartWidget* _this,
 
     if(_this->centerAngle == angle)
         return LE_SUCCESS;
+
+    if(angle < -360 || angle > 360)
+        return LE_FAILURE;
         
     _this->centerAngle = angle;
+
+    _recalculateSliceAngles(_this);
     
     _this->fn->invalidate(_this);
         
@@ -169,6 +241,8 @@ static int32_t addEntry(lePieChartWidget* _this)
         
         return -1;
     }
+
+    _recalculateSliceAngles(_this);
     
     _this->fn->invalidate(_this);
     
@@ -223,6 +297,8 @@ static leResult setEntryValue(lePieChartWidget* _this,
         return LE_SUCCESS;
     
     pie->value = value;
+
+    _recalculateSliceAngles(_this);
     
     _this->fn->invalidate(_this);
         
@@ -424,166 +500,72 @@ static leResult setLabelsOffset(lePieChartWidget* _this,
 }
 
 static int32_t _getPieIndexAtPoint(lePieChartWidget* _this,
-                                   lePoint pnt)
+                                   lePoint pt)
 {
-    int32_t tempAngle, centerAngle;
-    uint32_t pointAngle;
-    uint32_t startAngle, endAngle;
-    uint32_t i;
-    uint32_t totalValue = 0;
+    lePoint centerPt;
+    float rad, mag, dot, det;
+    int32_t deg;
+    float xf, yf;
+    uint32_t itr, midAngle;
     lePieChartPie* pie;
+    lePoint offsetPnt, modPt;
 
-    tempAngle = _this->startAngle;
-    
-    while (tempAngle < 0)
+    // find the slice that the point angle intersects
+    for(itr = 0; itr < _this->pieArray.size; itr++)
     {
-        tempAngle += 360;
-    }
+        pie = (lePieChartPie*)_this->pieArray.values[itr];
 
-    startAngle = tempAngle;
-    
-    if(startAngle > 360)
-    {
-        startAngle %= 360;
-    }
+        modPt = pt;
 
-    if(pnt.x > 0 && pnt.y > 0)
-    {
-        //Q1
-        pointAngle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-    }
-    else if(pnt.x < 0 && pnt.y > 0)
-    {
-        //Q2
-        pointAngle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        pointAngle = 180 + pointAngle;
-    }
-    else if(pnt.x > 0 && pnt.y < 0)
-    {
-        //Q4
-        pointAngle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        pointAngle = 360 + pointAngle;
-    }
-    else if(pnt.x < 0 && pnt.y < 0)
-    {
-        //Q3
-        pointAngle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        pointAngle = 180 + pointAngle;
-    }
-    else if(pnt.x == 0 && pnt.y >= 0)
-    {
-        // +y
-        pointAngle = 90;
-    }
-    else if(pnt.x == 0 && pnt.y < 0)
-    {
-        // -y
-        pointAngle = 270;
-    }
-    else if(pnt.y == 0 && pnt.x > 0)
-    {
-        // +x
-        pointAngle = 0;
-    }
-    else
-    {
-        // -x
-        pointAngle = 180;
-    }
+        // transform the vector
+        centerPt.x = _this->widget.rect.width / 2;
+        centerPt.y = _this->widget.rect.height / 2;
 
-    //Get the total
-    for (i = 0; i < _this->pieArray.size; i++) 
-    {
-        pie = leArray_Get(&_this->pieArray, i);
-        
-        totalValue += pie->value;
-    }
-
-    //Test the angle if it's in a pie
-    for (i = 0; i < _this->pieArray.size; i++) 
-    {
-        pie = leArray_Get(&_this->pieArray, i);
-
-        if(_this->centerAngle < 0)
+        if (pie->offset != 0)
         {
-            centerAngle = - ((int32_t) (((float) (-_this->centerAngle) * (float) pie->value)/(float) totalValue + 0.5));
-            tempAngle = startAngle + centerAngle;
+            // find center angle of pie
+            midAngle = pie->startAngle + (pie->spanAngle / 2);
 
-            while (tempAngle < 0)
-            {
-                tempAngle += 360;
-            }
+            // find points of
+            lePolarToXY(pie->offset, midAngle , &offsetPnt);
+            offsetPnt.y *= -1;
 
-            endAngle = tempAngle;
-
-            if(endAngle > 360)
-            {
-                endAngle %= 360;
-            }
-            
-            if(startAngle >= endAngle)
-            {
-                if(pointAngle <= startAngle && pointAngle >= endAngle)
-                {
-                    if(((uint32_t) ((pnt.y * pnt.y) + (pnt.x * pnt.x)) <= 
-                        (pie->radius + pie->offset) * (pie->radius + pie->offset)))
-                    {
-                        return i;
-                    }
-                }
-            }
-            //Pie overlaps the 0-deg axis
-            else
-            {
-                if(pointAngle <= startAngle || pointAngle >= endAngle)
-                {
-                    if(((uint32_t) ((pnt.y * pnt.y) + (pnt.x * pnt.x)) <= 
-                        (pie->radius + pie->offset) * (pie->radius + pie->offset)))
-                    {
-                        return i;
-                    }
-                }
-            }
-        }
-        else
-        {
-            centerAngle = (int32_t) (((float) (_this->centerAngle) * (float) pie->value)/(float) totalValue + 0.5);
-            endAngle = startAngle + centerAngle;
-
-            if(endAngle > 360)
-                endAngle %= 360;
-
-            if(startAngle <= endAngle)
-            {
-                if(pointAngle <= endAngle && 
-                    pointAngle >= startAngle)
-                {
-                    if(((uint32_t) ((pnt.y * pnt.y) + (pnt.x * pnt.x)) <= 
-                        (pie->radius + pie->offset) * (pie->radius + pie->offset)))
-                    {
-                        return i;
-                    }
-                }
-            }
-            //Pie overlaps the 0-deg axis
-            else
-            {
-                if(pointAngle <= endAngle || pointAngle >= startAngle)
-                {
-                    if(((uint32_t) ((pnt.y * pnt.y) + (pnt.x * pnt.x)) <= 
-                        (pie->radius + pie->offset) * (pie->radius + pie->offset)))
-                    {
-                        return i;
-                    }
-                }
-            }
+            centerPt.x += offsetPnt.x;
+            centerPt.y += offsetPnt.y;
         }
 
-        startAngle = endAngle;
-    } 
+        modPt.x -= centerPt.x;
+        modPt.y -= centerPt.y;
+        modPt.y *= -1;
+
+        // normalize the vector
+        mag = leSqrt((modPt.x * modPt.x) + (modPt.y * modPt.y));
+
+        xf = (float)modPt.x / mag;
+        yf = (float)modPt.y / mag;
+
+        // calculate the angle
+        dot = (xf * 1.0f) + (yf * 0.0f);
+        det = (xf * 0.0f) - (yf * 1.0f);
+
+        rad = -atan2f(det, dot);
+
+        deg = (int32_t)(rad * 57.295827909f);
+
+        if(deg < 0)
+        {
+            deg += 360;
+        }
+
+        if(deg >= (int32_t)pie->startAngle && deg <= (int32_t)pie->startAngle + (int32_t)pie->spanAngle)
+        {
+            // ensure the point is inside the slice area
+            if(mag < pie->radius)
+                return itr;
+        }
+    }
 
     return -1;
-    
 }
 
 static void handleTouchDownEvent(lePieChartWidget* _this,
@@ -595,15 +577,11 @@ static void handleTouchDownEvent(lePieChartWidget* _this,
     pnt.x = evt->x;
     pnt.y = evt->y;
 
-    //Adjust point relative to widget local
+    // adjust point relative to widget local
     leUtils_PointScreenToLocalSpace((leWidget*)_this, &pnt);
 
-    //Adjust point relative widget center/origin
-    pnt.x -= _this->widget.rect.width/2 ; 
-    pnt.y = _this->widget.rect.height/2 - pnt.y;
-
     index = _getPieIndexAtPoint(_this, pnt);
-    
+
     if(index != -1)
     {
         leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
@@ -697,7 +675,7 @@ static const lePieChartWidgetVTable pieChartWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

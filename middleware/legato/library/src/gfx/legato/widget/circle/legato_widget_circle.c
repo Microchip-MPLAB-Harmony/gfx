@@ -35,13 +35,10 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
-#define DEFAULT_WIDTH           101
-#define DEFAULT_HEIGHT          101
+#define DEFAULT_WIDTH           100
+#define DEFAULT_HEIGHT          100
 
-#define DEFAULT_ORIGIN_X        50
-#define DEFAULT_ORIGIN_Y        50
-
-#define DEFAULT_RADIUS          50
+#define DEFAULT_RADIUS          30
 #define DEFAULT_THICKNESS       1
 
 static
@@ -64,11 +61,11 @@ void _leCircleWidget_Constructor(leCircleWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
 
-    _this->x = DEFAULT_ORIGIN_X;
-    _this->y = DEFAULT_ORIGIN_Y;
+    _this->x = 0;
+    _this->y = 0;
     _this->radius = DEFAULT_RADIUS;
     _this->thickness = DEFAULT_THICKNESS;
     _this->filled = LE_FALSE;
@@ -97,16 +94,18 @@ leCircleWidget* leCircleWidget_New()
     return cir;
 }
 
-static lePoint getOrigin(const leCircleWidget* _this)
+static leResult getOrigin(const leCircleWidget* _this,
+                          lePoint* pnt)
 {
-    lePoint pnt;
-    
     LE_ASSERT_THIS();
+
+    if(pnt == NULL)
+        return LE_FAILURE;
     
-    pnt.x = _this->x;
-    pnt.y = _this->y;
-        
-    return pnt;
+    pnt->x = _this->x;
+    pnt->y = _this->y;
+
+    return LE_SUCCESS;
 }
 
 static leResult setOrigin(leCircleWidget* _this,
@@ -309,7 +308,7 @@ static const leCircleWidgetVTable circleWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

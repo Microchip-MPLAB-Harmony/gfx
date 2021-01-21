@@ -105,6 +105,8 @@ static uint32_t getDiscreteValueAtIndex4(uint32_t idx, uint32_t val)
 
 static uint32_t getDiscreteValueAtIndex8(uint32_t idx, uint32_t val)
 {
+    (void)idx; // unused
+
     return val;
 }
 

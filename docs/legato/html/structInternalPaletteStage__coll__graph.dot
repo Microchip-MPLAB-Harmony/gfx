@@ -1,0 +1,36 @@
+digraph "InternalPaletteStage"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="InternalPaletteStage",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" base" ,fontname="Helvetica"];
+  Node2 [label="leRawDecodeStage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRawDecodeStage.html",tooltip=" "];
+  Node3 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cleanup" ,fontname="Helvetica"];
+  Node3 [label="void",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node4 -> Node2 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" state" ,fontname="Helvetica"];
+  Node4 [label="leRawDecodeState",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRawDecodeState.html",tooltip=" "];
+  Node5 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" palette" ,fontname="Helvetica"];
+  Node5 [label="lePixelBuffer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structlePixelBuffer.html",tooltip=" "];
+  Node3 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" pixels" ,fontname="Helvetica"];
+  Node6 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" size" ,fontname="Helvetica"];
+  Node6 [label="leSize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleSize.html",tooltip="This structure is used represents the size of an item."];
+  Node7 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" source\ntarget" ,fontname="Helvetica"];
+  Node7 [label="leImage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleImage.html",tooltip=" "];
+  Node5 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" buffer" ,fontname="Helvetica"];
+  Node8 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node8 [label="leStreamDescriptor",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleStreamDescriptor.html",tooltip="This struct represents a stream descriptor."];
+  Node3 -> Node8 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" address" ,fontname="Helvetica"];
+  Node7 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" palette" ,fontname="Helvetica"];
+  Node9 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" alphaMap\nmap" ,fontname="Helvetica"];
+  Node9 [label="leImageMap",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleImageMap.html",tooltip="This struct represents an image map."];
+  Node5 -> Node9 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" buffer" ,fontname="Helvetica"];
+  Node8 -> Node9 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node10 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" readOperation" ,fontname="Helvetica"];
+  Node10 [label="leRawSourceReadOperation",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRawSourceReadOperation.html",tooltip=" "];
+  Node11 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sourceOrigin\ntargetOrigin" ,fontname="Helvetica"];
+  Node11 [label="lePoint",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structlePoint.html",tooltip="This structure represents a integer Cartesian point."];
+  Node12 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" destRect\nsourceRect" ,fontname="Helvetica"];
+  Node12 [label="leRect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structleRect.html",tooltip="This struct represents a rectangle."];
+  Node2 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" stages" ,fontname="Helvetica"];
+}

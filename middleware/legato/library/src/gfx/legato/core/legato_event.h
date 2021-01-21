@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,10 +36,15 @@
 
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_event.h
+ * @brief Legato event definitions.
+ *
+ * @details Defines events that are used in the UI library.  Events
+ * are created and stored for later processing during a library context's update loop.
+ */
+
 #ifndef LEGATO_EVENT_H
 #define LEGATO_EVENT_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 #include "gfx/legato/datastructure/legato_list.h"
@@ -53,63 +56,55 @@
 // *****************************************************************************
 
 // *****************************************************************************
-/* Enumeration:
-    leEventID
 
-  Summary:
-    Defines internal event type IDs
-*/
+/**
+ * @brief This enum represents valid event IDs.
+ * @details Event IDs are used for internal and widget events are as follows:
+ */
 typedef enum leEventID
 {
     // internal events
-    LE_EVENT_NONE,
-    LE_EVENT_TOUCH_DOWN,
-    LE_EVENT_TOUCH_UP,
-    LE_EVENT_TOUCH_MOVE,
-    LE_EVENT_LANGUAGE_CHANGED,
+    LE_EVENT_NONE, /**< No event found. */
+    LE_EVENT_TOUCH_DOWN, /**< Touch down event. */
+    LE_EVENT_TOUCH_UP, /**< Touch up event. */
+    LE_EVENT_TOUCH_MOVE, /**< Touch move event. */
+    LE_EVENT_LANGUAGE_CHANGED, /**< Language changed. */
     
     // widget events
-    LE_WIDGET_EVENT_PAINT = 100,
-    LE_WIDGET_EVENT_MOVED,
-    LE_WIDGET_EVENT_RESIZED,
-    LE_WIDGET_EVENT_FOCUS_GAINED,
-    LE_WIDGET_EVENT_FOCUS_LOST,
+    LE_WIDGET_EVENT_PAINT = 100, /**< Paint event. */
+    LE_WIDGET_EVENT_MOVED, /**< Moved event. */
+    LE_WIDGET_EVENT_RESIZED, /**< Resized event. */
+    LE_WIDGET_EVENT_FOCUS_GAINED, /**< Focus gained event. */
+    LE_WIDGET_EVENT_FOCUS_LOST, /**< Focus lost event. */
 } leEventID;
 
-typedef struct leWidget leWidget;
 
 // *****************************************************************************
-/* Structure:
-    leEvent
-
-  Summary:
-    Basic UI event definition
-*/
+/**
+ * @brief This enum presents a event.
+ * An event contains valid event ids.
+ */
 typedef struct leEvent
 {
-    leEventID id;
+    leEventID id; /**< Event id#id. */
 } leEvent;
 
 // *****************************************************************************
-/* Function Pointer:
-    leEvent_FilterEvent
-
-  Summary:
-    Function pointer to define an event filter.  Event filters allow a
-    receiver to discard undesirable events
-*/
+/**
+ * @brief FilterEvent function pointer
+ *
+ * @details Function pointer to define an event filter.
+ * Event filters allow a receiver to discard undesirable events
+ */
 typedef leBool (*leEvent_FilterEvent)(leEvent*);
 
 // *****************************************************************************
-/* Structure:
-    leEventState
 
-  Summary:
-    Structure to manage the event lists, state and call back pointers
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents an event state.
+ * @details Structure to manage the event lists, state and call back pointers.
+ *
+ */
 typedef struct leEventState
 {
 #ifndef _WIN32
@@ -118,19 +113,22 @@ typedef struct leEventState
     OSAL_MUTEX_HANDLE_TYPE eventLock;
 #endif
 #endif
-    leList events;
-    leEvent_FilterEvent filter;
+    leList events; /**< Some documentation for the member BoxStruct#a. */
+    leEvent_FilterEvent filter; /**< Some documentation for the member BoxStruct#a. */
 } leEventState;
 
-// DOM-IGNORE-BEGIN
 /* internal use only */
-leEventState* _leGetEventState();
-
-leResult leEvent_Init();
-void leEvent_Shutdown();
-
-// DOM-IGNORE-END
-
+/**
+  * @cond INTERNAL
+  *
+  */
+leEventState* _leGetEventState(void);
+leResult leEvent_Init(void);
+void leEvent_Shutdown(void);
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Enumeration:
@@ -139,12 +137,17 @@ void leEvent_Shutdown();
   Summary:
     Defines what happened when processing an event
 */
+
+/**
+ * @brief This enum represents an event result.
+ * @details Event result is used to define the possible internal event states.
+ */
 typedef enum leEventResult
 {
     // internal events
-    LE_EVENT_HANDLED,     // the event was handled
-    LE_EVENT_DEFERRED,    // the event needs to wait
-    LE_EVENT_RESET_QUEUE  // the entire event queue should be flushed and reset
+    LE_EVENT_HANDLED,     /**< the event was handled. */
+    LE_EVENT_DEFERRED,    /**< the event needs to wait. */
+    LE_EVENT_RESET_QUEUE  /**< the entire event queue should be flushed and reset. */
 } leEventResult;
 
 
@@ -173,7 +176,16 @@ typedef enum leEventResult
   Remarks:
     
 */
-uint32_t leEvent_GetCount();
+
+ /**
+  * @brief Get Event Count.
+  * @details Returns the number of events listed in the current context.
+  * @code
+  * uint32_t nbr = leEvent_GetCount();
+  * @endcode
+  * @return number of events.
+  */
+uint32_t leEvent_GetCount(void);
 
 // *****************************************************************************
 /* Function:
@@ -192,7 +204,18 @@ uint32_t leEvent_GetCount();
   Remarks:
     
 */
-LIB_EXPORT leResult leEvent_SetFilter(leEvent_FilterEvent cb); 
+
+/**
+ * @brief Set filter event callback.
+ * @details Set filter event callback to <span class="param">cb</span>.
+ * @code
+ * leEvent_FilterEvent cb;
+ * leResult result = leEvent_SetFilter(cb);
+ * @param cb the event callback
+ * @endcode
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leEvent_SetFilter(leEvent_FilterEvent cb);
 
 // *****************************************************************************
 /* Function:
@@ -213,6 +236,17 @@ LIB_EXPORT leResult leEvent_SetFilter(leEvent_FilterEvent cb);
   Remarks:
     
 */
+
+/**
+ * @brief Add event.
+ * @details Adds <span class="param">event</span> to the list of events
+ * maintained by the current context.
+ * @code
+ * leResult result = leEvent_AddEvent(evt);
+ * @endcode
+ * @param void.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
 leResult leEvent_AddEvent(leEvent* evt);
 
 // *****************************************************************************
@@ -234,7 +268,16 @@ leResult leEvent_AddEvent(leEvent* evt);
   Remarks:
     
 */
-leResult leEvent_ClearList();
+
+/**
+ * @brief Clear event list.
+ * @details Clears the event list maintained by the current context.
+ * @code
+ * leResult result = leEvent_ClearList();
+ * @endcode
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leEvent_ClearList(void);
 
 // *****************************************************************************
 /* Function:
@@ -255,6 +298,15 @@ leResult leEvent_ClearList();
   Remarks:
     
 */
-leResult leEvent_ProcessEvents();
+
+/**
+ * @brief Process events.
+ * @details Processes any pending events.
+ * @code
+ * leResult result = leEvent_ProcessEvents();
+ * @endcode
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leEvent_ProcessEvents(void);
 
 #endif /* LEGATO_EVENT_H */

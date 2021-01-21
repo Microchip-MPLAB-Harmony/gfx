@@ -24,6 +24,7 @@
 // DOM-IGNORE-END
 
 
+#include <gfx/legato/legato.h>
 #include "gfx/legato/widget/radialmenu/legato_widget_radial_menu.h"
 
 #if LE_RADIALMENU_WIDGET_ENABLED
@@ -31,17 +32,18 @@
 #include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/renderer/legato_renderer.h"
-#include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
+
+#define DEFAULT_HIGHLIGHT_MARGIN 2
 
 enum
 {
     NOT_STARTED = LE_WIDGET_DRAW_STATE_READY,
     DONE = LE_WIDGET_DRAW_STATE_DONE,
     DRAW_BACKGROUND,
-	ARRANGE_ITEMS,
 	DRAW_ELLIPSE,
+	ARRANGE_ITEMS,
 };
 
 static struct
@@ -55,7 +57,7 @@ static void arrangeItems(leRadialMenuWidget* mn);
 
 static void nextState(leRadialMenuWidget* mn)
 {
-    switch(mn->widget.drawState)
+    switch(mn->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -68,92 +70,135 @@ static void nextState(leRadialMenuWidget* mn)
             }
 #endif
 
-            if(mn->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(mn->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                mn->widget.drawState = DRAW_BACKGROUND;
+                mn->widget.status.drawState = DRAW_BACKGROUND;
                 mn->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(mn->drawEllipse == LE_TRUE)
             {
-                mn->widget.drawState = DRAW_ELLIPSE;
+                mn->widget.status.drawState = DRAW_ELLIPSE;
                 mn->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawEllipse;
 
                 return;
             }
         }
+        // fall through
         case DRAW_ELLIPSE:
-        {            
-            /*if(mn->widgetList.size > 0)
+        {
+            if(mn->widgetList.size > 0)
             {
-                mn->widget.drawState = ARRANGE_ITEMS;
+                mn->widget.status.drawState = ARRANGE_ITEMS;
                 mn->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&arrangeItems;
 
                 return;
-            }*/
+            }
         }
-        case ARRANGE_ITEMS:
+        // fall through
+        default:
         {
-            mn->widget.drawState = DONE;
+            mn->widget.status.drawState = DONE;
             mn->widget.drawFunc = NULL;
-
-            return;
         }
     }
 }
 
 static void drawBackground(leRadialMenuWidget* mn)
 {
-    leWidget_SkinClassic_DrawBackground(&mn->widget, mn->widget.scheme->background);        
+    leWidget_SkinClassic_DrawBackground(&mn->widget,
+                                        leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_BACKGROUND),
+                                        paintState.alpha);
 
     nextState(mn);
 }
+
+
 
 static void drawEllipse(leRadialMenuWidget* mn)
 {
     lePoint centerPoint = lePoint_Zero;
-    
+    leRadialMenuItemNode* item;
+    leRect widgetRect, highlightRect;
+
     leUtils_PointToScreenSpace((leWidget*)mn, &centerPoint);
 
     centerPoint.x += mn->widget.rect.width / 2;
     centerPoint.y += mn->widget.rect.height / 2;
-    
+
     leRenderer_EllipseLine(centerPoint.x,
                            centerPoint.y,
-                           mn->a,
-                           mn->b,
-                           mn->theta,
+                           mn->ellipse.a,
+                           mn->ellipse.b,
+                           mn->ellipse.theta,
                            0,
                            360,
-                           mn->widget.scheme->foreground,
+                           leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_FOREGROUND),
                            paintState.alpha);
-    
+
+    if(mn->rotationDegrees == 0 && mn->highlightProminent == LE_TRUE && mn->widgetList.size > 0)
+    {
+        item = leList_Get(&mn->widgetList, mn->prominentIndex);
+        item->widget->fn->rectToScreen(item->widget, &widgetRect);
+
+        // top line
+        highlightRect = widgetRect;
+        highlightRect.x -= 4;
+        highlightRect.y -= 4;
+        highlightRect.width += 8;
+        highlightRect.height = 4;
+
+        leRenderer_RectFill(&highlightRect, leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_HIGHLIGHT), paintState.alpha);
+
+        // left line
+        highlightRect = widgetRect;
+        highlightRect.x -= 4;
+        highlightRect.y -= 4;
+        highlightRect.width = 4;
+        highlightRect.height += 8;
+
+        leRenderer_RectFill(&highlightRect, leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_HIGHLIGHT), paintState.alpha);
+
+        // right line
+        highlightRect = widgetRect;
+        highlightRect.x += highlightRect.width;
+        highlightRect.y -= 4;
+        highlightRect.width = 4;
+        highlightRect.height += 8;
+
+        leRenderer_RectFill(&highlightRect, leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_HIGHLIGHT), paintState.alpha);
+
+        // bottom line
+        highlightRect = widgetRect;
+        highlightRect.x -= 4;
+        highlightRect.y += highlightRect.height;
+        highlightRect.width += 8;
+        highlightRect.height = 4;
+
+        leRenderer_RectFill(&highlightRect, leScheme_GetRenderColor(mn->widget.scheme, LE_SCHM_HIGHLIGHT), paintState.alpha);
+    }
+
     nextState(mn);
 }
 
-
-
-
+static void arrangeItems(leRadialMenuWidget* mn)
+{
+    nextState(mn);
+}
 
 void _leRadialMenuWidget_Paint(leRadialMenuWidget* mn)
 {
-    if(mn->widget.scheme == NULL)
-    {
-        mn->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(mn->widget.drawState == NOT_STARTED)
+    if(mn->widget.status.drawState == NOT_STARTED)
     {
         nextState(mn);
     }
     
-    while(mn->widget.drawState != DONE)
+    while(mn->widget.status.drawState != DONE)
     {
         mn->widget.drawFunc((leWidget*)mn);
         

@@ -39,6 +39,13 @@
     Internal library use only
 *******************************************************************************/
 
+/** \file legato_imagedeocder_png.h
+* @brief PNG Image decoder
+*
+* @details Internal library use only
+*
+*/
+
 // DOM-IGNORE-BEGIN
 
 #ifndef LE_IMAGEDECODER_PNG_H

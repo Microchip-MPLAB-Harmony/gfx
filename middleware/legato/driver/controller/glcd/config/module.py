@@ -23,11 +23,11 @@
 ##############################################################################
 
 def loadModule():	
-    if ("PIC32MZ" in str(Variables.get("__PROCESSOR")) and "DA" in str(Variables.get("__PROCESSOR"))):
-        print("LE GLCD module loaded to support " + str(Variables.get("__PROCESSOR")))
-        cntlComponent = Module.CreateComponent("le_gfx_driver_glcd", "LE GLCD ", "/Graphics/Driver", "config/glcd.py")
-        cntlComponent.setDisplayType("LE GLCD Display Controller")
-        cntlComponent.addCapability("gfx_driver_glcd", "LE Display Driver", False)
-        cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
-    else:
-        print("LE GLCD module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))
+	if ("PIC32MZ" in str(Variables.get("__PROCESSOR")) and "DA" in str(Variables.get("__PROCESSOR"))):
+		print("LE GLCD module loaded to support " + str(Variables.get("__PROCESSOR")))
+		cntlComponent = Module.CreateComponent("le_gfx_driver_glcd", "LE GLCD ", "/Graphics/Driver", "config/glcd.py")
+		cntlComponent.setDisplayType("LE GLCD Display Controller")
+		cntlComponent.addCapability("gfx_driver_glcd", "LE Display Driver", False)
+		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+	else:
+		print("LE GLCD module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

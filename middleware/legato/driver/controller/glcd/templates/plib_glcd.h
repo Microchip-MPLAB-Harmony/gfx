@@ -39,6 +39,11 @@
     The GLCD PLIB provides a simple interface to manage the GLCD controller.
 *******************************************************************************/
 
+/** \file plib_glcd.h
+* @brief  GLCD function implementations for the GLCD PLIB.
+*
+* @details The GLCD PLIB provides a simple interface to manage the GLCD controller.
+*/
 
 #ifndef PLIB_GLCD_H
 #define PLIB_GLCD_H
@@ -363,17 +368,6 @@ void PLIB_GLCD_ResolutionXYSet(uint32_t resolutionX, uint32_t resolutionY);
 void PLIB_GLCD_SignalPolaritySet(GLCD_SIGNAL_POLARITY polarity);
 
 //******************************************************************************
-/* Function :  PLIB_GLCD_LayerStrideSet
-
-  Summary:
-    Sets the layer stride
-
-  Description:
-    
-*/
-void PLIB_GLCD_LayerStrideSet(GLCD_LAYER_ID layerId, uint32_t stride);
-
-//******************************************************************************
 /* Function :  PLIB_GLCD_LayerResXYSet
 
   Summary:
@@ -407,17 +401,6 @@ void PLIB_GLCD_LayerDestBlendFuncSet(GLCD_LAYER_ID layerId, GLCD_LAYER_DEST_BLEN
 void PLIB_GLCD_LayerSrcBlendFuncSet(GLCD_LAYER_ID layerId, GLCD_LAYER_SRC_BLEND_FUNC blendFunc);
 
 //******************************************************************************
-/* Function :  PLIB_GLCD_LayerColorModeSet
-
-  Summary:
-    Sets the layer color mode
-
-  Description:
-    
-*/
-void PLIB_GLCD_LayerColorModeSet(GLCD_LAYER_ID layerId, GLCD_LAYER_COLOR_MODE colorMode);
-
-//******************************************************************************
 /* Function :  PLIB_GLCD_VSyncInterruptEnable
 
   Summary:
@@ -438,17 +421,6 @@ void PLIB_GLCD_VSyncInterruptEnable(void);
     
 */
 void PLIB_GLCD_VSyncInterruptDisable(void);
-
-//******************************************************************************
-/* Function :  PLIB_GLCD_LayerGlobalAlphaSet
-
-  Summary:
-    Sets the layer alpha
-
-  Description:
-    
-*/
-void PLIB_GLCD_LayerGlobalAlphaSet(GLCD_LAYER_ID layerId, uint8_t value);
 
 //******************************************************************************
 /* Function :  PLIB_GLCD_IsVerticalBlankingActive

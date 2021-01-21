@@ -750,9 +750,8 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Rop(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *dst_
     GFX2D_REGS->GFX2D_CHID[2].GFX2D_CFG = pattern->format;
 
     GFX2D_REGS->GFX2D_CHID[3].GFX2D_PA = pmask->addr;
-    /* these registers are not required for mask surface */
-    //GFX2D_REGS->GFX2D_CHID[3].GFX2D_PITCH = pmask->width * _gfx2d_pixel_size[pmask->format];
-    //GFX2D_REGS->GFX2D_CHID[3].GFX2D_CFG = pmask->format;
+    GFX2D_REGS->GFX2D_CHID[3].GFX2D_PITCH = pmask->width * _gfx2d_pixel_size[pmask->format];
+    GFX2D_REGS->GFX2D_CHID[3].GFX2D_CFG = pmask->format;
     
     instr.wd0 = GFX2D_INST_ROP_WD0(0, 1);
     instr.wd1 = GFX2D_INST_ROP_WD1((dst_rect->width - 1), (dst_rect->height - 1));

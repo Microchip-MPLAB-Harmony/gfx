@@ -81,7 +81,7 @@ typedef struct SYS_INPUT_Init
   Returns:
     int32_t - Non-zero value indicates an error during initialization
 */
-int32_t SYS_INP_Init();
+int32_t SYS_INP_Init(void);
 
 // *****************************************************************************
 /* Function:
@@ -91,7 +91,7 @@ int32_t SYS_INP_Init();
     Maintains the state of the Input System Service.  During this phase input
     events may be broadcast to registered listeners
 */
-void SYS_INP_Tasks();
+void SYS_INP_Tasks(void);
 
 // *****************************************************************************
 /* Function:

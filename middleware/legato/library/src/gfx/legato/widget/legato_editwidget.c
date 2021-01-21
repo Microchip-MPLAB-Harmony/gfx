@@ -57,28 +57,44 @@ void _leEditWidget_Destructor(leEditWidget* _this)
 
 leResult _leEditWidget_EditStart(leEditWidget* _this)
 {
+    (void)_this; // unused
+
     return LE_FAILURE;
 }
 
 void _leEditWidget_EditEnd(leEditWidget* _this)
-{ }
+{
+    (void)_this; // unused
+}
 
 void _leEditWidget_EditClear(leEditWidget* _this)
-{ }
+{
+    (void)_this; // unused
+}
 
 void _leEditWidget_EditAccept(leEditWidget* _this)
-{ }
+{
+    (void)_this; // unused
+}
 
 void _leEditWidget_EditSet(leEditWidget* _this,
                            const leString* str)
-{ }
+{
+    (void)_this; // unused
+    (void)str; // unused
+}
 
 void _leEditWidget_EditAppend(leEditWidget* _this,
                               const leString* str)
-{ }
+{
+    (void)_this; // unused
+    (void)str; // unused
+}
 
 void _leEditWidget_EditBackspace(leEditWidget* _this)
-{ }
+{
+    (void)_this; // unused
+}
 
 void _leEditWidget_Clear()
 { 
@@ -133,7 +149,7 @@ void _leEditWidget_Backspace()
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
-void _leEditWidget_GenerateVTable()
+void _leEditWidget_GenerateVTable(void)
 {
     _leWidget_FillVTable((void*)&editWidgetVTable);
 
@@ -190,7 +206,7 @@ static const leEditWidgetVTable editWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

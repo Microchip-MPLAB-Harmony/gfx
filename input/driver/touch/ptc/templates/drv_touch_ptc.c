@@ -67,8 +67,6 @@ typedef struct
 
 DRV_TOUCH_PTC_OBJ drv_touch_ptc_obj;
 
-static SYS_TIME_HANDLE check_timer;
-//static volatile int check_ptc_status;
 extern qtm_surface_cs_control_t qtm_surface_cs_control1;
 extern volatile uint8_t time_to_measure_touch_var;
 

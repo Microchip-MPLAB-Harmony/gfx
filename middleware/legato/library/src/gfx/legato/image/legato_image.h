@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     Image drawing at specified coordinates
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_image.h
+ * @brief Image functions and defintions.
+ *
+ * @details Image drawing at specified coordinates.
+ */
+
 #ifndef LE_IMAGE_H
 #define LE_IMAGE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -59,12 +61,16 @@ typedef struct lePalette lePalette;
   Summary:
     Indicates the image encoding format
 */
+/**
+ * @brief This enum represents an image format.
+ * @details Image format is used to list supported image encodings.
+ */
 typedef enum leImageFormat
 {
     LE_IMAGE_FORMAT_RAW = 0,
     LE_IMAGE_FORMAT_RLE,
-    //LE_IMAGE_FORMAT_JPEG,
-    //LE_IMAGE_FORMAT_PNG
+    LE_IMAGE_FORMAT_JPEG,
+    LE_IMAGE_FORMAT_PNG
 } leImageFormat;
 
 #define LE_IMAGE_FORMAT_COUNT (LE_IMAGE_FORMAT_RLE + 1)
@@ -76,6 +82,10 @@ typedef enum leImageFormat
   Summary:
     A list of flags describing an image asset
 */
+/**
+ * @brief This enum represents image flags.
+ * @details Image flags are used to describe an image asset.
+ */
 typedef enum leImageFlags
 {
     LE_IMAGE_USE_MASK_COLOR  = 1 << 0,
@@ -91,6 +101,10 @@ typedef enum leImageFlags
   Summary:
     A list of flags defining image filtering modes
 */
+/**
+ * @brief This enum represents image filter modes.
+ * @details Image filter modes are used to list supported image filters.
+ */
 typedef enum leImageFilterMode
 {
     LE_IMAGEFILTER_NONE,
@@ -105,6 +119,10 @@ typedef enum leImageFilterMode
   Summary:
     Structure defining a general image map buffer.
 */
+/**
+ * @brief This struct represents an image map.
+ * @details An image map is used to describe an image map buffer.
+ */
 typedef struct leImageMap
 {
     leStreamDescriptor header; // standard stream header
@@ -152,6 +170,12 @@ typedef struct leImageMap
 
     lePalette* palette; // lookup palette for this image
 */
+/**
+ * @brief This struct represents an image.
+ * @details An image is used to describe an image asset.
+ */
+struct leImage;
+
 typedef struct leImage
 {
     leStreamDescriptor header;
@@ -167,7 +191,7 @@ typedef struct leImage
 
     leImageMap* alphaMap;
 
-    lePalette* palette;
+    struct leImage* palette;
 } leImage;
 
 // *****************************************************************************
@@ -197,12 +221,29 @@ typedef struct leImage
 
   Remarks:
 */
-LIB_EXPORT leResult leImage_Create(leImage* img,
-                                   uint32_t width,
-                                   uint32_t height,
-                                   leColorMode mode,
-                                   void* data,
-                                   uint32_t locationID);
+/**
+ * @brief Create an image.
+ * @details Creates an image <span class="param">img</span>
+ * given <span class="param">width</span>, <span class="param">height</span>,
+ * and <span class="param">mode</span>. The image is located at
+ * <span class="param">data</span> with <span class="param">locationID</span>.
+ * @code
+ * leResult res = leImage_Create();
+ * @endcode
+ * @param img the image object to initialize
+ * @param width the width of the image
+ * @param height the height of the image
+ * @param mode the color mode of the image
+ * @param data the data address of the image
+ * @param locationID the location ID of the image
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Create(leImage* img,
+                        uint32_t width,
+                        uint32_t height,
+                        leColorMode mode,
+                        void* data,
+                        uint32_t locationID);
 
 // *****************************************************************************
 /* Function:
@@ -229,9 +270,25 @@ LIB_EXPORT leResult leImage_Create(leImage* img,
                allocation
   Remarks:
 */
-LIB_EXPORT leImage* leImage_Allocate(uint32_t width,
-                                     uint32_t height,
-                                     leColorMode mode);
+/**
+ * @brief Allocate an image buffer.
+ * @details Dynamically allocates an image buffer in local memory
+ * using <span class="param">width</span> and <span class="param">height</span>
+ * color mode <span class="param">mode</span>.
+ * @code
+ * uint32_t width;
+ * uint32_t height;
+ * leColorMode mode;
+ * leImage* img = leImage_Allocate();
+ * @endcode
+ * @param width the width of the image in pixels
+ * @param height the height of the image in pixels
+ * @param mode the color mode of the image
+ * @return a valid image or null if there wasn't enough memory for the allocation
+ */
+leImage* leImage_Allocate(uint32_t width,
+                          uint32_t height,
+                          leColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -250,7 +307,18 @@ LIB_EXPORT leImage* leImage_Allocate(uint32_t width,
 
   Remarks:
 */
-LIB_EXPORT leResult leImage_Free(leImage* img);
+/**
+ * @brief Free image buffer.
+ * @details Frees an image buffer <span class="param">img</span>.
+ * @remark Buffer must be allocated using leImage_Allocate.
+ * @code
+ * leImage* img;
+ * leResult res = leImage_Free(img);
+ * @endcode
+ * @param img the image to free
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Free(leImage* img);
 
 // *****************************************************************************
 /* Structure:
@@ -270,6 +338,11 @@ LIB_EXPORT leResult leImage_Free(leImage* img);
     isDone - query the decoder for completion
     free - frees the decoder to cleanup any allocated resources
 */
+/**
+ * @brief This struct represents an image decoder.
+ * @details Structure defining a general image decoder object.  Specific decoders will
+ * implement this in their own way.
+ */
 typedef struct leImageDecoder
 {
     leBool   (*supportsImage)(const leImage* img);
@@ -278,8 +351,8 @@ typedef struct leImageDecoder
     leResult (*render)(const leImage* src, const leRect* srcRect, int32_t x, int32_t y, leBool ignoreMask, leBool ignoreAlpha, leImage* dst);
     leResult (*resize)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, uint32_t sizeX, uint32_t sizeY, leImage* dst);
     leResult (*resizeDraw)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, uint32_t sizeX, uint32_t sizeY, int32_t x, int32_t y, uint32_t a);
-    leResult (*rotate)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, const lePoint* origin, int32_t angle, leImage* dst);
-    leResult (*rotateDraw)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, const lePoint* origin, int32_t angle, int32_t x, int32_t y, uint32_t a);
+    leResult (*rotate)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, int32_t angle, leImage** dst, leBool alloc);
+    leResult (*rotateDraw)(const leImage* src, const leRect* srcRect, leImageFilterMode mode, int32_t angle, int32_t x, int32_t y, uint32_t a);
     leResult (*exec)(void);
     leBool   (*isDone)(void);
     void     (*free)(void);
@@ -301,7 +374,16 @@ typedef struct leImageDecoder
 
   Remarks:
 */
-void leImage_InitDecoders();
+/**
+ * @brief Get Event Count.
+ * @details Returns the number of events listed in the current context.
+ * @code
+ * uint32_t cnt = leEvent_GetCount();
+ * @endcode
+ * @param void.
+ * @return number of events.
+ */
+void leImage_InitDecoders(void);
 
 #if LE_STREAMING_ENABLED == 1
 // *****************************************************************************
@@ -334,11 +416,23 @@ typedef struct leImageStreamDecoder
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_Draw(const leImage* img,
-                                 leRect* sourceRect,
-                                 int32_t x,
-                                 int32_t y,
-                                 uint32_t a);
+/**
+ * @brief Draw an Image.
+ * @details Draws an image <span class="param">img</span> bounded by
+ * <span class="param">sourceRect</span> to location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @code
+ * leImage * fnptr;
+ * leResult res = leImage_Draw(img);
+ * @endcode
+ * @param img is the image to draw.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Draw(const leImage* img,
+                      const leRect* sourceRect,
+                      int32_t x,
+                      int32_t y,
+                      uint32_t a);
 
 
 // *****************************************************************************
@@ -362,12 +456,25 @@ LIB_EXPORT leResult leImage_Draw(const leImage* img,
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_Resize(const leImage* src,
-                                   const leRect* sourceRect,
-                                   leImageFilterMode mode,
-                                   uint32_t sizeX,
-                                   uint32_t sizeY,
-                                   leImage* target);
+/**
+ * @brief Resize image.
+ * @details Resizes the source image <span class="param">src</span> to
+ * destination image <span class="param">dst</span>
+ * to location <span class="param">x</span> and <span class="param">y</span>.
+ * using the specified  filter <span class="param">mode</span>.
+ * @code
+ * leImage * src;
+ * leResult res = leImage_Resize(src);
+ * @endcode
+ * @param src is the image to resize.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Resize(const leImage* src,
+                        const leRect* sourceRect,
+                        leImageFilterMode mode,
+                        uint32_t sizeX,
+                        uint32_t sizeY,
+                        leImage* target);
 
 // *****************************************************************************
 /* Function:
@@ -392,14 +499,27 @@ LIB_EXPORT leResult leImage_Resize(const leImage* src,
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_ResizeDraw(const leImage* src,
-                                       const leRect* sourceRect,
-                                       leImageFilterMode mode,
-                                       uint32_t sizeX,
-                                       uint32_t sizeY,
-                                       int32_t x,
-                                       int32_t y,
-                                       uint32_t a);
+/**
+ * @brief Resize draw image.
+ * @details Resizes the source image <span class="param">src</span> to
+ * destination image <span class="param">dst</span>
+ * to location <span class="param">x</span> and <span class="param">y</span>.
+ * using the specified  filter <span class="param">mode</span>.
+ * @code
+ * leImage * src;
+ * leResult res = fnptr->resizeDraw(src, sourceRect, mode, sizeX, sizeY, x, y, a);
+ * @endcode
+ * @param src is the image to resize.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_ResizeDraw(const leImage* src,
+                            const leRect* sourceRect,
+                            leImageFilterMode mode,
+                            uint32_t sizeX,
+                            uint32_t sizeY,
+                            int32_t x,
+                            int32_t y,
+                            uint32_t a);
 
 // *****************************************************************************
 /* Function:
@@ -422,11 +542,31 @@ LIB_EXPORT leResult leImage_ResizeDraw(const leImage* src,
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_Copy(const leImage* src,
-                                 const leRect* sourceRect,
-                                 int32_t x,
-                                 int32_t y,
-                                 leImage* dst);
+/**
+ * @brief Copy image.
+ * @details Copies <span class="param">img</span> bounded by
+ * <span class="param">srcRect</span> to location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @code
+ * leImage* src;
+ * leRect* sourceRect;
+ * int32_t x;
+ * int32_t y;
+ * leImage* dst;
+ * leResult res = leImage_Copy(src, sourceRect, x, y, dst);
+ * @endcode
+ * @param src pointer to source image asset to draw
+ * @param sourceRect the source rectangle of the image to decode
+ * @param x the x position
+ * @param y the y position
+ * @param dst the destination image to fill
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Copy(const leImage* src,
+                      const leRect* sourceRect,
+                      int32_t x,
+                      int32_t y,
+                      leImage* dst);
 
 // *****************************************************************************
 /* Function:
@@ -455,54 +595,67 @@ LIB_EXPORT leResult leImage_Copy(const leImage* src,
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_Render(const leImage* src,
-                                   const leRect* sourceRect,
-                                   int32_t x,
-                                   int32_t y,
-                                   leBool ignoreMask,
-                                   leBool ignoreAlpha,
-                                   leImage* dst);
+/**
+ * @brief Render image.
+ * @details Copies <span class="param">img</span> bounded by
+ * <span class="param">srcRect</span> to location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * The flag <span class="param">ignoreMask</span> determines if the masking color should
+ * be performed. The flag <span class="param">ignoreAlpha</span> determines
+ * if the alpha blending is performed.
+ * @code
+ * leImage * src;
+ * leResult res = leImage_Render(src);
+ * @endcode
+ * @param src is the image to render.
+ * @param sourceRect the source rectangle
+ * @param x the x position
+ * @param y the y position
+ * @param ignoreMask set to true to skip the mask stage for the source image
+ * @param ignoreAlpha the destination image to fill
+ * @param dst  set to true to skip the blend stage for the source image
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Render(const leImage* src,
+                        const leRect* sourceRect,
+                        int32_t x,
+                        int32_t y,
+                        leBool ignoreMask,
+                        leBool ignoreAlpha,
+                        leImage* dst);
+
+/**
+ * @brief Rotate image.
+ * @details Rotate image <span class="param">src</span> bounded by
+ * <span class="param">srcRect</span> by <span class="param">angle</span>
+ * degress. The resulting image is <span class="param">dst</span>  The
+ * result image is automatically allocated and should be freed by the
+ * caller.
+ * @code
+ * leImage * fnptr;
+ * leResult res = leImage_Rotate(src);
+ * @endcode
+ * @param src is the image to render.
+ * @param sourceRect the source rectangle
+ * @param mode the the filter mode
+ * @param angle the angle to rotate by (positive is counter clockwise)
+ * @param dst the destination image to fill
+ * @param alloc true if the decoder should automatically allocate the
+ *              destination image
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_Rotate(const leImage* src,
+                        const leRect* sourceRect,
+                        leImageFilterMode mode,
+                        int32_t angle,
+                        leImage** dst,
+                        leBool alloc);
 
 // *****************************************************************************
 /* Function:
     leResult leImage_Rotate(const leImage* src,
                             const leRect* sourceRect,
                             leImageFilterMode mode,
-                            const lePoint* origin,
-                            int32_t angle,
-                            leImage* dst);
-
-  Summary:
-    Decodes a portion of the given image at the specified coordinates and
-    rotates it by the given angle in degrees, around the origin point,
-    using the specified filter mode.
-
-    The result is stored into the provided destination image pointer.
-
-  Parameters:
-    leImage* src - pointer to source image asset to draw
-    leRect* sourceRect - the source rectangle of the image to decode
-    leImageFilterMode mode - the filter to use when rotating
-    const lePoint* origin - the point to rotate around in image space
-    int32_t angle - the angle (degrees) to rotate by
-    leImage* dst - pointer to destination image asset
-
-  Returns:
-    leResult
-*/
-LIB_EXPORT leResult leImage_Rotate(const leImage* src,
-                                   const leRect* sourceRect,
-                                   leImageFilterMode mode,
-                                   const lePoint* origin,
-                                   int32_t angle,
-                                   leImage* dst);
-
-// *****************************************************************************
-/* Function:
-    leResult leImage_Rotate(const leImage* src,
-                            const leRect* sourceRect,
-                            leImageFilterMode mode,
-                            const lePoint* origin,
                             int32_t angle,
                             int32_t x,
                             int32_t y,
@@ -519,7 +672,6 @@ LIB_EXPORT leResult leImage_Rotate(const leImage* src,
     leImage* src - pointer to source image asset to draw
     leRect* sourceRect - the source rectangle of the image to decode
     leImageFilterMode mode - the filter to use when rotating
-    const lePoint* origin - the point to rotate around in image space
     int32_t angle - the angle (degrees) to rotate by
     int32_t x - the X coordinate to draw to
     int32_t y - the Y coordinate to draw to
@@ -528,13 +680,31 @@ LIB_EXPORT leResult leImage_Rotate(const leImage* src,
   Returns:
     leResult
 */
-LIB_EXPORT leResult leImage_RotateDraw(const leImage* src,
-                                       const leRect* sourceRect,
-                                       leImageFilterMode mode,
-                                       const lePoint* origin,
-                                       int32_t angle,
-                                       int32_t x,
-                                       int32_t y,
-                                       uint32_t a);
+/**
+ * @brief Rotate draw image.
+ * @details Rotate image <span class="param">src</span> bounded by
+ * <span class="param">srcRect</span> around
+ * <span class="param">origin</span> at <span class="param">angle</span>
+ * degress. The resulting image is <span class="param">dst</span>.
+ * @code
+ * leImage * src;
+ * leResult res = leImage_RotateDraw(src);
+ * @endcode
+ * @param src is the image to render.
+ * @param sourceRect the source rectangle
+ * @param angle set to true to skip the mask stage for the source image
+ * @param x the destination image to fill
+ * @param y is the image to resize.
+ * @param a the alpha value to use
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leImage_RotateDraw(const leImage* src,
+                            const leRect* sourceRect,
+                            leImageFilterMode mode,
+                            int32_t angle,
+                            int32_t x,
+                            int32_t y,
+                            uint32_t a);
+
 
 #endif /* LE_IMAGE_H */

@@ -101,7 +101,7 @@ leResult leRenderer_HorzGradientRect(const leRect* rect,
         
         percent = lePercentWholeRounded(val, rect->width);
         
-        clr = leColorLerp(clr1, clr2, percent, LE_GLOBAL_COLOR_MODE);
+        clr = leColorLerp(clr1, clr2, percent, leRenderer_CurrentColorMode());
                                  
         leRenderer_VertLine(drawPoint.x,
                             drawPoint.y,
@@ -132,7 +132,7 @@ leResult leRenderer_VertGradientRect(const leRect* rect,
         
         percent = lePercentWholeRounded(val, rect->height);
         
-        clr = leColorLerp(clr1, clr2, percent, LE_GLOBAL_COLOR_MODE);
+        clr = leColorLerp(clr1, clr2, percent, leRenderer_CurrentColorMode());
                                  
         leRenderer_HorzLine(drawPoint.x,
                             drawPoint.y,

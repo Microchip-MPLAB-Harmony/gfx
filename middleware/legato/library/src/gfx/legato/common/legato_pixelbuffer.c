@@ -435,6 +435,38 @@ leResult lePixelBufferAreaFill_Unsafe(const lePixelBuffer* const buffer,
     return LE_SUCCESS;
 }
 
+leResult lePixelBufferCopy(lePixelBuffer* dest,
+                           uint32_t x,
+                           uint32_t y,
+                           const lePixelBuffer* src,
+                           const leRect* srcRect)
+{
+    int32_t row, col;
+    leRect bufferRect, clippedRect;
+    leColor color;
+
+    bufferRect.x = 0;
+    bufferRect.y = 0;
+    bufferRect.width = src->size.width;
+    bufferRect.height = src->size.height;
+
+    leRectClip(&bufferRect, srcRect, &clippedRect);
+
+    for(row = 0; row < clippedRect.height; ++row)
+    {
+        for(col = 0; col < clippedRect.width; ++col)
+        {
+            color = lePixelBufferGet(src, srcRect->x + col, srcRect->y + row);
+
+            color = leColorConvert(src->mode, dest->mode, color);
+
+            lePixelBufferSet_Unsafe(dest, x + col, y + row, color);
+        }
+    }
+
+    return LE_SUCCESS;
+}
+
 leBool lePixelBuffer_IsLocked(const lePixelBuffer* const buffer)
 {
     if(buffer == NULL)

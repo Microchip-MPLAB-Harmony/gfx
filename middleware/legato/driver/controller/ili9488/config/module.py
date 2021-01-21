@@ -30,3 +30,4 @@ def loadModule():
 	cntlComponent.addDependency("Parallel Display Interface", "Parallel Display Interface", False, True)
 	cntlComponent.addDependency("SPI Display Interface", "SPI Display Interface", False, True)
 	cntlComponent.addDependency("SYS_TIME", "SYS_TIME", True, True)
+	cntlComponent.setDependencyEnabled("SPI Display Interface", False)

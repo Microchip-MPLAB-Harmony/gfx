@@ -24,7 +24,7 @@
 // DOM-IGNORE-END
 
 
-#include <gfx/legato/image/legato_image.h>
+#include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/image/raw/legato_imagedecoder_raw.h"
 
 #include "gfx/legato/common/legato_math.h"
@@ -33,29 +33,19 @@
 #include "gfx/legato/image/legato_palette.h"
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/renderer/legato_renderer.h"
+#include "gfx/legato/renderer/legato_gpu.h"
 
 #if LE_STREAMING_ENABLED == 1
 
-#if LE_ASSET_DECODER_USE_PIXEL_CACHE == 1
-uint8_t leRawImageDecoderScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_MASK_CACHE == 1
-uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_PALETTE_CACHE == 1
-uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
-
-#if LE_ASSET_DECODER_USE_BLEND_CACHE == 1
-uint8_t leRawImageDecoderBlendBuffer[LE_ASSET_DECODER_CACHE_SIZE];
-#endif
+uint8_t LE_COHERENT_ATTR leRawImageDecoderScratchBuffer[LE_ASSET_DECODER_PIXEL_CACHE_SIZE];
+uint8_t LE_COHERENT_ATTR leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_PALETTE_CACHE_SIZE];
+uint8_t LE_COHERENT_ATTR leRawImageDecoderMashScratchBuffer[LE_ASSET_DECODER_MASK_CACHE_SIZE];
+uint8_t LE_COHERENT_ATTR leRawImageDecoderBlendBuffer[LE_ASSET_DECODER_BLEND_CACHE_SIZE];
 
 #endif
 
-static leImageDecoder decoder;
-static leRawDecodeState state;
+static LE_COHERENT_ATTR leImageDecoder _decoder;
+static LE_COHERENT_ATTR leRawDecodeState _state;
 
 #if LE_STREAMING_ENABLED == 1
 
@@ -68,7 +58,7 @@ static void _cleanup(leStreamManager* mgr);
 
 leResult _leRawImageDecoder_SourceIterateSetupStage(leRawDecodeState* state);
 leResult _leRawImageDecoder_TargetIterateSetupStage(leRawDecodeState* state);
-leResult _leRawImageDecoder_RotatedTargetIterateSetupStage(leRawDecodeState* state);
+//leResult _leRawImageDecoder_RotatedTargetIterateSetupStage(leRawDecodeState* state);
 
 leResult _leRawImageDecoder_PostReadStage(leRawDecodeState* state);
 
@@ -112,14 +102,14 @@ static leBool _supportsImage(const leImage* img)
            img->format == LE_IMAGE_FORMAT_RLE;
 }
 
-static leResult _initReadStage(leRawDecodeState* state)
+static leResult _initReadStage(leRawDecodeState* st)
 {
     // initialize read stage
 #if LE_STREAMING_ENABLED == 1
-    if(state->source->header.location == LE_STREAM_LOCATION_ID_INTERNAL)
+    if(st->source->header.location == LE_STREAM_LOCATION_ID_INTERNAL)
     {
 #endif
-        if(_leRawImageDecoder_ReadStage_Internal(state) == LE_FAILURE)
+        if(_leRawImageDecoder_ReadStage_Internal(st) == LE_FAILURE)
         {
             return LE_FAILURE;
         }
@@ -127,26 +117,26 @@ static leResult _initReadStage(leRawDecodeState* state)
     }
     else
     {
-        if(state->source->format == LE_IMAGE_FORMAT_RAW)
+        if(st->source->format == LE_IMAGE_FORMAT_RAW)
         {
-            if(state->source->palette != NULL)
+            if(st->source->palette != NULL)
             {
-                _leRawImageDecoder_ReadStage_StreamIndex(state);
+                _leRawImageDecoder_ReadStage_StreamIndex(st);
             }
             else
             {
-                _leRawImageDecoder_ReadStage_StreamColor(state);
+                _leRawImageDecoder_ReadStage_StreamColor(st);
             }
         }
         else
         {
-            if(state->source->palette != NULL)
+            if(st->source->palette != NULL)
             {
-                _leRawImageDecoder_ReadStage_StreamRLEIndex(state);
+                _leRawImageDecoder_ReadStage_StreamRLEIndex(st);
             }
             else
             {
-                _leRawImageDecoder_ReadStage_StreamRLE(state);
+                _leRawImageDecoder_ReadStage_StreamRLE(st);
             }
         }
     }
@@ -192,7 +182,7 @@ static leResult _initLookupStage(leRawDecodeState* state)
 
 static leResult _initConvertStage(leRawDecodeState* state)
 {
-    if(state->source->palette != NULL && state->source->palette->colorMode == state->targetMode)
+    if(state->source->palette != NULL && state->source->palette->buffer.mode == state->targetMode)
         return LE_SUCCESS;
 
     if(state->source->buffer.mode  == state->targetMode)
@@ -221,13 +211,15 @@ static leResult _draw(const leImage* img,
                       uint32_t a)
 {
     leRect imgRect, sourceClipRect, drawRect, clipRect;
-    leRect dmgRect = leRenderer_GetDrawRect();
+    leRect dmgRect;
+
+    leRenderer_GetDrawRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     imgRect.x = 0;
     imgRect.y = 0;
@@ -246,43 +238,57 @@ static leResult _draw(const leImage* img,
     drawRect.height = sourceClipRect.height;
 
     /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &dmgRect, &sourceClipRect);
+    leRectClipAdj(&drawRect, &dmgRect, &sourceClipRect, &clipRect);
 
     if(sourceClipRect.width <= 0 || sourceClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_DRAW;
+    _state.source = img;
+    _state.sourceRect = sourceClipRect;
 
-    state.source = img;
-    state.sourceRect = sourceClipRect;
+    //_state.renderX = x;
+    //_state.renderY = y;
 
-    //state.renderX = x;
-    //state.renderY = y;
+    _state.destRect = clipRect;
 
-    state.destRect = clipRect;
+    _state.globalAlpha = a;
 
-    state.globalAlpha = a;
+    _state.targetMode = leRenderer_CurrentColorMode();
 
-    state.targetMode = LE_GLOBAL_COLOR_MODE;
+    if(img->header.location == LE_STREAM_LOCATION_ID_INTERNAL &&
+       img->format == LE_IMAGE_FORMAT_RAW)
+    {
+        if(leGPU_BlitBuffer(&_state.source->buffer,
+                            &_state.sourceRect,
+                            &_state.destRect,
+                            a) == LE_SUCCESS)
+        {
+            // the op has already completed
+            // failure indicates to the exe loop that there are no stages to run
+            return LE_FAILURE;
+        }
+    }
 
-    if(_leRawImageDecoder_SourceIterateSetupStage(&state) == LE_FAILURE ||
-       _initReadStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_PostReadStage(&state) == LE_FAILURE ||
-       _initMaskStage(&state) == LE_FAILURE ||
-       _initLookupStage(&state) == LE_FAILURE ||
-       _initBlendStage(&state) == LE_FAILURE ||
-       _initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_FrameBufferWriteStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_SourceIterateSetupStage(&_state) == LE_FAILURE ||
+       _initReadStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE ||
+       _initMaskStage(&_state) == LE_FAILURE ||
+       _initLookupStage(&_state) == LE_FAILURE ||
+       _initBlendStage(&_state) == LE_FAILURE ||
+       _initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_FrameBufferWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
+
+    _state.mode = LE_RAW_MODE_DRAW;
 
     return LE_SUCCESS;
 }
@@ -297,7 +303,7 @@ static leResult _resize(const leImage* src,
     leRect imgRect, sourceClipRect, drawRect, targetRect, clipRect;
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     if(mode == LE_IMAGEFILTER_NONE)
@@ -311,7 +317,7 @@ static leResult _resize(const leImage* src,
         return LE_FAILURE;
     }
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     /* make sure the source rect is within the source bounds */
     imgRect.x = 0;
@@ -336,70 +342,70 @@ static leResult _resize(const leImage* src,
     targetRect.height = target->buffer.size.height;
 
     /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &targetRect, &sourceClipRect);
+    leRectClipAdj(&drawRect, &targetRect, &sourceClipRect, &clipRect);
 
     if(sourceClipRect.width <= 0 || sourceClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_RESIZE;
+    _state.mode = LE_RAW_MODE_RESIZE;
 
-    state.source = src;
-    state.sourceRect = sourceClipRect;
+    _state.source = src;
+    _state.sourceRect = sourceClipRect;
 
-    //state.renderX = 0;
-    //state.renderY = 0;
+    //_state.renderX = 0;
+    //_state.renderY = 0;
 
-    state.filterMode = mode;
-    state.target = target;
+    _state.filterMode = mode;
+    _state.target = target;
 
-    state.destRect = clipRect;
+    _state.destRect = clipRect;
 
-    state.targetMode = state.target->buffer.mode;
+    _state.targetMode = _state.target->buffer.mode;
 
     // iterator setup
-    if(_leRawImageDecoder_TargetIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_TargetIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // filter pre read stage
     if(mode == LE_IMAGEFILTER_NEAREST_NEIGHBOR)
     {
-        if(_leRawImageDecoder_ScaleNearestNeighborPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleNearestNeighborPreReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_ScaleBilinearPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleBilinearPreReadStage(&_state) == LE_FAILURE)
         {
             return LE_FAILURE;
         }
     }
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // post read stage
     if(mode == LE_IMAGEFILTER_BILINEAR)
     {
-        if(_leRawImageDecoder_ScaleBilinearPostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleBilinearPostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
 
     // convert and write
-    if(_initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_ImageWriteStage(&state) == LE_FAILURE)
+    if(_initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_ImageWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -417,10 +423,12 @@ static leResult _resizeDraw(const leImage* src,
                             uint32_t a)
 {
     leRect imgRect, sourceClipRect, drawRect, drawClipRect, clipRect;
-    leRect dmgRect = leRenderer_GetDrawRect();
+    leRect dmgRect;
+
+    leRenderer_GetDrawRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     if(mode == LE_IMAGEFILTER_NONE)
@@ -433,7 +441,7 @@ static leResult _resizeDraw(const leImage* src,
         return LE_FAILURE;
     }
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     imgRect.x = 0;
     imgRect.y = 0;
@@ -457,71 +465,87 @@ static leResult _resizeDraw(const leImage* src,
     drawClipRect.height = sizeY;
 
     /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &dmgRect, &drawClipRect);
+    leRectClipAdj(&drawRect, &dmgRect, &drawClipRect, &clipRect);
 
     if(drawClipRect.width <= 0 || drawClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_RESIZEDRAW;
+    _state.mode = LE_RAW_MODE_RESIZEDRAW;
 
-    state.source = src;
-    state.sourceRect = drawClipRect;
+    _state.source = src;
+    _state.sourceRect = drawClipRect;
 
-    state.filterMode = mode;
+    _state.filterMode = mode;
 
-    state.destRect = clipRect;
+    _state.destRect = clipRect;
 
-    state.sizeX = sizeX;
-    state.sizeY = sizeY;
+    _state.sizeX = sizeX;
+    _state.sizeY = sizeY;
 
-    state.targetMode = LE_GLOBAL_COLOR_MODE;
+    _state.targetMode = leRenderer_CurrentColorMode();
 
-    state.globalAlpha = a;
+    _state.globalAlpha = a;
+
+
+    if(src->header.location == LE_STREAM_LOCATION_ID_INTERNAL &&
+       src->format == LE_IMAGE_FORMAT_RAW)
+    {
+        if(leGPU_BlitStretchBuffer(&_state.source->buffer,
+                                   &_state.sourceRect,
+                                   &_state.destRect,
+                                   a) == LE_SUCCESS)
+        {
+            // the op has already completed
+            // failure indicates to the exe loop that there are no stages to run
+            return LE_FAILURE;
+        }
+    }
 
     // iterator setup
-    if(_leRawImageDecoder_TargetIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_TargetIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // filter pre read stage
     if(mode == LE_IMAGEFILTER_NEAREST_NEIGHBOR)
     {
-        if(_leRawImageDecoder_ScaleNearestNeighborPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleNearestNeighborPreReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_ScaleBilinearPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleBilinearPreReadStage(&_state) == LE_FAILURE)
         {
             return LE_FAILURE;
         }
     }
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // post read stage
     if(mode == LE_IMAGEFILTER_BILINEAR)
     {
-        if(_leRawImageDecoder_ScaleBilinearPostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_ScaleBilinearPostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
 
     // convert and write
-    if(_initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_FrameBufferWriteStage(&state) == LE_FAILURE)
+    if(_initBlendStage(&_state) == LE_FAILURE ||
+	   _initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_FrameBufferWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -538,7 +562,7 @@ static leResult _copy(const leImage* src,
     leRect imgRect, sourceClipRect, drawRect, targetRect, clipRect;
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     // modes must be the same
@@ -549,7 +573,7 @@ static leResult _copy(const leImage* src,
     if(LE_COLOR_MODE_IS_INDEX(src->buffer.mode) == LE_TRUE)
         return LE_FAILURE;
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     /* make sure the source rect is within the source bounds */
     imgRect.x = 0;
@@ -574,42 +598,42 @@ static leResult _copy(const leImage* src,
     targetRect.height = dst->buffer.size.height;
 
     /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &targetRect, &sourceClipRect);
+    leRectClipAdj(&drawRect, &targetRect, &sourceClipRect, &clipRect);
 
     if(sourceClipRect.width <= 0 || sourceClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_COPY;
+    _state.mode = LE_RAW_MODE_COPY;
 
-    state.source = src;
-    state.sourceRect = sourceClipRect;
+    _state.source = src;
+    _state.sourceRect = sourceClipRect;
 
-    state.target = dst;
+    _state.target = dst;
 
-    state.destRect = clipRect;
+    _state.destRect = clipRect;
 
-    state.targetMode = state.target->buffer.mode;
+    _state.targetMode = _state.target->buffer.mode;
 
     // iterator setup
-    if(_leRawImageDecoder_SourceIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_SourceIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
-    if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // convert and write
-    if(_leRawImageDecoder_ImageWriteStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_ImageWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -628,13 +652,13 @@ static leResult _render(const leImage* src,
     leRect imgRect, sourceClipRect, drawRect, targetRect, clipRect;
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     if(LE_COLOR_MODE_IS_INDEX(dst->buffer.mode) == LE_TRUE)
         return LE_FAILURE;
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     /* make sure the source rect is within the source bounds */
     imgRect.x = 0;
@@ -659,38 +683,38 @@ static leResult _render(const leImage* src,
     targetRect.height = dst->buffer.size.height;
 
     /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &targetRect, &sourceClipRect);
+    leRectClipAdj(&drawRect, &targetRect, &sourceClipRect, &clipRect);
 
     if(sourceClipRect.width <= 0 || sourceClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_RENDER;
+    _state.mode = LE_RAW_MODE_RENDER;
 
-    state.source = src;
-    state.sourceRect = sourceClipRect;
+    _state.source = src;
+    _state.sourceRect = sourceClipRect;
 
-    state.target = dst;
+    _state.target = dst;
 
-    state.destRect = clipRect;
+    _state.destRect = clipRect;
 
-    state.targetMode = state.target->buffer.mode;
+    _state.targetMode = _state.target->buffer.mode;
 
     // iterator setup
-    if(_leRawImageDecoder_SourceIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_SourceIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
-    if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     if(ignoreMask == LE_TRUE)
@@ -708,13 +732,13 @@ static leResult _render(const leImage* src,
     }
     else
     {
-        if(_initMaskStage(&state) == LE_FAILURE)
+        if(_initMaskStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
 
         dst->flags &= ~(LE_IMAGE_USE_MASK_COLOR);
     }
 
-    if(_initLookupStage(&state) == LE_FAILURE)
+    if(_initLookupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // source mask color is currently represented as an index into a palette that must be streamed
@@ -726,23 +750,23 @@ static leResult _render(const leImage* src,
 #if LE_STREAMING_ENABLED == 1
         if(src->palette->header.location != LE_STREAM_LOCATION_ID_INTERNAL)
         {
-            _leRawImageDecoder_ImageRenderPostLookupStage_Stream(&state);
+            _leRawImageDecoder_ImageRenderPostLookupStage_Stream(&_state);
         }
         else
         {
 #endif
-            _leRawImageDecoder_ImageRenderPostLookupStage(&state);
+            _leRawImageDecoder_ImageRenderPostLookupStage(&_state);
 #if LE_STREAMING_ENABLED == 1
         }
 #endif
     }
 
-    if(ignoreAlpha == LE_TRUE && _initBlendStage(&state) == LE_FAILURE)
+    if(ignoreAlpha == LE_TRUE && _initBlendStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // convert and write
-    if(_initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_ImageWriteStage(&state) == LE_FAILURE)
+    if(_initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_ImageWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -753,14 +777,14 @@ static leResult _render(const leImage* src,
 static leResult _rotate(const leImage* src,
                         const leRect* srcRect,
                         leImageFilterMode mode,
-                        const lePoint* origin,
                         int32_t angle,
-                        leImage* target)
+                        leImage** target,
+                        leBool alloc)
 {
-    leRect imgRect, sourceClipRect, drawRect, targetRect, clipRect;
+    leRect imgRect, sourceClipRect, targetRect;
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     if(mode == LE_IMAGEFILTER_NONE)
@@ -768,16 +792,12 @@ static leResult _rotate(const leImage* src,
 
     // can't blend
     if(mode == LE_IMAGEFILTER_BILINEAR &&
-      (LE_COLOR_MODE_IS_PIXEL(src->buffer.mode) == LE_FALSE ||
-       LE_COLOR_MODE_IS_PIXEL(target->buffer.mode) == LE_FALSE))
+      (LE_COLOR_MODE_IS_PIXEL(src->buffer.mode) == LE_FALSE))
     {
         return LE_FAILURE;
     }
 
-    if(target == NULL)
-        return LE_FAILURE;
-
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     /* make sure the source rect is within the source bounds */
     imgRect.x = 0;
@@ -791,81 +811,108 @@ static leResult _rotate(const leImage* src,
     // trim the source rectangle to fit
     leRectClip(&imgRect, srcRect, &sourceClipRect);
 
-    drawRect.x = 0;
-    drawRect.y = 0;
-    drawRect.width = sourceClipRect.width;
-    drawRect.height = sourceClipRect.height;
+    if(target == NULL)
+        return LE_FAILURE;
 
     targetRect.x = 0;
     targetRect.y = 0;
-    targetRect.width = target->buffer.size.width;
-    targetRect.height = target->buffer.size.height;
+    targetRect.width = sourceClipRect.width;
+    targetRect.height = sourceClipRect.height;
 
-    /* make sure the dest rect is within the damaged rect area */
-    clipRect = leRectClipAdj(&drawRect, &targetRect, &sourceClipRect);
+    leRotatedRectBounds(targetRect, angle, &targetRect);
+
+    if(alloc == LE_TRUE)
+    {
+        *target = leImage_Allocate(targetRect.width, targetRect.height, src->buffer.mode);
+
+        lePixelBufferAreaFill_Unsafe(&(*target)->buffer,
+                                     0,
+                                     0,
+                                     (*target)->buffer.size.width,
+                                     (*target)->buffer.size.height,
+                                     0);
+    }
+    else
+    {
+        if(*target == NULL)
+            return LE_FAILURE;
+
+        /*if((*target)->buffer.size.width < sourceClipRect.width ||
+           (*target)->buffer.size.height < sourceClipRect.height)
+            return LE_FAILURE;*/
+    }
+
+    _state.target = *target;
+
+    _state.destRect.x = 0;
+    _state.destRect.y = 0;
+    _state.destRect.width = _state.target->buffer.size.width;
+    _state.destRect.height = _state.target->buffer.size.height;
+
+    if(_state.target->buffer.pixels == NULL)
+        return LE_FAILURE;
 
     if(sourceClipRect.width <= 0 || sourceClipRect.height <= 0)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_ROTATE;
+    _state.mode = LE_RAW_MODE_ROTATE;
 
-    state.source = src;
-    state.sourceRect = sourceClipRect;
+    _state.source = src;
+    _state.sourceRect = sourceClipRect;
 
-    state.angle = angle;
-    state.origin = *origin;
+    _state.angle = angle;
+    _state.sourceOrigin.x = _state.sourceRect.x + _state.sourceRect.width / 2;
+    _state.sourceOrigin.y = _state.sourceRect.y + _state.sourceRect.height / 2;
+    _state.targetOrigin.x = _state.target->buffer.size.width / 2;
+    _state.targetOrigin.y = _state.target->buffer.size.height / 2;
 
-    state.filterMode = mode;
-    state.target = target;
+    _state.filterMode = mode;
 
-    state.destRect = clipRect;
-
-    state.targetMode = state.target->buffer.mode;
+    _state.targetMode = _state.target->buffer.mode;
 
     // iterator setup
-    if(_leRawImageDecoder_TargetIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_TargetIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // filter pre read stage
     if(mode == LE_IMAGEFILTER_NEAREST_NEIGHBOR)
     {
-        if(_leRawImageDecoder_RotateNearestNeighborPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_RotateNearestNeighborPreReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_RotateBilinearPreReadStage(&state) == LE_FAILURE)
-        {
+        if(_leRawImageDecoder_RotateBilinearPreReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
-        }
     }
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // post read stage
     if(mode == LE_IMAGEFILTER_BILINEAR)
     {
-        if(_leRawImageDecoder_RotateBilinearPostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_RotateBilinearPostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
 
     // convert and write
-    if(_initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_ImageWriteStage(&state) == LE_FAILURE)
+    if(_initBlendStage(&_state) == LE_FAILURE ||
+       _initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_ImageWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -876,17 +923,18 @@ static leResult _rotate(const leImage* src,
 static leResult _rotateDraw(const leImage* src,
                             const leRect* srcRect,
                             leImageFilterMode mode,
-                            const lePoint* origin,
                             int32_t angle,
                             int32_t x,
                             int32_t y,
                             uint32_t a)
 {
     leRect imgRect, sourceClipRect, drawRect, clipRect;
-    leRect dmgRect = leRenderer_GetDrawRect();
+    leRect dmgRect;
+
+    leRenderer_GetDrawRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
     if(mode == LE_IMAGEFILTER_NONE)
@@ -899,7 +947,7 @@ static leResult _rotateDraw(const leImage* src,
         return LE_FAILURE;
     }
 
-    memset(&state, 0, sizeof(leRawDecodeState));
+    memset(&_state, 0, sizeof(leRawDecodeState));
 
     imgRect.x = 0;
     imgRect.y = 0;
@@ -918,9 +966,16 @@ static leResult _rotateDraw(const leImage* src,
     imgRect.y += y;
 
     // calculate bounds of rotated rectangle
-    drawRect = leRotatedRectBounds(imgRect,
-                                   *origin,
-                                   angle);
+    leRotatedRectBounds(imgRect,
+                        angle,
+                        &drawRect);
+
+    // center rotated rectangle over original rectangle
+    drawRect.x = imgRect.x + imgRect.width / 2;
+    drawRect.y = imgRect.y + imgRect.height / 2;
+
+    drawRect.x -= drawRect.width / 2;
+    drawRect.y -= drawRect.height / 2;
 
     /* make sure the dest rect is within the damaged rect area */
     leRectClip(&drawRect, &dmgRect, &clipRect);
@@ -929,71 +984,72 @@ static leResult _rotateDraw(const leImage* src,
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
-    state.manager.exec = _exec;
-    state.manager.isDone = _isDone;
-    state.manager.abort = _abort;
-    state.manager.cleanup = _cleanup;
+    _state.manager.exec = _exec;
+    _state.manager.isDone = _isDone;
+    _state.manager.abort = _abort;
+    _state.manager.cleanup = _cleanup;
 #endif
 
-    state.mode = LE_RAW_MODE_ROTATEDRAW;
+    _state.mode = LE_RAW_MODE_ROTATEDRAW;
 
-    state.source = src;
-    state.filterMode = mode;
-    state.sourceRect = imgRect;
+    _state.source = src;
+    _state.filterMode = mode;
+    _state.sourceRect = imgRect;
 
     // store the target rect dimensions
-    state.destRect = clipRect;
+    _state.destRect = clipRect;
 
-    state.targetY = clipRect.y;
-    state.targetX = clipRect.x;
+    _state.targetY = 0;
+    _state.targetX = 0;
 
-    state.angle = angle;
-    state.origin = *origin;
+    _state.angle = angle;
+    //_state.sourceOrigin = srcRect->width
 
-    state.targetMode = LE_GLOBAL_COLOR_MODE;
+    _state.targetMode = leRenderer_CurrentColorMode();
 
-    state.globalAlpha = a;
+    _state.globalAlpha = a;
 
-    state.randomRLE = LE_TRUE;
+    _state.randomRLE = LE_TRUE;
 
     // iterator setup
-    if(_leRawImageDecoder_RotatedTargetIterateSetupStage(&state) == LE_FAILURE)
+    if(_leRawImageDecoder_TargetIterateSetupStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // filter pre read stage
     if(mode == LE_IMAGEFILTER_NEAREST_NEIGHBOR)
     {
-        if(_leRawImageDecoder_RotateNearestNeighborPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_RotateNearestNeighborPreReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_RotateBilinearPreReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_RotateBilinearPreReadStage(&_state) == LE_FAILURE)
         {
             return LE_FAILURE;
         }
     }
 
     // read stage
-    if(_initReadStage(&state) == LE_FAILURE)
+    if(_initReadStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // post read stage
     if(mode == LE_IMAGEFILTER_BILINEAR)
     {
-        if(_leRawImageDecoder_RotateBilinearPostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_RotateBilinearPostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
     else
     {
-        if(_leRawImageDecoder_PostReadStage(&state) == LE_FAILURE)
+        if(_leRawImageDecoder_PostReadStage(&_state) == LE_FAILURE)
             return LE_FAILURE;
     }
 
     // convert and write
-    if(_initMaskStage(&state) == LE_FAILURE ||
-       _initConvertStage(&state) == LE_FAILURE ||
-       _leRawImageDecoder_FrameBufferWriteStage(&state) == LE_FAILURE)
+    if(_initMaskStage(&_state) == LE_FAILURE ||
+		_initBlendStage(&_state) == LE_FAILURE ||
+		_initConvertStage(&_state) == LE_FAILURE ||
+       _leRawImageDecoder_FrameBufferWriteStage(&_state) == LE_FAILURE)
     {
         return LE_FAILURE;
     }
@@ -1004,22 +1060,25 @@ static leResult _rotateDraw(const leImage* src,
 #if LE_STREAMING_ENABLED == 1
 static void _cleanup(leStreamManager* mgr)
 #else
-static void _decoderCleanup()
+static void _decoderCleanup(void)
 #endif
 {
+#if LE_STREAMING_ENABLED == 1
+    (void)mgr; // unused
+#endif
     int32_t idx;
 
-    if(state.mode != LE_RAW_MODE_NONE)
+    if(_state.mode != LE_RAW_MODE_NONE)
     {
-        state.mode = LE_RAW_MODE_NONE;
+        _state.mode = LE_RAW_MODE_NONE;
 
         for(idx = 0; idx < LE_IMAGEDECODER_RAW_MAX_STAGES; idx++)
         {
-            if(state.stages[idx] != NULL)
+            if(_state.stages[idx] != NULL)
             {
-                if(state.stages[idx]->cleanup != NULL)
+                if(_state.stages[idx]->cleanup != NULL)
                 {
-                    state.stages[idx]->cleanup(state.stages[idx]);
+                    _state.stages[idx]->cleanup(_state.stages[idx]);
                 }
             }
             else
@@ -1029,7 +1088,7 @@ static void _decoderCleanup()
         }
 
 #if LE_STREAMING_ENABLED == 1
-        if(leGetState()->activeStream == (leStreamManager*)&state)
+        if(leGetState()->activeStream == (leStreamManager*)&_state)
         {
             leGetState()->activeStream = NULL;
         }
@@ -1040,34 +1099,34 @@ static void _decoderCleanup()
 #if LE_STREAMING_ENABLED == 1
 static leResult _exec(leStreamManager* mgr)
 #else
-static leResult _decoderExec()
+static leResult _decoderExec(void)
 #endif
 {
-    if(state.mode == LE_RAW_MODE_NONE)
+    if(_state.mode == LE_RAW_MODE_NONE)
         return LE_FAILURE;
 
 #if LE_STREAMING_ENABLED == 1
     if(leGetActiveStream() != NULL &&
-       leGetActiveStream() != (leStreamManager*)&state)
+       leGetActiveStream() != (leStreamManager*)&_state)
         return LE_FAILURE;
 
-    leGetState()->activeStream = (leStreamManager*)&state;
+    leGetState()->activeStream = (leStreamManager*)&_state;
 #endif
 
     // any stage can set done and exit the loop
-    while(state.done == LE_FALSE)
+    while(_state.done == LE_FALSE)
     {
         // stages can return false if they stall
-        if(state.stages[state.currentStage]->exec(state.stages[state.currentStage]) == LE_FAILURE)
+        if(_state.stages[_state.currentStage]->exec(_state.stages[_state.currentStage]) == LE_FAILURE)
             return LE_SUCCESS;
 
         // increment stage
-        state.currentStage++;
+        _state.currentStage++;
 
-        if(state.stages[state.currentStage] == NULL)
+        if(_state.stages[_state.currentStage] == NULL)
         {
             // restart the pipeline
-            state.currentStage = 0;
+            _state.currentStage = 0;
         }
     }
 
@@ -1089,16 +1148,20 @@ static leResult _decoderExec()
 #if LE_STREAMING_ENABLED == 1
 static leBool _isDone(leStreamManager* mgr)
 #else
-static leBool _decoderIsDone()
+static leBool _decoderIsDone(void)
 #endif
 {
-    return state.done;
+#if LE_STREAMING_ENABLED == 1
+    (void)mgr; // unused
+#endif
+
+    return _state.done;
 }
 
 #if LE_STREAMING_ENABLED == 1
 static void _abort(leStreamManager* mgr)
 {
-    state.done = LE_TRUE;
+    _state.done = LE_TRUE;
 
     // free the stages
     mgr->cleanup(mgr);
@@ -1115,38 +1178,38 @@ static void _abort(leStreamManager* mgr)
 
 static leResult _decoderExec(void)
 {
-    return state.manager.exec(&state.manager);
+    return _state.manager.exec(&_state.manager);
 }
 
 static leBool _decoderIsDone(void)
 {
-    return state.done;
+    return _state.done;
 }
 
 static void _decoderCleanup(void)
 {
-    state.manager.cleanup(&state.manager);
+    _state.manager.cleanup(&_state.manager);
 }
 
 #endif
 
 leImageDecoder* _leRawImageDecoder_Init(void)
 {
-    memset(&state, 0, sizeof(leImageDecoder));
+    memset(&_state, 0, sizeof(leImageDecoder));
 
-    decoder.supportsImage = _supportsImage;
-    decoder.draw = _draw;
-    decoder.copy = _copy;
-    decoder.render = _render;
-    decoder.resize = _resize;
-    decoder.resizeDraw = _resizeDraw;
-    decoder.rotate = _rotate;
-    decoder.rotateDraw = _rotateDraw;
-    decoder.exec = _decoderExec;
-    decoder.isDone = _decoderIsDone;
-    decoder.free = _decoderCleanup;
+    _decoder.supportsImage = _supportsImage;
+    _decoder.draw = _draw;
+    _decoder.copy = _copy;
+    _decoder.render = _render;
+    _decoder.resize = _resize;
+    _decoder.resizeDraw = _resizeDraw;
+    _decoder.rotate = _rotate;
+    _decoder.rotateDraw = _rotateDraw;
+    _decoder.exec = _decoderExec;
+    _decoder.isDone = _decoderIsDone;
+    _decoder.free = _decoderCleanup;
 
-    return &decoder;
+    return &_decoder;
 }
 
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,

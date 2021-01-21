@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   Module for Microchip Graphics Library - Driver Interface Library
@@ -34,7 +32,7 @@
 
   Summary:
     This file defines the common macros and definitions used by MPLAB Harmony Graphics
-	Suite drivers.
+    Suite drivers.
 
   Description:
     This file defines the common macros and definitions used by the
@@ -44,10 +42,14 @@
     This header file should be included by the graphics library and by each driver.
  *******************************************************************************/
 
-//DOM-IGNORE-BEGIN
+/** \file gfx_driver.h.ftl
+ * @brief GFX driver functions and definitions.
+ *
+ * @details This file defines the common macros and definitions used by the MPLAB
+ * Harmony Graphics Suite drivers
+ */
 #ifndef GFX_DRIVER_H
 #define GFX_DRIVER_H
-//DOM-IGNORE-END
 
 #include <stddef.h>
 #include <assert.h>
@@ -105,12 +107,11 @@ typedef uint32_t               gfxColor;
 #define ARGB_8888_BLUE_MASK    0xFF
 #define ARGB_8888_ALPHA_MASK   0xFF000000
 
+#define GFX_CTRLR_LAYER_START 0x80000000
 
-// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
     extern "C" {
 #endif
-// DOM-IGNORE-END
         
 // *****************************************************************************
 // *****************************************************************************
@@ -132,6 +133,11 @@ typedef uint32_t               gfxColor;
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents function call results.
+ * @details Results are used to report success and failure conditions. These
+ * are the various success and failure codes.
+ */
 typedef enum gfxResult
 {
     GFX_FAILURE = -1,
@@ -151,6 +157,10 @@ typedef enum gfxResult
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents booleans.
+ * @details Boolean are used to communicate true and false conditions.
+ */
 typedef enum gfxBool
 {
     GFX_FALSE = 0,
@@ -164,12 +174,20 @@ typedef enum gfxBool
   Summary:
     A two dimensional Cartesian point.
 */
+/**
+ * @brief This struct represents a point.
+ * @details A point is used to define a two dimensional Cartesian coordinate.
+ */
 typedef struct gfxPoint
 {
     int32_t x;
     int32_t y;
 } gfxPoint;
 
+/**
+ * @brief This constant represents a zero point.
+ * @details The zero is used to .
+ */
 static const gfxPoint gfxPoint_Zero = {0, 0};
 
 // *****************************************************************************
@@ -180,12 +198,20 @@ static const gfxPoint gfxPoint_Zero = {0, 0};
     A two dimensional indication of size.  Values are signed but should never be
     negative.
 */
+/**
+ * @brief This struct represents a size.
+ * @details A size is use to communicate the width and height of objects.
+ */
 typedef struct gfxSize
 {
     int32_t width;
     int32_t height;
 } gfxSize;
 
+/**
+ * @brief This constant represents a zero size.
+ * @details
+ */
 static const gfxSize gfxSize_Zero = {0, 0};
 
 // *****************************************************************************
@@ -195,6 +221,11 @@ static const gfxSize gfxSize_Zero = {0, 0};
   Summary:
     A rectangle definition.  
 */
+/**
+ * @brief This struct represents a rectangle.
+ * @details A rectangle defines a rectangle boundary.
+ * @details
+ */
 typedef struct gfxRect
 {
     int32_t x;
@@ -203,6 +234,34 @@ typedef struct gfxRect
     int32_t height;
 } gfxRect;
 
+/**
+ * @brief This constant represents a zero rectangle.
+ * @details
+ */
+static const gfxRect gfxRect_Zero = {0, 0, 0, 0};
+
+// *****************************************************************************
+/* Structure:
+    gfxLayerState
+
+  Summary:
+    A layer state structure definition.  
+*/
+/**
+ * @brief This struct represents a layer state.
+ * @details This structure is provided by the driver to describe layer state.
+ * @details
+ */
+typedef struct gfxLayerState
+{
+    gfxRect rect;
+    gfxBool enabled;
+} gfxLayerState;
+
+/**
+ * @brief This type represents a buffer;
+ * @details
+ */
 typedef void* gfxBuffer;
 
 // *****************************************************************************
@@ -213,6 +272,10 @@ typedef void* gfxBuffer;
     Maskable list of color valies.
 
 */
+/**
+ * @brief This enum represents a color mask.
+ * @details Colormask is maskable list of color values to extract color components.
+ */
 typedef enum gfxColorMask
 {
     GFX_COLOR_MASK_GS_8      = 0x1,
@@ -239,6 +302,11 @@ typedef enum gfxColorMask
   Summary:
     List of available color modes.
 */
+/**
+ * @brief This enum represents color modes.
+ * @details Lists the common RGB color representations.
+ * @see GFX_COLOR_MODE_IS_PIXEL(mode) GFX_COLOR_MODE_IS_INDEX(mode) GFX_COLOR_MODE_IS_ALPHA(mode)
+ */
 typedef enum gfxColorMode
 {
     GFX_COLOR_MODE_GS_8       = 0x0,
@@ -270,6 +338,10 @@ typedef enum gfxColorMode
   Summary:
     List of available bits-per-pixel sizes.    
 */
+/**
+ * @brief This enum represents bits per pixel (BPP).
+ * @details List of commonly BPP values to represent color depth.
+ */
 typedef enum gfxBitsPerPixel
 {
     GFX_BPP1,
@@ -296,6 +368,11 @@ typedef enum gfxBitsPerPixel
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents color mode information.
+ * @details Color mode information is use to keep track of
+ * specific information about a color.
+ */
 typedef struct gfxColorModeInfo
 {
     uint32_t size;
@@ -327,6 +404,10 @@ typedef struct gfxColorModeInfo
   Summary:
     Color information reference table
 */
+/**
+ * @brief This array represents a color information reference table.
+ * @details
+ */
 extern const gfxColorModeInfo gfxColorInfoTable[];
 
 
@@ -337,6 +418,10 @@ extern const gfxColorModeInfo gfxColorInfoTable[];
   Summary:
     Blend name reference table
 */
+/**
+ * @brief This enum represents blend modes.
+ * @details Blend modes are used to define the type of blend function.
+ */
 typedef enum gfxBlend
 {
     GFX_BLEND_NONE,
@@ -348,7 +433,43 @@ typedef enum gfxBlend
     GFX_BLEND_SUBTRACT,
 } gfxBlend;
 
+/**
+ * @brief This enum represents alpha modes.
+ * @details Global alpha modes are used to define the type of global
+ * alpha blending operations.
+ */
+typedef enum gfxAlpha
+{
+    GFX_GLOBAL_ALPHA_OFF,
+    GFX_GLOBAL_ALPHA_ON,
+    GFX_GLOBAL_ALPHA_SCALE
+} gfxAlpha;
 
+/**
+ * @brief This enum represents transparency modes.
+ * @details Transparency modes are used to define the target of transparency
+ * to perform.
+ */
+typedef enum gfxTransparency
+{
+    GFX_TRANSPARENCY_NONE,
+    GFX_TRANSPARENCY_SOURCE,
+    GFX_TRANSPARENCY_DESTINATION,
+}
+gfxTransparency;
+
+
+typedef enum gfxPaletteSelect
+{
+    GFX_PALETTE_ONE,
+    GFX_PALETTE_TWO
+}
+gfxPaletteSelect;
+
+/**
+ * @brief This enum represents buffer flags.
+ * @details List of buffer status conditions.
+ */
 enum gfxBufferFlags
 {
     GFX_BF_NONE = 0,
@@ -374,6 +495,12 @@ enum gfxBufferFlags
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a pixel buffer.
+ * @details A pixel buffer is a wrapper around a basic data pointer.  A
+ * pixel buffer has a color mode, a pixel count, a rectangular dimension, a
+ * pixel count, and a length in bytes.
+ */
 typedef struct gfxPixelBuffer
 {
     gfxColorMode mode;
@@ -388,8 +515,6 @@ typedef struct gfxPixelBuffer
 } gfxPixelBuffer;
 
 
-//DOM-IGNORE-BEGIN
-static const gfxRect gfxRect_Zero = {0, 0, 0, 0};
 
 // *****************************************************************************
 // *****************************************************************************
@@ -418,6 +543,19 @@ static const gfxRect gfxRect_Zero = {0, 0, 0, 0};
   Remarks:
     
 */
+/**
+ * @brief Get red channel.
+ * @details Returns the red channel from <span class="param">clr</span>
+ * using <span class="param">mode</span>.
+ * @code
+ * gfxColor clr;
+ * gfxColorMode mode;
+ * uint32_t red = gfxColorChannelRed(clr, mode);
+ * @endcode
+ * @param clr is an rgb color.
+ * @param mode is an rgb colormode.
+ * @return Returns the red color component
+ */
 uint32_t gfxColorChannelRed(gfxColor clr, gfxColorMode mode);
 
 // *****************************************************************************
@@ -440,6 +578,19 @@ uint32_t gfxColorChannelRed(gfxColor clr, gfxColorMode mode);
   Remarks:
     
 */
+/**
+ * @brief Get green channel.
+ * @details Returns the green channel from <span class="param">clr</span>
+ * using <span class="param">mode</span>.
+ * @code
+ * gfxColor clr;
+ * gfxColorMode mode;
+ * uint32_t green = gfxColorChannelGreen(clr, mode);
+ * @endcode
+ * @param clr is an rgb color.
+ * @param mode is an rgb colormode.
+ * @return Returns the green color component
+ */
 uint32_t gfxColorChannelGreen(gfxColor clr, gfxColorMode mode);
 
 // *****************************************************************************
@@ -462,6 +613,19 @@ uint32_t gfxColorChannelGreen(gfxColor clr, gfxColorMode mode);
   Remarks:
     
 */
+/**
+ * @brief Get blue channel.
+ * @details Returns the blue channel from <span class="param">clr</span>
+ * using <span class="param">mode</span>.
+ * @code
+ * gfxColor clr;
+ * gfxColorMode mode;
+ * uint32_t blue = gfxColorChannelBlue(clr, mode);
+ * @endcode
+ * @param clr is an rgb color.
+ * @param mode is an rgb colormode.
+ * @return Returns the blue color component
+ */
 uint32_t gfxColorChannelBlue(gfxColor clr, gfxColorMode mode);
 
 // *****************************************************************************
@@ -484,6 +648,19 @@ uint32_t gfxColorChannelBlue(gfxColor clr, gfxColorMode mode);
   Remarks:
     
 */
+/**
+ * @brief Get alpha channel.
+ * @details Returns the alpha channel from <span class="param">clr</span>
+ * using <span class="param">mode</span>.
+ * @code
+ * gfxColor clr;
+ * gfxColorMode mode;
+ * uint32_t alpha = gfxColorChannelAlpha(clr, mode);
+ * @endcode
+ * @param clr is an rgb color.
+ * @param mode is an rgb colormode.
+ * @return Returns the alpha color component
+ */
 uint32_t gfxColorChannelAlpha(gfxColor clr, gfxColorMode mode); 
 
 // *****************************************************************************
@@ -535,6 +712,25 @@ gfxColor gfxColorConvert(gfxColorMode mode_in,
   Remarks:
     
 */
+/**
+ * @brief Create pixel buffer.
+ * @details Initializes a rectangular pixel buffer <span class="param">buffer</span>
+ * with size <span class="param">x</span> by <span class="param">y</span>
+ * using <span class="param">mode</span> at optional address
+ * <span class="param">address</span>.
+ * @code
+ * gfxColor clr;
+ * gfxColorMode mode;
+ * uint32_t blue = gfxPixelBufferCreate(clr, mode);
+ * @endcode
+ * @param width is the horizonal width.
+ * @param height is the vertical height.
+ * @param mode is an rgb colormode.
+ * @param address is an optional address location.
+ * @param buffer is buffer to initialize.
+ * @return GFX_SUCCESS if set, otherwise GFX_FAILURE.
+ */
+
 gfxResult gfxPixelBufferCreate(const int32_t width,
                                const int32_t height,
                                const gfxColorMode mode,
@@ -556,7 +752,21 @@ gfxResult gfxPixelBufferCreate(const int32_t width,
     
   Returns:
     gfxBuffer - the pointer to the offset point in the source buffer
-*/                                          
+*/
+/**
+ * @brief Get buffer offset.
+ * @details Gets the buffer offset of <span class="param">buffer</span> at location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t x, y;
+ * gfxBuffer offset = gfxPixelBufferOffsetGet(buffer, x, y);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param x is a x coordinate.
+ * @param y is a y coordinate.
+ * @return Returns buffer offset.
+ */
 gfxBuffer gfxPixelBufferOffsetGet(const gfxPixelBuffer* const buffer,
                                   uint32_t x,
                                   uint32_t y);
@@ -577,7 +787,21 @@ gfxBuffer gfxPixelBufferOffsetGet(const gfxPixelBuffer* const buffer,
     
   Returns:
     gfxBuffer - the pointer to the offset point in the source buffer
-*/                                               
+*/
+/**
+ * @brief Get buffer offset.
+ * @details Gets the buffer offset of <span class="param">buffer</span> at location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t x, y;
+ * gfxBuffer offset = gfxPixelBufferOffsetGet_Unsafe(buffer, x, y);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param x is a x coordinate.
+ * @param y is a y coordinate.
+ * @return Returns buffer offset.
+ */
 gfxBuffer gfxPixelBufferOffsetGet_Unsafe(const gfxPixelBuffer* const buffer,
                                          uint32_t x,
                                          uint32_t y);                                                  
@@ -597,7 +821,21 @@ gfxBuffer gfxPixelBufferOffsetGet_Unsafe(const gfxPixelBuffer* const buffer,
     
   Returns:
     gfxColor - the value of the pixel at the point in the source buffer
-*/                                                      
+*/
+/**
+ * @brief Get pixel.
+ * @details Gets the pixel from <span class="param">buffer</span> at location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t x, y;
+ * gfxColor clr = gfxPixelBufferGet(buffer, x, y);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param x is a x coordinate.
+ * @param y is a y coordinate.
+ * @return the value of the pixel at the point in the source buffer
+ */
 gfxColor gfxPixelBufferGet(const gfxPixelBuffer* const buffer,
                            uint32_t x,
                            uint32_t y);
@@ -617,7 +855,22 @@ gfxColor gfxPixelBufferGet(const gfxPixelBuffer* const buffer,
     
   Returns:
     gfxColor - the value of the pixel at the point in the source buffer
-*/                                             
+*/
+/**
+ * @brief Get pixel.
+ * @details Gets the pixel from <span class="param">buffer</span> at location
+ * <span class="param">x</span> and <span class="param">y</span>.
+ * @remark Like gfxPixelBufferGet but performs no bounds checking.
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t x, y;
+ * gfxColor clr = gfxPixelBufferGet(buffer, x, y);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param x is a x coordinate.
+ * @param y is a y coordinate.
+ * @return the value of the pixel at the point in the source buffer
+ */
 gfxColor gfxPixelBufferGet_Unsafe(const gfxPixelBuffer* const buffer,
                                   uint32_t x,
                                   uint32_t y);
@@ -638,8 +891,24 @@ gfxColor gfxPixelBufferGet_Unsafe(const gfxPixelBuffer* const buffer,
     
   Returns:
     gfxColor - the resultant value that was retrieved
-*/                                        
-gfxColor gfxPixelBufferGetIndex_Unsafe(const gfxPixelBuffer* const buffer,
+*/
+/**
+ * @brief Get pixel at index.
+ * @details Gets the pixel from <span class="param">buffer</span> at index
+ * <span class="param">idx</span>.
+ * Interprets the pixel buffer as a table of indices and looks up a specific index at
+ * position 'idx'.  Indices may be 1bpp, 4bpp, or 8bpp in size and are indicated by the
+ * color mode of the pixel buffer.
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t idx;
+ * gfxColor clr = gfxPixelBufferGetIndex(buffer, idx);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param idx is a location.
+ * @return Returns color.
+ */
+gfxColor gfxPixelBufferGetIndex(const gfxPixelBuffer* const buffer,
                                        const uint32_t idx);
 
 // *****************************************************************************
@@ -657,6 +926,23 @@ gfxColor gfxPixelBufferGetIndex_Unsafe(const gfxPixelBuffer* const buffer,
   Returns:
     gfxColor - the resultant value that was retrieved
 */
+/**
+ * @brief Get pixel at index.
+ * @details Gets the pixel from <span class="param">buffer</span> at index
+ * <span class="param">idx</span>.
+ * Interprets the pixel buffer as a table of indices and looks up a specific index at
+ * position 'idx'.  Indices may be 1bpp, 4bpp, or 8bpp in size and are indicated by the
+ * color mode of the pixel buffer.
+ * A faster less-safe version of gfxPixelBufferGetIndex;
+ * @code
+ * gfxBuffer buffer;
+ * uint32_t idx;
+ * gfxColor clr = gfxPixelBufferGetIndex_Unsafe(buffer, idx);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @param idx is a location.
+ * @return Returns color.
+ */
 gfxColor gfxPixelBufferGetIndex_Unsafe(const gfxPixelBuffer* const buffer,
                                        const uint32_t idx); 
 
@@ -673,6 +959,16 @@ gfxColor gfxPixelBufferGetIndex_Unsafe(const gfxPixelBuffer* const buffer,
   Returns:
     gfxBool - true if the buffer is locked
 */
+/**
+ * @brief Determine if buffer is locked.
+ * @details Returns locked status of <span class="param">buffer</span>.
+ * @code
+ * gfxBuffer buffer;
+ * gfxColor clr = gfxPixelBuffer_IsLocked(buffer);
+ * @endcode
+ * @param buffer is pixel buffer.
+ * @return GFX_SUCCESS if set, otherwise GFX_FAILURE.
+ */
 gfxBool gfxPixelBuffer_IsLocked(const gfxPixelBuffer* const buffer);
 
 // *****************************************************************************
@@ -690,146 +986,257 @@ gfxBool gfxPixelBuffer_IsLocked(const gfxPixelBuffer* const buffer);
   Returns:
     gfxResult
 */
+/**
+ * @brief Set locked state.
+ * @details Sets the lock state of <span class="param">buffer</span>.
+ * @code
+ * gfxBuffer buffer;
+ * gfxBool locked;
+ * gfxResult res = gfxPixelBuffer_SetLocked(buffer, locked);
+ * @endcode
+ * @param buffer is pixel buffer to modify.
+ * @param locked is new lock state.
+ * @return GFX_SUCCESS if set, otherwise GFX_FAILURE.
+ */
 gfxResult gfxPixelBuffer_SetLocked(gfxPixelBuffer* buffer,
                                    gfxBool locked);
 
 
+/**
+ * @brief This struct represents the possible IOCTL requests for a gfx driver.
+ * @details This struct represents the possible IOCTL requests for a gfx driver.
+ */
+typedef enum gfxDriverIOCTLRequest
+{
+    GFX_IOCTL_RESET, // resets the device, arg = NULL
+    GFX_IOCTL_GET_COLOR_MODE, // returns the supported color mode for the driver, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_GET_BUFFER_COUNT, // returns the driver buffer count, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_GET_DISPLAY_SIZE, // returns the driver buffer count, arg = gfxIOCTLArg_DisplaySize
+    GFX_IOCTL_ENABLE_GPU, // tells the driver to utilize a GPU if possible, arg = gfxIOCTLArg_Value
+    
+    GFX_IOCTL_LAYER_SWAP, // indicates that the driver should swap the current layer, arg = NULL
+    GFX_IOCTL_FRAME_START, // indicates that the driver should begin a new frame, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_FRAME_END, // indicates that the driver should end the current frame, arg = NULL
+    GFX_IOCTL_GET_VSYNC_COUNT, // gets the current driver vsync count, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_GET_FRAMEBUFFER, // gets a pointer to the internal driver frame buffer, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_SET_PALETTE, // sets the current driver palette, arg = gfxIOCTLArg_Palette
+    
+    GFX_IOCTL_GET_LAYER_COUNT, // gets the driver layer count, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_GET_ACTIVE_LAYER, // gets the active driver layer, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_SET_ACTIVE_LAYER, // sets the active driver layer, arg = gfxIOCTLArg_Value
 
+    GFX_IOCTL_SET_LAYER_LOCK, // locks a layer, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_GET_LAYER_ENABLED, // get layer enabled, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_SET_LAYER_ENABLED, // set layer enabled, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_SET_LAYER_UNLOCK, // unlocks a layer, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_GET_LAYER_RECT, // get layer rect, arg = gfxIOCTLArg_LayerRect
+    GFX_IOCTL_SET_LAYER_POSITION, // set layer position, arg = gfxIOCTLArg_LayerPosition
+    GFX_IOCTL_SET_LAYER_SIZE, // sets a layer size, arg = gfxIOCTLArg_LayerSize
+    GFX_IOCTL_SET_LAYER_WINDOW_SIZE, // set layer clipped window size, arg = gfxIOCTLArg_LayerWindowSize
+    GFX_IOCTL_SET_LAYER_ALPHA, // set layer alpha value, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_SET_LAYER_BASE_ADDRESS, // set layer base address, arg = gfxIOCTLArg_LayerValue
+    GFX_IOCTL_SET_LAYER_COLOR_MODE, // set layer color mode, arg = gfxIOCTLArg_LayerValue
+} gfxDriverIOCTLRequest;
 
-// *****************************************************************************
-/* Structure:
-    struct gfxDisplayDriver
+#define GFX_IOCTL_LAYER_REQ_START GFX_IOCTL_SET_LAYER_LOCK
+#define GFX_IOCTL_LAYER_REQ_END   GFX_IOCTL_SET_LAYER_COLOR_MODE
 
-  Summary:
-    Defines the interface for a Legato display driver.  All drivers must,
-    at a minimum, implement these interfaces
+/**
+ * @brief This enum represents the possible IOCTL responses for a gfx driver.
+ * @details This enum represents the possible IOCTL responses for a gfx driver.
+ */
+typedef enum gfxDriverIOCTLResponse
+{
+    GFX_IOCTL_UNSUPPORTED   = -1,
+    GFX_IOCTL_OK            =  0,
+    GFX_IOCTL_ERROR_UNKNOWN =  1,
+} gfxDriverIOCTLResponse;
 
-    getColorMode - returns the supported color mode for the driver
+/**
+ * @brief This struct represents a standard IOCTL value argument.
+ * @details This struct represents a standard IOCTL value argument.
+ */
+typedef struct gfxIOCTLArg_Value
+{
+    union
+    {
+        uint32_t v_uint;
+        int32_t v_int;
+        void* v_pointer;
+        gfxBool v_bool;
+        gfxColorMode v_colormode;
+        gfxPixelBuffer* v_pbuffer;
+    } value;
+} gfxIOCTLArg_Value;
 
-    getBufferCount - returns the number of buffers the driver is configured to use
+/**
+ * @brief This struct represents a standard IOCTL size value argument.
+ * @details This struct represents a standard IOCTL size value argument.
+ */
+typedef struct gfxIOCTLArg_DisplaySize
+{
+    uint32_t width;
+    uint32_t height;
+} gfxIOCTLArg_DisplaySize;
 
-    getDisplayWidth - returns the width of the driver frame buffer
+/**
+ * @brief This struct represents an IOCTL palette argument.
+ * @details This struct represents an IOCTL palette value argument.
+ */
+typedef struct gfxIOCTLArg_Palette
+{
+    gfxBuffer* palette;
+    gfxColorMode mode;
+    uint32_t colorCount;
+} gfxIOCTLArg_Palette;
 
-    getDisplayHeight - returns the height of the driver frame buffer
+/**
+ * @brief This struct represents a basic layer request argument.
+ * @details This struct represents a basic layer request argument.
+ */
+typedef struct
+{
+    uint32_t id;
+} gfxIOCTLArg_LayerArg;
 
-    update - the driver tasks/update function
+/**
+ * @brief This struct represents layer position.
+ * @details Layer point is used to define the position of a layer.
+ */
+typedef struct
+{
+    gfxIOCTLArg_LayerArg base;
+    
+    int32_t x;
+    int32_t y;
+} gfxIOCTLArg_LayerPosition;
 
-    getLayerCount - the number of hardware layers the driver supports
+/**
+ * @brief This struct represents layer size.
+ * @details Layer size is used to define the extent of a layer.
+ */
+typedef struct
+{
+    gfxIOCTLArg_LayerArg base;
+    
+    uint32_t width;
+    uint32_t height;
+} gfxIOCTLArg_LayerSize;
 
-    getActiveLayer - the current active hardware layer
+/**
+ * @brief This struct represents a layer rectangle.
+ * @details Layer size is used to define the dimensions of a layer.
+ */
+typedef struct
+{
+    gfxIOCTLArg_LayerArg base;
+    
+    int32_t x;
+    int32_t y;
+    uint32_t width;
+    uint32_t height;
+} gfxIOCTLArg_LayerRect;
 
-    setActiveLayer - sets the current active hardware layer
-                     all buffer writes should go to this layer
+/**
+ * @brief This struct represents a common layer value.
+ * @details .
+ */
+typedef struct
+{
+    gfxIOCTLArg_LayerArg base;
+    
+    union
+    {
+        uint32_t v_uint;
+        int32_t v_int;
+        void* v_pointer;
+        gfxBool v_bool;
+        gfxColorMode v_colormode;
+    } value;
+} gfxIOCTLArg_LayerValue;
 
-    blitBuffer - instructs the driver to blit a buffer (buf) at
-                 location (x, y)
-
-    swap - instructs the driver to swap its buffer chain
-
-    getVSYNCCount - queries the driver for its VSYNC counter
-                    if a driver implements this counter this value
-                    can be used to do frame rate calculations
-
-*/
+/**
+ * @brief This struct represents the display driver interface.
+ * @details Establishes the interface for a Legato display driver.  All drivers
+ * must, at a minimum, implement these interfaces. Interfaces with gfxResult
+ * can return unsuccessful if not supported.
+ * @see implementations:
+ * - drv_gfx_lcc_ftl.h
+ * - drv_gfx_glcd.h
+ * - drv_gfx_external_controller_ftl.h
+ */
 typedef struct gfxDisplayDriver
 {
-    gfxColorMode (*getColorMode)(void);
-
-    uint32_t (*getBufferCount)(void);
-
-    uint32_t (*getDisplayWidth)(void);
-
-    uint32_t (*getDisplayHeight)(void);
-
     void (*update)(void);
 
-    uint32_t (*getLayerCount)(void);
-
-    uint32_t (*getActiveLayer)(void);
-
-    gfxResult (*setActiveLayer)(uint32_t idx);
-
     gfxResult (*blitBuffer)(int32_t x,
-                           int32_t y,
-                           gfxPixelBuffer* buf,
-                           gfxBlend gfx);
+                            int32_t y,
+                            gfxPixelBuffer* buf);
 
-    void (*swap)(void);
-
-    uint32_t (*getVSYNCCount)(void);
-
-    gfxPixelBuffer* (*getFrameBuffer)(int32_t idx);
+    gfxDriverIOCTLResponse (*ioctl)(gfxDriverIOCTLRequest request,
+                                    void* arg);
 
 } gfxDisplayDriver;
 
-// *****************************************************************************
-/* Structure:
-    struct gfxGraphicsProcessor
-
-  Summary:
-    Defines the interface for a Legato display driver.  All drivers must,
-    at a minimum, implement these interfaces
-
-    getColorMode - returns the supported color mode for the driver
-
-    getBufferCount - returns the number of buffers the driver is configured to use
-
-    getDisplayWidth - returns the width of the driver frame buffer
-
-    getDisplayHeight - returns the height of the driver frame buffer
-
-    update - the driver tasks/update function
-
-    getLayerCount - the number of hardware layers the driver supports
-
-    getActiveLayer - the current active hardware layer
-
-    setActiveLayer - sets the current active hardware layer
-                     all buffer writes should go to this layer
-
-    blitBuffer - instructs the driver to blit a buffer (buf) at
-                 location (x, y)
-
-    swap - instructs the driver to swap its buffer chain
-
-    getVSYNCCount - queries the driver for its VSYNC counter
-                    if a driver implements this counter this value
-                    can be used to do frame rate calculations
-
-*/
+/**
+ * @brief This struct represents the graphics processor interface.
+ * @details Establishes the interface for a Legato GPU driver.  All drivers
+ * must, at a minimum, implement these interfaces. Interfaces that return gfxResult
+ * can return unsuccessful if not supported.
+ * @see implementations:
+ * - libnano2d_ftl.h
+ */
 typedef struct gfxGraphicsProcessor
 {
-    gfxResult (*drawLine)(gfxPixelBuffer * dest,
-                        const gfxPoint* p1,
-                        const gfxPoint* p2,
-                           const gfxRect* clipRect,
-                           const gfxColor color,
-                        const gfxBlend blend);
+    gfxResult (*drawLine)(gfxPixelBuffer * dest,      /**< @see drv_gfx_glcd.h */
+                          const gfxPoint* p1,
+                          const gfxPoint* p2,
+                          const gfxRect* clipRect,
+                          const gfxColor color);
 
     gfxResult (*fillRect)(gfxPixelBuffer * dest,
-                        const gfxRect* clipRect,
-                        const gfxColor color,
-                        const gfxBlend blend);
+                          const gfxRect* clipRect,
+                          const gfxColor color);
 
     gfxResult (*blitBuffer)(const gfxPixelBuffer* source,
-                        const gfxRect* srcRect,
-                        const gfxPixelBuffer* dest,
-                        const gfxRect* destRect,
-                        const gfxBlend blend);
+                            const gfxRect* srcRect,
+                            const gfxPixelBuffer* dest,
+                            const gfxRect* destRect);
 
-    gfxResult (*blitStretchBuffer)(const gfxPixelBuffer* source,
-                        const gfxRect* srcRect,
-                        const gfxPixelBuffer* dest,
-                        const gfxRect* destRect,
-                        const gfxBlend blend);
+    gfxResult (*setBlend)(const gfxBlend blend);
+
+    gfxResult (*setGlobalAlpha)(
+                        const gfxAlpha srcGlobalAlpha,
+                        const gfxAlpha dstGlobalAlpha,
+                        uint32_t srcGlobalAlphaValue,
+                        uint32_t dstGlobalAlphaValue);
+
+    gfxResult (*setPalette)(
+                        uint32_t index_count,
+                        gfxBuffer color_table,
+                        gfxBool color_convert);
+
+    gfxResult (*setTransparency)(
+                        gfxTransparency transparency,
+                        gfxColor color,
+                        uint32_t foreground_rop,
+                        uint32_t background_rop);
 
 } gfxGraphicsProcessor;
 
-//DOM-IGNORE-BEGIN
+<#if gfx_legato?? && gfx_legato.LeGPUConnected?? && gfx_legato.LeGPUConnected == false>
+static const gfxGraphicsProcessor gfxGPUInterface =
+{
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+</#if>
+
 #ifdef __cplusplus
     }
 #endif
-// DOM-IGNORE-END
      
 #endif // GFX_DRIVER_H
 

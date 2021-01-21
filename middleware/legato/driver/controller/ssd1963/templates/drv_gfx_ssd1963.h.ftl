@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   MPLAB Harmony Generated Driver Header File
@@ -52,36 +50,20 @@
 
 gfxResult DRV_SSD1963_Initialize(void);
 
-gfxColorMode DRV_SSD1963_GetColorMode(void);
-uint32_t DRV_SSD1963_GetBufferCount(void);
-uint32_t DRV_SSD1963_GetDisplayWidth(void);
-uint32_t DRV_SSD1963_GetDisplayHeight(void);
 void DRV_SSD1963_Update(void);
-uint32_t DRV_SSD1963_GetLayerCount();
-uint32_t DRV_SSD1963_GetActiveLayer();
-gfxResult DRV_SSD1963_SetActiveLayer(uint32_t idx);
+
 gfxResult DRV_SSD1963_BlitBuffer(int32_t x,
                                  int32_t y,
-                                 gfxPixelBuffer* buf,
-                                 gfxBlend gfx);
-void DRV_SSD1963_Swap(void);
-uint32_t DRV_SSD1963_GetSwapCount(void);
+                                 gfxPixelBuffer* buf);
 
+gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req,
+                                         void* arg);
 
-static const gfxDisplayDriver ssd1963DisplayDriver =
+static const gfxDisplayDriver gfxDriverInterface =
 {
-    DRV_SSD1963_GetColorMode,
-    DRV_SSD1963_GetBufferCount,
-    DRV_SSD1963_GetDisplayWidth,
-    DRV_SSD1963_GetDisplayHeight,
-    DRV_SSD1963_Update,
-    DRV_SSD1963_GetLayerCount,
-    DRV_SSD1963_GetActiveLayer,
-    DRV_SSD1963_SetActiveLayer,
-    DRV_SSD1963_BlitBuffer,
-    DRV_SSD1963_Swap,
-    DRV_SSD1963_GetSwapCount,
-    NULL /* GetFrameBuffer not supported */
+    .update = DRV_SSD1963_Update,
+    .blitBuffer = DRV_SSD1963_BlitBuffer,
+    .ioctl = DRV_SSD1963_IOCTL
 };
 
 #ifdef __cplusplus

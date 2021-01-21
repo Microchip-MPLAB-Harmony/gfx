@@ -65,3 +65,52 @@ uint32_t leColorChannelAlpha(leColor clr, leColorMode mode)
     
     return 0xFF;
 }
+
+leColor leColorSwap(leColor clr,
+                    leColorMode mode)
+{
+    uint32_t r, g, b, a;
+
+    switch(mode)
+    {
+        case LE_COLOR_MODE_RGB_565:
+        {
+            r = leColorChannelRed(clr, LE_COLOR_MODE_RGB_565);
+            g = leColorChannelGreen(clr, LE_COLOR_MODE_RGB_565);
+            b = leColorChannelBlue(clr, LE_COLOR_MODE_RGB_565);
+
+            return r | (g << 5) | (b << 11);
+        }
+        case LE_COLOR_MODE_RGBA_5551:
+        {
+            r = leColorChannelRed(clr, LE_COLOR_MODE_RGBA_5551);
+            g = leColorChannelGreen(clr, LE_COLOR_MODE_RGBA_5551);
+            b = leColorChannelBlue(clr, LE_COLOR_MODE_RGBA_5551);
+            a = leColorChannelAlpha(clr, LE_COLOR_MODE_RGBA_5551);
+
+            return r | (g << 6) | (b << 11) | (a << 15);
+        }
+        case LE_COLOR_MODE_RGB_888:
+        {
+            r = (clr & 0xFF0000) >> 16;
+            g = (clr & 0xFF00) >> 8;
+            b = (clr & 0xFF) >> 0;
+
+            return r | (g << 8) | (b << 16);
+        }
+        case LE_COLOR_MODE_RGBA_8888:
+        case LE_COLOR_MODE_ARGB_8888:
+        {
+            r = (clr & 0xFF000000) >> 24;
+            g = (clr & 0xFF0000) >> 16;
+            b = (clr & 0xFF00) >> 8;
+            a = (clr & 0xFF) >> 0;
+
+            return r | (g << 8) | (b << 16) | (a << 24);
+        }
+        default:
+        {
+            return clr;
+        }
+    }
+}

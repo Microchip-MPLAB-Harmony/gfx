@@ -77,6 +77,8 @@ typedef struct
     uint32_t data_buffer_size;
     uint8_t *data_buffer_ptr;
     uint8_t partial_frames;
+    GFX_Disp_Intf_Callback callback;
+    void * callback_parm;
 } GFX_DISP_INTF_PORTGROUP;
 
 uintptr_t ContextHandle;
@@ -84,7 +86,8 @@ uintptr_t ContextHandle;
 GFX_DISP_INTF_PORTGROUP portGroupIntf =
 {
         .locked = 0,
-        .transferStatus = GFX_INTF_DMA_STATUS_NO_TRANSFER
+        .transferStatus = GFX_INTF_DMA_STATUS_NO_TRANSFER,
+        .callback = NULL
 };
 
 static void GFX_Disp_Intf_DMATransferCallback(DMAC_TRANSFER_EVENT event,
@@ -185,6 +188,10 @@ void GFX_Disp_Intf_StartTransfer(uint8_t * cmd_buffer,
     }
     
     portGroupIntf.data_buffer_size = data_buffer_size;
+
+<#if UseTimerTrigger == true>
+    TC${TimerTriggerIndex}_CompareStart();
+</#if>
     
     if (cmd_buffer != NULL && cmd_buffer_size > 0)
     {
@@ -360,12 +367,27 @@ static void GFX_Disp_Intf_DMATransferCallback(DMAC_TRANSFER_EVENT event,
     {
         default:
         case GFX_INTF_DMA_STATUS_NO_TRANSFER:
+        {
             break;
+        }
         case GFX_INTF_DMA_STATUS_CMD_TRANSFER:
         {
             if (portGroupIntf.data_buffer_ptr == NULL)
             {
                 portGroupIntf.transferStatus = GFX_INTF_DMA_STATUS_NO_TRANSFER;
+
+<#if UseTimerTrigger == true>
+                TC${TimerTriggerIndex}_CompareStop();
+</#if>
+
+                if (portGroupIntf.callback != NULL)
+                {
+                    portGroupIntf.callback((GFX_Disp_Intf) &portGroupIntf,
+                                           GFX_DISP_INTF_TX_DONE,
+                                           portGroupIntf.callback_parm);
+                }
+
+
             }
             else
             {
@@ -389,10 +411,32 @@ static void GFX_Disp_Intf_DMATransferCallback(DMAC_TRANSFER_EVENT event,
             else
             {                
                 portGroupIntf.transferStatus = GFX_INTF_DMA_STATUS_NO_TRANSFER;
+
+<#if UseTimerTrigger == true>
+                TC${TimerTriggerIndex}_CompareStop();
+</#if>
+
+                if (portGroupIntf.callback != NULL)
+                {
+                    portGroupIntf.callback((GFX_Disp_Intf) &portGroupIntf,
+                                           GFX_DISP_INTF_TX_DONE,
+                                           portGroupIntf.callback_parm);
+                }
             }
             break;
         }
     }
+}
+
+int GFX_Disp_Intf_Set_Callback(GFX_Disp_Intf intf, GFX_Disp_Intf_Callback cb, void * parm)
+{
+    if (((GFX_DISP_INTF_PORTGROUP *) intf) == NULL)
+        return -1;
+
+    ((GFX_DISP_INTF_PORTGROUP *) intf)->callback = cb;
+    ((GFX_DISP_INTF_PORTGROUP *) intf)->callback_parm = parm;
+
+    return 0;
 }
 
 

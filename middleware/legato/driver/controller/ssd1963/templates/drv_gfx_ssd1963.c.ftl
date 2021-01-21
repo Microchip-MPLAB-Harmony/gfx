@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   SSD1963 Display Top-Level Driver Source File
@@ -404,45 +402,9 @@ void DRV_SSD1963_Update(void)
     }
 }
 
-gfxColorMode DRV_SSD1963_GetColorMode(void)
-{
-    return PIXEL_BUFFER_COLOR_MODE;
-}
-
-uint32_t DRV_SSD1963_GetBufferCount(void)
-{
-    return 1;
-}
-
-uint32_t DRV_SSD1963_GetDisplayWidth(void)
-{
-    return SCREEN_WIDTH;
-}
-
-uint32_t DRV_SSD1963_GetDisplayHeight(void)
-{
-    return SCREEN_HEIGHT;
-}
-
-uint32_t DRV_SSD1963_GetLayerCount()
-{
-    return 1;
-}
-
-uint32_t DRV_SSD1963_GetActiveLayer()
-{
-    return 0;
-}
-
-gfxResult DRV_SSD1963_SetActiveLayer(uint32_t idx)
-{
-    return LE_SUCCESS;
-}
-
 gfxResult DRV_SSD1963_BlitBuffer(int32_t x,
                                 int32_t y,
-                                 gfxPixelBuffer* buf,
-                                 gfxBlend gfx)
+                                 gfxPixelBuffer* buf)
 {
 <#if ParallelInterfaceWidth == "8-bit">
     int row, col, dataIdx;
@@ -486,13 +448,82 @@ gfxResult DRV_SSD1963_BlitBuffer(int32_t x,
     return GFX_SUCCESS;
 }
 
-void DRV_SSD1963_Swap(void)
+gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req,
+                                         void* arg)
 {
-    swapCount++;
-}
-
-uint32_t DRV_SSD1963_GetSwapCount(void)
-{
-    return swapCount;
+	switch(request)
+	{
+		case GFX_IOCTL_GET_COLOR_MODE:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = PIXEL_BUFFER_COLOR_MODE;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_BUFFER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_DISPLAY_SIZE:
+		{
+			disp = (gfxIOCTLArg_DisplaySize*)arg;			
+			
+			disp->width = SCREEN_WIDTH;
+			disp->height = SCREEN_HEIGHT;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_ACTIVE_LAYER:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 0;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_RECT:
+		{
+			rect = (gfxIOCTLArg_LayerRect*)arg;
+			
+			rect->x = 0;
+			rect->y = 0;
+			rect->width = SCREEN_WIDTH;
+			rect->height = SCREEN_HEIGHT;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_VSYNC_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = swapCount;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_LAYER_SWAP:
+		{
+			swapCount += 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		default:
+		{
+		}
+	}
+	
+	return GFX_IOCTL_UNSUPPORTED;
 }
 

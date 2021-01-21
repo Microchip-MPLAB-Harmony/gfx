@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,12 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+
+/** \file legato_stringtable.h
+ * @brief String table functions and definitions.
+ *
+ * @details .
+ */
 
 #ifndef LEGATO_STRINGTABLE_H
 #define LEGATO_STRINGTABLE_H
@@ -35,13 +39,10 @@
 #define LE_STRING_MAX_CHAR_WIDTH  6
 
 // *****************************************************************************
-/* Enumeration:
-    leStringEncodingMode
-
-  Summary:
-    Indicates the string encoding mode type.  Any characters above 255 must use
-    UTF8 or UTF16
-*/
+/**
+ * @brief This enum represents string encoding modes.
+ * @details String encoding modes are used to encode text.
+ */
 typedef enum leStringEncodingMode
 {
     LE_STRING_ENCODING_ASCII,
@@ -70,6 +71,11 @@ typedef enum leStringEncodingMode
                      from the font table
     encodingMode - indicates how strings are encoded in the stringIndexTable
 */
+/**
+ * @brief This struct represents string a string table.
+ * @details String table is used to describe a string table asset. There is
+ * typically only ever one of these defined at any one time.
+ */
 typedef struct leStringTable
 {
     leStreamDescriptor header;
@@ -88,6 +94,10 @@ typedef struct leStringTable
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents string a string table entry.
+ * @details
+ */
 typedef struct leStringInfo
 {
     uint32_t stringIndex;
@@ -99,172 +109,118 @@ typedef struct leStringInfo
 } leStringInfo;
 
 // *****************************************************************************
-/* Function:
-    uint32_t  leStringTable_GetStringCount(const leStringTable* table)
-
-  Summary:
-     Gets the number of strings in a string table
-
-  Description:
-     Gets the number of strings in a string table
-
-  Parameters:
-    const leStringTable* table - the table to query
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of strings in the table
-*/
-LIB_EXPORT uint32_t leStringTable_GetStringCount(const leStringTable* table);
+/**
+ * @brief Gets the number of strings in a string table.
+ * @details Gets the number of strings in <span class="param">table</span>.
+ * @code
+ * leStringTable* table;
+ * uint32_t cnt = leStringTable_GetStringCount(table);
+ * @endcode
+ * @param table is the table to query.
+ * @return the number of strings in the table.
+ */
+uint32_t leStringTable_GetStringCount(const leStringTable* table);
 
 // *****************************************************************************
-/* Function:
-    uint32_t  leStringTable_GetLanguageCount(const leStringTable* table)
-
-  Summary:
-     Gets the number of languages in a string table
-
-  Description:
-     Gets the number of languages in a string table
-
-  Parameters:
-    const leStringTable* table - the table to query
-
-  Remarks:
-
-  Returns:
-    uint32_t - the number of languages in the table
-*/
-
-LIB_EXPORT uint32_t leStringTable_GetLanguageCount(const leStringTable* table);
+/**
+ * @brief Get number of languages in a string table.
+ * @details Gets the number of languages in <span class="param">table</span>.
+ * @code
+ * leStringTable* table;
+ * uint32_t cnt = leStringTable_GetLanguageCount(table);
+ * @endcode
+ * @param table is the table to query.
+ * @return the number of languages in the table.
+ */
+uint32_t leStringTable_GetLanguageCount(const leStringTable* table);
 
 // *****************************************************************************
-/* Function:
-    uint32_t  leStringTable_GetStringOffset(const leStringTable* table                                            const leStringTable* table,
-                                            uint32_t stringID,
-                                            uint32_t languageID)
-
-  Summary:
-     gets the offset of a string in the string table given a string ID and a
-     language ID
-
-  Description:
-     gets the offset of a string in the string table given a string ID and a
-     language ID
-
-  Parameters:
-    const leStringTable* table - the table to query
-    uint32_t stringID - the string to query
-    uint32_t languageID - the language to query
-
-  Remarks:
-
-  Returns:
-    uint32_t - the offset of the string in bytes
-*/
-LIB_EXPORT uint32_t leStringTable_GetStringOffset(const leStringTable* table,
-                                                  uint32_t stringID,
-                                                  uint32_t languageID);
+/**
+ * @brief Get offset of a string in table by string and language ID.
+ * @details Gets the offset of a string in <span class="param">table</span>
+ * by <span class="param">stringID</span> and <span class="param">languageID</span>.
+ * @code
+ * leStringTable* table;
+ * uint32_t off = leStringTable_GetStringOffset(table, stringID, languageID);
+ * @endcode
+ * @param table is the table to query.
+ * @param stringID the search criteria.
+ * @param languageID the search criteria.
+ * @return the offset of the string in bytes.
+ */
+uint32_t leStringTable_GetStringOffset(const leStringTable* table,
+                                       uint32_t stringID,
+                                       uint32_t languageID);
 
 // *****************************************************************************
-/* Function:
-    uint32_t  leStringTable_GetActiveStringOffset(const leStringTable* table                                                  const leStringTable* table,
-                                                  uint32_t stringID)
-
-  Summary:
-     Gets the offset of a string in the string table using an the active global
-     language
-
-  Description:
-     Gets the offset of a string in the string table using an the active global
-     language
-
-  Parameters:
-    const leStringTable* table - the table to query
-    uint32_t stringID - the string to query
-
-  Remarks:
-
-  Returns:
-    uint32_t - the offset of the string in bytes
-*/
-LIB_EXPORT uint32_t leStringTable_GetActiveStringOffset(const leStringTable* table,
-                                                        uint32_t stringID);
+/**
+ * @brief Get offset of a string in table using active global language.
+ * @details Gets the offset of a string in <span class="param">table</span>
+ * by <span class="param">stringID</span>.
+ * @code
+ * leStringTable* table;
+ * uint32_t off = leStringTable_GetActiveStringOffset(table, stringID);
+ * @endcode
+ * @param table is the table to query.
+ * @param stringID is the search criteria.
+ * @return the offset of the string in bytes.
+ */
+uint32_t leStringTable_GetActiveStringOffset(const leStringTable* table,
+                                             uint32_t stringID);
 
 // *****************************************************************************
-/* Function:
-    leFont*  leStringTable_GetStringFont(const leStringTable* table                                         const leStringTable* table,
-                                         uint32_t stringID,
-                                         uint32_t languageID)
-
-  Summary:
-     Gets the font for a string table string
-
-  Description:
-     Gets the font for a string table string
-
-  Parameters:
-    const leStringTable* table - the table to query
-    uint32_t stringID - the string to query
-    uint32_t languageID - the language to query
-
-  Remarks:
-
-  Returns:
-    leFont* - the font for the string
-*/
-LIB_EXPORT leFont* leStringTable_GetStringFont(const leStringTable* table,
-                                               uint32_t stringID,
-                                               uint32_t languageID);
+/**
+ * @brief Get font for a string table string.
+ * @details Gets the font in <span class="param">table</span> by
+ * <span class="param">stringID</span> and
+ * <span class="param">languageID</span>.
+ * @code
+ * leStringTable* table;
+ * uint32_t stringID;
+ * uint32_t languageID;
+ * leFont* font = leStringTable_GetActiveStringOffset(table, stringID, languageID);
+ * @endcode
+ * @param table is the table to query.
+ * @param stringID the string search criteria.
+ * @param languageID the language search criteria.
+ * @return the font for the string.
+ */
+leFont* leStringTable_GetStringFont(const leStringTable* table,
+                                    uint32_t stringID,
+                                    uint32_t languageID);
 
 // *****************************************************************************
-/* Function:
-    leResult  leStringTable_StringLookup(const leStringTable* table                                         const leStringTable* table,
-                                         leStringInfo* info)
-
-  Summary:
-     Gets the info for a string table string
-
-  Description:
-     Gets the info for a string table string
-
-  Parameters:
-    const leStringTable* table - the table to query
-    leStringInfo* info - a filled leStringInfo structure
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
-LIB_EXPORT leResult leStringTable_StringLookup(const leStringTable* table,
-                                               leStringInfo* info);
+/**
+ * @brief Get info for a string table string.
+ * @details Gets the offset of a string in <span class="param">table</span> by
+ * <span class="param">info</span>.
+ * @code
+ * leStringTable* table;
+ * leResult res = leStringTable_GetActiveStringOffset(table, info);
+ * @endcode
+ * @param table is the table to query.
+ * @param info is the filled leStringInfo structure
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringTable_StringLookup(const leStringTable* table,
+                                    leStringInfo* info);
 
 // *****************************************************************************
-/* Function:
-    leResult  leStringTable_GetStringLength(const leStringTable* table                                            const leStringTable* table,
-                                            leStringInfo* info)
-
-  Summary:
-     Gets the length of a string in the string table in codepoints
-
-  Description:
-     Gets the length of a string in the string table in codepoints
-
-  Parameters:
-    const leStringTable* table - the table to query
-    leStringInfo* info - a valid leStringInfo structure
-
-  Remarks:
-    The provided info pointer will have its length value set
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-LIB_EXPORT leResult leStringTable_GetStringLength(const leStringTable* table,
-                                                  leStringInfo* info);
+/**
+ * @brief Get length of a string in the string table in codepoints.
+ * @details Gets the length of a string in <span class="param">table</span> by
+ * <span class="param">info</span>.
+ * @code
+ * leStringTable* table;
+ * leStringInfo* info;
+ * leResult res = leStringTable_GetStringLength(table, info);
+ * @endcode
+ * @param table is the table to query.
+ * @param info is the info search criteria.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringTable_GetStringLength(const leStringTable* table,
+                                       leStringInfo* info);
 
 
 #endif /* LEGATO_STRINGTABLE_H */

@@ -1,0 +1,13 @@
+digraph "C:/harmony3_dev/gfx/middleware" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_092bcda8a4c3ae9b70a1f62131a17a84 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="gfx" fontname="Helvetica", fontsize="10", URL="dir_092bcda8a4c3ae9b70a1f62131a17a84.html"]
+  subgraph clusterdir_89f38898316618d73bea37637642b0a7 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_89f38898316618d73bea37637642b0a7.html"];
+    dir_89f38898316618d73bea37637642b0a7 [shape=plaintext label="middleware"];
+    dir_f9263886f735bf5529b65b69f132d1a2 [shape=box label="legato" color="red" fillcolor="white" style="filled" URL="dir_f9263886f735bf5529b65b69f132d1a2.html"];
+  }
+  }
+}

@@ -67,7 +67,9 @@ void _leCheckBoxWidget_GetImageRect(const leCheckBoxWidget* cbox,
 									leRect* imgSrcRect)
 {
     leRect textRect = leRect_Zero;
-    leRect bounds = cbox->fn->localRect(cbox);
+    leRect bounds;
+
+    cbox->fn->localRect(cbox, &bounds);
     
     imgRect->x = 0;
     imgRect->y = 0;
@@ -109,8 +111,8 @@ void _leCheckBoxWidget_GetImageRect(const leCheckBoxWidget* cbox,
     leUtils_ArrangeRectangle(imgRect,
                              textRect,
                              bounds,
-                             cbox->widget.halign,
-                             cbox->widget.valign,
+                             cbox->widget.style.halign,
+                             cbox->widget.style.valign,
                              cbox->imagePosition,
                              cbox->widget.margin.left,
                              cbox->widget.margin.top,
@@ -118,7 +120,7 @@ void _leCheckBoxWidget_GetImageRect(const leCheckBoxWidget* cbox,
                              cbox->widget.margin.bottom,
                              cbox->imageMargin);
 
-	*imgRect = leRectClipAdj(imgRect, &bounds, imgSrcRect);
+	leRectClipAdj(imgRect, &bounds, imgSrcRect, imgRect);
 
 	// move the rect to screen space
 	leUtils_RectToScreenSpace((leWidget*)cbox, imgRect);
@@ -138,8 +140,8 @@ void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
         return;
     
     cbox->string->fn->getRect(cbox->string, textRect);
-    
-    bounds = cbox->fn->localRect(cbox);
+
+    cbox->fn->localRect(cbox, &bounds);
     
     // calculate image dimensions
     if(cbox->checked == LE_TRUE)
@@ -173,8 +175,8 @@ void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
     leUtils_ArrangeRectangleRelative(textRect,
                                      imgRect,
                                      bounds,
-                                     cbox->widget.halign,
-                                     cbox->widget.valign,
+                                     cbox->widget.style.halign,
+                                     cbox->widget.style.valign,
                                      cbox->imagePosition,
                                      cbox->widget.margin.left,
                                      cbox->widget.margin.top,
@@ -196,7 +198,7 @@ static void drawBorder(leCheckBoxWidget* cbox);
 
 static void nextState(leCheckBoxWidget* cbox)
 {
-    switch(cbox->widget.drawState)
+    switch(cbox->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -209,17 +211,18 @@ static void nextState(leCheckBoxWidget* cbox)
             }
 #endif
             
-            if(cbox->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(cbox->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                cbox->widget.drawState = DRAW_BACKGROUND;
+                cbox->widget.status.drawState = DRAW_BACKGROUND;
                 cbox->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            cbox->widget.drawState = DRAW_IMAGE;
+            cbox->widget.status.drawState = DRAW_IMAGE;
             cbox->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawImage;
 
             return;
@@ -229,25 +232,27 @@ static void nextState(leCheckBoxWidget* cbox)
             if(cbox->string != NULL &&
                cbox->string->fn->length(cbox->string) != 0)
             {
-                cbox->widget.drawState = DRAW_STRING;
+                cbox->widget.status.drawState = DRAW_STRING;
                 cbox->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
 
                 return;
             }
         }
+        // fall through
         case DRAW_STRING:
         {
-            if(cbox->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(cbox->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 cbox->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                cbox->widget.drawState = DRAW_BORDER;
+                cbox->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            cbox->widget.drawState = DONE;
+            cbox->widget.status.drawState = DONE;
             cbox->widget.drawFunc = NULL;
         }
     }
@@ -264,16 +269,16 @@ static void drawCheckBox(leCheckBoxWidget* cbox, leRect* rect)
     fillRect.height = CHECKBOX_SIZE;
     
     leRenderer_RectFill(&fillRect,
-                        cbox->widget.scheme->background,
+                        leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_BACKGROUND),
                         paintState.alpha);
     
     // draw box border
     leWidget_SkinClassic_Draw2x2BeveledBorder(rect,
-                                             cbox->widget.scheme->shadow,
-                                             cbox->widget.scheme->shadowDark,
-                                             cbox->widget.scheme->highlight,
-                                             cbox->widget.scheme->highlightLight,
-                                             paintState.alpha);
+                                              leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_SHADOW),
+                                              leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_SHADOWDARK),
+                                              leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_HIGHLIGHT),
+                                              leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                              paintState.alpha);
         
     if(cbox->checked == LE_TRUE)
     {
@@ -281,42 +286,42 @@ static void drawCheckBox(leCheckBoxWidget* cbox, leRect* rect)
                             rect->y + 5,
                             rect->x + 5,
                             rect->y + 7,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
                             
         leRenderer_DrawLine(rect->x + 5,
                             rect->y + 7,
                             rect->x + 9,
                             rect->y + 3,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
         
         leRenderer_DrawLine(rect->x + 3,
                             rect->y + 6,
                             rect->x + 5,
                             rect->y + 8,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
                             
         leRenderer_DrawLine(rect->x + 5,
                             rect->y + 8,
                             rect->x + 9,
                             rect->y + 4,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
                      
         leRenderer_DrawLine(rect->x + 3,
                             rect->y + 7,
                             rect->x + 5,
                             rect->y + 9,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
                             
         leRenderer_DrawLine(rect->x + 5,
                             rect->y + 9,
                             rect->x + 9,
                             rect->y + 5,
-                            cbox->widget.scheme->foreground,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
     }
 }
@@ -334,7 +339,7 @@ static void onImageStreamFinished(leStreamManager* dec)
 {
     leCheckBoxWidget* cbox = (leCheckBoxWidget*)dec->userData;
 
-    cbox->widget.drawState = DRAW_IMAGE;
+    cbox->widget.status.drawState = DRAW_IMAGE;
 
     nextState(cbox);
 }
@@ -375,7 +380,7 @@ static void drawImage(leCheckBoxWidget* cbox)
             leGetActiveStream()->onDone = onImageStreamFinished;
             leGetActiveStream()->userData = cbox;
 
-            cbox->widget.drawState = WAIT_IMAGE;
+            cbox->widget.status.drawState = WAIT_IMAGE;
             
             return;
         }
@@ -390,7 +395,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 {
     leCheckBoxWidget* cbox = (leCheckBoxWidget*)strm->userData;
 
-    cbox->widget.drawState = DRAW_STRING;
+    cbox->widget.status.drawState = DRAW_STRING;
 
     nextState(cbox);
 }
@@ -409,8 +414,8 @@ static void drawString(leCheckBoxWidget* cbox)
     cbox->string->fn->_draw(cbox->string,
                             textRect.x,
                             textRect.y,
-                            cbox->widget.halign,
-                            cbox->widget.scheme->text,
+                            cbox->widget.style.halign,
+                            leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_TEXT),
                             paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
@@ -419,7 +424,7 @@ static void drawString(leCheckBoxWidget* cbox)
         leGetActiveStream()->onDone = onStringStreamFinished;
         leGetActiveStream()->userData = cbox;
 
-        cbox->widget.drawState = WAIT_STRING;
+        cbox->widget.status.drawState = WAIT_STRING;
 
         return;
     }
@@ -430,12 +435,12 @@ static void drawString(leCheckBoxWidget* cbox)
 
 static void drawBorder(leCheckBoxWidget* cbox)
 {
-    if(cbox->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(cbox->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)cbox,
                                                     paintState.alpha);
     }
-    else if(cbox->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(cbox->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)cbox,
                                                       paintState.alpha);
@@ -446,27 +451,20 @@ static void drawBorder(leCheckBoxWidget* cbox)
 
 void _leCheckBoxWidget_Paint(leCheckBoxWidget* cbox)
 {
-    if(cbox->widget.scheme == NULL)
-    {
-        cbox->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(cbox->widget.drawState == NOT_STARTED)
+    if(cbox->widget.status.drawState == NOT_STARTED)
     {
         nextState(cbox);
     }
 
 #if LE_STREAMING_ENABLED == 1
-    if(cbox->widget.drawState == WAIT_IMAGE ||
-       cbox->widget.drawState == WAIT_STRING)
+    if(cbox->widget.status.drawState == WAIT_IMAGE ||
+       cbox->widget.status.drawState == WAIT_STRING)
     {
         return;
     }
 #endif
     
-    while(cbox->widget.drawState != DONE)
+    while(cbox->widget.status.drawState != DONE)
     {
         cbox->widget.drawFunc((leWidget*)cbox);
         
@@ -475,8 +473,8 @@ void _leCheckBoxWidget_Paint(leCheckBoxWidget* cbox)
 #endif
         
 #if LE_STREAMING_ENABLED == 1
-        if(cbox->widget.drawState == WAIT_IMAGE ||
-           cbox->widget.drawState == WAIT_STRING)
+        if(cbox->widget.status.drawState == WAIT_IMAGE ||
+           cbox->widget.status.drawState == WAIT_STRING)
             break;
 #endif
     }

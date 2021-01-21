@@ -31,21 +31,21 @@ peripherals = {
 
 def loadModule():
 	# load GFX2D peripheral 
-    if ("A5D2" in str(Variables.get("__PROCESSOR")) or "9X60" in str(Variables.get("__PROCESSOR"))):
+    if ("9X60" in str(Variables.get("__PROCESSOR"))):
         print("LE GFX2D module loaded to support " + str(Variables.get("__PROCESSOR")))
         periphName = "GFX2D"
         periphID = "44061"
-        periphScript = "peripheral/" + periphName.lower() + ".py"
+        periphScript = "peripheral/" + "LE " + periphName.lower() + ".py"
         
         print("GFX: create component: Peripheral " + periphName + " (ID = " + periphID + ")")
             
-        periphComponent = Module.CreateComponent("le_plib_gfx2d", "LE " + periphName.upper(), "/Peripherals/" +
+        periphComponent = Module.CreateComponent("plib_gfx2d", periphName.upper(), "/Peripherals/" +
                            periphName.upper() + "/",  "peripheral/plib_gfx2d.py")
         periphComponent.setDisplayType("Peripheral Library")
         periphComponent.addCapability("GFX2D", "GFX2D")
-        cntlComponent = Module.CreateComponent("le_gfx_gfx2d", "LE GFX2D", "/Graphics/Processor", "driver/gfx2d.py")
-        cntlComponent.setDisplayType("LE Graphics Processor")
-        cntlComponent.addCapability("le_gfx_driver_gfx2d", "LE Graphics Processor", False)
+        cntlComponent = Module.CreateComponent("le_gfx_gfx2d", "LE GFX2D", "/Graphics/Processor", "gfx2d.py")
+        cntlComponent.setDisplayType("Graphics Processor")
+        cntlComponent.addCapability("LE GPU Driver", "LE GPU Driver", False)
         cntlComponent.addDependency("GFX2D", "GFX2D", False, True)
     else:
         print("LE GFX2D module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

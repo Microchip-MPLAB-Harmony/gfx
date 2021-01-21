@@ -29,10 +29,6 @@
 #include "gfx/canvas/gfx_canvas_api.h"
 #include "gfx/canvas/gfx_canvas.h"
 
-<#if GPUBlitEnabled == true && GraphicsProcessorDriverName != "NULL">
-#include "gfx/driver/processor/2dgpu/libnano2d.h"
-</#if>
-
 #include "definitions.h"
 
 
@@ -62,22 +58,9 @@ typedef enum
 } GFXC_STATE;
 
 //LE Driver interface function prototypes
-static gfxColorMode GFXC_GetColorMode(void);
-static uint32_t GFXC_GetBufferCount(void);
-static uint32_t GFXC_GetDisplayWidth(void);
-static uint32_t GFXC_GetDisplayHeight(void);
 static void GFXC_Update(void);
-static uint32_t GFXC_GetLayerCount();
-static uint32_t GFXC_GetActiveLayer();
-static gfxResult GFXC_SetActiveLayer(uint32_t idx);
 static gfxResult GFXC_BlitBuffer(int32_t x, int32_t y, gfxPixelBuffer* buf);
-static gfxResult GFXC_SetPalette(gfxBuffer* palette,
-                          gfxColorMode mode,
-                          uint32_t colorCount);
-static gfxLayerState GFXC_GetLayerState(uint32_t idx);
-static void GFXC_Swap(void);
-static uint32_t GFXC_GetVSYNCCount(void);
-static gfxPixelBuffer * GFXC_GetPixelBuffer(int32_t idx);
+static gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request, void* arg);
 
 GFXC_CANVAS canvas[CONFIG_NUM_CANVAS_OBJ];
 unsigned int numLayers = CONFIG_NUM_LAYERS;
@@ -110,23 +93,11 @@ const gfxDisplayDriver * gfxDispCtrlr = &${DisplayDriverName};
 const gfxDisplayDriver * gfxDispCtrlr = NULL;
 </#if>
 
-
 const gfxDisplayDriver gfxDriverInterface =
 {
-    GFXC_GetColorMode,
-    GFXC_GetBufferCount,
-    GFXC_GetDisplayWidth,
-    GFXC_GetDisplayHeight,
-    GFXC_Update,
-    GFXC_GetLayerCount,
-    GFXC_GetActiveLayer,
-    GFXC_SetActiveLayer,
-    GFXC_GetLayerState,
-    GFXC_BlitBuffer,
-    GFXC_Swap,
-    GFXC_GetVSYNCCount,
-    GFXC_GetPixelBuffer,
-    GFXC_SetPalette,
+    .update = GFXC_Update,
+    .blitBuffer = GFXC_BlitBuffer,
+    .ioctl = GFX_CANVAS_IOCTL
 };
 
 <#list 0.. (NumCanvasObjects - 1) as i>
@@ -191,68 +162,26 @@ void GFX_CANVAS_Initialize(void)
         canvas[i].effects.move.status = GFXC_FX_IDLE;
     }
 
-<#if DisplayDriverName != "NULL">
-    numLayers =  gfxDispCtrlr->getLayerCount();
-<#else>
-    numLayers =  CONFIG_NUM_LAYERS;
-</#if>
-
     if (gfxDispCtrlr != NULL)
     {
-        displayWidth = gfxDispCtrlr->getDisplayWidth();
-        displayHeight = gfxDispCtrlr->getDisplayHeight();
+        gfxIOCTLArg_DisplaySize disp;
+        
+        gfxDispCtrlr->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, (gfxIOCTLArg_DisplaySize *) &disp);
+        displayWidth = disp.width;
+        displayHeight = disp.height;
     }
 
     gfxcObjectsInitialize();
 }
 
-
-//Library interface functions
-gfxColorMode GFXC_GetColorMode()
+gfxResult GFXC_FrameStart(uint32_t reserved)
 {
-    return canvas[activeCanvasID].pixelBuffer.mode;
+    return GFX_SUCCESS;
 }
 
-uint32_t GFXC_GetBufferCount()
+gfxResult GFXC_FrameEnd(void)
 {
-    return 1;
-}
-
-uint32_t GFXC_GetDisplayWidth()
-{
-    return canvas[activeCanvasID].pixelBuffer.size.width;
-}
-
-uint32_t GFXC_GetDisplayHeight()
-{
-    return canvas[activeCanvasID].pixelBuffer.size.height;
-}
-
-uint32_t GFXC_GetLayerCount()
-{
-    return CONFIG_NUM_CANVAS_OBJ;
-}
-
-uint32_t GFXC_GetActiveLayer()
-{
-    return activeCanvasID;
-}
-
-gfxResult GFXC_SetActiveLayer(uint32_t canvasID)
-{
-    if (canvasID < CONFIG_NUM_CANVAS_OBJ)
-    {
-        activeCanvasID = canvasID;
-        
-        return GFX_SUCCESS;
-    }
-    
-    return GFX_FAILURE;    
-}
-
-void GFXC_Swap(void)
-{
-
+    return GFX_SUCCESS;
 }
 
 uint32_t GFXC_GetVSYNCCount(void)
@@ -298,8 +227,7 @@ gfxResult GFXC_BlitBuffer(int32_t x,
     gfxcGPU->blitBuffer(buf,
                        &srcRect,
                        &canvas[activeCanvasID].pixelBuffer,
-                       &destRect,
-                       blend );
+                       &destRect);
 <#else>
     rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
 
@@ -316,126 +244,114 @@ gfxResult GFXC_BlitBuffer(int32_t x,
     return GFX_SUCCESS;
 }
 
-gfxResult GFXC_SetPalette(gfxBuffer* palette,
-                          gfxColorMode mode,
-                          uint32_t colorCount)
+gfxResult GFXC_GetLayerState(uint32_t idx, gfxLayerState* st)
 {
-    //Global Palette is a controller function, pass it down to the controller
-    if (gfxDispCtrlr != NULL && 
-        gfxDispCtrlr->setPalette != NULL)
-        return gfxDispCtrlr->setPalette(palette, mode, colorCount);
-    else
-        return GFX_FAILURE;
-}
+    st->rect.x = canvas[idx].layer.pos.xpos;
+    st->rect.y = canvas[idx].layer.pos.ypos;
+    st->rect.width = canvas[idx].layer.size.width;
+    st->rect.height = canvas[idx].layer.size.height;
+    st->enabled = canvas[idx].active;
 
-gfxLayerState GFXC_GetLayerState(uint32_t idx)
-{
-    gfxLayerState layerState;
-
-    layerState.rect.x = canvas[idx].layer.pos.xpos;
-    layerState.rect.y = canvas[idx].layer.pos.ypos;
-    layerState.rect.width = canvas[idx].layer.size.width;
-    layerState.rect.height = canvas[idx].layer.size.height;
-
-    layerState.enabled = canvas[idx].active;
-
-    return layerState;
+    return GFX_SUCCESS;
 }
 
 GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
 {
-    argSetSize setSizeParm;
-    argSetSize setResParm;
-    argSetPosition setPositionParm;
-    argSetValue setAlphaParm;
-    argSetValue setBaseAddressParm;
-    argSetValue setColorModeParm;
+    gfxIOCTLArg_Value argValue;
+    gfxIOCTLArg_LayerValue setBaseAddressParm;
+    gfxIOCTLArg_LayerValue setLayerEnabledParm;
+    gfxIOCTLArg_LayerValue setColorModeParm;
+    gfxIOCTLArg_LayerSize setResParm;
+    gfxIOCTLArg_LayerPosition setPositionParm;
+    gfxIOCTLArg_LayerSize setSizeParm;
+    gfxIOCTLArg_LayerValue setAlphaParm;
     
     if (canvasID < CONFIG_NUM_CANVAS_OBJ &&
         canvas[canvasID].layer.id != LAYER_ID_INVALID &&
         gfxDispCtrlr != NULL &&
-        gfxDispCtrlr->ctrlrConfig != NULL)
+        gfxDispCtrlr->ioctl != NULL)
     {
-        setBaseAddressParm.layerID = canvas[canvasID].layer.id;
+        setBaseAddressParm.base.id = canvas[canvasID].layer.id;
         if (canvas[canvasID].pixelBuffer.pixels != NULL)
-            setBaseAddressParm.value = (unsigned int) canvas[canvasID].pixelBuffer.pixels;
+            setBaseAddressParm.value.v_uint = (unsigned int) canvas[canvasID].pixelBuffer.pixels;
         else
         {
-            gfxDispCtrlr->setActiveLayer(canvas[canvasID].layer.id);
-            setBaseAddressParm.value = (unsigned int) gfxDispCtrlr->getFrameBuffer(0)->pixels;
+            argValue.value.v_int = canvas[canvasID].layer.id;
+            gfxDispCtrlr->ioctl(GFX_IOCTL_SET_ACTIVE_LAYER, (gfxIOCTLArg_Value*) &argValue);
+            
+            gfxDispCtrlr->ioctl(GFX_IOCTL_GET_FRAMEBUFFER, (gfxIOCTLArg_Value*) &argValue);
+            setBaseAddressParm.value.v_uint = argValue.value.v_uint;
         }
                     
-        setColorModeParm.layerID = canvas[canvasID].layer.id;
-        setColorModeParm.value = (unsigned int) canvas[canvasID].pixelBuffer.mode;
+        setColorModeParm.base.id = canvas[canvasID].layer.id;
+        setColorModeParm.value.v_uint = (unsigned int) canvas[canvasID].pixelBuffer.mode;
         
-        setResParm.layerID = canvas[canvasID].layer.id;
+        setResParm.base.id = canvas[canvasID].layer.id;
         setResParm.width = canvas[canvasID].pixelBuffer.size.width;
         setResParm.height = canvas[canvasID].pixelBuffer.size.height;
         
-        setSizeParm.layerID = canvas[canvasID].layer.id;
+        setSizeParm.base.id = canvas[canvasID].layer.id;
         setSizeParm.width = canvas[canvasID].layer.size.width;
         setSizeParm.height = canvas[canvasID].layer.size.height; 
         
-        setPositionParm.layerID = canvas[canvasID].layer.id;
-        setPositionParm.xpos = canvas[canvasID].layer.pos.xpos;
-        setPositionParm.ypos = canvas[canvasID].layer.pos.ypos;   
+        setPositionParm.base.id = canvas[canvasID].layer.id;
+        setPositionParm.x = canvas[canvasID].layer.pos.xpos;
+        setPositionParm.y = canvas[canvasID].layer.pos.ypos;   
         
-        setAlphaParm.layerID = canvas[canvasID].layer.id;
-        setAlphaParm.value = canvas[canvasID].layer.alpha;   
+        setAlphaParm.base.id = canvas[canvasID].layer.id;
+        setAlphaParm.value.v_uint = canvas[canvasID].layer.alpha;   
 
 <#if WindowClippingEnabled == true>
-        //clipping code
-        if (setPositionParm.xpos < 0)
+        if (setPositionParm.x < 0)
         {
             //align offsets for 8bpp frames
             if (gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size == 1)
-                setPositionParm.xpos = -(abs(setPositionParm.xpos) & ~0x3);
+                setPositionParm.x = -(abs(setPositionParm.x) & ~0x3);
 
-            setBaseAddressParm.value += abs(setPositionParm.xpos) * 
+            setBaseAddressParm.value.v_uint += abs(setPositionParm.x) * 
                     gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size; 
 
-            setSizeParm.width += setPositionParm.xpos;
-            setPositionParm.xpos = 0;
+            setSizeParm.width += setPositionParm.x;
+            setPositionParm.x = 0;
         }
 
-        if (setPositionParm.ypos < 0)
+        if (setPositionParm.y < 0)
         {
-            setBaseAddressParm.value += abs(setPositionParm.ypos) * 
+            setBaseAddressParm.value.v_uint += abs(setPositionParm.y) * 
                     setResParm.width * 
                     gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size;
 
-            setSizeParm.height += setPositionParm.ypos;
-            setPositionParm.ypos = 0;
+            setSizeParm.height += setPositionParm.y;
+            setPositionParm.y = 0;
         }
 
-        if (setPositionParm.xpos + setSizeParm.width > displayWidth)
-            setSizeParm.width = displayWidth - setPositionParm.xpos;
+        if (setPositionParm.x + setSizeParm.width > displayWidth)
+            setSizeParm.width = displayWidth - setPositionParm.x;
 
-        if (setPositionParm.ypos + setSizeParm.height > displayHeight)
-            setSizeParm.height = displayHeight - setPositionParm.ypos;
+        if (setPositionParm.y + setSizeParm.height > displayHeight)
+            setSizeParm.height = displayHeight - setPositionParm.y;
 </#if>
-        
-        //Lock layer and apply layer properties
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_LOCK, (void *) &canvas[canvasID].layer.id);
-        
-        if (setBaseAddressParm.value != NULL)
-            gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_BASE_ADDRESS, (void *) &setBaseAddressParm);
-        
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_COLOR_MODE, (void *) &setColorModeParm);
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_SIZE, (void *) &setResParm);
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_WINDOW_POSITION, (void *) &setPositionParm);
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_WINDOW_SIZE, (void *) &setSizeParm);
-        
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_ALPHA, (void *) &setAlphaParm);
-        
-        if (canvas[canvasID].active == true)
-            gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_ENABLE, (void *) &canvas[canvasID].layer.id);
-        else
-            gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_DISABLE, (void *) &canvas[canvasID].layer.id);
 
+        //Lock layer and apply layer properties
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_LOCK, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
+
+        if (setBaseAddressParm.value.v_uint != NULL)
+            gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_BASE_ADDRESS, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
         
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_COLOR_MODE, (gfxIOCTLArg_LayerValue *) &setColorModeParm);
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_SIZE, (gfxIOCTLArg_LayerSize *) &setResParm);
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_POSITION, (void *) &setPositionParm);
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_WINDOW_SIZE, (void *) &setSizeParm);
+        
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_ALPHA, (void *) &setAlphaParm);
+
+        setLayerEnabledParm.base.id = canvas[canvasID].layer.id;
+        setLayerEnabledParm.value.v_bool = canvas[canvasID].active;
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_ENABLED, (gfxIOCTLArg_LayerValue *) &setLayerEnabledParm);
+
+
         //Unlock layer to affect changes
-        gfxDispCtrlr->ctrlrConfig(GFX_CTRLR_SET_LAYER_UNLOCK, (void *) &canvas[canvasID].layer.id);
+        gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_UNLOCK, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
 
         return GFX_SUCCESS;
     }
@@ -725,6 +641,114 @@ void GFX_CANVAS_Task(void)
         default:
             break;
     }
+}
+
+gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
+                                      void* arg)
+{
+    gfxIOCTLArg_Value* val;
+    gfxIOCTLArg_DisplaySize* disp;
+    gfxIOCTLArg_LayerRect* rect;
+    
+    switch(request)
+    {
+        case GFX_IOCTL_GET_BUFFER_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = CONFIG_BUFFER_PER_LAYER;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_DISPLAY_SIZE:
+        {
+            disp = (gfxIOCTLArg_DisplaySize*)arg;
+            
+            disp->width = canvas[activeCanvasID].pixelBuffer.size.width;
+            disp->height = canvas[activeCanvasID].pixelBuffer.size.height;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_LAYER_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = CONFIG_NUM_CANVAS_OBJ;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_ACTIVE_LAYER:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = activeCanvasID;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_SET_ACTIVE_LAYER:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            if(val->value.v_uint >= CONFIG_NUM_CANVAS_OBJ)
+            {
+                return GFX_IOCTL_ERROR_UNKNOWN;
+            }
+            else
+            {
+                activeCanvasID = val->value.v_uint;
+
+                return GFX_IOCTL_OK;
+            }
+        }
+        case GFX_IOCTL_GET_LAYER_RECT:
+        {
+            rect = (gfxIOCTLArg_LayerRect*)arg;
+            
+            if(rect->base.id >= CONFIG_NUM_CANVAS_OBJ)        
+                return GFX_IOCTL_ERROR_UNKNOWN;
+            
+            rect->x = canvas[rect->base.id].layer.pos.xpos;
+            rect->y = canvas[rect->base.id].layer.pos.ypos;
+            rect->width = canvas[rect->base.id].layer.size.width;
+            rect->height = canvas[rect->base.id].layer.size.height;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_VSYNC_COUNT:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 0;
+            
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_FRAMEBUFFER:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_pbuffer = &canvas[activeCanvasID].pixelBuffer;
+                        
+            return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_SET_PALETTE:
+        {
+            //Global Palette is a controller function, pass it down to the controller
+            if (gfxDispCtrlr != NULL)
+                return gfxDispCtrlr->ioctl(GFX_IOCTL_SET_PALETTE, (gfxIOCTLArg_Palette*) arg);
+            else
+                return GFX_FAILURE;
+        }
+        default:
+        {
+            if (request >= GFX_IOCTL_LAYER_REQ_START && 
+                request < GFX_IOCTL_LAYER_REQ_END)
+            {
+                return gfxDispCtrlr->ioctl(request, (gfxIOCTLArg_LayerArg*)arg);
+            }
+        }
+    }
+    
+    return GFX_IOCTL_UNSUPPORTED;
 }
 
 /* *****************************************************************************

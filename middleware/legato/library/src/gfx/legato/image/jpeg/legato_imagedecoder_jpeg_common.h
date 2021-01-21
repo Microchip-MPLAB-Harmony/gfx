@@ -39,6 +39,13 @@
     Internal library use only
 *******************************************************************************/
 
+/** \file legato_imagedeocder_jpeg_common.h
+* @brief JPEG Image decoder
+*
+* @details Internal library use only
+*
+*/
+
 #ifndef LE_IMAGEDECODER_JPEG_COMMON_H
 #define LE_IMAGEDECODER_JPEG_COMMON_H
 

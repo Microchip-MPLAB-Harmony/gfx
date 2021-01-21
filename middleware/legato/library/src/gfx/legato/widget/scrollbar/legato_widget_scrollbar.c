@@ -191,7 +191,7 @@ void leScrollBarWidget_Constructor(leScrollBarWidget* _this)
 
     _this->state = LE_SCROLLBAR_STATE_NONE;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_BEVEL;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_BEVEL;
 
     _this->alignment = LE_ORIENTATION_VERTICAL;
     
@@ -214,7 +214,7 @@ static void destructor(leScrollBarWidget* _this)
     _leWidget_Destructor((leWidget*)_this);
 }
 
-leScrollBarWidget* leScrollBarWidget_New()
+leScrollBarWidget* leScrollBarWidget_New(void)
 {
     leScrollBarWidget* bar = NULL;
 
@@ -387,8 +387,8 @@ static leResult stepBackward(leScrollBarWidget* _this)
         
     _invalidateHandleRect(_this);
         
-    if(_this->value - _this->step < DEFAULT_MIN ||
-       _this->value - _this->step > _this->max)
+    if(((int32_t)_this->value - (int32_t)_this->step) < DEFAULT_MIN ||
+       ((int32_t)_this->value - (int32_t)_this->step) > (int32_t)_this->max)
     {
         _this->value = DEFAULT_MIN;
     }
@@ -415,9 +415,9 @@ static leResult stepForward(leScrollBarWidget* _this)
         return LE_FAILURE;
         
     _invalidateHandleRect(_this);
-        
-    if(_this->value + _this->step < DEFAULT_MIN ||
-       _this->value + _this->step > _this->max)
+
+    if(((int32_t)_this->value - (int32_t)_this->step) < DEFAULT_MIN ||
+        ((int32_t)_this->value - (int32_t)_this->step) > (int32_t)_this->max)
     {
         _this->value = _this->max;
     }
@@ -620,7 +620,7 @@ void _leScrollBarWidget_Paint(leScrollBarWidget* _this);
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
-void _leScrollBarWidget_GenerateVTable()
+void _leScrollBarWidget_GenerateVTable(void)
 {
     _leWidget_FillVTable((void*)&scrollBarWidgetVTable);
 
@@ -694,7 +694,7 @@ static const leScrollBarWidgetVTable scrollBarWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,

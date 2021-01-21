@@ -1,0 +1,12 @@
+digraph "lePixelBufferOffsetGet"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="lePixelBufferOffsetGet",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Get buffer at point."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="lePixelBufferGet_Unsafe",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__pixelbuffer_8h.html#af63ae8ca48e5e5b0b38ada5f66575e41",tooltip="Get pixel at point."];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="lePixelBufferGet",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$legato__pixelbuffer_8h.html#a8e99e8197326458e1111923d77035530",tooltip="Get pixel at point."];
+}

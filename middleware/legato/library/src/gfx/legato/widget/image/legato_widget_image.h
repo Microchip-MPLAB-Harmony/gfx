@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     This module implements image widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_image.h
+ * @brief Image widget menu functions and definitions.
+ *
+ * @details This module implements image widget functions.
+ */
 
 #ifndef LEGATO_IMAGE_H
 #define LEGATO_IMAGE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -59,33 +60,27 @@ typedef struct leImage leImage;
 // Section: Data Types and Constants
 // *****************************************************************************
 // *****************************************************************************
-#if LE_IMAGE_WIDGET_DEBUG_CB == 1
-typedef void (*leImageWidget_DrawEventCallback)(leImageWidget* );
 
-#define DEBUG_START_VFN void (*setDebugDrawStartCallback)(THIS_TYPE* _this, leImageWidget_DrawEventCallback cb);
-#define DEBUG_END_VFN void (*setDebugDrawEndCallback)(THIS_TYPE* _this, leImageWidget_DrawEventCallback cb);
-#else
-#define DEBUG_START_VFN
-#define DEBUG_END_VFN
-#endif
-
-
-// DOM-IGNORE-BEGIN
-
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 #define LE_IMAGEWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
     leImage*  (*getImage)(const THIS_TYPE* _this); \
     leResult  (*setImage)(THIS_TYPE* _this, leImage* img); \
-    DEBUG_START_VFN \
-    DEBUG_END_VFN \
-    
+
 typedef struct leImageWidgetVTable
 {
 	LE_IMAGEWIDGET_VTABLE(leImageWidget)
 } leImageWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Enumeration:
@@ -100,6 +95,10 @@ typedef struct leImageWidgetVTable
   Remarks:
     None.
 */
+/**
+  * @brief This struct represents a image widget.
+  * @details An image widget displays an image asset.
+  */
 typedef struct leImageWidget
 {
     leWidget widget; // widget base class
@@ -115,135 +114,97 @@ typedef struct leImageWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leImageWidget* leImageWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leImageWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leImageWidget* wgt = leImageWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leImageWidget* leImageWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the managment of this memory until the
-    widget is added to a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leImageWidget <span class="param">wgt</span>.
+ * @code
+ * leImageWidget* wgt;
+ * leImageWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leImageWidget_Constructor(leImageWidget* img);
 
-  Description:
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
+
+/**
+ * @brief Get image pointer.
+ * @details Gets the image pointer for <span class="param">_this</span>.
+ * @code
+ * const leImageWidget* _this;
+ * leImage* img = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the string pointer.
+ */
+virtual leImage* getImage(const leImageWidget* _this);
 
 
-  Parameters:
-    void
+/**
+ * @brief Set image pointer.
+ * @details Sets the image pointer to
+ * <span class="param">img</span> for <span class="param">_this</span>.
+ * @code
+ * leImageWidget* _this;
+ * leImage* img;
+ * leResult res = _this->fn->setString(_this, img);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param img is the string pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setImage(leImageWidget* _this,
+                          leImage* img);
 
-  Returns:
-    leImageWidget* - the widget
+/**
+ * @brief Set debug draw start callback.
+ * @details Sets the debug draw start callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leImageWidget* _this;
+ * leImageWidget_DrawEventCallback cb;
+ * leResult res = _this->fn->setDebugDrawStartCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setDebugDrawStartCallback(leImageWidget* _this,
+                                           leImageWidget_DrawEventCallback cb);
 
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leImageWidget* leImageWidget_New();
+/**
+ * @brief Set debug draw end callback.
+ * @details Sets the debug draw end callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leImageWidget* _this;
+ * leImageWidget_DrawEventCallback cb;
+ * leResult res = _this->fn->setDebugDrawEndCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual void setDebugDrawEndCallback(leImageWidget* _this,
+                                     leImageWidget_DrawEventCallback cb);
 
-/* Function:
-    void leImageWidget_Constructor(leImageWidget* wgt)
-
-  Summary:
-    Initializes an leImageWidget widget pointer.
-
-  Description:
-    Initializes an leImageWidget widget pointer.
-
-  Parameters:
-    leImageWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leImageWidget_Constructor(leImageWidget* img);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leImage* getImage(const leImageWidget* _this)
-
-  Summary:
-     Gets the image pointer
-
-  Description:
-     Gets the image pointer
-
-  Parameters:
-    const leImageWidget* _this - The image to operate on
-
-  Remarks:
-    Usage - _this->fn->getImage(_this);
-
-  Returns:
-    leImage* - the image pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setImage(leImageWidget* _this,
-                      leImage* img)
-
-  Summary:
-     Sets the image pointer
-
-  Description:
-     Sets the image pointer
-
-  Parameters:
-    leImageWidget* _this - The image to operate on
-    leImage* img - the image pointer
-
-  Remarks:
-    Usage - _this->fn->setImage(_this, img);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    void setDebugDrawStartCallback(leImageWidget* _this,
-                                   leImageWidget_DrawEventCallback cb)
-
-  Summary:
-     Sets the debug draw start callback
-
-  Description:
-     Sets the debug draw start callback
-
-  Parameters:
-    leImageWidget* _this - The image to operate on
-    leImageWidget_DrawEventCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setDebugDrawStartCallback(_this, cb);
-
-  Returns:
-    void
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    void setDebugDrawEndCallback(leImageWidget* _this,
-                                 leImageWidget_DrawEventCallback cb)
-
-  Summary:
-     Sets the debug draw end callback
-
-  Description:
-     Sets the debug draw end callback
-
-  Parameters:
-    leImageWidget* _this - The image to operate on
-    leImageWidget_DrawEventCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setDebugDrawEndCallback(_this, cb);
-
-  Returns:
-    void
-*/
-
+#undef THIS_TYPE
+#endif
 
 
 #endif // LE_IMAGE_WIDGET_ENABLED

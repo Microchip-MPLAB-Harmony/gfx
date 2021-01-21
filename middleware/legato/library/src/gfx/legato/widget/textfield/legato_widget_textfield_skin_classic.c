@@ -56,7 +56,9 @@ void _leTextFieldWidget_GetTextRect(leTextFieldWidget* txt,
                                     leRect* textRect,
                                     leRect* drawRect)
 {
-    leRect bounds = txt->fn->localRect(txt);
+    leRect bounds;
+
+    txt->fn->localRect(txt, &bounds);
 
     *textRect = leRect_Zero;
     *drawRect = leRect_Zero;
@@ -73,7 +75,7 @@ void _leTextFieldWidget_GetTextRect(leTextFieldWidget* txt,
     leUtils_ArrangeRectangleRelative(textRect,
                                      leRect_Zero,
                                      bounds,
-                                     txt->editWidget.widget.halign,
+                                     txt->editWidget.widget.style.halign,
                                      LE_VALIGN_MIDDLE,
                                      0,
                                      txt->editWidget.widget.margin.left,
@@ -92,9 +94,11 @@ void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* txt,
                                       leRect* cursorRect)
 {
     leRect textRect;
-    leRect bounds = txt->fn->localRect(txt);
+    leRect bounds;
     leRect charRect;
     const leString* str = NULL;
+
+    txt->fn->localRect(txt, &bounds);
 
     if(txt->text.fn->length(&txt->text) > 0)
     {
@@ -119,7 +123,7 @@ void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* txt,
         leUtils_ArrangeRectangleRelative(&textRect,
                                          leRect_Zero,
                                          bounds,
-                                         txt->editWidget.widget.halign,
+                                         txt->editWidget.widget.style.halign,
                                          LE_VALIGN_MIDDLE,
                                          0,
                                          txt->editWidget.widget.margin.left,
@@ -141,7 +145,7 @@ void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* txt,
         // middle of the text
         else
         {
-            txt->hintText->fn->getCharRect(txt->hintText, txt->cursorPos, &charRect);
+            txt->hintText->fn->getCharRect(str, txt->cursorPos, &charRect);
 
             cursorRect->x = textRect.x + charRect.x;
         }
@@ -162,7 +166,7 @@ static void drawBorder(leTextFieldWidget* txt);
 
 static void nextState(leTextFieldWidget* txt)
 {
-    switch(txt->editWidget.widget.drawState)
+    switch(txt->editWidget.widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -175,48 +179,52 @@ static void nextState(leTextFieldWidget* txt)
             }
 #endif
 
-            if(txt->editWidget.widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(txt->editWidget.widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                txt->editWidget.widget.drawState = DRAW_BACKGROUND;
+                txt->editWidget.widget.status.drawState = DRAW_BACKGROUND;
                 txt->editWidget.widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(txt->text.fn->length(&txt->text) > 0 ||
                 (txt->hintText != NULL && leGetEditWidget() != (void*)txt))
             {
-                txt->editWidget.widget.drawState = DRAW_STRING;
+                txt->editWidget.widget.status.drawState = DRAW_STRING;
                 txt->editWidget.widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
 
                 return;
             }
         }
+        // fall through
         case DRAW_STRING:
         {
             if(txt->cursorEnable == LE_TRUE && txt->cursorVisible == LE_TRUE)
             {
-                txt->editWidget.widget.drawState = DRAW_CURSOR;
+                txt->editWidget.widget.status.drawState = DRAW_CURSOR;
                 txt->editWidget.widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawCursor;
                 
                 return; 
             }
         }
+        // fall through
         case DRAW_CURSOR:
         {
-            if(txt->editWidget.widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(txt->editWidget.widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 txt->editWidget.widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                txt->editWidget.widget.drawState = DRAW_BORDER;
+                txt->editWidget.widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            txt->editWidget.widget.drawState = DONE;
+            txt->editWidget.widget.status.drawState = DONE;
             txt->editWidget.widget.drawFunc = NULL;
         }
     }
@@ -224,10 +232,10 @@ static void nextState(leTextFieldWidget* txt)
 
 static void drawBackground(leTextFieldWidget* txt)
 {
-    if(txt->editWidget.widget.backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(txt->editWidget.widget.style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
-        leWidget_SkinClassic_DrawBackground((leWidget*)txt, 
-                                            txt->editWidget.widget.scheme->background,
+        leWidget_SkinClassic_DrawBackground((leWidget*)txt,
+                                            leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_BACKGROUND),
                                             paintState.alpha);
     }
     
@@ -239,7 +247,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 {
     leTextFieldWidget* txt = (leTextFieldWidget*)strm->userData;
 
-    txt->editWidget.widget.drawState = DRAW_STRING;
+    txt->editWidget.widget.status.drawState = DRAW_STRING;
 
     nextState(txt);
 }
@@ -256,8 +264,8 @@ static void drawString(leTextFieldWidget* txt)
         txt->text.fn->_draw(&txt->text,
                             textRect.x,
                             textRect.y,
-                            txt->editWidget.widget.halign,
-                            txt->editWidget.widget.scheme->text,
+                            txt->editWidget.widget.style.halign,
+                            leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_TEXT),
                             paintState.alpha);
     }
     else if(txt->hintText != NULL && leGetEditWidget() != (void*)txt)
@@ -265,8 +273,8 @@ static void drawString(leTextFieldWidget* txt)
         txt->hintText->fn->_draw(txt->hintText,
                                  textRect.x,
                                  textRect.y,
-                                 txt->editWidget.widget.halign,
-                                 txt->editWidget.widget.scheme->textDisabled,
+                                 txt->editWidget.widget.style.halign,
+                                 leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_TEXT_DISABLED),
                                  paintState.alpha);
     }
 
@@ -276,7 +284,7 @@ static void drawString(leTextFieldWidget* txt)
         leGetActiveStream()->onDone = onStringStreamFinished;
         leGetActiveStream()->userData = txt;
 
-        txt->editWidget.widget.drawState = WAIT_STRING;
+        txt->editWidget.widget.status.drawState = WAIT_STRING;
 
         return;
     }
@@ -292,8 +300,8 @@ static void drawCursor(leTextFieldWidget* txt)
     _leTextFieldWidget_GetCursorRect(txt, &cursorRect);
     
     // draw cursor line
-    leRenderer_RectFill(&cursorRect, 
-                        txt->editWidget.widget.scheme->foreground,
+    leRenderer_RectFill(&cursorRect,
+                        leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_FOREGROUND),
                         paintState.alpha);
     
     nextState(txt);
@@ -301,12 +309,12 @@ static void drawCursor(leTextFieldWidget* txt)
 
 static void drawBorder(leTextFieldWidget* txt)
 {
-    if(txt->editWidget.widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(txt->editWidget.widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)txt,
                                                     paintState.alpha);
     }
-    else if(txt->editWidget.widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(txt->editWidget.widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardLoweredBorder((leWidget*)txt,
                                                        paintState.alpha);
@@ -317,19 +325,12 @@ static void drawBorder(leTextFieldWidget* txt)
 
 void _leTextFieldWidget_Paint(leTextFieldWidget* txt)
 {
-    if(txt->editWidget.widget.scheme == NULL)
-    {
-        txt->editWidget.widget.drawState = DONE;
-        
-        return;
-    }
-
-    if(txt->editWidget.widget.drawState == NOT_STARTED)
+    if(txt->editWidget.widget.status.drawState == NOT_STARTED)
     {
         nextState(txt);
     }
     
-    while(txt->editWidget.widget.drawState != DONE)
+    while(txt->editWidget.widget.status.drawState != DONE)
     {
         txt->editWidget.widget.drawFunc((leWidget*)txt);
         
@@ -338,7 +339,7 @@ void _leTextFieldWidget_Paint(leTextFieldWidget* txt)
 #endif
 
 #if LE_STREAMING_ENABLED == 1
-        if(txt->editWidget.widget.drawState == WAIT_STRING)
+        if(txt->editWidget.widget.status.drawState == WAIT_STRING)
             break;
 #endif
     }

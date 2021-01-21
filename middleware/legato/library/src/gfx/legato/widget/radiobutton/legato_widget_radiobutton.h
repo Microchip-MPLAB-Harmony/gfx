@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements radio button widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_radiobutton.h
+ * @brief Radiobutton functions and definitions.
+ *
+ * @details This module implements scroll bar widget functions.
+ */
+
 #ifndef LEGATO_RADIOBUTTON_H
 #define LEGATO_RADIOBUTTON_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -63,6 +65,12 @@ typedef struct leRadioButtonGroup leRadioButtonGroup;
   Summary:
     Radio button selected function callback type
 */
+/**
+ * @brief This function represents a select event callback.
+ * @details Select event callback is used indicate a radio button
+ * selection.
+ * @details .
+ */
 typedef void (*leRadioButtonWidget_SelectedEvent)(leRadioButtonWidget*);
 
 // *****************************************************************************
@@ -72,6 +80,12 @@ typedef void (*leRadioButtonWidget_SelectedEvent)(leRadioButtonWidget*);
   Summary:
     Radio button deselected function callback type
 */
+/**
+ * @brief This function represents a deselect event callback.
+ * @details Deselect event callback is used indicate a radio button
+ * deselection.
+ * @details .
+ */
 typedef void (*leRadioButtonWidget_DeselectedEvent)(leRadioButtonWidget*);
 
 // *****************************************************************************
@@ -80,8 +94,11 @@ typedef void (*leRadioButtonWidget_DeselectedEvent)(leRadioButtonWidget*);
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
-typedef struct leRadioButtonWidget leRadioButtonWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leRadioButtonWidget leRadioButtonWidget;
 
 #define LE_RADIOBUTTONWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
@@ -113,7 +130,10 @@ typedef struct leRadioButtonWidgetVTable
 	LE_RADIOBUTTONWIDGET_VTABLE(leRadioButtonWidget)
 } leRadioButtonWidgetVTable; 
 
-// DOM-IGNORE-END
+    /**
+      * @endcond
+      *
+      */
 
 // *****************************************************************************
 /* Enumeration:
@@ -131,6 +151,13 @@ typedef struct leRadioButtonWidgetVTable
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a radio button widget.
+ * @details A radio button is similar to a checkbox widget in that it has an on
+ * and off state.  It is further capable of being added to a radio button group. This
+ * group provides a mutually exclusive selection capability so that only one
+ * radio button may be selected at any one time.
+ */
 typedef struct leRadioButtonWidget
 {
     leWidget widget; // widget base class
@@ -182,27 +209,35 @@ typedef struct leRadioButtonWidget
   Remarks:
     Use leWidget_Delete() to free this pointer.
 */
-LIB_EXPORT leRadioButtonWidget* leRadioButtonWidget_New();
+/**
+ * @brief Create widget.
+ * @details Creates a new leRadioButtonWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leRadioButtonWidget* wgt = leRadioButtonWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leRadioButtonWidget* leRadioButtonWidget_New(void);
 
-/* Function:
-    void leRadioButtonWidget_Constructor(leRadioButtonWidget* wgt)
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leRadioButtonWidget <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonWidget* wgt;
+ * leRadioButtonWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leRadioButtonWidget_Constructor(leRadioButtonWidget* wgt);
 
-  Summary:
-    Initializes an leRadioButtonWidget widget pointer.
 
-  Description:
-    Initializes an leRadioButtonWidget widget pointer.
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
-  Parameters:
-    leRadioButtonWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -223,6 +258,17 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leRadioButtonGroup* - the radio button group
 */
+/**
+ * @brief Get button's group pointe.
+ * @details Gets the button's group pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRadioButtonGroup* ptr = wgt->fn->getGroup(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the radio button group;
+ */
+virtual leBool getSelected(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -243,6 +289,18 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leBool - the selected state
 */
+/**
+ * @brief Set selected.
+ * @details Set selected using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leBool selected = wgt->fn->getSelected(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_TRUE if set, otherwise LE_FALSE;
+ */
+virtual leBool getSelected(const leRadioButtonWidget* _this);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -263,10 +321,22 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set selected.
+ * @details Set selected using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leResult res = wgt->fn->setSelected(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setSelected(leRadioButtonWidget* _this);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
-    void select(leRadioButtonWidget* _this)
+    void selected(leRadioButtonWidget* _this)
 
   Summary:
      internal use only
@@ -274,7 +344,7 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
 
 // *****************************************************************************
 /* Virtual Member Function:
-    void deselect(leRadioButtonWidget* _this)
+    void deselected(leRadioButtonWidget* _this)
 
   Summary:
      internal use only
@@ -299,6 +369,17 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leString* - the string pointer
 */
+/**
+ * @brief Get text string pointer.
+ * @details Gets the text string pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leString* str = wgt->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the string pointer;
+ */
+virtual leString* getString(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -321,6 +402,22 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set text string pointer.
+ * @details Sets the text string pointer to <span class="param">str</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leString* str;
+ * leResult res = wgt->fn->setString(_this, str);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param str the string pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setString(leRadioButtonWidget* _this,
+                           const leString* str);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -341,6 +438,18 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leImage* - the image pointer
 */
+/**
+ * @brief Get text string pointer.
+ * @details Gets the text string pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leString* str = wgt->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the string pointer;
+ */
+virtual leString* getString(const leRadioButtonWidget* _this);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -363,6 +472,22 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set selected image pointer.
+ * @details Sets the selected image pointer to <span class="param">img</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leImage* img;
+ * leResult res = wgt->fn->setSelectedImage(_this, img);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param img the image pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setSelectedImage(leRadioButtonWidget* _this,
+                                  const leImage* img);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -383,6 +508,17 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leImage* - the image pointer
 */
+/**
+ * @brief Get unselected image pointer.
+ * @details Gets the unselected image pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leImage* img = wgt->fn->getUnselectedImage(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the image pointer;
+ */
+virtual leImage* getUnselectedImage(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -405,6 +541,21 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set image position.
+ * @details Sets the image position to <span class="param">pos</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leImage* img;
+ * leResult res = wgt->fn->setUnselectedImage(_this, img);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param img the image pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setUnselectedImage(leRadioButtonWidget* _this,
+                                    const leImage* img);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -425,6 +576,17 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leRelativePosition - the position
 */
+/**
+ * @brief Get unselected image pointer.
+ * @details Gets the unselected image pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRelativePosition pos = wgt->fn->getImagePosition(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns the position;
+ */
+virtual leRelativePosition getImagePosition(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -447,6 +609,22 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set image position.
+ * @details Sets the image position to <span class="param">pos</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRelativePosition pos;
+ * leResult res = wgt->fn->setImagePosition(_this, pos);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param pos the position value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setImagePosition(leRadioButtonWidget* _this,
+                                  leRelativePosition pos);
+
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -467,6 +645,17 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     uint32_t - the margin value
 */
+/**
+ * @brief Get image margin.
+ * @details Gets the image margin using <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * uint32_t margin = wgt->fn->getCircleButtonSize(_this);
+ * @endcode
+ * @param _this is the widget to query
+ * @return the margin value.
+ */
+virtual uint32_t getImageMargin(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:
@@ -489,134 +678,112 @@ LIB_EXPORT void leRadioButtonWidget_Constructor(leRadioButtonWidget* btn);
   Returns:
     leResult - the result of the operation
 */
+/**
+ * @brief Set image margin.
+ * @details Sets the image margin to <span class="param">mg</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * uint32_t sz;
+ * leResult res = wgt->fn->setCircleButtonSize(_this, mg);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param mg the margin value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setImageMargin(leRadioButtonWidget* _this,
+                        uint32_t mg);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leRadioButtonWidget_SelectedEvent getSelectedEventCallback(const leRadioButtonWidget* _this)
-
-  Summary:
-     Gets the selected event callback pointer
-
-  Description:
-     Gets the selected event callback pointer
-
-  Parameters:
-    const leRadioButtonWidget* _this - The radio button widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getSelectedEventCallback(_this);
-
-  Returns:
-    leRadioButtonWidget_SelectedEvent - the callback pointer
-*/
+/**
+ * @brief Get circle button size.
+ * @details Gets the circle button size using <span class="param">_this</span>.
+ * @code
+ * leWindowWidget* _this;
+ * uint32_t sz = wgt->fn->getCircleButtonSize(_this);
+ * @endcode
+ * @param _this is the widget to query
+ * @return the circle button size.
+ */
+uint32_t getCircleButtonSize(const leRadioButtonWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setSelectedEventCallback(leRadioButtonWidget* _this,
-                                      leRadioButtonWidget_SelectedEvent cb)
+/**
+ * @brief Set circle button size.
+ * @details Sets circle button size to <span class="param">sz</span>
+ * using <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonWidget* wgt;
+ * uint32_t sz;
+ * leResult res = wgt->fn->setCircleButtonSize(_this, sz);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param sz the size value.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCircleButtonSize(leRadioButtonWidget* _this,
+                                     uint32_t sz);
 
-  Summary:
-     Sets the selected event callback pointer
+/**
+ * @brief Get deselected event callback pointer.
+ * @details Gets the deselected event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRadioButtonWidget_SelectedEvent cb = _this->fn->getDeselectedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leRadioButtonWidget_SelectedEvent getSelectedEventCallback
+                                        (const leRadioButtonWidget* _this);
 
-  Description:
-     Sets the selected event callback pointer
+/**
+ * @brief Set deselected event callback pointer.
+ * @details Sets the deselected event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRadioButtonWidget_SelectedEvent cb;
+ * leResult res = _this->fn->setSelectedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setSelectedEventCallback(leRadioButtonWidget* _this,
+                                            leRadioButtonWidget_SelectedEvent cb);
 
-  Parameters:
-    leRadioButtonWidget* _this - The radio button widget to operate on
-    leRadioButtonWidget_SelectedEvent cb - the callback pointer
+/**
+ * @brief Get deselected event callback pointer.
+ * @details Gets the deselected event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRadioButtonWidget_DeselectedEvent cb = _this->fn->getDeselectedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leRadioButtonWidget_DeselectedEvent getDeselectedEventCallback
+                                        (const leRadioButtonWidget* _this);
 
-  Remarks:
-    Usage - _this->fn->setSelectedEventCallback(_this, cb);
+/**
+ * @brief Set deselected event callback pointer.
+ * @details Sets the deselected event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leRadioButtonWidget* _this;
+ * leRadioButtonWidget_DeselectedEvent cb;
+ * leResult res = _this->fn->setDeselectedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setDeselectedEventCallback(leRadioButtonWidget* _this,
+                                            leRadioButtonWidget_DeselectedEvent cb);
 
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leRadioButtonWidget_DeselectedEvent getDeselectedEventCallback(const leRadioButtonWidget* _this)
-
-  Summary:
-     Gets the deselected event callback pointer
-
-  Description:
-     Gets the deselected event callback pointer
-
-  Parameters:
-    const leRadioButtonWidget* _this - The radio button widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getDeselectedEventCallback(_this);
-
-  Returns:
-    leRadioButtonWidget_DeselectedEvent - the callback pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setDeselectedEventCallback(leRadioButtonWidget* _this,
-                                        leRadioButtonWidget_DeselectedEvent cb)
-
-  Summary:
-     Sets the deselected event callback pointer
-
-  Description:
-     Sets the deselected event callback pointer
-
-  Parameters:
-    leRadioButtonWidget* _this - The radio button widget to operate on
-    leRadioButtonWidget_DeselectedEvent cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setDeselectedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getCircleButtonSize(const leRadioButtonWidget* _this)
-
-  Summary:
-     Gets the circle button size
-
-  Description:
-     Gets the circle button size
-
-  Parameters:
-    const leRadioButtonWidget* _this - The radio button widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getCircleButtonSize(_this);
-
-  Returns:
-    uint32_t - the circle button size
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setCircleButtonSize(leRadioButtonWidget* _this,
-                                 uint32_t sz)
-
-  Summary:
-     Sets the circle button size
-
-  Description:
-     Sets the circle button size
-
-  Parameters:
-    leRadioButtonWidget* _this - The radio button widget to operate on
-    uint32_t sz - the size value
-
-  Remarks:
-    Usage - _this->fn->setCircleButtonSize(_this, sz);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-
+#undef THIS_TYPE
+#endif
 
 #endif // LE_RADIOBUTTON_WIDGET_ENABLED
 #endif /* LEGATO_RADIOBUTTON_H */

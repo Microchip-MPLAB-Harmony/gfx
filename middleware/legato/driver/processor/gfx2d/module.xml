@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Module name="gfx_le_gfx2d" id="E71613BE-9D36-48E7-9C2D-AED138E6CD3L" version="1.0.0">
+<Module name="le_gfx_gfx2d" id="C1C04B5B-D3AC-4317-A1C7-629E557F33DC" version="1.0.0">
     <ConfigRoot path="module.py"/>
 </Module>

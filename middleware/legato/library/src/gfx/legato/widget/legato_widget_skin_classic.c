@@ -47,37 +47,35 @@ static void drawBorder(leWidget* wdg);
 
 static void drawBackground(leWidget* wdg)
 {
-    //leRect rect;
-    
     //printf("button painting\n");
     
-    if(wdg->backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(wdg->style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
         //Only support round corners for no or line borders
-        if (wdg->cornerRadius > 0 && 
-            (wdg->borderType == LE_WIDGET_BORDER_NONE || 
-             wdg->borderType == LE_WIDGET_BORDER_LINE))
+        if (wdg->style.cornerRadius > 0 &&
+            (wdg->style.borderType == LE_WIDGET_BORDER_NONE ||
+             wdg->style.borderType == LE_WIDGET_BORDER_LINE))
         {
             leWidget_SkinClassic_DrawRoundCornerBackground(wdg,
-                                                           wdg->scheme->base,
+                                                           leScheme_GetRenderColor(wdg->scheme, LE_SCHM_BASE),
                                                            paintState.alpha);
         }
         else
         {
             leWidget_SkinClassic_DrawBackground(wdg,
-                                                wdg->scheme->base,
+                                                leScheme_GetRenderColor(wdg->scheme, LE_SCHM_BASE),
                                                 paintState.alpha);
         }
     }
 
-    if(wdg->borderType != LE_WIDGET_BORDER_NONE)
+    if(wdg->style.borderType != LE_WIDGET_BORDER_NONE)
     {
-        wdg->drawState = DRAW_BORDER;
+        wdg->status.drawState = DRAW_BORDER;
         wdg->drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
     }
     else
     {
-        wdg->drawState = DONE;
+        wdg->status.drawState = DONE;
         wdg->drawFunc = NULL;
         
         return;
@@ -90,29 +88,22 @@ static void drawBackground(leWidget* wdg)
 
 static void drawBorder(leWidget* wdg)
 {
-    if(wdg->borderType == LE_WIDGET_BORDER_LINE)
+    if(wdg->style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder(wdg, paintState.alpha);
     }
-    else if(wdg->borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(wdg->style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder(wdg, paintState.alpha);
     }
         
-    wdg->drawState = DONE;
+    wdg->status.drawState = DONE;
     wdg->drawFunc = NULL;
 }
 
 void _leWidget_Paint(leWidget* wdg)
 {
-    if(wdg->scheme == NULL)
-    {
-        wdg->drawState = DONE;
-        
-        return;
-    }
-    
-    if(wdg->drawState == NOT_STARTED)
+    if(wdg->status.drawState == NOT_STARTED)
     {
         paintState.alpha = 255;
 

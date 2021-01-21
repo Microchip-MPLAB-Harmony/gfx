@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   Module for Microchip Graphics Library - Legato User Interface Library
@@ -45,10 +43,18 @@
     search path for header files.
  *******************************************************************************/
 
-//DOM-IGNORE-BEGIN
+/** \file legato_common.h
+ * @brief Common macros and definitions used by Legato.
+ *
+ * @details This file defines the common macros and definitions used
+ * by the legato library definition and implementation files.
+ *
+ * @remark The directory in which this file resides should be added to the
+ * compiler's search path for header files.
+ */
+
 #ifndef LEGATO_COMMON_H
 #define LEGATO_COMMON_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/legato_config.h"
 
@@ -71,32 +77,22 @@ typedef unsigned __int64     uint64_t;
 #include <stdint.h>
 #endif
 
-/* export macros for shared libraries */
-#ifdef _WIN32
-#ifdef LIBRARY
-#define LIB_EXPORT __declspec( dllexport )
-#else
-#define LIB_EXPORT __declspec( dllimport )
-#endif
-#else
-#define LIB_EXPORT 
-#endif
-
 #ifndef WIN32
 //#include "osal/osal.h" FIXME for H3
 #endif
 
-// DOM-IGNORE-BEGIN
+/**
+ * @brief Defines the default color of mode for all schemes.
+ * @details In Legato there is a need to identify the default
+ * color mode for schemes.
+ */
 #ifndef LE_DEFAULT_SCHEME_COLOR_MODE
 #define LE_DEFAULT_SCHEME_COLOR_MODE LE_COLOR_MODE_RGB_565
 #endif
-// DOM-IGNORE-END
 
-// DOM-IGNORE-BEGIN
 #ifdef __cplusplus
     extern "C" {
 #endif
-// DOM-IGNORE-END
         
 // *****************************************************************************
 // *****************************************************************************
@@ -117,6 +113,12 @@ typedef unsigned __int64     uint64_t;
   Remarks:
     None.
 */
+
+/**
+ * @brief This enum represents function call results.
+ * @details Results are used to report success and failure conditions. These
+ * are the various success and failure codes.
+ */
 typedef enum leResult
 {
     LE_FAILURE = -1,
@@ -136,10 +138,14 @@ typedef enum leResult
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents booleans.
+ * @details Boolean are used to communicate true and false conditions.
+ */
 typedef enum leBool
 {
-    LE_FALSE = 0,
-    LE_TRUE
+    LE_FALSE = 0,   /**< Logic false =0. */
+    LE_TRUE         /**< Logic true = 1. */
 } leBool;
 
 // *****************************************************************************
@@ -154,12 +160,17 @@ typedef enum leBool
 
   Remarks:
     None.
-*/
+*/   
+/**
+ * @brief This enum represents the vertical alignment mode of objects.
+ * @details The vertical alignment mode controls how objects are positioned
+ * vertically.
+ */
 typedef enum
 {
-    LE_VALIGN_TOP,
-    LE_VALIGN_MIDDLE,
-    LE_VALIGN_BOTTOM
+    LE_VALIGN_TOP,      /**< Aligns with the top. */
+    LE_VALIGN_MIDDLE,   /**< Aligns with the middle. */
+    LE_VALIGN_BOTTOM    /**< Aligns with the bottom. */
 } leVAlignment;
 
 // *****************************************************************************
@@ -175,11 +186,16 @@ typedef enum
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents the horizontal alignment mode of objects.
+ * @details The horizontal alignment mode controls how objects are positioned
+ * horizontally.
+ */
 typedef enum
 {
-    LE_HALIGN_LEFT,
-    LE_HALIGN_CENTER,
-    LE_HALIGN_RIGHT
+    LE_HALIGN_LEFT,     /**< Aligns with the left edge. */
+    LE_HALIGN_CENTER,   /**< Aligns with the center. */
+    LE_HALIGN_RIGHT     /**< Aligns with the right edge. */
 } leHAlignment;
 
 // *****************************************************************************
@@ -195,14 +211,23 @@ typedef enum
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents the four margin settings for objects.
+ * @details The four margin: left, top, right, bottom controls
+ * the size of the borders around objects.
+ */
 typedef struct leMargin
 {
-    uint8_t left;
-    uint8_t top;
-    uint8_t right;
-    uint8_t bottom;
+    uint8_t left;       /**< Aligns with the left margin. */
+    uint8_t top;        /**< Aligns with the top margin. */
+    uint8_t right;      /**< Aligns with the right margin. */
+    uint8_t bottom;     /**< Aligns with the bottom margin. */
 } leMargin;
 
+/**
+ * @brief This const represents zero margin settings for objects.
+ * @details .
+ */
 static const leMargin leMargin_Zero = {0, 0, 0, 0};
 
 // *****************************************************************************
@@ -218,12 +243,17 @@ static const leMargin leMargin_Zero = {0, 0, 0, 0};
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents the four directions modes for objects.
+ * @details The four directions: right, down, left, up controls
+ * the direction of objects.
+ */
 typedef enum leDirection
 {
-  LE_DIRECTION_RIGHT,
-  LE_DIRECTION_DOWN,
-  LE_DIRECTION_LEFT,
-  LE_DIRECTION_UP
+  LE_DIRECTION_RIGHT,   /**< Specifies right direction. */
+  LE_DIRECTION_DOWN,    /**< Specifies down direction. */
+  LE_DIRECTION_LEFT,    /**< Specifies left direction. */
+  LE_DIRECTION_UP       /**< Specifies up direction. */
 } leDirection;
 
 // *****************************************************************************
@@ -239,10 +269,15 @@ typedef enum leDirection
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents the two rotation direction modes for objects.
+ * @details The two directions: counter clockwise, clockwise controls
+ * the rotation direction of objects.
+ */
 typedef enum leRotationDirection
 {
-    LE_COUNTER_CLOCKWISE,
-    LE_CLOCKWISE,
+    LE_COUNTER_CLOCKWISE,   /**< Specifies counter clockwise rotation. */
+    LE_CLOCKWISE,           /**< Specifies clockwise rotation. */
 } leRotationDirection;
 
 // *****************************************************************************
@@ -258,13 +293,18 @@ typedef enum leRotationDirection
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents the relative position modes for objects.
+ * @details The relative position modes controls
+ * the relative position of objects to other objects.
+ */
 typedef enum leRelativePosition
 {
-    LE_RELATIVE_POSITION_LEFTOF,
-    LE_RELATIVE_POSITION_ABOVE,
-    LE_RELATIVE_POSITION_RIGHTOF,
-    LE_RELATIVE_POSITION_BELOW,
-    LE_RELATIVE_POSITION_BEHIND
+    LE_RELATIVE_POSITION_LEFTOF,    /**< Position to the left of object. */
+    LE_RELATIVE_POSITION_ABOVE,     /**< Positive to the right of object. */
+    LE_RELATIVE_POSITION_BELOW,     /**< Positive to the top of object. */
+    LE_RELATIVE_POSITION_RIGHTOF,   /**< Positive to the bottom of object. */
+    LE_RELATIVE_POSITION_BEHIND     /**< Positive to the top of object. */
 } leRelativePosition;
 
 // *****************************************************************************
@@ -280,6 +320,11 @@ typedef enum leRelativePosition
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents the orientation modes for objects.
+ * @details The orientation modes controls the horizontal and vertical of
+ * objects to other objects.
+ */
 typedef enum leOrientation
 {
   LE_ORIENTATION_HORIZONTAL,
@@ -293,12 +338,20 @@ typedef enum leOrientation
   Summary:
     A two dimensional Cartesian point.
 */
+/**
+ * @brief This structure represents a integer Cartesian point.
+ * @details A point is specified by an x and y coordinate.
+ */
 typedef struct lePoint
 {
     int32_t x;
     int32_t y;
 } lePoint;
 
+/**
+ * @brief This const represents zero point setting for a coordinate .
+ * @details .
+ */
 static const lePoint lePoint_Zero = {0, 0};
 
 // *****************************************************************************
@@ -309,12 +362,20 @@ static const lePoint lePoint_Zero = {0, 0};
     A two dimensional indication of size.  Values are signed but should never be
     negative.
 */
+/**
+ * @brief This structure is used represents the size of an item.
+ * @details A size is specified by a width and height.
+ */
 typedef struct leSize
 {
-    int32_t width;
-    int32_t height;
+    int32_t width;      /**< width of an item. */
+    int32_t height;     /**< height of an item. */
 } leSize;
 
+/**
+ * @brief This const represents zero size setting for an object .
+ * @details .
+ */
 static const leSize leSize_Zero = {0, 0};
 
 // *****************************************************************************
@@ -324,6 +385,11 @@ static const leSize leSize_Zero = {0, 0};
   Summary:
     A rectangle definition.  
 */
+/**
+ * @brief This struct represents a rectangle.
+ * @details A rectangle is specified by x and y top-left position and a width and height
+ * bottom-right position.
+ */
 typedef struct leRect
 {
     int16_t x;
@@ -332,20 +398,28 @@ typedef struct leRect
     int16_t height;
 } leRect;
 
+/**
+ * @brief This typedef represents general-purpose buffer.
+ * @details The address of any variable of any data type (char, int,
+ * float etc.) can be assigned to a void pointer variable.
+ */
 typedef void* leBuffer;
 
 /* library configuration flags */
+/**
+ * @brief This typedef represents Legato character.
+ * @details A Legato character is a 16-bit character.
+ */
 typedef uint16_t leChar;
+
 #define LE_UNKNOWN_GLYPH  0xFFFF
 
-// DOM-IGNORE-END
-
-//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
     }
 #endif
-// DOM-IGNORE-END
-     
+
+#define ASSIGN_VIRTUAL_FUNCTION(name) .name = name
+#define ASSIGN_VTABLE_FUNCTION(vtable, name) vtable.name = name
 #endif // LEGATO_COMMON_H
 
 /*******************************************************************************

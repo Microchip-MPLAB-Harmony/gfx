@@ -1,0 +1,17 @@
+digraph "C:/harmony3_dev/gfx/middleware/legato/driver/controller" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_f6792742576531c8d0dcc3348644119e {
+    graph [ bgcolor="#ddddee", pencolor="black", label="driver" fontname="Helvetica", fontsize="10", URL="dir_f6792742576531c8d0dcc3348644119e.html"]
+  subgraph clusterdir_3ad0064d60c3a2f99351286e220b4df5 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_3ad0064d60c3a2f99351286e220b4df5.html"];
+    dir_3ad0064d60c3a2f99351286e220b4df5 [shape=plaintext label="controller"];
+    dir_0145f6b52c2718dc7b3abf5b64f3ec6d [shape=box label="external_controller" color="red" fillcolor="white" style="filled" URL="dir_0145f6b52c2718dc7b3abf5b64f3ec6d.html"];
+    dir_2a6993e85b988e157f6c056430c1ebe9 [shape=box label="glcd" color="red" fillcolor="white" style="filled" URL="dir_2a6993e85b988e157f6c056430c1ebe9.html"];
+    dir_611bdfc211aca45fd12561038f3d4e88 [shape=box label="interface" color="red" fillcolor="white" style="filled" URL="dir_611bdfc211aca45fd12561038f3d4e88.html"];
+    dir_81b225fb3ee9afba1cce049d1d134f0a [shape=box label="lcc" color="red" fillcolor="white" style="filled" URL="dir_81b225fb3ee9afba1cce049d1d134f0a.html"];
+    dir_9a0a561ff1a64fd94267f86d34da07d2 [shape=box label="lcdc" color="red" fillcolor="white" style="filled" URL="dir_9a0a561ff1a64fd94267f86d34da07d2.html"];
+  }
+  }
+}

@@ -47,6 +47,11 @@ def instantiateComponent(comp):
 	InterfaceType.setDefaultValue("SPI 4-line")
 	InterfaceType.setVisible(False)
 
+        InterfaceSpiIndex = comp.createIntegerSymbol("DRV_INTERFACE_SPI_INDEX", None)
+	InterfaceSpiIndex.setLabel("SPI Index")
+	InterfaceSpiIndex.setDefaultValue(0)
+	InterfaceSpiIndex.setMin(0)
+
 	TransferModeSettingsMenu = comp.createMenuSymbol("TransferModeSettingsMenu", None)
 	TransferModeSettingsMenu.setLabel("Transfer Mode Settings")
 	

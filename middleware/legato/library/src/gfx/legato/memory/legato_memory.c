@@ -26,6 +26,8 @@
 
 #include "gfx/legato/memory/legato_memory.h"
 
+#if LE_MEMORY_MANAGER_ENABLE == 1
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,12 +38,12 @@
 
 #include "gfx/legato/memory/legato_fixedheap.h"
 
-uint8_t fixedHeap16[LE_FIXEDHEAP_BLOCK_SIZE(16) * LE_FIXEDHEAP_SIZE_16];
-uint8_t fixedHeap32[LE_FIXEDHEAP_BLOCK_SIZE(32) * LE_FIXEDHEAP_SIZE_32];
-uint8_t fixedHeap64[LE_FIXEDHEAP_BLOCK_SIZE(64) * LE_FIXEDHEAP_SIZE_64];
-uint8_t fixedHeap128[LE_FIXEDHEAP_BLOCK_SIZE(128) * LE_FIXEDHEAP_SIZE_128];
-uint8_t fixedHeap196[LE_FIXEDHEAP_BLOCK_SIZE(196) * LE_FIXEDHEAP_SIZE_196];
-uint8_t fixedHeap256[LE_FIXEDHEAP_BLOCK_SIZE(256) * LE_FIXEDHEAP_SIZE_256];
+uint8_t LE_COHERENT_MEMORY fixedHeap16[LE_FIXEDHEAP_BLOCK_SIZE(16) * LE_FIXEDHEAP_SIZE_16];
+uint8_t LE_COHERENT_MEMORY fixedHeap32[LE_FIXEDHEAP_BLOCK_SIZE(32) * LE_FIXEDHEAP_SIZE_32];
+uint8_t LE_COHERENT_MEMORY fixedHeap64[LE_FIXEDHEAP_BLOCK_SIZE(64) * LE_FIXEDHEAP_SIZE_64];
+uint8_t LE_COHERENT_MEMORY fixedHeap128[LE_FIXEDHEAP_BLOCK_SIZE(128) * LE_FIXEDHEAP_SIZE_128];
+uint8_t LE_COHERENT_MEMORY fixedHeap196[LE_FIXEDHEAP_BLOCK_SIZE(196) * LE_FIXEDHEAP_SIZE_196];
+uint8_t LE_COHERENT_MEMORY fixedHeap256[LE_FIXEDHEAP_BLOCK_SIZE(256) * LE_FIXEDHEAP_SIZE_256];
 
 typedef struct leFixedMemoryPoolDef
 {
@@ -65,7 +67,7 @@ leFixedHeap fixedHeaps[LE_FIXED_HEAP_COUNT];
 
 #endif
 
-uint8_t variableHeapData[LE_VARIABLEHEAP_SIZE];
+uint8_t LE_COHERENT_MEMORY variableHeapData[LE_VARIABLEHEAP_SIZE];
 
 leVariableHeap variableHeap;
 
@@ -97,6 +99,172 @@ leResult leMemory_Init()
     return LE_SUCCESS;
 }
 
+#if LE_FIXEDHEAP_ENABLE == 1
+#if LE_USE_DEBUG_ALLOCATOR == 1
+static void* _fixedHeapAlloc(uint32_t size, uint32_t line, const char* func, const char* file)
+#else
+static void* _fixedHeapAlloc(uint32_t size)
+#endif
+{
+    uint32_t i = 0;
+    void* ptr;
+
+    /* try to find a fixed heap that this will fit in */
+    while(fixedHeaps[i].initialized == LE_TRUE)
+    {
+        if(size < fixedHeaps[i].logicalBlockSize)
+        {
+            ptr = LE_FHEAP_ALLOC(&fixedHeaps[i]);
+
+            if(ptr != NULL)
+            {
+#if LE_MALLOC_ZEROIZE == 1
+                memset(ptr, 0, size);
+#endif
+
+                return ptr;
+            }
+        }
+
+        i++;
+    }
+
+    return NULL;
+}
+
+
+
+static int32_t _findFixedHeapForPointer(void* ptr)
+{
+    int32_t i = 0;
+
+    /* try to find the fixed heap that contains this pointer */
+    while(fixedHeaps[i].initialized == LE_TRUE)
+    {
+        /* make sure the heap actually contains this pointer */
+        if(leFixedHeap_Contains(&fixedHeaps[i], ptr) == LE_TRUE)
+        {
+            return i;
+        }
+
+        i++;
+    }
+
+    return -1;
+}
+
+static int32_t _findFixedHeapSizeForPointer(void* ptr)
+{
+    int32_t i = 0;
+
+    /* try to find the fixed heap that contains this pointer */
+    while(fixedHeaps[i].initialized == LE_TRUE)
+    {
+        /* make sure the heap actually contains this pointer */
+        if(leFixedHeap_Contains(&fixedHeaps[i], ptr) == LE_TRUE)
+        {
+            return fixedHeaps[i].logicalBlockSize;
+        }
+
+        i++;
+    }
+
+    return -1;
+}
+
+static leResult _fixedHeapFree(void* ptr)
+{
+    int32_t heapIdx = _findFixedHeapForPointer(ptr);
+
+    if(heapIdx == -1)
+        return LE_FAILURE;
+
+    leFixedHeap_Free(&fixedHeaps[heapIdx], ptr);
+
+    return LE_SUCCESS;
+}
+
+static int32_t _getFixedHeapForSize(uint32_t size)
+{
+    int32_t i = 0;
+
+    /* try to find a fixed heap that this will fit in */
+    while(fixedHeaps[i].initialized == LE_TRUE)
+    {
+        if(size < fixedHeaps[i].logicalBlockSize)
+            return i;
+
+        i++;
+    }
+
+    return -1;
+}
+
+#if LE_USE_DEBUG_ALLOCATOR == 1
+static void* _fixedHeapRealloc(void* ptr, uint32_t size, uint32_t line, const char* func, const char* file)
+#else
+static void* _fixedHeapRealloc(void* ptr, uint32_t size)
+#endif
+{
+    int32_t current = _findFixedHeapForPointer(ptr);
+    int32_t target = _getFixedHeapForSize(size);
+    void* newPtr;
+
+    if(target == -1)
+        return NULL;
+
+    if(current == target)
+        return ptr;
+
+    /* try to find a fixed heap that this will fit in */
+    for(; target < LE_FIXED_HEAP_COUNT; ++target)
+    {
+        if(fixedHeaps[target].capacity > 0)
+            break;
+    }
+
+    // no room
+    if(target == LE_FIXED_HEAP_COUNT)
+        return NULL;
+
+    if(target == current)
+        return ptr;
+
+    newPtr = LE_FHEAP_ALLOC(&fixedHeaps[target]);
+
+    LE_ASSERT(newPtr != NULL);
+
+    if(newPtr != NULL)
+    {
+#if LE_MALLOC_ZEROIZE == 1
+        memset(newPtr, 0, size);
+#endif
+
+        // copy the data
+        if(target > current)
+        {
+            /* new block can completely contain old data */
+            memcpy(newPtr, ptr, size);
+        }
+        else
+        {
+            /* need to truncate old data for new block */
+            memcpy(newPtr, ptr, size);
+        }
+
+        leFixedHeap_Free(&fixedHeaps[current], ptr);
+
+#if LE_FIXEDHEAP_DEBUG == 1
+        LE_ASSERT(leFixedHeap_Validate(&fixedHeaps[current]) == LE_SUCCESS);
+#endif
+
+        return newPtr;
+    }
+
+    return NULL;
+}
+#endif
+
 #if LE_USE_DEBUG_ALLOCATOR == 1
 void* leMalloc(size_t size,
                size_t line,
@@ -109,50 +277,20 @@ void* leMalloc(size_t size)
     void* ptr;
 
 #if LE_FIXEDHEAP_ENABLE == 1
-    uint32_t i = 0;
-
-    /* try to find a fixed heap that this will fit in */
-    while(fixedHeaps[i].initialized == LE_TRUE)
-    {
-        if(size < fixedHeaps[i].logicalBlockSize)
-        {
 #if LE_USE_DEBUG_ALLOCATOR == 1
-            ptr = leFixedHeap_Alloc(&fixedHeaps[i],
-                                    line,
-                                    func,
-                                    file);
+    ptr = _fixedHeapAlloc(size, line, func, file);
 #else
-            ptr = leFixedHeap_Alloc(&fixedHeaps[i]);
+    ptr = _fixedHeapAlloc(size);
 #endif
 
-            LE_ASSERT(ptr != NULL);
 
-            if(ptr != NULL)
-            {
-#if LE_MALLOC_ZEROIZE == 1
-                memset(ptr, 0, size);
-#endif
+    if(ptr != NULL)
+        return ptr;
 
-                return ptr;
-            }
-
-            return NULL;
-        }
-
-        i++;
-    }
 #endif
 
     /* use the dynamic allocator to handle anything the fixed heaps can't fit */
-#if LE_USE_DEBUG_ALLOCATOR == 1
-    ptr = leVariableHeap_Alloc(&variableHeap,
-                               size,
-                               line,
-                               func,
-                               file);
-#else
-    ptr = leVariableHeap_Alloc(&variableHeap, size);
-#endif
+    ptr = LE_VHEAP_ALLOC(&variableHeap, size);
 
     LE_ASSERT(ptr != NULL);
 
@@ -162,10 +300,12 @@ void* leMalloc(size_t size)
         memset(ptr, 0, size);
 #endif
 
+        //leMemoryPrintReport();
+
         return ptr;
     }
 
-    return ptr;
+    return NULL;
 }
 
 #if LE_USE_DEBUG_ALLOCATOR == 1
@@ -179,102 +319,141 @@ void* leRealloc(void* ptr, size_t size)
 #endif
 {
     void* newPtr = NULL;
-    uint32_t oldSize = 0;
 
 #if LE_FIXEDHEAP_ENABLE == 1
-    uint32_t i = 0;
+    uint32_t oldSize = 0;
+    uint32_t fixedHeapSize;
+    int32_t fixedHeapIndex;
 #endif
-
-    if(size == 0)
-        return NULL;
 
     if(ptr == NULL)
     {
-#if LE_USE_DEBUG_ALLOCATOR == 1
-        return leMalloc(size, line, func, file);
-#else
-        return leMalloc(size);
-#endif
+        return LE_MALLOC(size);
+    }
+
+    if(size == 0)
+    {
+        LE_FREE(ptr);
+
+        return NULL;
     }
 
 #if LE_FIXEDHEAP_ENABLE == 1
-    /* try to find the size of the old pointer for data preservation */
-    while(fixedHeaps[i].initialized == LE_TRUE)
-    {
-        if(leFixedHeap_Contains(&fixedHeaps[i], ptr) == LE_TRUE)
-        {
-            oldSize = fixedHeaps[i].logicalBlockSize;
+    fixedHeapIndex = _findFixedHeapForPointer(ptr);
 
-            break;
+    if(fixedHeapIndex >= 0)
+    {
+#if LE_USE_DEBUG_ALLOCATOR == 1
+        newPtr = _fixedHeapRealloc(ptr, size, line, func, file);
+#else
+        newPtr = _fixedHeapRealloc(ptr, size);
+#endif
+
+        if(newPtr != NULL)
+            return newPtr;
+
+        // allocate from variable heap
+#if LE_USE_DEBUG_ALLOCATOR == 1
+        newPtr = leVariableHeap_Alloc(&variableHeap, size, line, func, file);
+#else
+        newPtr = leVariableHeap_Alloc(&variableHeap, size);
+#endif
+
+        fixedHeapSize = _findFixedHeapSizeForPointer(ptr);
+
+        // copy the data
+        if(fixedHeapSize < size)
+        {
+            /* new block can completely contain old data */
+            memcpy(newPtr, ptr, size);
+        }
+        else
+        {
+            /* need to truncate old data for new block */
+            memcpy(newPtr, ptr, size);
         }
 
-        i++;
+        LE_FREE(ptr);
+
+        return newPtr;
     }
 #endif
 
-    if(oldSize == 0)
-    {
-        oldSize = leVariableHeap_SizeOf(&variableHeap, ptr);
-    }
+    // not an allocated pointer, just do normal malloc
+    if(leVariableHeap_Contains(&variableHeap, ptr) == LE_FALSE)
+        return LE_MALLOC(size);
 
-    /* couldn't find old pointer */
-    if(oldSize == 0)
-        return NULL;
+#if LE_FIXEDHEAP_ENABLE == 1
+    oldSize = leVariableHeap_SizeOf(&variableHeap, ptr);
+
+    // see if this will fit in a fixed pool
 
 #if LE_USE_DEBUG_ALLOCATOR == 1
-    newPtr = leMalloc(size, line, func, file);
+    newPtr = _fixedHeapAlloc(size, line, func, file);
 #else
-    newPtr = leMalloc(size);
+    newPtr = _fixedHeapAlloc(size);
+#endif
+
+    // found a fixed pool to hold the data
+    if(newPtr != NULL)
+    {
+        // copy the data
+        if(oldSize < size)
+        {
+            /* new block can completely contain old data */
+            memcpy(newPtr, ptr, size);
+        }
+        else
+        {
+            /* need to truncate old data for new block */
+            memcpy(newPtr, ptr, size);
+        }
+
+        LE_FREE(ptr);
+
+        //leMemoryPrintReport();
+
+        return newPtr;
+    }
+#endif
+
+#if LE_USE_DEBUG_ALLOCATOR == 1
+    newPtr = leVariableHeap_Realloc(&variableHeap, ptr, size, line, func, file);
+#else
+    newPtr = leVariableHeap_Realloc(&variableHeap, ptr, size);
 #endif
 
     LE_ASSERT(newPtr != NULL);
 
-    if(newPtr == NULL)
-        return NULL;
-
-    if(oldSize < size)
-    {
-        /* new block can completely contain old data */
-        memcpy(newPtr, ptr, size);
-    }
-    else
-    {
-        /* need to truncate old data for new block */
-        memcpy(newPtr, ptr, size);
-    }
-
-    LE_FREE(ptr);
+    //leMemoryPrintReport();
 
     return newPtr;
 }
 
 void leFree(void* ptr)
 {
-#if LE_FIXEDHEAP_ENABLE == 1
-    uint32_t i = 0;
-#endif
-
     if(ptr == NULL)
         return;
 
+    leVariableHeap_Validate(&variableHeap);
+
 #if LE_FIXEDHEAP_ENABLE == 1
-    /* try to find the fixed heap that contains this pointer */
-    while(fixedHeaps[i].initialized == LE_TRUE)
+    if(_fixedHeapFree(ptr) == LE_SUCCESS)
     {
-        /* make sure the heap actually contains this pointer */
-        if(leFixedHeap_Contains(&fixedHeaps[i], ptr) == LE_TRUE)
-        {
-            leFixedHeap_Free(&fixedHeaps[i], ptr);
+        leVariableHeap_Validate(&variableHeap);
 
-            return;
-        }
-
-        i++;
+        return;
     }
 #endif
 
+    leVariableHeap_Validate(&variableHeap);
+
     /* attempt to free from the dynamic heap */
     leVariableHeap_Free(&variableHeap, ptr);
+
+    leVariableHeap_Validate(&variableHeap);
+
+    //leMemoryPrintReport();
 }
 
 void leMemoryGetUsageReport(leMemoryStatusReport* rpt)
@@ -298,6 +477,33 @@ void leMemoryGetUsageReport(leMemoryStatusReport* rpt)
         rpt->fixedHeapReport[idx].maxUsage = fixedHeaps[idx].maxUsage;
         rpt->fixedHeapReport[idx].currentCapacity = fixedHeaps[idx].capacity;
     }
+#endif
+}
+
+#include <stdio.h>
+
+void leMemoryPrintReport(void)
+{
+    leVariableHeap_Dump(&variableHeap, LE_TRUE);
+#if 0
+#if LE_FIXEDHEAP_ENABLE == 1
+    size_t idx;
+#endif
+
+    printf("Variable Heap Status:\n");
+    printf("    Total Size:    %u\n", variableHeap.size);
+    printf("    Max Usage:     %u\n", variableHeap.maxUsage);
+    printf("    Current Usage: %u\n\n", variableHeap.used);
+
+#if LE_FIXEDHEAP_ENABLE == 1
+    for(idx = 0; idx < LE_FIXED_HEAP_COUNT - 1; idx++)
+    {
+        printf("Fixed Heap (%u) Status:\n", fixedHeaps[idx].logicalBlockSize);
+        printf("    Number of Elements:  %u\n", fixedHeaps[idx].numElements);
+        printf("    Max Usage:           %u\n", fixedHeaps[idx].maxUsage);
+        printf("    Current Usage:       %u\n\n", fixedHeaps[idx].capacity);
+    }
+#endif
 #endif
 }
 
@@ -334,3 +540,5 @@ leResult leMemoryValidateHeaps()
 
     return LE_SUCCESS;
 }
+
+#endif // LE_MEMORY_MANAGER_ENABLE

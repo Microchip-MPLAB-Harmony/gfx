@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
   MPLAB Harmony LCC Generated Driver Header File
@@ -41,6 +39,18 @@
 
     Created with MPLAB Harmony Version 3.0
 *******************************************************************************/
+
+/** \file drv_gfx_lcc.h.ftl
+ * @brief LCC driver functions and definitions.
+ *
+ * @details This header file contains the function prototypes and definitions
+ * of the data types and constants that make up the interface to the Low-Cost
+ * Controllerless (LCC) Graphics Controller.
+ *
+ * This driver is configured via MHC and generated specific to the configuration
+ * and hardware architecture set in MHC.
+ * @see LE LCC Display Driver component
+ */
 
 #ifndef _DRV_GFX_LCC_H
 #define _DRV_GFX_LCC_H
@@ -66,40 +76,75 @@ extern "C"
 // *****************************************************************************
 // *****************************************************************************
 
+/**
+ * @brief Initialize driver.
+ * @details Initializes the LCC driver. This routine is typically called
+ * by a graphics library or by the application during application initialization.
+ * @code
+ * gfxResult res = DRV_LCC_Initialize();
+ * @endcode
+ * @return GFX_SUCCESS if driver ready to render, otherwise GFX_FAILURE.
+ */
 gfxResult DRV_LCC_Initialize(void);
-gfxPixelBuffer * DRV_LCC_GetFrameBuffer(int32_t idx);
-gfxColorMode DRV_LCC_GetColorMode(void);
-uint32_t DRV_LCC_GetBufferCount(void);
-uint32_t DRV_LCC_GetDisplayWidth(void);
-uint32_t DRV_LCC_GetDisplayHeight(void);
+
+/**
+ * @brief Execute update task.
+ * @details Performs a driver task update.
+ * @code
+ * DRV_LCC_Update();
+ * @endcode
+ * @return void.
+ */
 void DRV_LCC_Update(void);
-uint32_t DRV_LCC_GetLayerCount();
-uint32_t DRV_LCC_GetActiveLayer();
-gfxResult DRV_LCC_SetActiveLayer(uint32_t idx);
+
+/**
+ * @brief Blit buffer.
+ * @details Copies <span class="param">buf</span>
+ * to the framebuffer at location <span class="param">x</span> and
+ * <span class="param">y</span>.
+ * @code
+ * gfxDisplayDriver* drv;
+ * gfxResult res = drv->blitBuffer();
+ * @endcode
+ * @return GFX_SUCCESS if blit was performed, otherwise GFX_FAILURE.
+ */
 gfxResult DRV_LCC_BlitBuffer(int32_t x,
                             int32_t y,
-                            gfxPixelBuffer* buf,
-                            gfxBlend gfx);
-void DRV_LCC_Swap(void);
-uint32_t DRV_LCC_GetVSYNCCount(void);
+                            gfxPixelBuffer* buf);
 
+/**
+ * @brief Graphics driver generic IOCTL interface.
+ * @details Sends an IOCTL message to the driver.
+ * @code
+ * gfxIOCTLArg_Value val;
+ * val.value.v_uint = 1;
+ * DRV_LCC_IOCTL(GFX_IOCTL_FRAME_START, &val);
+ * @endcode
+ * @return gfxDriverIOCTLResponse the IOCTL handler response
+ */
+ gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest req,
+                                      void* arg);
 
-static const gfxDisplayDriver lccDisplayDriver =
+/**
+ * @brief Defines the LCC interface functions.
+ * @details Establishes the driver abstract interface functions between the driver
+ * and client. The client is either a graphics library middleware or application which
+ * interfaces with the driver through these functions.
+ */
+static const gfxDisplayDriver gfxDriverInterface =
 {
-    DRV_LCC_GetColorMode,
-    DRV_LCC_GetBufferCount,
-    DRV_LCC_GetDisplayWidth,
-    DRV_LCC_GetDisplayHeight,
-    DRV_LCC_Update,
-    DRV_LCC_GetLayerCount,
-    DRV_LCC_GetActiveLayer,
-    DRV_LCC_SetActiveLayer,
-    DRV_LCC_BlitBuffer,
-    DRV_LCC_Swap,
-    DRV_LCC_GetVSYNCCount,
-    DRV_LCC_GetFrameBuffer
+    .update = DRV_LCC_Update,				        /**< implements update */
+    .blitBuffer = DRV_LCC_BlitBuffer,			    /**< implements blitbuffer */
+	.ioctl = DRV_LCC_IOCTL                          /**< implements driver ioctl interface */
 };
         
+#ifdef _DOXYGEN_
+
+
+
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif

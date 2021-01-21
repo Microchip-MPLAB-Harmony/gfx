@@ -304,6 +304,27 @@ gfxResult DRV_GFX2D_SetTransparency(
                         uint32_t foreground_rop,
                         uint32_t background_rop);
 
+/**
+ * @brief Set global alpha.
+ * @details Set global alpha for source and destination buffers using
+ * <span class="param">srcGlobalAlpha</span> and
+ * <span class="param">dstGlobalAlpha</span> with specified
+ * <span class="param">srcGlobalAlphaValue</span> and
+ * <span class="param">dstGlobalAlphaValue</span>.
+ * @code
+ * gfxResult res = gfxGPUInterface.DRV_GFX2D_SetGlobalAlpha(srcGlobalAlpha, dstGlobalAlpha, srcGlobalAlphaValue, dstGlobalAlphaValue);
+ * @endcode
+ * @param srcGlobalAlpha is the source alpha operation.
+ * @param dstGlobalAlpha is the destination alpha operation
+ * @param srcGlobalAlphaValue is the source alpha value
+ * @param dstGlobalAlphaValue is the destination alpha value
+ * @return GFX_SUCCESS if completed, otherwise GFX_FAILURE.
+ */
+gfxResult DRV_GFX2D_SetGlobalAlpha(const gfxAlpha srcGlobalAlpha,
+                                   const gfxAlpha dstGlobalAlpha,
+                                   uint32_t srcGlobalAlphaValue,
+                                   uint32_t dstGlobalAlphaValue);
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Functions
@@ -317,7 +338,7 @@ static const gfxGraphicsProcessor gfxGPUInterface =
     DRV_GFX2D_Fill,
     DRV_GFX2D_Blit,
     DRV_GFX2D_SetBlend,
-    NULL,
+    DRV_GFX2D_SetGlobalAlpha,
     DRV_GFX2D_SetPalette,
     DRV_GFX2D_SetTransparency
 };

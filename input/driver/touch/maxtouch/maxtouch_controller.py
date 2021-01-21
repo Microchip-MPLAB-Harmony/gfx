@@ -107,7 +107,7 @@ def instantiateComponent(component):
         DRV_SYNC_MAXTOUCH_C.setDependencies(syncFileGen, ["DRV_I2C_MODE"])
 	DRV_SYNC_MAXTOUCH_C.setMarkup(True)
 	
-        I2CIndex = component.createIntegerSymbol("I2CIndex", None)
+        I2CIndex = component.createIntegerSymbol("DRV_MAXTOUCH_I2C_INDEX", None)
 	I2CIndex.setLabel("I2C Driver Index")
 	I2CIndex.setDefaultValue(0)
 	I2CIndex.setMin(0)
@@ -194,7 +194,7 @@ def onAttachmentConnected(source, target):
 		source["component"].setSymbolValue("Height", target["component"].getSymbolValue("TouchHeight"), 1)
 		
 	if source["id"] == "i2c":
-		I2CIndex = source["component"].getSymbolByID("I2CIndex")
+		I2CIndex = source["component"].getSymbolByID("DRV_MAXTOUCH_I2C_INDEX")
 		I2CIndex.setValue(int(target["component"].getID()[-1]), 1)
 		I2CIndex.setReadOnly(True)
 	
@@ -204,7 +204,7 @@ def onAttachmentDisconnected(source, target):
 		source["component"].clearSymbolValue("Height")
 	
 	if source["id"] == "i2c":
-		I2CIndex = source["component"].getSymbolByID("I2CIndex")
+		I2CIndex = source["component"].getSymbolByID("DRV_MAXTOUCH_I2C_INDEX")
 		I2CIndex.clearValue()
 		I2CIndex.setReadOnly(False)
 		

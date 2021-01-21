@@ -31,11 +31,13 @@
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
                                     leRawDecodeStage* stage);
 
-static struct InternalBlendStage
+struct InternalBlendStage
 {
     leRawDecodeStage base;
     leRenderState* renderer;
-} blendStage;
+};
+
+static LE_COHERENT_ATTR struct InternalBlendStage blendStage;
 
 static leResult stage_BlendRGBA5551(leRawDecodeStage* stage)
 {
@@ -64,7 +66,7 @@ static leResult stage_BlendRGBA8888(leRawDecodeStage* stage)
         resultClr = leRenderer_GetPixel(blendStage.base.state->targetX,
                                         blendStage.base.state->targetY);
 
-        resultClr = leColorConvert(LE_GLOBAL_COLOR_MODE,
+        resultClr = leColorConvert(stage->state->targetMode,
                                    LE_COLOR_MODE_RGBA_8888,
                                    resultClr);
 
@@ -89,7 +91,7 @@ static leResult stage_BlendARGB8888(leRawDecodeStage* stage)
         resultClr = leRenderer_GetPixel(blendStage.base.state->targetX,
                                         blendStage.base.state->targetY);
 
-        resultClr = leColorConvert(LE_GLOBAL_COLOR_MODE,
+        resultClr = leColorConvert(stage->state->targetMode,
                                    LE_COLOR_MODE_ARGB_8888,
                                    resultClr);
 

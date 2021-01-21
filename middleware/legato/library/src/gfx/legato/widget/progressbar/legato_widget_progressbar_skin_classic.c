@@ -60,7 +60,7 @@ void _leProgressBarWidget_GetBarRect(const leProgressBarWidget* bar,
     int32_t i;
     uint32_t p1, p2;
     
-    rect = bar->fn->rectToScreen(bar);
+    bar->fn->rectToScreen(bar, &rect);
     
     if(val2 < val1)
     {
@@ -120,7 +120,7 @@ static void drawBorder(leProgressBarWidget* bar);
 
 static void nextState(leProgressBarWidget* bar)
 {
-    switch(bar->widget.drawState)
+    switch(bar->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -133,37 +133,40 @@ static void nextState(leProgressBarWidget* bar)
             }
 #endif
             
-            if(bar->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(bar->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                bar->widget.drawState = DRAW_BACKGROUND;
+                bar->widget.status.drawState = DRAW_BACKGROUND;
                 bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
             if(bar->value > 0)
             {
-                bar->widget.drawState = DRAW_FILL;
+                bar->widget.status.drawState = DRAW_FILL;
                 bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawFill;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_FILL:
         {
-            if(bar->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(bar->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                bar->widget.drawState = DRAW_BORDER;
+                bar->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            bar->widget.drawState = DONE;
+            bar->widget.status.drawState = DONE;
             bar->widget.drawFunc = NULL;
         }
     }
@@ -171,9 +174,10 @@ static void nextState(leProgressBarWidget* bar)
 
 static void drawBackground(leProgressBarWidget* bar)
 {
-    if(bar->widget.backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(bar->widget.style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
-        leWidget_SkinClassic_DrawBackground((leWidget*)bar, bar->widget.scheme->base,
+        leWidget_SkinClassic_DrawBackground((leWidget*)bar,
+                                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BASE),
                                             paintState.alpha);
     }
     
@@ -187,7 +191,7 @@ static void drawFill(leProgressBarWidget* bar)
     _leProgressBarWidget_GetBarRect(bar, 0, bar->value, &barRect);
     
     leRenderer_RectFill(&barRect,
-                        bar->widget.scheme->background,
+                        leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BACKGROUND),
                         paintState.alpha);
              
     nextState(bar);
@@ -195,12 +199,12 @@ static void drawFill(leProgressBarWidget* bar)
 
 static void drawBorder(leProgressBarWidget* bar)
 {
-    if(bar->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(bar->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)bar,
                                                     paintState.alpha);
     }
-    else if(bar->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(bar->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardLoweredBorder((leWidget*)bar,
                                                        paintState.alpha);
@@ -211,19 +215,12 @@ static void drawBorder(leProgressBarWidget* bar)
 
 void _leProgressBarWidget_Paint(leProgressBarWidget* bar)
 {
-    if(bar->widget.scheme == NULL)
-    {
-        bar->widget.drawState = DONE;
-        
-        return;
-    }
-
-    if(bar->widget.drawState == NOT_STARTED)
+    if(bar->widget.status.drawState == NOT_STARTED)
     {
         nextState(bar);
     }
     
-    while(bar->widget.drawState != DONE)
+    while(bar->widget.status.drawState != DONE)
     {
         bar->widget.drawFunc((leWidget*)bar);
         

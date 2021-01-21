@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     This module implements text field widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_textfield.h
+ * @brief Textfield Widget functions and definitions.
+ *
+ * @details This module implements text field widget functions.
+ */
 
 #ifndef LEGATO_TEXTFIELD_H
 #define LEGATO_TEXTFIELD_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -61,6 +62,10 @@ typedef struct leTextFieldWidget leTextFieldWidget;
   Summary:
     Text changed event function callback type
 */
+/**
+ * @brief This function represents a text changed event callback.
+ * @details The callback is used indicate a text changed has occured.
+ */
 typedef void (*leTextFieldWidget_TextChangedCallback)(leTextFieldWidget*);
 
 // *****************************************************************************
@@ -70,10 +75,17 @@ typedef void (*leTextFieldWidget_TextChangedCallback)(leTextFieldWidget*);
   Summary:
     Focus changed event function callback type
 */
+/**
+ * @brief This function represents a focus change callback.
+ * @details The callback is used indicate a focus change has occured.
+ */
 typedef void (*leTextFieldWidget_FocusChangedCallback)(leTextFieldWidget*, leBool);
 
-// DOM-IGNORE-BEGIN
-typedef struct leTextFieldWidget leTextFieldWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leTextFieldWidget leTextFieldWidget;
 
 #define LE_TEXTFIELDWIDGET_VTABLE(THIS_TYPE) \
     LE_EDITWIDGET_VTABLE(THIS_TYPE) \
@@ -110,20 +122,13 @@ typedef struct leTextFieldWidgetVTable
 // *****************************************************************************
 
 // *****************************************************************************
-/* Enumeration:
-    leTextFieldWidget
-
-  Summary:
-    Implementation of a text field widget.
-
-  Description:
-    A text field widget is a widget that is capable of displaying a single line
-    of editable text.  This widget is capable of receiving edit events from the
-    Legato edit event system.  It can also display a blinking cursor.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a text field widget.
+ * @details A text field widget is a widget that is capable of displaying a
+ * single line of editable text.  This widget is capable of receiving
+ * edit events from the Legato edit event system.  It can also display a
+ * blinking cursor.
+ */
 typedef struct leTextFieldWidget
 {
     leEditWidget editWidget; // edit widget base class
@@ -150,407 +155,297 @@ typedef struct leTextFieldWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leTextFieldWidget* leTextFieldWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leTextFieldWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leTextFieldWidget* wgt = leTextFieldWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leTextFieldWidget* leTextFieldWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leTextFieldWidget <span class="param">wgt</span>.
+ * @code
+ * leTextFieldWidget* wgt;
+ * leTextFieldWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leTextFieldWidget_Constructor(leTextFieldWidget* wgt);
 
-  Description:
 
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
-  Parameters:
-
-  Returns:
-    leTextFieldWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leTextFieldWidget* leTextFieldWidget_New();
-
-/* Function:
-    void leTextFieldWidget_Constructor(leTextFieldWidget* wgt)
-
-  Summary:
-    Initializes an leTextFieldWidget widget pointer.
-
-  Description:
-    Initializes an leTextFieldWidget widget pointer.
-
-  Parameters:
-    leTextFieldWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leTextFieldWidget_Constructor(leTextFieldWidget* txt);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getCursorDelay(const leTextFieldWidget* _this)
+/**
+ * @brief Get cursor blink delay.
+ * @details Gets the cursor blink delay from  <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * uint32_t delay = _this->fn->getCursorDelay(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the blink delay.
+ */
+virtual uint32_t getCursorDelay(const leTextFieldWidget* _this);
 
-  Summary:
-     Gets the cursor blink delay
-
-  Description:
-     Gets the cursor blink delay
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getCursorDelay(_this);
-
-  Returns:
-    uint32_t - the blink delay
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setCursorDelay(leTextFieldWidget* _this,
-                            uint32_t dt)
-
-  Summary:
-     Sets the cursor blink delay
-
-  Description:
-     Sets the cursor blink delay
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    uint32_t dt - the blink delay
-
-  Remarks:
-    Usage - _this->fn->setCursorDelay(_this, dt);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set cursor blink delay.
+ * @details Sets the cursor blink delay for <span class="param">wgt</span>.
+ * @code
+ * leTextFieldWidget* wgt;
+ * uint32_t dt;
+ * leResult res = _this->fn->setCursorDelay(_this, dt);
+ * @endcode
+ * @param wgt is the widget to modify.
+ * @param dt the the enabled state.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCursorDelay(leTextFieldWidget* _this,
+                                uint32_t dt);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leBool getCursorEnabled(const leTextFieldWidget* _this)
-
-  Summary:
-     Gets the cursor enabled state
-
-  Description:
-     Gets the cursor enabled state
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getCursorEnabled(_this);
-
-  Returns:
-    leBool - the enabled state
-*/
+/**
+ * @brief Get cursor enabled state.
+ * @details Gets the cursor enabled state from <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leBool enabled = _this->fn->getCursorEnabled(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the enabled state.
+ */
+virtual leBool getCursorEnabled(const leTextFieldWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setCursorEnabled(leTextFieldWidget* _this,
-                              leBool en)
+/**
+ * @brief Set cursor enabled state.
+ * @details Sets the cursor enabled state for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leBool en;
+ * leResult res = _this->fn->setCursorEnabled(_this, en);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param en the the enabled state.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCursorEnabled(leTextFieldWidget* _this,
+                                  leBool en);
 
-  Summary:
-     Sets the cursor enabled state
-
-  Description:
-     Sets the cursor enabled state
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    leBool en - the enabled state
-
-  Remarks:
-    Usage - _this->fn->setCursorEnabled(_this, en);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getCursorPosition(const leTextFieldWidget* _this)
+/**
+ * @brief Get cursor position.
+ * @details Gets the cursor position from  <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * uint32_t pos = _this->fn->getString(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the cursor position.
+ */
+virtual uint32_t getCursorPosition(const leTextFieldWidget* _this);
 
-  Summary:
-     Gets the cursor position
-
-  Description:
-     Gets the cursor position
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getCursorPosition(_this);
-
-  Returns:
-    uint32_t - the cursor position
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setCursorPosition(leTextFieldWidget* _this,
-                               uint32_t pos)
+/**
+ * @brief Set cursor position.
+ * @details Sets the cursor position for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * uint32_t pos;
+ * leResult res = _this->fn->setCursorPosition(_this, pos);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param pos the cursor position.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCursorPosition(leTextFieldWidget* _this,
+                                   uint32_t pos);
 
-  Summary:
-     Sets the cursor position
-
-  Description:
-     Sets the cursor position
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    uint32_t pos - the cursor position
-
-  Remarks:
-    Usage - _this->fn->setCursorPosition(_this, pos);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    const leString* getString(const leTextFieldWidget* txt)
+/**
+ * @brief Get pointer to the text field value string.
+ * @details Gets the pointer to the text field value string
+ * from <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leString* str = _this->fn->getString(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return string value pointer.
+ */
+virtual const leString* getString(const leTextFieldWidget* txt);
 
-  Summary:
-     Gets the pointer to the text field value string
-
-  Description:
-     Gets the pointer to the text field value string
-
-  Parameters:
-    const leTextFieldWidget* txt - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getString(_this);
-
-  Returns:
-    const leString* - the string value pointer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setString(leTextFieldWidget* _this,
-                       const leString* str)
-
-  Summary:
-     Sets the text field value to a given string
-
-  Description:
-     Sets the text field value to a given string
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    const leString* str - the string pointer
-
-  Remarks:
-    Usage - _this->fn->setString(_this, str);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set text field font pointer.
+ * @details Sets the text field font pointer for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * const leString* str;
+ * leResult res = _this->fn->setString(_this, str);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param str the string pointer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setString(leTextFieldWidget* _this,
+                           const leString* str);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leFont* getFont(const leTextFieldWidget* _this)
+/**
+ * @brief Get text field font pointer.
+ * @details Gets the text field font pointer from  <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leFont* fnt = _this->fn->getFont(_this);
+ * @endcode
+ * @param _this is the widget to query
+ * @return the font pointer.
+ */
+virtual leFont* getFont(const leTextFieldWidget* _this);
 
-  Summary:
-     Gets the text field font pointer
-
-  Description:
-     Gets the text field font pointer
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getFont(_this);
-
-  Returns:
-    leFont* - the font pointer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setFont(leTextFieldWidget* _this,
-                     const leFont* fnt)
+/**
+ * @brief Set text field font pointer.
+ * @details Sets the text field font pointer for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * const leFont* fnt;
+ * leResult res = _this->fn->setFont(_this, fnt);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param fnt the font pointer.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFont(leTextFieldWidget* _this,
+                         const leFont* fnt);
 
-  Summary:
-     Sets the text field font pointer
-
-  Description:
-     Sets the text field font pointer
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    const leFont* fnt - the font pointer
-
-  Remarks:
-    Usage - _this->fn->setFont(_this, fnt);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leString* getHintString(const leTextFieldWidget* txt)
+/**
+ * @brief Get hint string.
+ * @details Gets the hint string from <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leString* str = _this->fn->getHintString(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the hint string.
+ */
+virtual leString* getHintString(const leTextFieldWidget* _this);
 
-  Summary:
-     Gets the hint string
-
-  Description:
-     Gets the hint string
-
-  Parameters:
-    const leTextFieldWidget* txt - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getHintString(_this);
-
-  Returns:
-    leString* - the string pointer
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setHintString(leTextFieldWidget* _this,
-                           const leString* str)
-
-  Summary:
-     Sets the hint string
-
-  Description:
-     Sets the hint string
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    const leString* str - the string pointer
-
-  Remarks:
-    Usage - _this->fn->setHintString(_this, str);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Set hint string.
+ * @details Sets the hint string for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * const leString* str;
+ * leResult res = _this->fn->setHintString(_this, str);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param str the string pointer
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setHintString(leTextFieldWidget* _this,
+                               const leString* str);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setClearValueOnFirstEdit(leTextFieldWidget* _this,
-                                      leBool clr)
-
-  Summary:
-     Clears the initial string value on first edit
-
-  Description:
-     Clears the initial string value on first edit
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    leBool clr -
-
-  Remarks:
-    Usage - _this->fn->setClearValueOnFirstEdit(_this, clr);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leTextFieldWidget_TextChangedCallback getTextChangedEventCallback(const leTextFieldWidget* _this)
-
-  Summary:
-     Gets the text changed event callback pointer
-
-  Description:
-     Gets the text changed event callback pointer
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getTextChangedEventCallback(_this);
-
-  Returns:
-    leTextFieldWidget_TextChangedCallback - the callback pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setTextChangedEventCallback(leTextFieldWidget* _this,
-                                         leTextFieldWidget_TextChangedCallback cb)
-
-  Summary:
-     Sets the text changed event callback pointer
-
-  Description:
-     Sets the text changed event callback pointer
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    leTextFieldWidget_TextChangedCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setTextChangedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leTextFieldWidget_FocusChangedCallback getFocusChangedEventCallback(const leTextFieldWidget* _this)
-
-  Summary:
-     Gets the focus changed event callback pointer
-
-  Description:
-     Gets the focus changed event callback pointer
-
-  Parameters:
-    const leTextFieldWidget* _this - The text field widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getFocusChangedEventCallback(_this);
-
-  Returns:
-    leTextFieldWidget_FocusChangedCallback - the callback pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setFocusChangedEventCallback(leTextFieldWidget* _this,
-                                          leTextFieldWidget_FocusChangedCallback cb)
-
-  Summary:
-     Sets the focus changed event callback pointer
-
-  Description:
-     Sets the focus changed event callback pointer
-
-  Parameters:
-    leTextFieldWidget* _this - The text field widget to operate on
-    leTextFieldWidget_FocusChangedCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setFocusChangedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Clears initial string value on first edit.
+ * @details Clears the initial string value on first edit for <span class="param">_this</span>.
+ * @remark This is a Virtual Member Function
+ * @code
+ * leTextFieldWidget* _this;
+ * leBool clr;
+ * leResult res = _this->fn->setClearValueOnFirstEdit(_this, clr);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param clr
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setClearValueOnFirstEdit(leTextFieldWidget* _this,
+                                          leBool clr);
 
 
+/**
+ * @brief Get text changed event callback pointer.
+ * @details Gets the text changed event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leTextFieldWidget_TextChangedCallback cb = _this->fn->getTextChangedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leTextFieldWidget_TextChangedCallback getTextChangedEventCallback
+                                            (const leTextFieldWidget* _this);
+
+/**
+ * @brief Set text changed event callback pointer.
+ * @details Sets the text changed event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leTextFieldWidget_TextChangedCallback cb;
+ * leResult res = _this->fn->setTextChangedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setTextChangedEventCallback(leTextFieldWidget* _this,
+                                             leTextFieldWidget_TextChangedCallback cb);
+
+/**
+ * @brief Get focus changed event callback pointer.
+ * @details Gets the focus changed event callback pointer using <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leTextFieldWidget_FocusChangedCallback cb = _this->fn->getFocusChangedEventCallback(_this);
+ * @endcode
+ * @param _this is the widget to modify
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leTextFieldWidget_FocusChangedCallback getFocusChangedEventCallback
+                                                (const leTextFieldWidget* _this);
+
+/**
+ * @brief Set focus changed event callback pointer.
+ * @details Sets the focus changed event callback pointer to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * leTextFieldWidget_FocusChangedCallback cb;
+ * leResult res = _this->fn->setFocusChangedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFocusChangedEventCallback(leTextFieldWidget* _this,
+                                              leTextFieldWidget_FocusChangedCallback cb);
+
+#undef THIS_TYPE
+#endif
 
 #endif // LE_TEXTFIELD_WIDGET_ENABLED
 #endif /* LEGATO_TEXTFIELD_H */

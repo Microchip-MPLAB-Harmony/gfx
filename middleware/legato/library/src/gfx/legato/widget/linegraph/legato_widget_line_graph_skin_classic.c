@@ -57,9 +57,11 @@ enum
 
 static struct
 {
-    leRect rect;
+    leRect graphRect;
+
+    //leRect rect;
     float pixelsPerUnit;
-    leColor clr;
+    //leColor clr;
     uint32_t alpha;
     lePoint originPoint;
     int32_t originValue;
@@ -76,7 +78,7 @@ lePoint _leLineGraphWidget_GetOriginPoint(const leLineGraphWidget* _this);
 
 static void nextState(leLineGraphWidget* graph)
 {
-    switch(graph->widget.drawState)
+    switch(graph->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -89,17 +91,18 @@ static void nextState(leLineGraphWidget* graph)
             }
 #endif
             
-            if(graph->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(graph->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                graph->widget.drawState = DRAW_BACKGROUND;
+                graph->widget.status.drawState = DRAW_BACKGROUND;
                 graph->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            graph->widget.drawState = DRAW_LINE_GRAPH;
+            graph->widget.status.drawState = DRAW_LINE_GRAPH;
             graph->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawLineGraph;
     
             return;
@@ -107,23 +110,24 @@ static void nextState(leLineGraphWidget* graph)
         case DRAW_LINE_GRAPH:
         {            
             graph->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
-            graph->widget.drawState = DRAW_STRING;
+            graph->widget.status.drawState = DRAW_STRING;
             
             return;
         }
         case DRAW_STRING:
         {
-            if(graph->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(graph->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 graph->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                graph->widget.drawState = DRAW_BORDER;
+                graph->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            graph->widget.drawState = DONE;
+            graph->widget.status.drawState = DONE;
             graph->widget.drawFunc = NULL;
         }
     }
@@ -137,86 +141,142 @@ static void drawBackground(leLineGraphWidget* graph)
     nextState(graph);
 }
 
-//Gets the superset (largest) draw rectangle for the labels. 
-static void getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
-                                     leRect * rect)
+static void _calculateCategoryPoints(leLineGraphWidget* graph)
 {
-    leRect minLabelRect;
-    leRect maxLabelRect;
-    *rect = leRect_Zero;
+    leLineGraphCategory* cat;
 
-    if(graph->valueAxisLabelsVisible == LE_FALSE ||
-       graph->ticksLabelFont == NULL)
+    if(graph->categories.size == 0)
         return;
-    
-    //Calculate the offset for the value labels
-    minLabelRect = leRect_Zero;
-    maxLabelRect = leRect_Zero;
 
-    if (graph->minValue < 0)
+    int count = graph->categories.size;
+    int segmentWidth = paintState.graphRect.width;
+
+    if(count > 1)
     {
-        //Protect from overflow
-        if (graph->minValue > -MAX_TICK_LABEL_VALUE)
+        segmentWidth /= (count - 1);
+    }
+
+    for(int i = 0; i < count; ++i)
+    {
+        cat = (leLineGraphCategory*)graph->categories.values[i];
+
+        if(i == 0)
         {
-            sprintf(paintState.strbuff, "%d", (int)graph->minValue);
+            cat->drawX = paintState.graphRect.x;
+        }
+        else if(i == count - 1)
+        {
+            cat->drawX = paintState.graphRect.x + paintState.graphRect.width;
         }
         else
         {
-            sprintf(paintState.strbuff, "---");
+            cat->drawX = paintState.graphRect.x + (segmentWidth * i);
+        }
+    }
+}
+
+static void _getCategoryTextRect(const leLineGraphWidget* graph,
+                                 uint32_t catIdx,
+                                 leRect* rect)
+{
+    *rect = leRect_Zero;
+    leLineGraphCategory* cat;
+
+    if (catIdx >= graph->categories.size)
+        return;
+
+    cat = (leLineGraphCategory*)graph->categories.values[catIdx];
+
+    if(cat == NULL)
+        return;
+
+    if(cat->text == NULL)
+        return;
+
+    cat->text->fn->getRect(cat->text, rect);
+
+    rect->x = cat->drawX;
+    rect->x -= rect->width / 2;
+    rect->y = paintState.graphRect.y + paintState.graphRect.height + 1;
+
+    // get center of category, arrange text below it
+    switch(graph->categAxisTicksPosition)
+    {
+        case LINE_GRAPH_TICK_OUT:
+        {
+            rect->y += 1 + graph->tickLength;
+
+            break;
+        }
+        case LINE_GRAPH_TICK_CENTER:
+        {
+            rect->y += 1 + (graph->tickLength / 2);
+
+            break;
+        }
+        case LINE_GRAPH_TICK_IN:
+        {
+            rect->y += 1;
+
+            break;
+        }
+    }
+}
+
+static void _getCategoryLabelMaxDrawRect(const leLineGraphWidget* graph,
+                                         leRect* labelRect)
+{
+    leLineGraphCategory* cat;
+    leRect strRect;
+
+    for(uint32_t i = 0; i < graph->categories.size; ++i)
+    {
+        cat = (leLineGraphCategory*)graph->categories.values[i];
+
+        if(cat->text == NULL)
+            continue;
+
+        cat->text->fn->getRect(cat->text, &strRect);
+
+        //strRect.adjust(0, 0, 0, 1);
+
+        if(strRect.height > labelRect->height)
+        {
+            labelRect->height = strRect.height;
         }
 
-        leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &minLabelRect);
+        if(strRect.width > labelRect->width)
+        {
+            labelRect->width = strRect.width;
+        }
     }
+}
 
-    //Protect from overflow
-    if (graph->maxValue < MAX_TICK_LABEL_VALUE)
+static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
+                                      leRect* textRect)
+{
+    leRect minRect, maxRect;
+
+    if(graph->ticksLabelFont == NULL)
+        return;
+
+    sprintf(paintState.strbuff, "%i", graph->minValue);
+
+    leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &minRect);
+
+    sprintf(paintState.strbuff, "%i", graph->maxValue);
+
+    leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxRect);
+
+    if(maxRect.width > minRect.width)
     {
-        sprintf(paintState.strbuff, "%d", (int)graph->maxValue);
+        textRect->width = maxRect.width;
+        textRect->height = maxRect.height;
     }
     else
     {
-        sprintf(paintState.strbuff, "---");
-    }
-
-    leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxLabelRect);
-
-    rect->width = (maxLabelRect.width > minLabelRect.width) ?
-                  (maxLabelRect.width) :
-                  (minLabelRect.width);
-
-    rect->height = (maxLabelRect.height > minLabelRect.height) ?
-                   (maxLabelRect.height) :
-                   (minLabelRect.height);
-}
-
-//Gets the maximum draw rectangle for the category labels
-static void getCategoryLabelMaxDrawRect(const leLineGraphWidget* graph,
-                                        leRect* rect)
-{
-    int32_t categoryIndex;
-    leLineGraphCategory* category;
-    leRect textRect;
-    
-    *rect = leRect_Zero;
-    
-    for (categoryIndex = 0; (categoryIndex < (int32_t)graph->categories.size); categoryIndex++)
-    {
-        category = leArray_Get(&graph->categories, categoryIndex);
-        
-        if (category == NULL || category->text == NULL)
-            continue;
-        
-        category->text->fn->getRect(category->text, &textRect);
-        
-        if (textRect.height > rect->height)
-        {
-            rect->height = textRect.height;
-        }
-                   
-        if (textRect.width > rect->width)
-        {
-            rect->width = textRect.width;
-        }
+        textRect->width = minRect.width;
+        textRect->height = minRect.height;
     }
 }
 
@@ -247,23 +307,21 @@ static void drawTickLabelWithValue(const leLineGraphWidget* graph,
                               graph->ticksLabelFont,
                               &textRect);
 
-#if 0
     if (position == LE_RELATIVE_POSITION_LEFTOF)
     {
-        drawRect.x = tickPoint.x - textRect.width - LABEL_OFFSET_MIN_PIX;
-        drawRect.y = tickPoint.y - textRect.height/2;
+        textRect.x = tickPoint.x - textRect.width - LABEL_OFFSET_MIN_PIX;
+        textRect.y = tickPoint.y - textRect.height/2;
     }
     else if (position == LE_RELATIVE_POSITION_RIGHTOF)
     {
-        drawRect.x = tickPoint.x + textRect.width + LABEL_OFFSET_MIN_PIX;
-        drawRect.y = tickPoint.y - textRect.height/2;
+        textRect.x = tickPoint.x + textRect.width + LABEL_OFFSET_MIN_PIX;
+        textRect.y = tickPoint.y - textRect.height/2;
     }
     else
     {
-        drawRect.x = tickPoint.x;
-        drawRect.y = tickPoint.y;
+        textRect.x = tickPoint.x;
+        textRect.y = tickPoint.y;
     }
-#endif
 
     req.str = paintState.strbuff;
     req.font = graph->ticksLabelFont;
@@ -276,182 +334,106 @@ static void drawTickLabelWithValue(const leLineGraphWidget* graph,
     leStringRenderer_DrawCString(&req);
 }
 
-static void drawSeriesPoint(leLineGraphDataSeries* series,
-                            lePoint point)
-{
-    leRect rect;
-    uint32_t thk;
-    
-    switch(series->pointType)
-    {
-        case LINE_GRAPH_DATA_POINT_CIRCLE:
-        {
-            thk = series->fillPoints == LE_TRUE ? series->pointSize / 2 : 1;
-
-            rect.width = series->pointSize * 2;
-            rect.height = rect.width;
-            rect.x = point.x - rect.width;
-            rect.y = point.y - rect.height;
-
-            leRenderer_ArcFill(&rect,
-                               point.x - rect.x,
-                               point.y - rect.y,
-                               series->pointSize / 2,
-                               0,
-                               360,
-                               thk,
-                               series->scheme->foreground,
-                               LE_FALSE,
-                               paintState.alpha);
-
-            break;
-        }
-        case LINE_GRAPH_DATA_POINT_SQUARE:
-        {
-            rect.x = point.x - series->pointSize / 2;
-            rect.y = point.y - series->pointSize / 2;
-            rect.width = series->pointSize;
-            rect.height = series->pointSize;
-            
-            if (series->fillPoints == LE_TRUE)
-            {
-                leRenderer_RectFill(&rect,
-                                    series->scheme->foreground,
-                                    paintState.alpha);
-            }
-            else
-            {
-                leRenderer_RectLine(&rect,
-                                    series->scheme->foreground,
-                                    paintState.alpha);
-            }
-
-            break;
-        }
-        case LINE_GRAPH_DATA_POINT_NONE: //Do nothing
-        default:
-            break;
-    }    
-}
-
 //Gets the rectangle of the graph area (without labels or ticks)
 void _leLineGraphWidget_GetGraphRect(const leLineGraphWidget* graph,
                                      leRect* graphRect)
 {
-    lePoint p;
-    leMargin margin;
-    leRect widgetRect, valueLabelMaxRect, categoryLabelMaxRect;
-    
-    widgetRect = graph->fn->rectToScreen(graph);
-    
-    p.x = widgetRect.x;
-    p.y = widgetRect.y;
-    
-    valueLabelMaxRect = leRect_Zero;
-    *graphRect = leRect_Zero;
-    categoryLabelMaxRect = leRect_Zero;
-    
-    margin = graph->widget.margin;
-    graphRect->x = p.x + margin.left;
-    graphRect->width = widgetRect.width - margin.left - margin.right;
+    leRect categoryLabelMaxRect;
+    leRect valueLabelMaxRect;
 
-    if (graph->valueAxisTicksVisible)
+    graphRect->x = graph->widget.rect.x;
+    graphRect->y = graph->widget.rect.y;
+    graphRect->width = graph->widget.rect.width;
+    graphRect->height = graph->widget.rect.height;
+
+    graphRect->x += graph->widget.margin.left;
+    graphRect->y += graph->widget.margin.top;
+    graphRect->width -= graph->widget.margin.left + graph->widget.margin.right;
+    graphRect->height -= graph->widget.margin.top + graph->widget.margin.bottom;
+
+    // adjust for value tick position
+    if(graph->valueAxisTicksVisible == LE_TRUE)
     {
-        switch (graph->valueAxisTicksPosition)
+        switch(graph->valueAxisTicksPosition)
         {
             case LINE_GRAPH_TICK_OUT:
             {
                 graphRect->x += graph->tickLength;
                 graphRect->width -= graph->tickLength;
+
                 break;
             }
             case LINE_GRAPH_TICK_CENTER:
             {
-                graphRect->x += graph->tickLength/2;
-                graphRect->width -= graph->tickLength/2;
+                graphRect->x += graph->tickLength / 2;
+                graphRect->width -= graph->tickLength / 2;
+
                 break;
             }
-            default:
-                break;
+            default: { }
         }
     }
 
-    graphRect->y = p.y + margin.top;
-    graphRect->height = widgetRect.height - margin.top - margin.bottom;
-
-    if (graph->valueAxisLabelsVisible)
+    // adjust for value labels
+    if(graph->valueAxisLabelsVisible == LE_TRUE && graph->ticksLabelFont != NULL)
     {
-        getValueLabelMaxDrawRect(graph, &valueLabelMaxRect);
+        _getValueLabelMaxDrawRect(graph, &valueLabelMaxRect);
 
-        if(valueLabelMaxRect.y > 0)
+        //graphRect.adjust(0, valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX, 0, 0);
+
+        if(valueLabelMaxRect.width < LABEL_OFFSET_MIN_PIX)
         {
-            graphRect->y += valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX;
-            graphRect->height -= valueLabelMaxRect.height / 2 + LABEL_OFFSET_MIN_PIX;
+            valueLabelMaxRect.width = LABEL_OFFSET_MIN_PIX;
         }
-    }
 
-    if (graph->categAxisTicksVisible)
-    {
-        switch (graph->categAxisTicksPosition)
+        if(valueLabelMaxRect.height < LABEL_OFFSET_MIN_PIX)
         {
-            case LINE_GRAPH_TICK_OUT:
-            {
-                graphRect->height -= graph->tickLength;
-                break;
-            }
-            case LINE_GRAPH_TICK_CENTER:
-            {
-                graphRect->height -= graph->tickLength/2;
-                break;
-            }
-            default:
-                break;
+            valueLabelMaxRect.height = LABEL_OFFSET_MIN_PIX;
         }
+
+        graphRect->x += valueLabelMaxRect.width;
+        graphRect->width -= valueLabelMaxRect.width;
+
+        graphRect->y += valueLabelMaxRect.height;
+        graphRect->height -= valueLabelMaxRect.height;
     }
 
-    if (graph->categAxisLabelsVisible)
+    if(graph->categories.size > 0)
     {
-        getCategoryLabelMaxDrawRect(graph, &categoryLabelMaxRect);
-    }
-
-    if (categoryLabelMaxRect.height > (valueLabelMaxRect.height / 2))
-    {
-        graphRect->height -= (categoryLabelMaxRect.height +  LABEL_OFFSET_MIN_PIX);
-    }
-    else if (valueLabelMaxRect.height != 0)
-    {
-        graphRect->height -= (valueLabelMaxRect.height / 2 +  LABEL_OFFSET_MIN_PIX);
-    }
-
-    if (graph->fillValueArea == LE_TRUE)
-    {
-        if (categoryLabelMaxRect.width != 0)
+        // adjust for category ticks
+        if(graph->categAxisTicksVisible == LE_TRUE)
         {
-            if((categoryLabelMaxRect.width / 2) > valueLabelMaxRect.width)
+            switch(graph->categAxisTicksPosition)
             {
-                graphRect->x += (categoryLabelMaxRect.width/2 + LABEL_OFFSET_MIN_PIX * 2);
-                graphRect->width -= (categoryLabelMaxRect.width/2 + LABEL_OFFSET_MIN_PIX * 2);
-            }
-            else
-            {
-                graphRect->x += (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
-                graphRect->width -= (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
-            }
+                case LINE_GRAPH_TICK_OUT:
+                {
+                    graphRect->height -= graph->tickLength;
 
-            graphRect->width -= (categoryLabelMaxRect.width/2 + LABEL_OFFSET_MIN_PIX);
+                    break;
+                }
+                case LINE_GRAPH_TICK_CENTER:
+                {
+                    graphRect->height -= graph->tickLength / 2;
+
+                    break;
+                }
+                default: { }
+            }
         }
-    }
-    else if (valueLabelMaxRect.width != 0)
-    {
-        graphRect->x += (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
-        graphRect->width -= (valueLabelMaxRect.width + LABEL_OFFSET_MIN_PIX * 2);
+
+        if(graph->categAxisLabelsVisible == LE_TRUE)
+        {
+            _getCategoryLabelMaxDrawRect(graph, &categoryLabelMaxRect);
+
+            graphRect->height -= categoryLabelMaxRect.height;
+        }
     }
 }
 
 static void fillBase(leLineGraphWidget* graph)
 {
-    leRenderer_RectFill(&paintState.rect,
-                        graph->widget.scheme->background,
+    leRenderer_RectFill(&paintState.graphRect,
+                        leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_BACKGROUND),
                         paintState.alpha);
 }
 
@@ -461,32 +443,32 @@ static void drawValueAxisTickBorders(leLineGraphWidget* graph)
     {
         case LINE_GRAPH_TICK_OUT:
         {
-            leRenderer_HorzLine(paintState.rect.x - graph->tickLength,
-                                paintState.rect.y,
-                                paintState.rect.width,
-                                graph->widget.scheme->foreground,
+            leRenderer_HorzLine(paintState.graphRect.x - graph->tickLength,
+                                paintState.graphRect.y,
+                                paintState.graphRect.width,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
                                 
-            leRenderer_HorzLine(paintState.rect.x - graph->tickLength,
-                                paintState.rect.y + paintState.rect.height,
-                                paintState.rect.width,
-                                graph->widget.scheme->foreground,
+            leRenderer_HorzLine(paintState.graphRect.x - graph->tickLength,
+                                paintState.graphRect.y + paintState.graphRect.height,
+                                paintState.graphRect.width,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
 
             break;
         }
         case LINE_GRAPH_TICK_CENTER:
         {
-            leRenderer_HorzLine(paintState.rect.x - graph->tickLength / 2,
-                                paintState.rect.y,
-                                paintState.rect.width,
-                                graph->widget.scheme->foreground,
+            leRenderer_HorzLine(paintState.graphRect.x - graph->tickLength / 2,
+                                paintState.graphRect.y,
+                                paintState.graphRect.width,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
                                 
-            leRenderer_HorzLine(paintState.rect.x - graph->tickLength / 2,
-                                paintState.rect.y + paintState.rect.height,
-                                paintState.rect.width,
-                                graph->widget.scheme->foreground,
+            leRenderer_HorzLine(paintState.graphRect.x - graph->tickLength / 2,
+                                paintState.graphRect.y + paintState.graphRect.height,
+                                paintState.graphRect.width,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
                                 
             break;
@@ -500,7 +482,7 @@ static void drawMinMaxLabels(leLineGraphWidget* graph)
 {
     lePoint drawPoint = {0};
     
-    drawPoint.x = paintState.rect.x;
+    drawPoint.x = paintState.graphRect.x;
     
     if(graph->valueAxisTicksVisible)
     {
@@ -521,21 +503,21 @@ static void drawMinMaxLabels(leLineGraphWidget* graph)
         }
     }
     
-    drawPoint.y = paintState.rect.y;
+    drawPoint.y = paintState.graphRect.y;
     
     drawTickLabelWithValue(graph,
                            drawPoint,
                            LE_RELATIVE_POSITION_LEFTOF,
                            graph->maxValue,
-                           graph->widget.scheme->text);
+                           leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT));
 
-    drawPoint.y = paintState.rect.y + paintState.rect.height;
+    drawPoint.y = paintState.graphRect.y + paintState.graphRect.height;
     
     drawTickLabelWithValue(graph,
                            drawPoint,
                            LE_RELATIVE_POSITION_LEFTOF,
                            graph->minValue,
-                           graph->widget.scheme->text);
+                           leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT));
 }
 
 static void drawTicks(leLineGraphWidget* graph)
@@ -550,17 +532,17 @@ static void drawTicks(leLineGraphWidget* graph)
         {
             case LINE_GRAPH_TICK_OUT:
             {
-                drawPoint.x = paintState.rect.x - graph->tickLength;
+                drawPoint.x = paintState.graphRect.x - graph->tickLength;
                 break;
             }
             case LINE_GRAPH_TICK_CENTER:
             {
-                drawPoint.x = paintState.rect.x - graph->tickLength / 2;
+                drawPoint.x = paintState.graphRect.x - graph->tickLength / 2;
                 break;
             }
             case LINE_GRAPH_TICK_IN:
             {
-                drawPoint.x = paintState.rect.x;
+                drawPoint.x = paintState.graphRect.x;
                 break;
             }
             default:
@@ -572,13 +554,13 @@ static void drawTicks(leLineGraphWidget* graph)
     }
     else
     {
-        drawPoint.x = paintState.rect.x;
+        drawPoint.x = paintState.graphRect.x;
         drawEndPoint = drawPoint;
     }
     
     if (graph->valueGridLinesVisible)
     {
-        drawEndPoint.x = paintState.rect.x + paintState.rect.width;
+        drawEndPoint.x = paintState.graphRect.x + paintState.graphRect.width;
     }
 
     //Start drawing the positive ticks or gridlines
@@ -592,12 +574,12 @@ static void drawTicks(leLineGraphWidget* graph)
         {
             drawPoint.y = paintState.originPoint.y - (int32_t) ((float)(value - paintState.originValue) * paintState.pixelsPerUnit);
             
-            if(drawPoint.y > paintState.rect.y) 
+            if(drawPoint.y > paintState.graphRect.y)
             {
                 leRenderer_HorzLine(drawPoint.x,
                                     drawPoint.y,
                                     drawEndPoint.x - drawPoint.x,
-                                    graph->widget.scheme->foreground,
+                                    leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                     paintState.alpha);
 
                 if (graph->valueAxisLabelsVisible)
@@ -606,7 +588,7 @@ static void drawTicks(leLineGraphWidget* graph)
                                            drawPoint,
                                            LE_RELATIVE_POSITION_LEFTOF,
                                            value,
-                                           graph->widget.scheme->text);
+                                           leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT));
                 }
             }
         }
@@ -623,12 +605,12 @@ static void drawTicks(leLineGraphWidget* graph)
         {
             drawPoint.y = paintState.originPoint.y + (int32_t) ((float) (value - paintState.originValue) * -paintState.pixelsPerUnit);
             
-            if (drawPoint.y < (paintState.rect.y + paintState.rect.height))
+            if (drawPoint.y < (paintState.graphRect.y + paintState.graphRect.height))
             {
                 leRenderer_HorzLine(drawPoint.x,
                                     drawPoint.y,
                                     drawEndPoint.x - drawPoint.x,
-                                    graph->widget.scheme->foreground,
+                                    leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                     paintState.alpha);
             
                 if (graph->valueAxisLabelsVisible)
@@ -637,7 +619,7 @@ static void drawTicks(leLineGraphWidget* graph)
                                            drawPoint,
                                            LE_RELATIVE_POSITION_LEFTOF,
                                            value,
-                                           graph->widget.scheme->text);
+                                           leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT));
                 }
             }
         }
@@ -648,20 +630,22 @@ static void fillRegion(leLineGraphWidget* graph,
                        leLineGraphCategory* category,
                        leLineGraphDataSeries* series,
                        int32_t categoryIndex,
+                       lePoint valuePoint,
                        lePoint prevPoint,
                        leColor clr)
 {
     leLineGraphCategory* prevCategory;
-    int32_t * prevOldValue;
+    int32_t prevOldValue;
     //Get the four points
     lePoint nowOld, nowNew; //Old and new points of current category
     lePoint prevOld, prevNew; //old and new points of previous category
     lePoint scanPointA;
     lePoint scanPointB;
-    
+    void* arrayVal;
+
     prevCategory = leArray_Get(&graph->categories, categoryIndex - 1);
 
-    nowNew = paintState.valuePoint;
+    nowNew = valuePoint;
     nowOld = nowNew;
 
     prevNew = prevPoint;
@@ -669,35 +653,36 @@ static void fillRegion(leLineGraphWidget* graph,
 
     nowOld.y = paintState.originPoint.y - (int32_t) ((float) (category->stackValue  - paintState.originValue) * paintState.pixelsPerUnit);
 
-    prevOldValue = leArray_Get(&series->data, categoryIndex - 1);
-    prevOld.y = paintState.originPoint.y - (int32_t) ((float) (prevCategory->stackValue - *prevOldValue  - paintState.originValue) * paintState.pixelsPerUnit);
+    arrayVal = leArray_Get(&series->data, categoryIndex - 1);
+    prevOldValue = (int32_t)arrayVal;
+    prevOld.y = paintState.originPoint.y - (int32_t) ((float) (prevCategory->stackValue - prevOldValue  - paintState.originValue) * paintState.pixelsPerUnit);
 
     //Fill the region using vertical lines for now
     for (scanPointA.x = prevNew.x; scanPointA.x < nowNew.x; scanPointA.x++)
     {
         scanPointA.y = leGetYGivenXOnLine(prevNew, nowNew, scanPointA.x);
-        
-        if (scanPointA.y < paintState.rect.y)
+
+        if (scanPointA.y < paintState.graphRect.y)
         {
-            scanPointA.y = paintState.rect.y;
+            scanPointA.y = paintState.graphRect.y;
         }
-        else if (scanPointA.y > paintState.rect.y + paintState.rect.height)
+        else if (scanPointA.y > paintState.graphRect.y + paintState.graphRect.height)
         {
-            scanPointA.y = paintState.rect.y + paintState.rect.height;
+            scanPointA.y = paintState.graphRect.y + paintState.graphRect.height;
         }
-        
+
         scanPointB.x = scanPointA.x;
         scanPointB.y = leGetYGivenXOnLine(prevOld, nowOld, scanPointA.x);
-        
-        if (scanPointB.y < paintState.rect.y)
+
+        if (scanPointB.y < paintState.graphRect.y)
         {
-            scanPointB.y = paintState.rect.y;
+            scanPointB.y = paintState.graphRect.y;
         }
-        else if (scanPointB.y > paintState.rect.y + paintState.rect.height)
+        else if (scanPointB.y > paintState.graphRect.y + paintState.graphRect.height)
         {
-            scanPointB.y = paintState.rect.y + paintState.rect.height;
+            scanPointB.y = paintState.graphRect.y + paintState.graphRect.height;
         }
-        
+
         leRenderer_VertLine(scanPointA.x,
                             scanPointA.y,
                             scanPointB.y - scanPointA.y,
@@ -716,6 +701,7 @@ static void drawStackedFills(leLineGraphWidget* graph)
     int32_t value = 0;
     leLineGraphDataSeries* series;
     leLineGraphCategory* category;
+    void* arrayVal;
     
     for (categoryIndex = 0; (categoryIndex < (int32_t)graph->categories.size); categoryIndex++)
     {
@@ -727,23 +713,21 @@ static void drawStackedFills(leLineGraphWidget* graph)
     {
         prevPoint = paintState.originPoint;
         valuePoint = paintState.originPoint;
-        topValue = 0;
 
         series = leArray_Get(&graph->dataSeries, seriesIndex);
 
-        for (categoryIndex = 0; 
-             (categoryIndex < (int32_t)graph->categories.size); 
-             categoryIndex++)
+        for (categoryIndex = 0; (categoryIndex < (int32_t)graph->categories.size); categoryIndex++)
         {
             if (categoryIndex < (int32_t)series->data.size)
             {
-                value = (int32_t)leArray_Get(&series->data, categoryIndex);
+                arrayVal = leArray_Get(&series->data, categoryIndex);
+                value = (int32_t)arrayVal;
             }
             
             category = leArray_Get(&graph->categories, categoryIndex);
 
             valuePoint.x = paintState.originPoint.x + 
-                          ((categoryIndex * paintState.rect.width) / (graph->categories.size - 1));
+                          ((categoryIndex * paintState.graphRect.width) / (graph->categories.size - 1));
 
             topValue = category->stackValue;
             topValue += value;
@@ -756,8 +740,9 @@ static void drawStackedFills(leLineGraphWidget* graph)
                            category,
                            series,
                            categoryIndex,
+                           valuePoint,
                            prevPoint,
-                           series->scheme->base);
+                           leScheme_GetRenderColor(series->scheme, LE_SCHM_BASE));
             }
 
             category->stackValue = topValue;
@@ -775,6 +760,7 @@ static void drawUnstackedFills(leLineGraphWidget* graph)
     int32_t seriesIndex;
     int32_t categoryIndex;
     leLineGraphDataSeries* series;
+    void* arrayVal;
             
     //Do the fills first, then plot the points/lines
     if (graph->fillValueArea == LE_TRUE)
@@ -793,15 +779,16 @@ static void drawUnstackedFills(leLineGraphWidget* graph)
                 (categoryIndex < (int32_t)graph->categories.size && categoryIndex < (int32_t)series->data.size);
                  categoryIndex++)
             {
-                value = (int32_t)leArray_Get(&series->data, categoryIndex);
+                arrayVal = leArray_Get(&series->data, categoryIndex);
+                value = (int32_t)arrayVal;
 
                 if (graph->fillValueArea == LE_TRUE && (int32_t)graph->categories.size > 1)
                 {
-                    valuePoint.x = paintState.originPoint.x + ((categoryIndex * paintState.rect.width) / (graph->categories.size - 1));
+                    valuePoint.x = paintState.originPoint.x + ((categoryIndex * paintState.graphRect.width) / (graph->categories.size - 1));
                 }
                 else
                 {
-                    valuePoint.x = paintState.originPoint.x + (((categoryIndex + 1) * paintState.rect.width) / (graph->categories.size + 1));    
+                    valuePoint.x = paintState.originPoint.x + (((categoryIndex + 1) * paintState.graphRect.width) / (graph->categories.size + 1));
                 }
 
                 if (value >= paintState.originValue)
@@ -822,20 +809,20 @@ static void drawUnstackedFills(leLineGraphWidget* graph)
                     {
                         scanPoint.y = leGetYGivenXOnLine(prevPoint, valuePoint, scanPoint.x);
                         
-                        if (scanPoint.y <= paintState.rect.y)
+                        if (scanPoint.y <= paintState.graphRect.y)
                         {
-                            scanPoint.y = paintState.rect.y;
+                            scanPoint.y = paintState.graphRect.y;
                         }
-                        else if (scanPoint.y >= paintState.rect.y + paintState.rect.height)
+                        else if (scanPoint.y >= paintState.graphRect.y + paintState.graphRect.height)
                         {
-                            scanPoint.y = paintState.rect.y + paintState.rect.height;
+                            scanPoint.y = paintState.graphRect.y + paintState.graphRect.height;
                         }
                         
                         leRenderer_DrawLine(scanPoint.x,
                                             scanPoint.y,
                                             scanPoint.x,
                                             paintState.originPoint.y,
-                                            series->scheme->base,
+                                            leScheme_GetRenderColor(series->scheme, LE_SCHM_BASE),
                                             paintState.alpha);
 
                         scanPoint.x++;
@@ -885,18 +872,18 @@ static void drawOriginLine(leLineGraphWidget* graph)
 
         leRenderer_DrawLine(drawPoint.x,
                             drawPoint.y,
-                            paintState.rect.x + paintState.rect.width,
+                            paintState.graphRect.x + paintState.graphRect.width,
                             drawPoint.y,
-                            graph->widget.scheme->foreground,
+                            leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
     }
     else
     {
         leRenderer_DrawLine(drawPoint.x,
                             drawPoint.y,
-                            paintState.rect.x + paintState.rect.width,
+                            paintState.graphRect.x + paintState.graphRect.width,
                             drawPoint.y,
-                            graph->widget.scheme->foreground,
+                            leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
     }
 
@@ -906,7 +893,7 @@ static void drawOriginLine(leLineGraphWidget* graph)
                                drawPoint,
                                LE_RELATIVE_POSITION_LEFTOF,
                                paintState.originValue,
-                               graph->widget.scheme->text);
+                               leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT));
     }
 }
 
@@ -937,31 +924,31 @@ static void drawCategoryTicks(leLineGraphWidget* graph)
             break;
     }
     
-    if (drawPoint.y < paintState.rect.y)
+    if (drawPoint.y < paintState.graphRect.y)
     {
-        length = paintState.originPoint.y - paintState.rect.y;
+        length = paintState.originPoint.y - paintState.graphRect.y;
         
-        drawPoint.y = paintState.rect.y;
+        drawPoint.y = paintState.graphRect.y;
     }
     
     for (categoryIndex = 0; 
-         ((drawPoint.x < paintState.rect.x + paintState.rect.width) && 
-         (categoryIndex < (int32_t)graph->categories.size)); 
+         ((drawPoint.x < paintState.graphRect.x + paintState.graphRect.width) &&
+         (categoryIndex < graph->categories.size));
          categoryIndex++)
     {
         if (graph->fillValueArea == LE_TRUE && graph->categories.size > 1)
         {
-            drawPoint.x = paintState.rect.x + categoryIndex * paintState.rect.width / (graph->categories.size - 1);
+            drawPoint.x = paintState.graphRect.x + categoryIndex * paintState.graphRect.width / (graph->categories.size - 1);
         }
         else
         {
-            drawPoint.x = paintState.rect.x + (categoryIndex + 1) * paintState.rect.width / (graph->categories.size + 1);
+            drawPoint.x = paintState.graphRect.x + (categoryIndex + 1) * paintState.graphRect.width / (graph->categories.size + 1);
         }
         
         leRenderer_VertLine(drawPoint.x,
                             drawPoint.y,
                             length,
-                            graph->widget.scheme->foreground,
+                            leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                             paintState.alpha);
     }
 }
@@ -978,17 +965,17 @@ static void drawSubTicks(leLineGraphWidget* graph)
     {
         case LINE_GRAPH_TICK_OUT:
         {
-            drawPoint.x = paintState.rect.x - subTickLength;
+            drawPoint.x = paintState.graphRect.x - subTickLength;
             break;
         }
         case LINE_GRAPH_TICK_CENTER:
         {
-            drawPoint.x = paintState.rect.x - subTickLength / 2;
+            drawPoint.x = paintState.graphRect.x - subTickLength / 2;
             break;
         }
         case LINE_GRAPH_TICK_IN:
         {
-            drawPoint.x = paintState.rect.x;
+            drawPoint.x = paintState.graphRect.x;
             break;
         }
         default:
@@ -1002,12 +989,12 @@ static void drawSubTicks(leLineGraphWidget* graph)
     {
         drawPoint.y = paintState.originPoint.y - (int32_t) ((float) (value - paintState.originValue) * paintState.pixelsPerUnit);
 
-        if (drawPoint.y > paintState.rect.y)
+        if (drawPoint.y > paintState.graphRect.y)
         {
             leRenderer_HorzLine(drawPoint.x,
                                 drawPoint.y,
                                 subTickLength,
-                                graph->widget.scheme->foreground,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
         }               
     }
@@ -1021,12 +1008,12 @@ static void drawSubTicks(leLineGraphWidget* graph)
     {
         drawPoint.y = paintState.originPoint.y + (int32_t) ((float) (paintState.originValue - value) * paintState.pixelsPerUnit); 
         
-        if (drawPoint.y < (paintState.rect.y + paintState.rect.height))
+        if (drawPoint.y < (paintState.graphRect.y + paintState.graphRect.height))
         {
             leRenderer_HorzLine(drawPoint.x,
                                 drawPoint.y,
                                 subTickLength,
-                                graph->widget.scheme->foreground,
+                                leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                                 paintState.alpha);
         }              
     }
@@ -1035,249 +1022,333 @@ static void drawSubTicks(leLineGraphWidget* graph)
 static void drawBorders(leLineGraphWidget* graph)
 {
     // draw the borders
-    leRenderer_VertLine(paintState.rect.x,
-                        paintState.rect.y,
-                        paintState.rect.height,
-                        graph->widget.scheme->foreground,
+    leRenderer_VertLine(paintState.graphRect.x,
+                        paintState.graphRect.y,
+                        paintState.graphRect.height,
+                        leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                         paintState.alpha);
                         
-    leRenderer_VertLine(paintState.rect.x + paintState.rect.width,
-                        paintState.rect.y,
-                        paintState.rect.height,
-                        graph->widget.scheme->foreground,
+    leRenderer_VertLine(paintState.graphRect.x + paintState.graphRect.width,
+                        paintState.graphRect.y,
+                        paintState.graphRect.height,
+                        leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                         paintState.alpha);
     
-    leRenderer_HorzLine(paintState.rect.x,
-                        paintState.rect.y,
-                        paintState.rect.width,
-                        graph->widget.scheme->foreground,
+    leRenderer_HorzLine(paintState.graphRect.x,
+                        paintState.graphRect.y,
+                        paintState.graphRect.width,
+                        leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                         paintState.alpha);
                         
-    leRenderer_HorzLine(paintState.rect.x,
-                        paintState.rect.y + paintState.rect.height,
-                        paintState.rect.width,
-                        graph->widget.scheme->foreground,
+    leRenderer_HorzLine(paintState.graphRect.x,
+                        paintState.graphRect.y + paintState.graphRect.height,
+                        paintState.graphRect.width,
+                        leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_FOREGROUND),
                         paintState.alpha);
+}
+
+static void drawSeriesPoint(leLineGraphDataSeries* series,
+                            const lePoint pnt)
+{
+    leColor clr = leScheme_GetRenderColor(series->scheme, LE_SCHM_FOREGROUND);
+
+    leRect drawRect;
+    drawRect.x = pnt.x - series->pointSize / 2;
+    drawRect.y = pnt.y - series->pointSize / 2;
+    drawRect.width = series->pointSize;
+    drawRect.height = series->pointSize;
+
+    if(series->pointType == LINE_GRAPH_DATA_POINT_CIRCLE)
+    {
+        if(series->fillPoints == LE_TRUE)
+        {
+            leRenderer_CircleFill(&drawRect,
+                                  0,
+                                  0,
+                                  clr,
+                                  paintState.alpha);
+        }
+        else
+        {
+            leRenderer_CircleDraw(&drawRect,
+                                  1,
+                                  clr,
+                                  paintState.alpha);
+        }
+    }
+    else if(series->pointType == LINE_GRAPH_DATA_POINT_SQUARE)
+    {
+        if(series->fillPoints == LE_TRUE)
+        {
+            leRenderer_RectFill(&drawRect,
+                                clr,
+                                paintState.alpha);
+        }
+        else
+        {
+            leRenderer_RectLine(&drawRect,
+                                clr,
+                                paintState.alpha);
+        }
+    }
+}
+
+static int LineGetXGivenY(int x1, int y1, int x2, int y2, int y3)
+{
+    if (y1 == y2)
+        return x1;
+
+    return (x1 - ((x1 - x2) * (y1 - y3))/(y1 - y2));
+}
+
+/*static int LineGetYGivenX(int x1, int y1, int x2, int y2, int x3)
+{
+    if (x1 == x2)
+        return y1;
+
+    return (y1 - ((y1 - y2) * (x1 - x3))/(x1 - x2));
+}*/
+
+static void drawUnstackedLines(leLineGraphWidget* graph)
+{
+    uint32_t itr, catIdx;
+    lePoint prevPoint;
+    lePoint valuePoint;
+    lePoint start, end;
+    leColor clr;
+    leLineGraphDataSeries* series;
+
+    //determine the width of each category + L & R margins
+    for(itr = 0; itr < graph->dataSeries.size; ++itr)
+    {
+        series = (leLineGraphDataSeries*)graph->dataSeries.values[itr];
+
+        prevPoint = paintState.originPoint;
+        valuePoint = paintState.originPoint;
+
+        clr = leScheme_GetRenderColor(series->scheme, LE_SCHM_FOREGROUND);
+
+        for(catIdx = 0; catIdx < graph->categories.size; ++catIdx)
+        {
+            int32_t value = (int32_t)series->data.values[catIdx];
+
+            if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
+            {
+                valuePoint.x = paintState.originPoint.x + ((catIdx * paintState.graphRect.width) / (graph->categories.size - 1));
+            }
+            else
+            {
+                valuePoint.x = paintState.originPoint.x + (((catIdx + 1) * paintState.graphRect.width) / (graph->categories.size + 1));
+            }
+
+            if (value >= paintState.originValue)
+            {
+                valuePoint.y = paintState.originPoint.y - (int) ((float)(value - paintState.originValue) * paintState.pixelsPerUnit);
+            }
+            // draw the points below the origin value
+            else if (value < paintState.originValue)
+            {
+                valuePoint.y = paintState.originPoint.y + (int) ((float)(paintState.originValue - value) * paintState.pixelsPerUnit);
+            }
+
+            if(series->drawLines == LE_TRUE && catIdx > 0)
+            {
+                start = prevPoint;
+                end = valuePoint;
+
+                if(start.y < paintState.graphRect.y)
+                {
+                    start.y = paintState.graphRect.y;
+
+                    start.x = LineGetXGivenY(prevPoint.x,
+                                             prevPoint.y,
+                                             valuePoint.x,
+                                             valuePoint.y,
+                                             start.y);
+                }
+                else if(start.y > paintState.graphRect.y + paintState.graphRect.height)
+                {
+                    start.y = paintState.graphRect.y + paintState.graphRect.height;
+
+                    start.x = LineGetXGivenY(prevPoint.x,
+                                             prevPoint.y,
+                                             valuePoint.x,
+                                             valuePoint.y,
+                                             start.y);
+                }
+
+                if (end.y < paintState.graphRect.y)
+                {
+                    end.y = paintState.graphRect.y;
+
+                    end.x = LineGetXGivenY(prevPoint.x,
+                                           prevPoint.y,
+                                           valuePoint.x,
+                                           valuePoint.y,
+                                           end.y);
+                }
+                else if(end.y > paintState.graphRect.y + paintState.graphRect.height)
+                {
+                    end.y = paintState.graphRect.y + paintState.graphRect.height;
+
+                    end.x = LineGetXGivenY(prevPoint.x,
+                                           prevPoint.y,
+                                           valuePoint.x,
+                                           valuePoint.y,
+                                           end.y);
+                }
+
+                // draw lines
+                if(series->drawLines == LE_TRUE && catIdx > 0)
+                {
+                    leRenderer_DrawLine(start.x,
+                                        start.y,
+                                        end.x,
+                                        end.y,
+                                        clr,
+                                        paintState.alpha);
+                }
+            }
+
+            //draw the point if it's within graph area
+            if(series->pointType != LINE_GRAPH_DATA_POINT_NONE &&
+               valuePoint.y >= paintState.graphRect.y &&
+               valuePoint.y <= paintState.graphRect.y + paintState.graphRect.height)
+            {
+                drawSeriesPoint(series, valuePoint);
+            }
+
+            prevPoint.x = valuePoint.x;
+            prevPoint.y = valuePoint.y;
+        }
+    }
 }
 
 static void drawStackedLines(leLineGraphWidget* graph)
 {
-    int32_t categoryIndex = 0;
-    int32_t seriesIndex = 0;
-    leLineGraphDataSeries* series;
-    leLineGraphCategory* category;
+    uint32_t itr;
     lePoint valuePoint;
     int32_t topValue;
-    int32_t value = 0;
-    lePoint start;
-    lePoint end;
-    leLineGraphCategory* prevCategory;
-    
-    for (categoryIndex = 0; 
-         categoryIndex < (int32_t)graph->categories.size; 
-         categoryIndex++)
-    {
-        category = leArray_Get(&graph->categories, categoryIndex);
-        category->stackValue = 0;
-    }
-
-    for (seriesIndex = 0; seriesIndex < (int32_t)graph->dataSeries.size; seriesIndex++)
-    {
-        valuePoint = paintState.originPoint;
-        topValue = 0;
-
-        series = leArray_Get(&graph->dataSeries, seriesIndex);
-
-        for (categoryIndex = 0; 
-             categoryIndex < (int32_t)graph->categories.size; 
-             categoryIndex++)
-        {
-            if (categoryIndex < (int32_t)series->data.size)
-            {
-                value = (int32_t)leArray_Get(&series->data, categoryIndex);
-            }
-            
-            category = leArray_Get(&graph->categories, categoryIndex);
-
-            if (graph->fillValueArea == LE_TRUE && graph->categories.size > 1)
-            {
-                valuePoint.x = paintState.originPoint.x + ((categoryIndex * paintState.rect.width) / (graph->categories.size - 1));
-            }
-            else
-            {
-                valuePoint.x = paintState.originPoint.x + (((categoryIndex + 1) * paintState.rect.width) / (graph->categories.size + 1));    
-            }
-
-            topValue = category->stackValue;
-
-            topValue += value;
-
-            valuePoint.y = paintState.originPoint.y - (int32_t) ((float) (topValue - paintState.originValue) * paintState.pixelsPerUnit);
-
-            if (series->drawLines == LE_TRUE && categoryIndex > 0)
-            {
-                start.x = -1;
-                start.y = -1;
-                prevCategory = leArray_Get(&graph->categories, categoryIndex - 1);
-
-                if (graph->fillValueArea == LE_TRUE && graph->categories.size > 1)
-                {
-                    start.x = paintState.originPoint.x + ((categoryIndex - 1)* paintState.rect.width) / (graph->categories.size - 1);
-                }
-                else
-                {
-                    start.x = paintState.originPoint.x + (((categoryIndex) * paintState.rect.width) / (graph->categories.size + 1));    
-                }
-
-                start.y = paintState.originPoint.y - (int32_t) ((float) (prevCategory->stackValue  - paintState.originValue) * paintState.pixelsPerUnit);
-            
-                end.x = paintState.valuePoint.x;
-                end.y = paintState.valuePoint.y;
-
-                if (start.y < paintState.rect.y)
-                {
-
-                    start.x = leGetXGivenYOnLine(start, paintState.valuePoint, paintState.rect.y);
-                    start.y = paintState.rect.y;
-
-                }
-                else if (start.y > paintState.rect.y + paintState.rect.height)
-                {
-                    start.x = leGetXGivenYOnLine(start, valuePoint, paintState.rect.y + paintState.rect.height);
-                    start.y = paintState.rect.y + paintState.rect.height;
-                }
-
-                if (end.y < paintState.rect.y)
-                {
-                    end.x = leGetXGivenYOnLine(end, start, paintState.rect.y);
-                    end.y = paintState.rect.y;
-                }
-                else if (end.y > paintState.rect.y + paintState.rect.height)
-                {
-                    end.x = leGetXGivenYOnLine(end, start, paintState.rect.y + paintState.rect.height);
-                    end.y = paintState.rect.y + paintState.rect.height;
-                }
-
-                if (start.x != end.x || start.y != end.y)
-                {
-                    leRenderer_DrawLine(start.x,
-                                        start.y,
-                                        end.x,
-                                        end.y,
-                                        series->scheme->foreground,
-                                        paintState.alpha);
-                }
-            }
-
-            //Draw the point if it's within graph area
-            if ((series->pointType != LINE_GRAPH_DATA_POINT_NONE) &&
-                (valuePoint.y >= paintState.rect.y) && 
-                (valuePoint.y <= paintState.rect.y + paintState.rect.height))
-            {
-                drawSeriesPoint(series, valuePoint);
-            }
-
-            category->stackValue = topValue;
-        }
-    }
-}   
-
-static void drawUnstackedLines(leLineGraphWidget* graph)
-{
-    int32_t categoryIndex = 0;
-    int32_t seriesIndex = 0;
-    leLineGraphDataSeries * series;
-    lePoint prevPoint;
-    lePoint valuePoint;
-    int32_t value;
+    leLineGraphDataSeries* series;
+    leLineGraphCategory *cat, *prevCat;
+    leColor clr;
+    uint32_t catIdx;
     lePoint start, end;
-    
-    //determine the width of each category + L & R margins
-    for (seriesIndex = 0; seriesIndex < (int32_t)graph->dataSeries.size; seriesIndex++)
+
+    for(catIdx = 0; catIdx < graph->categories.size; ++catIdx)
     {
-        prevPoint = paintState.originPoint;
+        cat = graph->categories.values[catIdx];
+        cat->stackValue = 0;
+    }
+
+    for(itr = 0; itr < graph->dataSeries.size; ++itr)
+    {
         valuePoint = paintState.originPoint;
 
-        series = leArray_Get(&graph->dataSeries, seriesIndex);
-        
-        if (series == NULL)
-            continue;
+        series = (leLineGraphDataSeries*)graph->dataSeries.values[itr];
 
-        for (categoryIndex = 0; 
-             (categoryIndex < (int32_t)graph->categories.size &&
-             categoryIndex < (int32_t)series->data.size); 
-             categoryIndex++)
+        clr = leScheme_GetRenderColor(series->scheme, LE_SCHM_FOREGROUND);
+
+        for(catIdx = 0; catIdx < graph->categories.size; ++catIdx)
         {
-            value = (int32_t)leArray_Get(&series->data, categoryIndex);
+            cat = graph->categories.values[catIdx];
 
-            if (graph->fillValueArea == LE_TRUE && graph->categories.size > 1)
+            int32_t value = (int32_t)series->data.values[catIdx];
+
+            if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
             {
-                valuePoint.x = paintState.originPoint.x + ((categoryIndex * paintState.rect.width) / (graph->categories.size - 1));
+                valuePoint.x = paintState.originPoint.x + ((catIdx * paintState.graphRect.width) / (graph->categories.size - 1));
             }
             else
             {
-                valuePoint.x = paintState.originPoint.x + (((categoryIndex + 1) * paintState.rect.width) / (graph->categories.size + 1));    
+                valuePoint.x = paintState.originPoint.x + (((catIdx + 1) * paintState.graphRect.width) / (graph->categories.size + 1));
             }
-            
-            if (value >= paintState.originValue)
+
+            topValue = cat->stackValue + value;
+
+            valuePoint.y = paintState.originPoint.y - (int) ((float) (topValue - paintState.originValue) * paintState.pixelsPerUnit);
+
+            if(series->drawLines == LE_TRUE && catIdx > 0)
             {
-                valuePoint.y = paintState.originPoint.y - (int32_t) ((float)(value - paintState.originValue) * paintState.pixelsPerUnit);
-            }
-            //draw the points below the origin value
-            else if (value < paintState.originValue)
-            {
-                valuePoint.y = paintState.originPoint.y + (int32_t) ((float)(paintState.originValue - value) * paintState.pixelsPerUnit);
-            }
-            
-            if (series->drawLines == LE_TRUE && categoryIndex > 0)
-            {
-                start = prevPoint;
+                if(catIdx > 0)
+                {
+                    prevCat = graph->categories.values[catIdx - 1];
+
+                    if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
+                    {
+                        start.x = paintState.originPoint.x + ((catIdx - 1) * paintState.graphRect.width) / (graph->categories.size - 1);
+                    }
+                    else
+                    {
+                        start.x = paintState.originPoint.x + (((catIdx - 1) * paintState.graphRect.width) / (graph->categories.size + 1));
+                    }
+
+                    start.y = paintState.originPoint.y - (int) ((float) (prevCat->stackValue  - paintState.originValue) * paintState.pixelsPerUnit);
+                }
+
                 end.x = valuePoint.x;
                 end.y = valuePoint.y;
 
-                if (start.y < paintState.rect.y)
+                if (start.y < paintState.graphRect.y)
                 {
-                    start.y = paintState.rect.y;
-                    start.x = leGetXGivenYOnLine(prevPoint, valuePoint, start.y);
+                    start.x = LineGetXGivenY(start.x,
+                                             start.y,
+                                             valuePoint.x,
+                                             valuePoint.y,
+                                             paintState.graphRect.y);
+
+                    start.y = paintState.graphRect.y;
+
                 }
-                else if (start.y > paintState.rect.y + paintState.rect.height)
+                else if (start.y > paintState.graphRect.y + paintState.graphRect.height)
                 {
-                    start.y = paintState.rect.y + paintState.rect.height;
-                    start.x = leGetXGivenYOnLine(prevPoint, valuePoint, start.y);
+                    start.x = LineGetXGivenY(start.x,
+                                             start.y,
+                                             valuePoint.x,
+                                             valuePoint.y,
+                                             paintState.graphRect.y + paintState.graphRect.height);
+
+                    start.y = paintState.graphRect.y + paintState.graphRect.height;
                 }
 
-                if (end.y < paintState.rect.y)
+                if (end.y < paintState.graphRect.y)
                 {
-                    end.y = paintState.rect.y;
-                    end.x = leGetXGivenYOnLine(prevPoint, valuePoint, end.y);
+                    end.x = LineGetXGivenY(end.x,
+                                              end.y,
+                                              start.x,
+                                              start.y,
+                                              paintState.graphRect.y);
+
+                    end.y = paintState.graphRect.y;
                 }
-                else if (end.y > paintState.rect.y + paintState.rect.height)
+                else if (end.y > paintState.graphRect.y + paintState.graphRect.height)
                 {
-                    end.y = paintState.rect.y + paintState.rect.height;
-                    end.x = leGetXGivenYOnLine(prevPoint, valuePoint, end.y);
+                    end.x = LineGetXGivenY(end.x,
+                                              end.y,
+                                              start.x,
+                                              start.y,
+                                              paintState.graphRect.y + paintState.graphRect.height);
+
+                    end.y = paintState.graphRect.y + paintState.graphRect.height;
                 }
 
-                //Draw lines
-                if (start.x != end.x || start.y != end.y)
-                {
-                    leRenderer_DrawLine(start.x,
-                                        start.y,
-                                        end.x,
-                                        end.y,
-                                        series->scheme->foreground,
-                                        paintState.alpha);
-                }
+                leRenderer_DrawLine(start.x,
+                                    start.y,
+                                    end.x,
+                                    end.y,
+                                    clr,
+                                    paintState.alpha);
             }
-            
+
             //Draw the point if it's within graph area
-            if (series->pointType != LINE_GRAPH_DATA_POINT_NONE && 
-                valuePoint.y >= paintState.rect.y &&
-                valuePoint.y <= paintState.rect.y + paintState.rect.height)
+            if(series->pointType != LINE_GRAPH_DATA_POINT_NONE &&
+               (valuePoint.y >= paintState.graphRect.y) &&
+               (valuePoint.y <= paintState.graphRect.y + paintState.graphRect.height))
             {
                 drawSeriesPoint(series, valuePoint);
             }
 
-            prevPoint = valuePoint;
+            cat->stackValue = topValue;
         }
     }
 }
@@ -1297,21 +1368,10 @@ static void drawLines(leLineGraphWidget* graph)
 
 static void drawLineGraph(leLineGraphWidget* graph)
 {
-    //leRect widgetRect;
-    
-    //widgetRect = graph->fn->rectToScreen(graph);
-
-
-    _leLineGraphWidget_GetGraphRect(graph, &paintState.rect);
+    _leLineGraphWidget_GetGraphRect(graph, &paintState.graphRect);
         
-    paintState.pixelsPerUnit = (float) paintState.rect.height / ((float) graph->maxValue - (float) graph->minValue);
+    paintState.pixelsPerUnit = (float) paintState.graphRect.height / ((float) graph->maxValue - (float) graph->minValue);
         
-    // fill the base
-    if(graph->fillGraphArea == LE_TRUE)
-    {
-        fillBase(graph);
-    }
-
     // adjust the horizontal borders if ticks are shown
     if (graph->valueAxisTicksVisible == LE_TRUE)
     {
@@ -1324,137 +1384,83 @@ static void drawLineGraph(leLineGraphWidget* graph)
         drawMinMaxLabels(graph);
     }
 
-    // determine the origin point
-    paintState.originPoint = _leLineGraphWidget_GetOriginPoint(graph);
-    
-    if (graph->minValue < 0 && graph->maxValue > 0)
+    //determine the origin axis
+    paintState.originPoint.x = paintState.graphRect.x;
+
+    if(graph->minValue < 0 && graph->maxValue > 0)
     {
+        paintState.originPoint.y = paintState.graphRect.y + (int) ((float) graph->maxValue * paintState.pixelsPerUnit);
         paintState.originValue = 0;
     }
-    else if (graph->minValue >= 0)
+    else if(graph->minValue >= 0)
     {
+        paintState.originPoint.y = paintState.graphRect.y + paintState.graphRect.height;
         paintState.originValue = graph->minValue;
     }
-    else if (graph->maxValue <= 0)
+    else if(graph->minValue <= 0)
     {
-        paintState.originValue = graph->maxValue;
-    }
-    
-    //Draw the ticks
-    if (graph->valueAxisTicksVisible || graph->valueGridLinesVisible)
-    {
-        drawTicks(graph);
+        paintState.originPoint.y = paintState.graphRect.y;
+        paintState.originValue = graph->minValue;
     }
 
-    //Draw the fills if needed
+    _calculateCategoryPoints(graph);
+
+    // fill the base
+    if(graph->fillGraphArea == LE_TRUE)
+    {
+        fillBase(graph);
+    }
+
+    // draw the fills
     if (graph->fillValueArea == LE_TRUE &&
-        graph->categories.size > 0 && 
+        graph->categories.size > 0 &&
         graph->dataSeries.size > 0)
     {
         drawFills(graph);
     }
-    
-    //Draw the origin line
+
+    // draw the origin line
     if(paintState.originValue == 0)
     {
         drawOriginLine(graph);
     }
 
-    //Draw the category ticks
+    // draw the points/lines
+    if(graph->categories.size > 0 && graph->dataSeries.size > 0)
+    {
+        drawLines(graph);
+    }
+
+    // draw the ticks
+    if (graph->valueAxisTicksVisible || graph->valueGridLinesVisible)
+    {
+        drawTicks(graph);
+    }
+
+    // draw the category ticks
     if((graph->categAxisTicksVisible == LE_TRUE) && (graph->categories.size > 0))
     {
         drawCategoryTicks(graph);
     }
-    
-    //Draw the subticks, only if major ticks are also visible
+
+    // draw the subticks, only if major ticks are also visible
     if (graph->valueAxisSubticksVisible && graph->valueAxisTicksVisible)
     {
         drawSubTicks(graph);
     }
 
     drawBorders(graph);
-    
-    //Draw the points/lines
-    if(graph->categories.size > 0 && graph->dataSeries.size > 0)
-    {
-        drawLines(graph);
-    }
 
     nextState(graph);
 }
 
-static void _leLineGraphWidget_GetCategoryTextRect(leLineGraphWidget* graph,
-                                           uint32_t categoryIndex,
-                                           const leRect* graphRect,
-                                           leRect* textRect,
-                                           leRect* drawRect)
-{
-    leLineGraphCategory * category;
-    leRect bounds;
-    
-    *textRect = leRect_Zero;
-    *drawRect = leRect_Zero;
-    
-    if (categoryIndex >= graph->categories.size)
-        return;
-    
-    category = leArray_Get(&graph->categories, categoryIndex);
-    
-    if (category == NULL || category->text == NULL)
-        return;
-    
-    category->text->fn->getRect(category->text, textRect);
-    
-    bounds.x = 0;
-    bounds.y = 0;
-    bounds.width = graphRect->width;
-    bounds.height = textRect->height;
-    
-    leRectClip(textRect, &bounds, drawRect);
-
-    //get center of category, arrange text below it
-    switch (graph->categAxisTicksPosition)
-    {
-        case LINE_GRAPH_TICK_OUT:
-        {
-            textRect->y = graphRect->y + graphRect->height + graph->tickLength + LABEL_OFFSET_MIN_PIX;
-            break;
-        }
-        case LINE_GRAPH_TICK_CENTER:
-        {
-            textRect->y = graphRect->y + graphRect->height + graph->tickLength / 2 + LABEL_OFFSET_MIN_PIX;
-            break;
-        }
-        case LINE_GRAPH_TICK_IN:
-        {
-            textRect->y = graphRect->y + graphRect->height + LABEL_OFFSET_MIN_PIX;
-            break;
-        }
-        default:
-            break;
-    }
-
-    if (graph->fillValueArea == LE_TRUE  && graph->categories.size > 1)
-    {
-        textRect->x = graphRect->x + 
-                     ((categoryIndex)* graphRect->width / (graph->categories.size - 1)) - textRect->width/2;
-    }
-    else
-    {
-        textRect->x = graphRect->x + 
-                     ((categoryIndex + 1)* graphRect->width / (graph->categories.size + 1)) - textRect->width/2;
-    }
-
-    drawRect->x = textRect->x;
-    drawRect->y = textRect->y;
-}
 
 #if LE_STREAMING_ENABLED == 1
 static void onStringStreamFinished(leStreamManager* strm)
 {
     leLineGraphWidget* graph = (leLineGraphWidget*)strm->userData;
 
-    graph->widget.drawState = DRAW_STRING;
+    graph->widget.status.drawState = DRAW_STRING;
 
     nextState(graph);
 }
@@ -1462,33 +1468,28 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leLineGraphWidget* graph)
 {
-    leRect textRect, drawRect;
+    leRect textRect;
     leLineGraphCategory* category;
     uint32_t categoryIndex = 0;
 
     if (graph->categAxisLabelsVisible)
     {
-        for (categoryIndex = 0; 
-             (categoryIndex < (int32_t)graph->categories.size); 
-             categoryIndex++)
+        for (categoryIndex = 0; (categoryIndex < graph->categories.size); categoryIndex++)
         {
             category = leArray_Get(&graph->categories, categoryIndex);
             
             if (category == NULL || category->text == NULL)
                 continue;
-                
-            _leLineGraphWidget_GetCategoryTextRect(graph,
-                                                   categoryIndex,
-                                                   &paintState.rect,
-                                                   &textRect,
-                                                   &drawRect);
-            
-            
+
+            _getCategoryTextRect(graph,
+                                 categoryIndex,
+                                 &textRect);
+
             category->text->fn->_draw(category->text,
                                       textRect.x,
                                       textRect.y,
                                       LE_HALIGN_CENTER,
-                                      graph->widget.scheme->text,
+                                      leScheme_GetRenderColor(graph->widget.scheme, LE_SCHM_TEXT),
                                       paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
@@ -1497,7 +1498,7 @@ static void drawString(leLineGraphWidget* graph)
                 leGetActiveStream()->onDone = onStringStreamFinished;
                 leGetActiveStream()->userData = graph;
 
-                graph->widget.drawState = WAIT_STRING;
+                graph->widget.status.drawState = WAIT_STRING;
 
                 return;
             }
@@ -1510,12 +1511,12 @@ static void drawString(leLineGraphWidget* graph)
 
 static void drawBorder(leLineGraphWidget* graph)
 {    
-    if(graph->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(graph->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)graph,
                                                     paintState.alpha);
     }
-    else if(graph->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(graph->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)graph,
                                                       paintState.alpha);
@@ -1526,17 +1527,10 @@ static void drawBorder(leLineGraphWidget* graph)
 
 void _leLineGraphWidget_Paint(leLineGraphWidget* graph)
 {
-    if(graph->widget.scheme == NULL)
-    {
-        graph->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(graph->widget.drawState == NOT_STARTED)
+    if(graph->widget.status.drawState == NOT_STARTED)
         nextState(graph);
     
-    while(graph->widget.drawState != DONE)
+    while(graph->widget.status.drawState != DONE)
     {
         graph->widget.drawFunc((leWidget*)graph);
         
@@ -1545,7 +1539,7 @@ void _leLineGraphWidget_Paint(leLineGraphWidget* graph)
 #endif
 
 #if LE_STREAMING_ENABLED == 1
-        if(graph->widget.drawState == WAIT_STRING)
+        if(graph->widget.status.drawState == WAIT_STRING)
             break;
 #endif
     }

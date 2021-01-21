@@ -167,7 +167,7 @@ static void drawHandle(leScrollBarWidget* bar);
 
 static void nextState(leScrollBarWidget* bar)
 {
-    switch(bar->widget.drawState)
+    switch(bar->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -180,35 +180,35 @@ static void nextState(leScrollBarWidget* bar)
             }
 #endif
 
-            bar->widget.drawState = DRAW_BACKGROUND;
+            bar->widget.status.drawState = DRAW_BACKGROUND;
             bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
             return;
         }
         case DRAW_BACKGROUND:
         {
-            bar->widget.drawState = DRAW_UP_BUTTON;
+            bar->widget.status.drawState = DRAW_UP_BUTTON;
             bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawUpButton;
             
             return;
         }
         case DRAW_UP_BUTTON:
         {            
-            bar->widget.drawState = DRAW_DOWN_BUTTON;
+            bar->widget.status.drawState = DRAW_DOWN_BUTTON;
             bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawDownButton;
             
             return;
         }
         case DRAW_DOWN_BUTTON:
         {            
-            bar->widget.drawState = DRAW_HANDLE;
+            bar->widget.status.drawState = DRAW_HANDLE;
             bar->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawHandle;
             
             return;
         }
         case DRAW_HANDLE:
         {
-            bar->widget.drawState = DONE;
+            bar->widget.status.drawState = DONE;
             bar->widget.drawFunc = NULL;
         }
     }
@@ -218,12 +218,12 @@ static void drawBackground(leScrollBarWidget* bar)
 {
     leRect rect;
     
-    if(bar->widget.backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(bar->widget.style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
         _leScrollBar_GetScrollAreaRect(bar, &rect);
      
         leRenderer_RectFill(&rect,
-                            bar->widget.scheme->background,
+                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BACKGROUND),
                             paintState.alpha);
     }
     
@@ -242,7 +242,7 @@ static void drawUpButton(leScrollBarWidget* bar)
     if(bar->state == LE_SCROLLBAR_STATE_TOP_INSIDE)
     {
         leRenderer_RectFill(&rect,
-                            bar->widget.scheme->background,
+                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BACKGROUND),
                             paintState.alpha);
         
         arrowOffset = 1;
@@ -250,7 +250,7 @@ static void drawUpButton(leScrollBarWidget* bar)
     else
     {
         leRenderer_RectFill(&rect,
-                            bar->widget.scheme->base,
+                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BASE),
                             paintState.alpha);
     }
                  
@@ -260,47 +260,47 @@ static void drawUpButton(leScrollBarWidget* bar)
         pnt.x = rect.x + (rect.width / 2) - 1 + arrowOffset;
         pnt.y = rect.y + (rect.height / 2) - 1 + arrowOffset;
         
-        leRenderer_BlendPixel_Safe(pnt.x, pnt.y - 1, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_HorzLine(pnt.x - 1, pnt.y + 0, 2, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_HorzLine(pnt.x - 2, pnt.y + 1, 4, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_HorzLine(pnt.x - 3, pnt.y + 2, 6, bar->widget.scheme->foreground, paintState.alpha);
+        leRenderer_BlendPixel_Safe(pnt.x, pnt.y - 1, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 1, pnt.y + 0, 2, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 2, pnt.y + 1, 4, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 3, pnt.y + 2, 6, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
     }
     else
     {
         pnt.x = rect.x + (rect.width / 2) - 1 + arrowOffset;
         pnt.y = rect.y + (rect.height / 2) - 1 + arrowOffset;
 
-        leRenderer_BlendPixel_Safe(pnt.x - 1, pnt.y, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_VertLine(pnt.x, pnt.y - 1, 2, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_VertLine(pnt.x + 1, pnt.y - 2, 4, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_VertLine(pnt.x + 2, pnt.y - 3, 6, bar->widget.scheme->foreground, paintState.alpha);
+        leRenderer_BlendPixel_Safe(pnt.x - 1, pnt.y, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_VertLine(pnt.x, pnt.y - 1, 2, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_VertLine(pnt.x + 1, pnt.y - 2, 4, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_VertLine(pnt.x + 2, pnt.y - 3, 6, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
     }
     
     // draw button border
-    if(bar->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(bar->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawLineBorder(&rect,
-                                            bar->widget.scheme->shadowDark,
+                                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
                                             paintState.alpha);
     }
-    else if(bar->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(bar->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         if(bar->state == LE_SCROLLBAR_STATE_TOP_INSIDE)
         {
             leWidget_SkinClassic_Draw2x2BeveledBorder(&rect,
-                                            bar->widget.scheme->shadowDark,
-                                            bar->widget.scheme->shadow,
-                                            bar->widget.scheme->highlightLight,
-                                            bar->widget.scheme->highlight,
-                                            paintState.alpha);
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOW),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHT),
+                                                      paintState.alpha);
         }
         else
         {
             leWidget_SkinClassic_Draw1x2BeveledBorder(&rect,
-                                  bar->widget.scheme->highlightLight,
-                                  bar->widget.scheme->shadowDark,
-                                  bar->widget.scheme->shadow,
-                                  paintState.alpha);
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOW),
+                                                      paintState.alpha);
         }
     }
     
@@ -319,7 +319,7 @@ static void drawDownButton(leScrollBarWidget* bar)
     if(bar->state == LE_SCROLLBAR_STATE_BOTTOM_INSIDE)
     {
         leRenderer_RectFill(&rect,
-                            bar->widget.scheme->background,
+                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BACKGROUND),
                             paintState.alpha);
         
         arrowOffset = 1;
@@ -327,7 +327,7 @@ static void drawDownButton(leScrollBarWidget* bar)
     else
     {
         leRenderer_RectFill(&rect,
-                            bar->widget.scheme->base,
+                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BASE),
                             paintState.alpha);
     }
         
@@ -345,47 +345,47 @@ static void drawDownButton(leScrollBarWidget* bar)
         pnt.x = rect.x + (rect.width / 2) - 1 + arrowOffset;
         pnt.y = rect.y + (rect.height / 2) - 1 + arrowOffset;
         
-        leRenderer_HorzLine(pnt.x - 3, pnt.y - 1, 6, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_HorzLine(pnt.x - 2, pnt.y + 0, 4, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_HorzLine(pnt.x - 1, pnt.y + 1, 2, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_BlendPixel_Safe(pnt.x, pnt.y + 2, bar->widget.scheme->foreground, paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 3, pnt.y - 1, 6, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 2, pnt.y + 0, 4, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_HorzLine(pnt.x - 1, pnt.y + 1, 2, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_BlendPixel_Safe(pnt.x, pnt.y + 2, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
     }
     else
     {
         pnt.x = rect.x + (rect.width / 2) - 1 + arrowOffset;
         pnt.y = rect.y + (rect.height / 2) - 1 + arrowOffset;
         
-        leRenderer_VertLine(pnt.x - 1, pnt.y - 3, 6, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_VertLine(pnt.x + 0, pnt.y - 2, 4, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_VertLine(pnt.x + 1, pnt.y - 1, 2, bar->widget.scheme->foreground, paintState.alpha);
-        leRenderer_BlendPixel_Safe(pnt.x + 2, pnt.y, bar->widget.scheme->foreground, paintState.alpha);
+        leRenderer_VertLine(pnt.x - 1, pnt.y - 3, 6, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_VertLine(pnt.x + 0, pnt.y - 2, 4, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_VertLine(pnt.x + 1, pnt.y - 1, 2, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
+        leRenderer_BlendPixel_Safe(pnt.x + 2, pnt.y, leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_FOREGROUND), paintState.alpha);
     }
     
     // draw button border
-    if(bar->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(bar->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawLineBorder(&rect,
-                                            bar->widget.scheme->shadowDark,
+                                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
                                             paintState.alpha);
     }
-    else if(bar->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(bar->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         if(bar->state == LE_SCROLLBAR_STATE_BOTTOM_INSIDE)
         {
             leWidget_SkinClassic_Draw2x2BeveledBorder(&rect,
-                                        bar->widget.scheme->shadowDark,
-                                        bar->widget.scheme->shadow,
-                                        bar->widget.scheme->highlightLight,
-                                        bar->widget.scheme->highlight,
-                                        paintState.alpha);
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOW),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHT),
+                                                      paintState.alpha);
         }
         else
         {
             leWidget_SkinClassic_Draw1x2BeveledBorder(&rect,
-                                        bar->widget.scheme->highlightLight,
-                                        bar->widget.scheme->shadowDark,
-                                        bar->widget.scheme->shadow,
-                                        paintState.alpha);
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                      leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOW),
+                                                      paintState.alpha);
         }
     }
     
@@ -400,22 +400,22 @@ static void drawHandle(leScrollBarWidget* bar)
     
     // fill handle area
     leRenderer_RectFill(&rect,
-                        bar->widget.scheme->base,
+                        leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_BASE),
                         paintState.alpha);
     
     // draw handle border
-    if(bar->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(bar->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawLineBorder(&rect,
-                                            bar->widget.scheme->shadowDark,
+                                            leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
                                             paintState.alpha);
     }
-    else if(bar->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(bar->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_Draw1x2BeveledBorder(&rect,
-                                                  bar->widget.scheme->highlightLight,
-                                                  bar->widget.scheme->shadowDark,
-                                                  bar->widget.scheme->shadow,
+                                                  leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                  leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                  leScheme_GetRenderColor(bar->widget.scheme, LE_SCHM_SHADOW),
                                                   paintState.alpha);
     }
     
@@ -424,17 +424,10 @@ static void drawHandle(leScrollBarWidget* bar)
 
 void _leScrollBarWidget_Paint(leScrollBarWidget* bar)
 {
-    if(bar->widget.scheme == NULL)
-    {
-        bar->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(bar->widget.drawState == NOT_STARTED)
+    if(bar->widget.status.drawState == NOT_STARTED)
         nextState(bar);
     
-    while(bar->widget.drawState != DONE)
+    while(bar->widget.status.drawState != DONE)
     {
         bar->widget.drawFunc((leWidget*)bar);
         

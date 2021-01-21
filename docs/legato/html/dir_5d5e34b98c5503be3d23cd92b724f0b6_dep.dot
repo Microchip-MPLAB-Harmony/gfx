@@ -1,0 +1,15 @@
+digraph "C:/harmony3_dev/gfx/middleware/legato/library" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_f9263886f735bf5529b65b69f132d1a2 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="legato" fontname="Helvetica", fontsize="10", URL="dir_f9263886f735bf5529b65b69f132d1a2.html"]
+  subgraph clusterdir_5d5e34b98c5503be3d23cd92b724f0b6 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_5d5e34b98c5503be3d23cd92b724f0b6.html"];
+    dir_5d5e34b98c5503be3d23cd92b724f0b6 [shape=plaintext label="library"];
+    dir_6f5404e9306b78bc89b3358cb6d1ffcd [shape=box label="config" color="black" fillcolor="white" style="filled" URL="dir_6f5404e9306b78bc89b3358cb6d1ffcd.html"];
+    dir_2ff63308701858054d619e2b5daf4cbd [shape=box label="plugins_java" color="red" fillcolor="white" style="filled" URL="dir_2ff63308701858054d619e2b5daf4cbd.html"];
+    dir_3c2b569b6ab4a56e47b3633ebf6eadc7 [shape=box label="src" color="red" fillcolor="white" style="filled" URL="dir_3c2b569b6ab4a56e47b3633ebf6eadc7.html"];
+  }
+  }
+}

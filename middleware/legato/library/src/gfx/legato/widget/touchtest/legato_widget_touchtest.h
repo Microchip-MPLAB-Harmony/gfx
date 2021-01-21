@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,10 +37,14 @@
     This module implements graphical touch test (box) widget functions.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_touchtest.h
+ * @brief Window Widget functions and definitions.
+ *
+ * @details This module implements window container widget functions.
+ */
+
 #ifndef LEGATO_TOUCHTEST_H
 #define LEGATO_TOUCHTEST_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -50,9 +52,16 @@
 
 #include "gfx/legato/widget/legato_widget.h"
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 #define LE_TOUCHTEST_MEMORY_SIZE 20
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 // *****************************************************************************
@@ -73,6 +82,11 @@
   Remarks:
     None.
 */
+/**
+ * @brief This enum represents touch test state.
+ * @details Used to define possible test states.
+ * @details .
+ */
 typedef enum leTouchTestState
 {
     LE_TOUCHTEST_STATE_UP,
@@ -88,11 +102,18 @@ typedef struct leTouchTestWidget leTouchTestWidget;
   Summary:
     Point added event function callback type
 */
+/**
+ * @brief This function represents a point added event callback.
+ * @details The callback is used indicate a point added has occured.
+ */
 typedef void (*leTouchTestWidget_PointAddedEventCallback)(leTouchTestWidget*, lePoint*);
 
 
-// DOM-IGNORE-BEGIN
-typedef struct leTouchTestWidget leTouchTestWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leTouchTestWidget leTouchTestWidget;
 
 #define LE_TOUCHTESTWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
@@ -107,7 +128,11 @@ typedef struct leTouchTestWidgetVTable
 	LE_TOUCHTESTWIDGET_VTABLE(leTouchTestWidget)
 } leTouchTestWidgetVTable; 
 
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
+
 
 
 // *****************************************************************************
@@ -125,6 +150,12 @@ typedef struct leTouchTestWidgetVTable
   Remarks:
     None.
 */
+/**
+ * @brief This struct represents a touch test widget.
+ * @details The touch test widget is a specialized widget that displays
+ * intersecting lines based on input events.  This can help visualize touch
+ * interaction and aid determining accurate input coordinates.
+ */
 typedef struct leTouchTestWidget
 {
     leWidget widget; // widget base class
@@ -148,133 +179,82 @@ typedef struct leTouchTestWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leTouchTestWidget* leTouchTestWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leTouchTestWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leTouchTestWidget* wgt = leTouchTestWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leTouchTestWidget* leTouchTestWidget_New(void);
 
-  Summary:
-    Allocates memory for a new widget of this type.  The application is
-    responsible for the managment of this memory until the widget is added to
-    a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leTouchTestWidget <span class="param">wgt</span>.
+ * @code
+ * leTouchTestWidget* wgt;
+ * leTouchTestWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leTouchTestWidget_Constructor(leTouchTestWidget* wgt);
 
-  Description:
-
-
-  Parameters:
-
-  Returns:
-    leTouchTestWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leTouchTestWidget* leTouchTestWidget_New();
-
-/* Function:
-    void leTouchTestWidget_Constructor(leTouchTestWidget* wgt)
-
-  Summary:
-    Initializes an leTouchTestWidget widget pointer.
-
-  Description:
-    Initializes an leTouchTestWidget widget pointer.
-
-  Parameters:
-    leTouchTestWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leTouchTestWidget_Constructor(leTouchTestWidget* tch);
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult addPoint(leTouchTestWidget* _this,
-                      lePoint* pnt)
-
-  Summary:
-     Add a point to the widget
-
-  Description:
-     Add a point to the widget
-
-  Parameters:
-    leTouchTestWidget* _this - The touchtest widget to operate on
-    lePoint* pnt - the point
-
-  Remarks:
-    Usage - _this->fn->addPoint(_this, pnt);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Add point.
+ * @details Adds a point for <span class="param">_this</span>.
+ * @code
+ * leTouchTestWidget* _this;
+ * lePoint* pnt;
+ * leResult res = _this->fn->addPoint(_this, pnt);
+ * @endcode
+ * @param  _this is the widget to query.
+ * @param pnt is the point.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult addPoint(leTouchTestWidget* _this,
+                  lePoint* pnt);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult clearPoints(leTouchTestWidget* _this)
-
-  Summary:
-     Clear all points
-
-  Description:
-     Clear all points
-
-  Parameters:
-    leTouchTestWidget* _this - The touchtest widget to operate on
-
-  Remarks:
-    Usage - _this->fn->clearPoints(_this);
-
-  Returns:
-    leResult - the result of the operation
-*/
+/**
+ * @brief Clear points.
+ * @details Clears points for <span class="param">_this</span>.
+ * @code
+ * leTouchTestWidget* _this;
+ * leResult res = _this->fn->clearPoints(_this);
+ * @endcode
+ * @param  _this is the widget to query.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult clearPoints(leTouchTestWidget* _this);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leTouchTestWidget_PointAddedEventCallback getPointAddedEventCallback(const leTouchTestWidget* _this)
+/**
+ * @brief Set point add event callback.
+ * @details Sets point added event callback to <span class="param">cb</span>
+ * using <span class="param">_this</span>.
+ * @code
+ * leTouchTestWidget* _this;
+ * leTouchTestWidget_PointAddedEventCallback cb;
+ * leResult res = _this->fn->setPointAddedEventCallback(_this, cb);
+ * @endcode
+ * @param _this is the widget to modify
+ * @param cb is the callback func
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setPointAddedEventCallback(leTouchTestWidget* _this,
+                                    leTouchTestWidget_PointAddedEventCallback cb);
 
-  Summary:
-     Get the point added event callback pointer
-
-  Description:
-     Get the point added event callback pointer
-
-  Parameters:
-    const leTouchTestWidget* _this - The touchtest widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getPointAddedEventCallback(_this);
-
-  Returns:
-    leTouchTestWidget_PointAddedEventCallback - the callback pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setPointAddedEventCallback(leTouchTestWidget* _this,
-                                        leTouchTestWidget_PointAddedEventCallback cb)
-
-  Summary:
-     Set the point added event callback pointer
-
-  Description:
-     Set the point added event callback pointer
-
-  Parameters:
-    leTouchTestWidget* _this - The touchtest widget to operate on
-    leTouchTestWidget_PointAddedEventCallback cb - the callback pointer
-
-  Remarks:
-    Usage - _this->fn->setPointAddedEventCallback(_this, cb);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-
+#undef THIS_TYPE
+#endif
 
 #endif // LE_TOUCHTEST_WIDGET_ENABLED
 #endif /* LEGATO_TOUCHTEST_H */

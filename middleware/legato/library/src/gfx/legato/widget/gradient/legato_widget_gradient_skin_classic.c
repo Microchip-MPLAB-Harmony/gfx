@@ -53,7 +53,7 @@ static void drawBorder(leGradientWidget* grad);
 
 static void nextState(leGradientWidget* grad)
 {
-    switch(grad->widget.drawState)
+    switch(grad->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -66,27 +66,29 @@ static void nextState(leGradientWidget* grad)
             }
 #endif
             
-            if(grad->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(grad->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                grad->widget.drawState = DRAW_BACKGROUND;
+                grad->widget.status.drawState = DRAW_BACKGROUND;
                 grad->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            if(grad->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(grad->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 grad->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                grad->widget.drawState = DRAW_BORDER;
+                grad->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            grad->widget.drawState = DONE;
+            grad->widget.status.drawState = DONE;
             grad->widget.drawFunc = NULL;
         }
     }
@@ -96,36 +98,36 @@ static void drawBackground(leGradientWidget* grad)
 {
     leRect rect;
     
-    if(grad->widget.backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(grad->widget.style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
-        rect = grad->fn->rectToScreen(grad);
+        grad->fn->rectToScreen(grad, &rect);
         
         if(grad->dir == LE_DIRECTION_LEFT)
         {
             leRenderer_HorzGradientRect(&rect,
-                                        grad->widget.scheme->foreground,
-                                        grad->widget.scheme->foregroundInactive,
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND),
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),
                                         paintState.alpha);
         }
         else if(grad->dir == LE_DIRECTION_RIGHT)
         {
             leRenderer_HorzGradientRect(&rect,
-                                        grad->widget.scheme->foregroundInactive,
-                                        grad->widget.scheme->foreground,
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND),
                                         paintState.alpha);
         }
         else if(grad->dir == LE_DIRECTION_DOWN)
         {
             leRenderer_VertGradientRect(&rect,
-                                        grad->widget.scheme->foreground,
-                                        grad->widget.scheme->foregroundInactive,
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND),
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),
                                         paintState.alpha);
         }
         else if(grad->dir == LE_DIRECTION_UP)
         {
             leRenderer_VertGradientRect(&rect,
-                                        grad->widget.scheme->foregroundInactive,
-                                        grad->widget.scheme->foreground,
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),
+                                        leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND),
                                         paintState.alpha);
         }
     }
@@ -135,12 +137,12 @@ static void drawBackground(leGradientWidget* grad)
 
 static void drawBorder(leGradientWidget* grad)
 {
-    if(grad->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(grad->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)grad,
                                                     paintState.alpha);
     }
-    else if(grad->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(grad->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)grad,
                                                       paintState.alpha);
@@ -151,19 +153,12 @@ static void drawBorder(leGradientWidget* grad)
 
 void _leGradientWidget_Paint(leGradientWidget* grad)
 {
-    if(grad->widget.scheme == NULL)
-    {
-        grad->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(grad->widget.drawState == NOT_STARTED)
+    if(grad->widget.status.drawState == NOT_STARTED)
     {
         nextState(grad);
     }
     
-    while(grad->widget.drawState != DONE)
+    while(grad->widget.status.drawState != DONE)
     {
         grad->widget.drawFunc((leWidget*)grad);
         

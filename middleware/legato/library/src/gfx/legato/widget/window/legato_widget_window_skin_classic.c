@@ -94,7 +94,7 @@ void _leWindowWidget_GetIconRect(const leWindowWidget* win,
         imgSrcRect->x = 0;
         imgSrcRect->y = 0;
         imgSrcRect->width = 0;
-        imgRect->height = 0;
+        imgSrcRect->height = 0;
     
         return;
     }
@@ -117,11 +117,11 @@ void _leWindowWidget_GetIconRect(const leWindowWidget* win,
                                      LE_RELATIVE_POSITION_LEFTOF,
                                      win->widget.margin.left,
                                      win->widget.margin.top,
-                                     win->widget.margin.left,
+                                     win->widget.margin.right,
                                      win->widget.margin.bottom,
                                      win->iconMargin);
                                      
-    *imgRect = leRectClipAdj(imgRect, &barRect, imgSrcRect);    
+    leRectClipAdj(imgRect, &barRect, imgSrcRect, imgRect);
     
     leUtils_RectToScreenSpace((leWidget*)win, imgRect);                                 
 }
@@ -176,7 +176,7 @@ static void drawBorder(leWindowWidget* win);
 
 static void nextState(leWindowWidget* win)
 {
-    switch(win->widget.drawState)
+    switch(win->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -189,17 +189,18 @@ static void nextState(leWindowWidget* win)
             }
 #endif
 
-            if(win->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(win->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                win->widget.drawState = DRAW_BACKGROUND;
+                win->widget.status.drawState = DRAW_BACKGROUND;
                 win->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            win->widget.drawState = DRAW_TITLE_BAR;
+            win->widget.status.drawState = DRAW_TITLE_BAR;
             win->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawTitleBar;
             
             return;
@@ -208,35 +209,38 @@ static void nextState(leWindowWidget* win)
         {
             if(win->icon != NULL)
             {
-                win->widget.drawState = DRAW_ICON;
+                win->widget.status.drawState = DRAW_ICON;
                 win->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawIcon;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_ICON:
         {
             if(win->title != NULL)
             {
-                win->widget.drawState = DRAW_STRING;
+                win->widget.status.drawState = DRAW_STRING;
                 win->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_STRING:
         {
-            if(win->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(win->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 win->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                win->widget.drawState = DRAW_BORDER;
+                win->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            win->widget.drawState = DONE;
+            win->widget.status.drawState = DONE;
             win->widget.drawFunc = NULL;
         }
     }
@@ -258,22 +262,8 @@ static void drawTitleBar(leWindowWidget* win)
     leUtils_RectToScreenSpace((leWidget*)win, &barRect);
     
     leRenderer_RectFill(&barRect,
-                        win->widget.scheme->background,
+                        leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_BACKGROUND),
                         paintState.alpha);
-    
-    // draw title bar border
-    /*if(win->widget.borderType == LE_WIDGET_BORDER_LINE)
-    {
-        leDraw_LineBorder(&barRect, win->widget.scheme->shadowDark);
-    }
-    else if(win->widget.borderType == LE_WIDGET_BORDER_BEVEL)
-    {
-        leDraw_2x2BevelBorder(&barRect,
-                              win->widget.scheme->base,
-                              win->widget.scheme->highlightLight,
-                              win->widget.scheme->shadow,
-                              win->widget.scheme->shadowDark);
-    }*/
     
     nextState(win);
 }
@@ -283,7 +273,7 @@ static void onImageStreamFinished(leStreamManager* dec)
 {
     leWindowWidget* win = (leWindowWidget*)dec->userData;
 
-    win->widget.drawState = DRAW_ICON;
+    win->widget.status.drawState = DRAW_ICON;
 
     nextState(win);
 }
@@ -307,7 +297,7 @@ static void drawIcon(leWindowWidget* win)
         leGetActiveStream()->onDone = onImageStreamFinished;
         leGetActiveStream()->userData = win;
 
-        win->widget.drawState = WAIT_ICON;
+        win->widget.status.drawState = WAIT_ICON;
 
         return;
     }
@@ -321,7 +311,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 {
     leWindowWidget* win = (leWindowWidget*)strm->userData;
 
-    win->widget.drawState = DRAW_STRING;
+    win->widget.status.drawState = DRAW_STRING;
 
     nextState(win);
 }
@@ -336,8 +326,8 @@ static void drawString(leWindowWidget* win)
     win->title->fn->_draw(win->title,
                           textRect.x,
                           textRect.y,
-                          win->widget.halign,
-                          win->widget.scheme->text,
+                          win->widget.style.halign,
+                          leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_TEXT),
                           paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
@@ -346,7 +336,7 @@ static void drawString(leWindowWidget* win)
         leGetActiveStream()->onDone = onStringStreamFinished;
         leGetActiveStream()->userData = win;
 
-        win->widget.drawState = WAIT_STRING;
+        win->widget.status.drawState = WAIT_STRING;
 
         return;
     }
@@ -359,22 +349,22 @@ static void drawBorder(leWindowWidget* win)
 {
     leRect rect;
     
-    if(win->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(win->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)win,
                                                     paintState.alpha);
     }
-    else if(win->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(win->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
-        rect = win->fn->localRect(win);
+        win->fn->localRect(win, &rect);
         
         leUtils_RectToScreenSpace((leWidget*)win, &rect);
         
         leWidget_SkinClassic_Draw2x2BeveledBorder(&rect,
-                                                  win->widget.scheme->base,
-                                                  win->widget.scheme->highlightLight,
-                                                  win->widget.scheme->shadowDark,
-                                                  win->widget.scheme->shadow,
+                                                  leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_BASE),
+                                                  leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
+                                                  leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_SHADOWDARK),
+                                                  leScheme_GetRenderColor(win->widget.scheme, LE_SCHM_SHADOW),
                                                   paintState.alpha);
     }
     
@@ -383,25 +373,18 @@ static void drawBorder(leWindowWidget* win)
 
 void _leWindowWidget_Paint(leWindowWidget* win)
 {
-    if(win->widget.scheme == NULL)
-    {
-        win->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(win->widget.drawState == NOT_STARTED)
+    if(win->widget.status.drawState == NOT_STARTED)
         nextState(win);
 
 #if LE_STREAMING_ENABLED == 1
-    if(win->widget.drawState == WAIT_ICON ||
-       win->widget.drawState == WAIT_STRING)
+    if(win->widget.status.drawState == WAIT_ICON ||
+       win->widget.status.drawState == WAIT_STRING)
     {
         return;
     }
 #endif
     
-    while(win->widget.drawState != DONE)
+    while(win->widget.status.drawState != DONE)
     {
         win->widget.drawFunc((leWidget*)win);
         
@@ -410,8 +393,8 @@ void _leWindowWidget_Paint(leWindowWidget* win)
 #endif
         
 #if LE_STREAMING_ENABLED == 1
-        if(win->widget.drawState == WAIT_ICON ||
-           win->widget.drawState == WAIT_STRING)
+        if(win->widget.status.drawState == WAIT_ICON ||
+           win->widget.status.drawState == WAIT_STRING)
             break;
 #endif
     }

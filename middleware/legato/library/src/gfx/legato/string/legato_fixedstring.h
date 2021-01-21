@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,16 +20,21 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+
+/** \file legato_fixedstring.h
+ * @brief Fixed string functions and definitions.
+ *
+ * @details
+ */
 
 #ifndef LEGATO_FIXEDSTRING_H
 #define LEGATO_FIXEDSTRING_H
 
 #include "gfx/legato/string/legato_string.h"
 
-// DOM-IGNORE-BEGIN
-struct leFixedString;
-
+/**
+  * @cond INTERNAL
+  */struct leFixedString;
 #define LE_FIXEDSTRING_VTABLE(THIS_TYPE) \
     LE_STRING_VTABLE(THIS_TYPE) \
     \
@@ -40,103 +44,87 @@ typedef struct leFixedStringVTable
 {
 	LE_FIXEDSTRING_VTABLE(struct leFixedString)
 } leFixedStringVTable;
+/**
+  * @endcond
+  */
 
-// DOM-IGNORE-END
-
-// *****************************************************************************
-/* Structure:
-    leFixedString
-
-  Summary:
-    String type that dynamically allocates internal memory to accommodate dynamic
-    string operations.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a fixed string.
+ * @details String type that allocates internal memory to accommodate
+ * fixed string operations
+ */
 typedef struct leFixedString
 {
-    leString base; // string base data
-
-    const leFixedStringVTable* fn; // function table
-    
-    leChar*  data;     // local string data storage
-    uint16_t capacity; // actual memory capacity of the string
-    
-    uint16_t length;   // actual length of the string
-    
-    const leFont*  font; // the font used for this string    
+    leString base;                    /**< base data */
+    const leFixedStringVTable* fn;    /**< function table */
+    leChar*     data;                 /**< data storage */
+    uint16_t    capacity;             /**< string capacity */
+    uint16_t    length;               /**< string length */
+    const leFont*  font;              /**< string font */
 } leFixedString;
 
 // *****************************************************************************
-/* Function:
-    leFixedString* leFixedString_New(leChar* buffer,
-                                     uint32_t size)
-
-   Summary:
-    Allocates a memory for a new fixed string and automatically calls its
-    constructor function
-
-   Parameters:
-    leChar* buf - the buffer to assign to this string
-    uint32_t size - the size of the buffer
-
-  Returns:
-    leFixedString* - pointer to the newly allocated string
-
-  Remarks:
-    Caller is responsible for freeing the memory allocated by this function
-    using leString_Delete()
-*/
-LIB_EXPORT leFixedString* leFixedString_New(leChar* buf,
-                                            uint32_t size);
+/**
+ * @brief Create a new fixed string.
+ * @details Creates a new leFixedString and automatically calls
+ * its constructor function.
+ * @remark Caller is responsible for freeing the memory allocated by this
+ * function using leString_Delete().
+ * @code
+ * leChar* buf;
+ * uint32_t size;
+ * leFixedString * str = leFixedString_New(buf, size);
+ * @endcode
+ * @return pointer to the newly allocated string
+ */
+leFixedString* leFixedString_New(leChar* buf,
+                                 uint32_t size);
 
 // *****************************************************************************
-/* Function:
-    void leFixedString_Constructor(leFixedString* str, leChar* buffer, uint32_t size)
-
-   Summary:
-    Constructs a new fixed string at the given pointer
-
-   Parameters:
-    leFixedString* str - the string to construct
-    leChar* buf - the buffer to assign to this string
-    uint32_t size - the size of the buffer
-
-  Returns:
-    
-  Remarks:
-    It is assumed that the pointer provided is being managed by the caller.  Use
-    leString_PDelete() to properly destruct this pointer.
-*/
-LIB_EXPORT void leFixedString_Constructor(leFixedString* str,
-                                          leChar* buf,
-                                          uint32_t size);
+/**
+ * @brief Consructs a fixed string.
+ * @details Allocates a memory for an existing <span class="param">str </span>.
+ * @remark It is assumed that the pointer provided is being managed by the caller.
+ * Use the destructor member function to destroy the string.
+ * @code
+ * leFixedString_Constructor(str, buf, size);
+ * @param str is string to construct.
+ * @param buf is the buffer to assign to this string.
+ * @param size is the size of the buffer.
+ * @endcode
+ * @return void
+ */
+void leFixedString_Constructor(leFixedString* str,
+                               leChar* buf,
+                               uint32_t size);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setBuffer(leFixedString* str,
-                       leChar* buf,
-                       uint32_t size)
 
-  Summary:
-    Sets a fixed buffer to this string
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
 
-  Description:
-    Sets a fixed buffer to this string
+// *****************************************************************************
+/**
+ * @brief Set capacity of the dynamic string.
+ * @details Copies up to <span class="param">size</span> items of
+ * <span class="param">buf</span> to  <span class="param">_this</span>.
+ * @code
+ * leFixedString* _this;
+ * leChar* buf;
+ * uint32_t size;
+ * leResult res = _this->fn->setBuffer(_this, buf, size);
+ * @endcode
+ * @param  _this is the string to operate on;
+ * @param buf is the buffer to set;
+ * @param size is the size of the buffer;
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setBuffer(leFixedString* _this,
+                           leChar* buf,
+                           uint32_t size);
 
-  Parameters:
-    leFixedString* str - The string to operate on
-    leChar* buf - the buffer to set
-    uint32_t size - the size of the buffer
-
-  Remarks:
-    Usage - _this->fn->setBuffer(_this, buf, size);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
+#undef THIS_TYPE
+#endif
 
 
 #endif /* LEGATO_FIXEDSTRING_H */

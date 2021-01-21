@@ -25,6 +25,8 @@
 
 #include "gfx/legato/memory/legato_fixedheap.h"
 
+#if LE_MEMORY_MANAGER_ENABLE == 1
+
 #include "gfx/legato/common/legato_error.h"
 #include "legato_fixedheap.h"
 
@@ -146,6 +148,10 @@ void* leFixedHeap_Alloc(leFixedHeap* heap)
 
     if(heap->freeList == NULL)
         return NULL;
+
+#if LE_FIXEDHEAP_DEBUG == 1
+    LE_ASSERT(leFixedHeap_Validate(heap) == LE_SUCCESS);
+#endif
 
     freeBlk = (leFixedHeapBlock*)heap->freeList;
 
@@ -276,6 +282,8 @@ leResult leFixedHeap_Validate(struct leFixedHeap* heap)
 
         i++;
     }
+#else
+    (void)heap; // unused
 #endif
 
     return LE_SUCCESS;
@@ -325,3 +333,5 @@ void leFixedHeap_Dump(leFixedHeap* heap,
 #endif
 
 #endif
+
+#endif // LE_MEMORY_MANAGER_ENABLE

@@ -39,6 +39,12 @@
     Abstract display driver definition for the Legato graphics library.
 *******************************************************************************/
 
+/** \file legato_driver.h
+* @brief Abstract display driver definition for the Legato graphics library.
+*
+* @details Abstract display driver definition used by all display drivers.
+*/
+
 
 #ifndef LEGATO_DRIVER_H
 #define LEGATO_DRIVER_H

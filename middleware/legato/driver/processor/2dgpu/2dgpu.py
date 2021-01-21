@@ -46,7 +46,7 @@ def instantiateComponent(comp):
 	Nano2DMode.setLabel("Driver Mode")
 	Nano2DMode.setDefaultValue(nano2d_default_mode)
 	Nano2DMode.setDependencies(setCommonMode, ["HarmonyCore.SELECT_RTOS"])
-	Nano2DMode.setReadOnly(True)
+	#Nano2DMode.setReadOnly(True)
 
 	Nano2DSymQueueSize = comp.createIntegerSymbol("DRV_NANO2D_QUEUE_SIZE", None)
 	Nano2DSymQueueSize.setLabel("Transfer Queue Size")
@@ -56,11 +56,6 @@ def instantiateComponent(comp):
 	Nano2DSymQueueSize.setDependencies(asyncModeOptions, ["drv_2dgpu.DRV_NANO2D_MODE"])
 	Nano2DSymQueueSize.setReadOnly(True)
 
-	Nano2DScratchBufferSize = comp.createIntegerSymbol("SCRATCHBUFFER_SIZE", None)
-	Nano2DScratchBufferSize.setLabel("Scratch Buffer Size")
-	Nano2DScratchBufferSize.setMin(1)
-	Nano2DScratchBufferSize.setDefaultValue(4096)
-	
 	#
 	#GPU_DRIVER_H = comp.createFileSymbol("GPU_DRIVER_H", None)
 	#GPU_DRIVER_H.setSourcePath("../gpu_driver.h")

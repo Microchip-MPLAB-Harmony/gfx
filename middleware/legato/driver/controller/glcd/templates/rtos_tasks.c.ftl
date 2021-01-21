@@ -1,9 +1,9 @@
 <#if HarmonyCore.SELECT_RTOS == "FreeRTOS">
-    <#lt>void _LCC_Tasks(  void *pvParameters  )
+    <#lt>void _GLCD_Tasks(  void *pvParameters  )
     <#lt>{
     <#lt>    while(1)
     <#lt>    {
-    <#lt>        DRV_LCC_Update();
+    <#lt>        DRV_GLCD_Update();
              <#if rtosEnableTaskDelay >
     <#lt>        vTaskDelay(${rtosTaskDelay} / portTICK_PERIOD_MS);
              </#if>

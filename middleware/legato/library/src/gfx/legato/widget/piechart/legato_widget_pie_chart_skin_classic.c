@@ -56,11 +56,8 @@ enum
 static struct
 {
     leRect pieRect;
-    int32_t startAngle;
-    int32_t centerAngle;
     //lePoint p;
     lePoint pieCenter;
-    uint32_t totalValue;
     uint32_t alpha;
 } paintState;
 
@@ -70,7 +67,7 @@ static void drawBorder(lePieChartWidget* chart);
 
 static void nextState(lePieChartWidget* chart)
 {
-    switch(chart->widget.drawState)
+    switch(chart->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -83,34 +80,36 @@ static void nextState(lePieChartWidget* chart)
             }
 #endif
             
-            if(chart->widget.backgroundType != LE_WIDGET_BACKGROUND_NONE) 
+            if(chart->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
-                chart->widget.drawState = DRAW_BACKGROUND;
+                chart->widget.status.drawState = DRAW_BACKGROUND;
                 chart->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
                 return;
             }
         }
+        // fall through
         case DRAW_BACKGROUND:
         {
-            chart->widget.drawState = DRAW_PIE_CHART;
+            chart->widget.status.drawState = DRAW_PIE_CHART;
             chart->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawPieChart;
     
             return;
         }
         case DRAW_PIE_CHART:
         {            
-            if(chart->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(chart->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 chart->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                chart->widget.drawState = DRAW_BORDER;
+                chart->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            chart->widget.drawState = DONE;
+            chart->widget.status.drawState = DONE;
             chart->widget.drawFunc = NULL;
         }
     }
@@ -131,93 +130,38 @@ static void drawSliceLabel(lePieChartWidget* chart,
     int32_t midAngle;
     
     leRect textRect, bounds, drawRect;
-    uint32_t value;
-    
-    value = pie->value;
 
-    //Protect from overflow
-    if (value < MAX_TICK_LABEL_VALUE)
-    {
-        sprintf(strbuff, "%d", (int)value);
-    }
-    else
-    {
-        sprintf(strbuff, "---");
-    }
+    sprintf(strbuff, "%i", (int32_t)pie->value);
 
     leFixedString_Constructor(&str, charbuff, MAX_TICK_LABEL_DIGITS);
     str.fn->setFromCStr(&str, strbuff);
     str.fn->setFont(&str, chart->labelFont);
 
     //Get the string rectangle
-    bounds = chart->fn->localRect(chart);
+    chart->fn->localRect(chart, &bounds);
     str.fn->getRect(&str, &textRect);
 
     leRectClip(&textRect, &bounds, &drawRect);
 
     //Find center angle of pie
-    midAngle = paintState.startAngle + paintState.centerAngle / 2;
+    midAngle = pie->startAngle + (pie->spanAngle / 2);
 
-    if (midAngle > 360)
-        midAngle %= 360;
+    lePolarToXY(pie->radius + pie->offset + chart->labelsOffset, midAngle , &centerPoint);
+    centerPoint.y *= -1;
 
-    lePolarToXY(pie->offset + chart->labelsOffset, midAngle , &centerPoint);
+    centerPoint.x += chart->widget.rect.x + (chart->widget.rect.width / 2);
+    centerPoint.y += chart->widget.rect.y + (chart->widget.rect.height / 2);
 
-    //Orient the text rectangle based on the label quadrant
-    if (midAngle < 10)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - (textRect.height/2);
-    }
-    else if (midAngle <= 80)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - textRect.height;
-    }
-    else if (midAngle <= 100)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x - (textRect.width/2);
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - textRect.height;
-    }
-    else if (midAngle <= 170)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x - textRect.width;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - textRect.height;
-    }
-    else if (midAngle <= 190)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x - textRect.width;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - (textRect.height/2);
-    }
-    else if (midAngle <= 260)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x - textRect.width;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y;
-    }
-    else if (midAngle <= 280)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x - (textRect.width/2);
-        drawRect.y = paintState.pieCenter.y - centerPoint.y;
-    }
-    else if (midAngle <= 350)
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y;
-    }
-    else
-    {
-        drawRect.x = paintState.pieCenter.x + centerPoint.x;
-        drawRect.y = paintState.pieCenter.y - centerPoint.y - (textRect.height/2);
-    }
-
-//                drawRect.x = p.x + centerPoint.x;
-//                drawRect.y = p.y - centerPoint.y;
+    drawRect.x = centerPoint.x - (textRect.width / 2);
+    drawRect.y = centerPoint.y - (textRect.height / 2);
+    drawRect.width = textRect.width;
+    drawRect.height = textRect.height;
 
     str.fn->_draw(&str,
                   drawRect.x,
                   drawRect.y,
                   LE_HALIGN_CENTER,
-                  chart->widget.scheme->text,
+                  leScheme_GetRenderColor(chart->widget.scheme, LE_SCHM_TEXT),
                   paintState.alpha);
 
     str.fn->destructor(&str);
@@ -227,37 +171,36 @@ static void drawSliceArc(lePieChartWidget* chart,
                          lePieChartPie* pie,
                          leColor clr)
 {
-    lePoint offsetPoint;
-    int32_t midAngle;
-    lePoint center;
+    uint32_t midAngle;
+    lePoint center, offset;
+    leRect arcRect;
 
-    center.x = paintState.pieCenter.x;
-    center.y = paintState.pieCenter.y;
+    center.x = chart->widget.rect.x + paintState.pieCenter.x;
+    center.y = chart->widget.rect.y + paintState.pieCenter.y;
+
+    arcRect.x = center.x - (pie->radius / 2);
+    arcRect.y = center.y - (pie->radius / 2);
+    arcRect.width = pie->radius;
+    arcRect.height = pie->radius;
 
     if (pie->offset != 0)
     {
-        //Find center angle of pie
-        midAngle = paintState.startAngle + paintState.centerAngle / 2;
+        // find center angle of pie
+        midAngle = pie->startAngle + (pie->spanAngle / 2);
 
-        if (midAngle > 360)
-        {
-            midAngle %= 360;
-        }
-        
-        //Find points of 
-        lePolarToXY(pie->offset, midAngle , &offsetPoint);
+        // find points of
+        lePolarToXY(pie->offset, midAngle , &offset);
+        offset.y *= -1;
 
-        center.x += offsetPoint.x;
-        center.y -= offsetPoint.y;
+        arcRect.x += offset.x;
+        arcRect.y += offset.y;
     }
 
-    leRenderer_ArcFill(&paintState.pieRect,
-                       center.x,
-                       center.y,
+    leRenderer_ArcFill(&arcRect,
+                       pie->startAngle,
+                       pie->spanAngle,
                        pie->radius,
-                       paintState.startAngle,
-                       paintState.centerAngle,
-                       pie->radius,
+                       LE_FALSE,
                        clr,
                        LE_FALSE,
                        paintState.alpha);  
@@ -270,32 +213,14 @@ static void drawPieSlice(lePieChartWidget* chart,
     lePieChartPie* pie = leArray_Get(&chart->pieArray, idx);
     leColor clr;
     
-    //paintState.pieCenter = paintState.p;
-
     if (pie->scheme != NULL)
     {
-        clr = pie->scheme->foreground;
-        //GFX_Set(GFXF_DRAW_COLOR, pie->scheme->foreground);
-        //GFX_Set(GFXF_DRAW_GRADIENT_COLOR, pie->scheme->foreground & 0xffffff00, pie->scheme->foreground, NULL, NULL);
+        clr = leScheme_GetRenderColor(pie->scheme, LE_SCHM_FOREGROUND);
     }
     else
     {
-        clr = chart->widget.scheme->foreground;
-        //GFX_Set(GFXF_DRAW_COLOR, chart->widget.scheme->foreground);
-        //GFX_Set(GFXF_DRAW_GRADIENT_COLOR, chart->widget.scheme->foreground & 0xffffff00, chart->widget.scheme->foreground, NULL, NULL);
+        clr = leScheme_GetRenderColor( chart->widget.scheme, LE_SCHM_FOREGROUND);
     }
-
-    //GFX_Set(GFXF_DRAW_THICKNESS, pie->radius);
-    
-    if (chart->centerAngle < 0)
-    {
-        paintState.centerAngle = - ((int32_t) (((float) (-chart->centerAngle) * (float) pie->value)/(float) paintState.totalValue + 0.5));
-    }
-    else
-    {
-        paintState.centerAngle = (int32_t) (((float) (chart->centerAngle) * (float) pie->value)/(float) paintState.totalValue + 0.5);
-    }
-    
                 
     if (pie->radius > 0)
     {                
@@ -306,39 +231,12 @@ static void drawPieSlice(lePieChartWidget* chart,
             drawSliceLabel(chart, pie);
         }
     }
-    
-    paintState.startAngle += paintState.centerAngle;
-    
-    while (paintState.startAngle < 0)
-    {
-        paintState.startAngle += 360;
-    }
 }
 
 static void drawPieChart(lePieChartWidget* chart)
 {
     unsigned int i;
     
-    paintState.totalValue = 0;
-    
-    //paintState.p.x = chart->widget.rect.width / 2;
-    //paintState.p.y = chart->widget.rect.height / 2;
-    
-    paintState.startAngle = chart->startAngle;
-    
-    while(paintState.startAngle < 0)
-    {
-        paintState.startAngle += 360;
-    }
-    
-    if(paintState.startAngle > 360)
-    {
-        paintState.startAngle %= 360;
-    }
-    
-    
-    //leUtils_PointToScreenSpace((leWidget*)chart, &paintState.p);
-
     paintState.pieRect.x = 0;
     paintState.pieRect.y = 0;
     paintState.pieRect.width = chart->widget.rect.width;
@@ -349,18 +247,7 @@ static void drawPieChart(lePieChartWidget* chart)
     paintState.pieCenter.x = paintState.pieRect.width / 2;
     paintState.pieCenter.y = paintState.pieRect.height / 2;
 
-    //GFX_Set(GFXF_DRAW_MODE, GFX_DRAW_LINE);
-    //GFX_Set(GFXF_DRAW_COLOR, chart->widget.scheme->foreground);
-        
-    //Get the total
-    for (i = 0; i < chart->pieArray.size; i++) 
-    {
-        lePieChartPie * pie = leArray_Get(&chart->pieArray, i);
-        
-        paintState.totalValue += pie->value;
-    }
-
-    //Draw the pies
+    // draw the pies
     for (i = 0; i < chart->pieArray.size; i++) 
     {
         drawPieSlice(chart, i);
@@ -371,12 +258,12 @@ static void drawPieChart(lePieChartWidget* chart)
 
 static void drawBorder(lePieChartWidget* chart)
 {    
-    if(chart->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(chart->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)chart,
                                                     paintState.alpha);
     }
-    else if(chart->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(chart->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)chart,
                                                       paintState.alpha);
@@ -387,19 +274,12 @@ static void drawBorder(lePieChartWidget* chart)
 
 void _lePieChartWidget_Paint(lePieChartWidget* chart)
 {
-    if(chart->widget.scheme == NULL)
-    {
-        chart->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(chart->widget.drawState == NOT_STARTED)
+    if(chart->widget.status.drawState == NOT_STARTED)
     {
         nextState(chart);
     }
     
-    while(chart->widget.drawState != DONE)
+    while(chart->widget.status.drawState != DONE)
     {
         chart->widget.drawFunc((leWidget*)chart);
         

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -38,7 +36,11 @@
   Description:
     This module implements arc drawing widget functions.
 *******************************************************************************/
-
+/** \file legato_widget_arc.h
+ * @brief Arc widget definitions and functions.
+ *
+ * @details This module implements arc drawing widget functions.
+ */
 
 #ifndef LEGATO_WIDGET_ARC_H
 #define LEGATO_WIDGET_ARC_H
@@ -55,7 +57,11 @@
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 typedef struct leArcWidget leArcWidget;
 
 #define LE_ARCWIDGET_VTABLE(THIS_TYPE) \
@@ -76,38 +82,28 @@ typedef struct leArcWidgetVTable
 {
 	LE_ARCWIDGET_VTABLE(leArcWidget)
 } leArcWidgetVTable; 
+/**
+  * @endcond
+  *
+  */
 
-// *****************************************************************************
-/* Structure:
-    leArcWidget
-
-  Summary:
-    Implementation of a arc widget.
-
-  Description:
-    A arc widget draws a arc of the specified origin and radius inside
-    the widget bounds.  All coordinates are expressed in local widget space.
-
-    The color of the arc is determined by the widget scheme's 'foreground'
-    color.
-
-  Remarks:
-    None.
-*/
+/**
+ * @brief This struct represents a arc widget.
+ *
+ * @details A arc widget draws a arc of the specified origin and radius inside
+ * the widget bounds.  All coordinates are expressed in local widget space. The
+ * color of the arc is determined by the widget scheme's 'foreground' color.
+ */
 typedef struct leArcWidget
 {
-    leWidget widget; // base widget header
-    
-    const leArcWidgetVTable* fn;
-
-    uint32_t radius; // the radius of the arc
-
-    int32_t startAngle; //the start angle of the arc
-    int32_t centerAngle; //the center angle of the arc
-    uint32_t endAngle; //the end angle of the arc
-    uint32_t thickness; //the thickness of the arc
-
-    leBool roundEdge; //draws round edge if true.
+    leWidget widget;            /**< base widget header#widget.*/
+    const leArcWidgetVTable* fn; /**< virtual function table#fn.*/
+    uint32_t radius;            /**< the radius of the arc#radius.*/
+    int32_t startAngle;         /**< the start angle of the arc#startAngle. */
+    int32_t centerAngle;        /**< the center angle of the arc#centerAngle. */
+    uint32_t endAngle;          /**< the end angle of the arc#endAngle. */
+    uint32_t thickness;         /**< the thickness of the arc#thickness. */
+    leBool roundEdge;           /**< draws round edge if true#roundEdge.*/
 } leArcWidget;
 
 // *****************************************************************************
@@ -116,261 +112,173 @@ typedef struct leArcWidget
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leArcWidget* leArcWidget_New()
-
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the management of this memory until the
-    widget is added to a widget tree.
-
-  Description:
-
-
-  Parameters:
-    void
-
-  Returns:
-    leArcWidget*
-
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-
-*/
-LIB_EXPORT leArcWidget* leArcWidget_New();
-
-/* Function:
-    void leArcWidget_Constructor(leArcWidget* wgt)
-
-  Summary:
-    Initializes an leArcWidget widget pointer.
-
-  Description:
-    Initializes an leArcWidget widget pointer.
-
-  Parameters:
-    leArcWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leArcWidget_Constructor(leArcWidget* wgt);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getRadius(const leArcWidget* _this)
-
-  Summary:
-     Gets the radius of the arc
-
-  Description:
-     Gets the radius of the arc
-
-  Parameters:
-    const leArcWidget* _this - The widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getRadius(_this);
-
-  Returns:
-    uint32_t - the arc radius
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setRadius(leArcWidget* _this,
-                       uint32_t rad)
-
-  Summary:
-     Sets the radius of the arc
-
-  Description:
-     Sets the radius of the arc
-
-  Parameters:
-    leArcWidget* _this - The widget to operate on
-    uint32_t rad - the arc radius
-
-  Remarks:
-    Usage - _this->fn->setRadius(_this, rad);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    int32_t getStartAngle(const leArcWidget* _this)
-
-  Summary:
-     Gets the start angle of the arc
-
-  Description:
-     Gets the start angle of the arc
-
-  Parameters:
-    const leArcWidget* _this - The widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getStartAngle(_this);
-
-  Returns:
-    int32_t - the starting angle value
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setStartAngle(leArcWidget* _this,
-                           int32_t ang)
-
-  Summary:
-     Sets the start angle of the arc
-
-  Description:
-     Sets the start angle of the arc
-
-  Parameters:
-    leArcWidget* _this - The widget to operate on
-    int32_t ang - the starting angle value
-
-  Remarks:
-    Usage - _this->fn->setStartAngle(_this, ang);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    uint32_t getThickness(const leArcWidget* _this)
-
-  Summary:
-     Gets the thickness of the arc
-
-  Description:
-     Gets the thickness of the arc
-
-  Parameters:
-    const leArcWidget* _this - The widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getThickness(_this);
-
-  Returns:
-    uint32_t - the arc thickness
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setThickness(leArcWidget* _this,
-                          uint32_t val)
-
-  Summary:
-     Sets the thickness of the arc
-
-  Description:
-     Sets the thickness of the arc
-
-  Parameters:
-    leArcWidget* _this - The widget to operate on
-    uint32_t val - the arc thickness
-
-  Remarks:
-    Usage - _this->fn->setThickness(_this, val);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    int32_t getCenterAngle(const leArcWidget* _this)
-
-  Summary:
-     Gets the center angle of the arc
-
-  Description:
-     Gets the center angle of the arc
-
-  Parameters:
-    const leArcWidget* _this - The widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getCenterAngle(_this);
-
-  Returns:
-    int32_t - the center angle value
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setCenterAngle(leArcWidget* _this,
-                            int32_t ang)
-
-  Summary:
-     Sets the center angle of the arc
-
-  Description:
-     Sets the center angle of the arc
-
-  Parameters:
-    leArcWidget* _this - The widget to operate on
-    int32_t ang - the center angle value
-
-  Remarks:
-    Usage - _this->fn->setCenterAngle(_this, ang);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leBool getRoundEdge(const leArcWidget* _this)
-
-  Summary:
-     Gets the rounded edge setting value
-
-  Description:
-     Gets the rounded edge setting value
-
-  Parameters:
-    const leArcWidget* _this - The widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getRoundEdge(_this);
-
-  Returns:
-    leBool - the rounded edge value
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setRoundEdge(leArcWidget* _this,
-                          leBool rnd)
-
-  Summary:
-     Sets the arc to draw rounded edges
-
-  Description:
-     Sets the arc to draw rounded edges
-
-  Parameters:
-    leArcWidget* _this - The widget to operate on
-    leBool rnd - the rounded edge value
-
-  Remarks:
-    Usage - _this->fn->setRoundEdge(_this, rnd);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-
+/**
+ * @brief Create widget.
+ * @details Creates a new leArcWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leArcWidget* wgt = leArcWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leArcWidget* leArcWidget_New(void);
+
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leArcWidget <span class="param">wgt</span>.
+ * @code
+ * leArcWidget* wgt;
+ * leArcWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leArcWidget_Constructor(leArcWidget* wgt);
+
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
+
+/**
+ * @brief Get radius of an arc
+ * @details Gets the radius of <span class="param">_this</span>.
+ * @code
+ * leArcWidget* _this;
+ * uint32_t arc = _this->fn->getRadius(_this);
+ * @endcode
+ * @param _this is the widget to operate on.
+ * @returns the arc radius
+ */
+virtual uint32_t getRadius(const leArcWidget* _this);
+
+/**
+ * @brief Set radius of an arc.
+ * @details Sets the arc radius for <span class="param">_this</span> to
+ * <span class="param">rad</span>.
+ * @code
+ * leArcWidget* _this;
+ * leResult res = _this->fn->setRadius(_this, rad);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param rad the arc radius
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setRadius(leArcWidget* _this,
+                          uint32_t rad);
+
+/**
+ * @brief Get start angle of the arc.
+ * @details Gets the start angle of <span class="param">_this</span>.
+ * @code
+ * leArcWidget* _this;
+ * uint32_t startAngle = _this->fn->getStartAngle(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the start angle value
+ */
+virtual int32_t getStartAngle(const leArcWidget* _this);
+
+/**
+ * @brief Set start angle of an arc.
+ * @details Sets the start angle for <span class="param">_this</span> to
+ * <span class="param">angle</span>.
+ * @code
+ * leArcWidget* _this;
+ * int32_t angle;
+ * leResult res = _this->fn->setStartAngle(_this, angle);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param angle the starting angle value
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setStartAngle(leArcWidget* _this,
+                              int32_t angle);
+
+/**
+ * @brief Get thickness of an arc.
+ * @details Gets the thickness of <span class="param">_this</span>.
+ * @code
+ * leArcWidget* _this;
+ * uint32_t thickness = _this->fn->getThickness(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns thickness of arc.
+ */
+virtual uint32_t getThickness(const leArcWidget* _this);
+
+/**
+ * @brief Set thickness of an arc.
+ * @details Sets the arc thickness for <span class="param">_this</span> to
+ * <span class="param">thickness</span>.
+ * @code
+ * leArcWidget* _this;
+ * leResult res = _this->fn->setThickness(_this, thickness);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param thickness the arc thickness
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setThickness(leArcWidget* _this,
+                             uint32_t thickness);
+
+/**
+ * @brief Get thickness of an arc.
+ * @details Gets the arc thickness of <span class="param">_this</span>.
+ * @code
+ * leArcWidget* _this;
+ * uint32_t thickness = _this->fn->getThickness(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns thickness of arc.
+ */
+virtual int32_t getCenterAngle(const leArcWidget* _this);
+
+/**
+ * @brief Set center angle of an arc.
+ * @details Sets the arc center angle for <span class="param">_this</span> to
+ * <span class="param">ang</span>.
+ * @code
+ * leArcWidget* _this;
+ * leResult res = _this->fn->setCenterAngle(_this, ang);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param angle the center angle value
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setCenterAngle(THIS_TYPE* _this,
+                                int32_t angle);
+
+/**
+ * @brief Get rounded edge setting.
+ * @details Gets the arc rounded edge setting of <span class="param">_this</span>.
+ * @code
+ * leArcWidget* _this;
+ * leBool round = _this->fn->getRoundEdge(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns LE_TRUE if round edge is set, otherwise LE_FALSE.
+ */
+virtual leBool getRoundEdge(const THIS_TYPE* _this);
+
+/**
+ * @brief Set draw rounded edges
+ * @details Sets arc draw rounded edges flag for <span class="param">_this</span> to
+ * <span class="param">round</span>.
+ * @code
+ * leArcWidget* _this;
+ * leResult res = _this->fn->setRoundEdge(_this, round);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param round the rounded edge value
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setRoundEdge(THIS_TYPE* _this,
+                             leBool round);
+
+
+#undef THIS_TYPE
+#endif
 
 #endif // LE_ARC_WIDGET_ENABLED
 #endif /* LEGATO_WIDGET_ARC_H */

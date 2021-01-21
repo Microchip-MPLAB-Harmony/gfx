@@ -41,7 +41,7 @@
 -->
 
 /*** MXT336T Driver Configuration ***/
-#define DRV_MAXTOUCH_I2C_MODULE_INDEX   ${I2CIndex}
+#define DRV_MAXTOUCH_I2C_MODULE_INDEX   ${DRV_MAXTOUCH_I2C_INDEX}
 <#--
 /*******************************************************************************
  End of File

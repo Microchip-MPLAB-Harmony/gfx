@@ -1,4 +1,21 @@
-// DOM-IGNORE-BEGIN
+<#--
+/*******************************************************************************
+  GFX HGC Initialization File
+
+  File Name:
+    gfx_hgc_init.c
+
+  Summary:
+    This file contains source code necessary to initialize the system.
+
+  Description:
+    This file contains source code necessary to initialize the system.  It
+    implements the "SYS_Initialize" function, configuration bits, and allocates
+    any necessary global system resources, such as the systemObjects structure
+    that contains the object handles to all the MPLAB Harmony module objects in
+    the system.
+ *******************************************************************************/
+
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,26 +38,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
-
-<#--
-/*******************************************************************************
-  GFX HGC Initialization File
-
-  File Name:
-    gfx_hgc_init.c
-
-  Summary:
-    This file contains source code necessary to initialize the system.
-
-  Description:
-    This file contains source code necessary to initialize the system.  It
-    implements the "SYS_Initialize" function, configuration bits, and allocates
-    any necessary global system resources, such as the systemObjects structure
-    that contains the object handles to all the MPLAB Harmony module objects in
-    the system.
- *******************************************************************************/
-
  -->
     DRV_2DGPU_Initialize();
 <#--

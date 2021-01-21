@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     This module implements functions to control a radio button group.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_radiobutton_group.h
+ * @brief Radiobutton widget functions and definitions.
+ *
+ * @details This module implements functions to control a radio button group.
+ */
 
 #ifndef LEGATO_RADIOBUTTON_GROUP_H
 #define LEGATO_RADIOBUTTON_GROUP_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -77,6 +78,11 @@ typedef struct leRadioButtonWidget leRadioButtonWidget;
         None.
         
 */
+/**
+ * @brief This struct represents radio button group.
+ * @details Defines the parameters required for a Radio Button
+ * group. Marks the current selected Radio button within the group.
+ */
 typedef struct leRadioButtonGroup
 {
     leArray buttonList;
@@ -110,7 +116,17 @@ typedef struct leRadioButtonGroup
         leResult    
 
 */
-LIB_EXPORT leResult leRadioButtonGroup_Create(leRadioButtonGroup** grp);
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonGroup** wgt;
+ * leResult res = leRadioButtonGroup_Create(wgt);
+ * @endcode
+ * @param param1 wgt is the widget to initialize
+ * @return void.
+ */
+leResult leRadioButtonGroup_Create(leRadioButtonGroup** grp);
 
 /*    Function:
         void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp)
@@ -129,7 +145,17 @@ LIB_EXPORT leResult leRadioButtonGroup_Create(leRadioButtonGroup** grp);
         void
 
 */
-LIB_EXPORT void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp);
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonGroup** grp;
+ * leRadioButtonGroup_Destroy(grp);
+ * @endcode
+ * @param param1 wgt is the widget to initialize
+ * @return void.
+ */
+void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp);
 
 /*    Function:
         leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp,
@@ -151,7 +177,17 @@ LIB_EXPORT void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp);
         leResult
 
 */
-LIB_EXPORT leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp,leRadioButtonWidget* btn);
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonGroup** grp;
+ * leResult res = leRadioButtonGroup_AddButton(grp);
+ * @endcode
+ * @param param1 wgt is the widget to initialize
+ * @return void.
+ */
+leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp,leRadioButtonWidget* btn);
 
 /*    Function:
         leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
@@ -172,9 +208,19 @@ LIB_EXPORT leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp,leRadio
     Returns:
         leResult
 
-*/                                                 
-LIB_EXPORT leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
-                                                    leRadioButtonWidget* btn);
+*/
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonGroup** grp;
+ * leResult res = leRadioButtonGroup_RemoveButton(grp);
+ * @endcode
+ * @param param1 wgt is the widget to initialize
+ * @return void.
+ */
+leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
+                                         leRadioButtonWidget* btn);
 
 /*    Function:
         leResult leRadioButtonGroup_SelectButton(leRadioButtonGroup* grp,
@@ -195,9 +241,21 @@ LIB_EXPORT leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
     Returns:
         leResult
 
-*/                                                    
-LIB_EXPORT leResult leRadioButtonGroup_SelectButton(leRadioButtonGroup* grp,
-                                                    leRadioButtonWidget* btn);
+*/
+/**
+ * @brief Initialize widget.
+ * @details Initializes <span class="param">wgt</span>.
+ * @code
+ * leRadioButtonGroup** grp;
+ * leRadioButtonWidget* btn;
+ * leResult res = leRadioButtonGroup_SelectButton(grp, btn);
+ * @endcode
+ * @param param1 grp is the button group to modify
+ * @param param2 btn is the button to select
+ * @return void.
+ */
+leResult leRadioButtonGroup_SelectButton(leRadioButtonGroup* grp,
+                                         leRadioButtonWidget* btn);
                                                     
 
 #endif // LE_RADIOBUTTON_WIDGET_ENABLED

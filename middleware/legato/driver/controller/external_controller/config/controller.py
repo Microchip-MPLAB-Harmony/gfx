@@ -37,16 +37,17 @@ def instantiateComponent(comp):
 	
 	execfile(Module.getPath() + "/config/config.py")
 	execfile(Module.getPath() + "/config/files.py")
+	execfile(Module.getPath() + "/config/rtos.py")
 
 	comp.setDependencyEnabled("Parallel Display Interface", True);
 	comp.setDependencyEnabled("SPI Display Interface", False);
 
 def onAttachmentConnected(source, target):
-	print("dependency Connected = " + str(target['id']))
+	print("dependency Connected = " + target["component"].getDisplayName())
 	gfxCoreComponentTable = ["gfx_hal_le"]
 	if (Database.getComponentByID("gfx_hal_le") is None):
 		Database.activateComponents(gfxCoreComponentTable)
-	updateDisplayManager(source["component"], target["component"])
+	updateDisplayManager(source["component"], target)
 	if source["id"] == "Display Interface":
 		print("Display Interface Connected")
 	elif (source["id"] == "Graphics Display"):
@@ -70,10 +71,12 @@ def onDisplayInterfaceTypeChanged(source, event):
 def onInitCommandsCountChanged(source, event):
 	global numCommands
 	print("Init Commands Countchanged : " + str(event["value"]))
-	for x in range(numCommands - 1):
+	for x in range(numCommands):
 		if (x < int(event["value"])):
+			print("setvisible command " + str(x))
 			source.getComponent().getSymbolByID("Command" + str(x)).setVisible(True)
 		else:
+			print("hide command " + str(x))
 			source.getComponent().getSymbolByID("Command" + str(x)).setVisible(False)
 
 def onInitCommandParmsCountChanged(source, event):
@@ -82,7 +85,7 @@ def onInitCommandParmsCountChanged(source, event):
 	sub = re.search('Command(.*)ParmsCount', str(event["id"]))
 	if (sub and sub.group(1)):
 		print("sub is : " + str((sub.group(1))))
-		for x in range(numParms - 1):
+		for x in range(numParms):
 			if (x < int(event["value"])):
 				source.getComponent().getSymbolByID("Command" + str(sub.group(1)) + "Parm" + str(x)).setVisible(True)
 			else:
@@ -283,11 +286,29 @@ def configureBaseDriverSSD1963(comp):
 	comp.getSymbolByID("SetYAddressCommand").setValue(0x2b)
 	comp.getSymbolByID("MemoryWriteCommand").setValue(0x2c)
 
-def updateDisplayManager(component, source):
+def updateDisplayManager(component, target):
 	if (Database.getComponentByID("gfx_hal_le") is not None):
-		Database.setSymbolValue("gfx_hal_le", "DisplayWidth", component.getSymbolValue("DisplayWidth"), 1)    
-		Database.setSymbolValue("gfx_hal_le", "DisplayHeight", component.getSymbolValue("DisplayHeight"), 1)
+		if target["id"] == "gfx_display":
+			Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzPulseWidth", target["component"].getSymbolValue("HorzPulseWidth"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzBackPorch", target["component"].getSymbolValue("HorzBackPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHorzFrontPorch", target["component"].getSymbolValue("HorzFrontPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertPulseWidth", target["component"].getSymbolValue("VertPulseWidth"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertBackPorch", target["component"].getSymbolValue("VertBackPorch"), 1)    
+			Database.setSymbolValue("gfx_hal_le", "DisplayVertFrontPorch", target["component"].getSymbolValue("VertFrontPorch"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayDataEnablePolarity", target["component"].getSymbolValue("DataEnablePolarity"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayVSYNCNegative", target["component"].getSymbolValue("VSYNCNegative"), 1)
+			Database.setSymbolValue("gfx_hal_le", "DisplayHSYNCNegative", target["component"].getSymbolValue("HSYNCNegative"), 1)
+			component.setSymbolValue("DisplayWidth", target["component"].getSymbolValue("DisplayWidth"), 1)
+			component.setSymbolValue("DisplayHeight", target["component"].getSymbolValue("DisplayHeight"), 1)
 		Database.setSymbolValue("gfx_hal_le", "gfx_driver", component.getID(), 1)
-		Database.setSymbolValue("gfx_hal_le", "gfx_display", component.getDependencyComponent("Graphics Display").getID(), 1)
 		Database.setSymbolValue("gfx_hal_le", "DriverName", component.getDisplayName(), 1)
-		Database.setSymbolValue("gfx_hal_le", "DisplayName", component.getDependencyComponent("Graphics Display").getDisplayName(), 1)
+
+def onBlitTypeChanged(source, event):
+	source.getComponent().getSymbolByID("GFX_EXTERNAL_CONTROLLER_C").setEnabled(event['value'] == "Synchronous")
+	source.getComponent().getSymbolByID("GFX_EXTERNAL_CONTROLLER_ASYNC_C").setEnabled(event['value'] != "Synchronous")
+
+

@@ -35,17 +35,15 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
-#define DEFAULT_WIDTH           101
-#define DEFAULT_HEIGHT          101
+#include <math.h>
 
-#define DEFAULT_ORIGIN_X        50
-#define DEFAULT_ORIGIN_Y        50
+#define DEFAULT_WIDTH           100
+#define DEFAULT_HEIGHT          100
 
-#define DEFAULT_RADIUS          50
+#define DEFAULT_RADIUS          30
 #define DEFAULT_START_ANGLE     0
-#define DEFAULT_START_VALUE     0
-#define DEFAULT_END_VALUE       100
-#define DEFAULT_VALUE           50
+#define DEFAULT_SPAN_ANGLE      180
+#define DEFAULT_VALUE           0
 
 #define DEFAULT_DIRECTION       COUNTER_CLOCKWISE
 
@@ -65,45 +63,54 @@ const
 #endif
 leCircularSliderWidgetVTable circularSliderWidgetVTable;
 
-//Returns the center point of the circle button in layer space
-lePoint _leCircularSliderWidget_GetCircleCenterPointAtValue(leCircularSliderWidget* _this, int32_t value)
+static uint32_t _calculateSnapValue(uint32_t divisions,
+                                    uint32_t val)
 {
-    //Determine start/end points of activeArc edge
-    lePoint innerPoint, outerPoint, center, sliderPoint;
-    int32_t valueEndAngle;
-    int32_t valueCenterAngle;
+    uint32_t clmp;
 
-    valueCenterAngle = (int32_t) ((value - _this->startValue)* _this->degPerUnit);
-
-    sliderPoint.x = _this->widget.rect.width/2;
-    sliderPoint.y = _this->widget.rect.height/2;
-    
-    leUtils_PointToScreenSpace((leWidget*)_this, &sliderPoint);
-
-    if (_this->direction == LE_COUNTER_CLOCKWISE)
+    if(divisions > 1)
     {
-        valueEndAngle = _this->startAngle + valueCenterAngle;
+        uint32_t stepAmt = 100 / divisions;
+
+        for(uint32_t lastStep = 0; lastStep < 100; lastStep += stepAmt)
+        {
+            clmp = lastStep + stepAmt;
+
+            if(clmp > 100)
+            {
+                clmp = 100;
+            }
+
+            if(val < clmp)
+            {
+                if(val - lastStep < (clmp) - val)
+                {
+                    return lastStep;
+                }
+                else
+                {
+                    return clmp;
+                }
+            }
+            else if(val == stepAmt)
+            {
+                return stepAmt;
+            }
+        }
+
+        return 100;
     }
     else
     {
-        valueEndAngle = 360 + _this->startAngle - valueCenterAngle; 
+        if(val <= 50)
+        {
+            return 0;
+        }
+        else
+        {
+            return 100;
+        }
     }
-
-    if (valueEndAngle < 0)
-        valueEndAngle = -valueEndAngle;
-
-    if (valueEndAngle > 360)
-        valueEndAngle %= 360;
-
-    lePolarToXY(_this->radius - _this->outsideBorderArc.thickness, valueEndAngle , &outerPoint);
-    lePolarToXY((_this->radius - _this->outsideBorderArc.thickness - _this->activeArc.thickness), 
-                valueEndAngle , 
-                &innerPoint);
-
-    center.x = sliderPoint.x + (innerPoint.x + ((outerPoint.x - innerPoint.x)/2));
-    center.y = sliderPoint.y - (innerPoint.y + ((outerPoint.y - innerPoint.y)/2));
-
-    return center;
 }
 
 void leCircularSliderWidget_Constructor(leCircularSliderWidget* _this)
@@ -113,68 +120,49 @@ void leCircularSliderWidget_Constructor(leCircularSliderWidget* _this)
     _this->widget.fn = (void*)&circularSliderWidgetVTable;
     _this->fn = &circularSliderWidgetVTable;
 
-    _this->widget.type = LE_WIDGET_ARC;
+    _this->widget.type = LE_WIDGET_CIRCULAR_SLIDER;
     
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
-    _this->widget.borderType = LE_WIDGET_BORDER_NONE;
-    _this->widget.backgroundType = LE_WIDGET_BACKGROUND_NONE;
+    _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
+    _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
 
     _this->radius = DEFAULT_RADIUS;
     _this->startAngle = DEFAULT_START_ANGLE;
-    _this->startValue = DEFAULT_START_VALUE;
-    _this->endValue = DEFAULT_END_VALUE;
+    _this->spanAngle = DEFAULT_SPAN_ANGLE;
     _this->value = DEFAULT_VALUE;
 
     _this->direction = LE_COUNTER_CLOCKWISE;
     _this->roundEdges = LE_TRUE;
-    _this->sticky = LE_TRUE;
+    _this->sticky = LE_FALSE;
+    _this->snapDivisions = 1;
     _this->buttonTouch = LE_TRUE;
     _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
 
     _this->outsideBorderArc.visible = LE_TRUE;
     _this->outsideBorderArc.thickness = DEFAULT_OUTSIDE_BORDER_THICKNESS;
-    _this->outsideBorderArc.startAngle = _this->startAngle;
-    _this->outsideBorderArc.centerAngle = 360;
     _this->outsideBorderArc.scheme = _this->widget.scheme;
 
     _this->activeArc.visible = LE_TRUE;
     _this->activeArc.radius = _this->radius - _this->outsideBorderArc.thickness;
     _this->activeArc.thickness = DEFAULT_ACTIVE_ARC_THICKNESS;
-    _this->activeArc.startAngle = _this->startAngle;
-    _this->activeArc.centerAngle = 180;
     _this->activeArc.scheme = _this->widget.scheme;
 
     _this->inActiveArc.visible = LE_TRUE;
     _this->inActiveArc.radius = _this->activeArc.radius;
     _this->inActiveArc.thickness = _this->activeArc.thickness;
-    _this->inActiveArc.startAngle = _this->activeArc.startAngle + _this->activeArc.centerAngle;
-    _this->inActiveArc.centerAngle = 180;
     _this->inActiveArc.scheme = _this->widget.scheme;
 
     _this->insideBorderArc.visible = LE_TRUE;
     _this->insideBorderArc.radius = _this->activeArc.radius - _this->activeArc.thickness;
     _this->insideBorderArc.thickness = DEFAULT_INSIDE_BORDER_THICKNESS;
-    _this->insideBorderArc.startAngle = _this->startAngle;
-    _this->insideBorderArc.centerAngle = 360;
     _this->insideBorderArc.scheme = _this->widget.scheme;
 
     _this->circleButtonArc.visible = LE_TRUE;
     _this->circleButtonArc.radius = DEFAULT_SLIDER_BUTTON_RADIUS;
     _this->circleButtonArc.thickness = DEFAULT_SLIDER_BUTTON_THICKNESS;
-    _this->circleButtonArc.startAngle = 0;
-    _this->circleButtonArc.centerAngle = 360;
     _this->circleButtonArc.scheme = _this->widget.scheme;
-
-    if (_this->endValue != _this->startValue)
-    {
-        _this->degPerUnit = (float) (360) / (float) (leAbsoluteValue(_this->endValue - _this->startValue));
-    }
-    else
-    {
-        _this->degPerUnit = 0;
-    }
 
     _this->pressedCallback = NULL;
     _this->valueChangedCallback = NULL;
@@ -217,12 +205,6 @@ static leResult setRadius(leCircularSliderWidget* _this,
     if(_this->radius == rad)
         return LE_SUCCESS;
         
-    if (_this->radius < (_this->outsideBorderArc.thickness + 
-                         _this->activeArc.thickness + 
-                         _this->insideBorderArc.thickness))
-        return LE_FAILURE;
-
-    _this->radius = rad;
     _this->radius = rad;
     
     _this->fn->invalidate(_this);
@@ -230,7 +212,7 @@ static leResult setRadius(leCircularSliderWidget* _this,
     return LE_SUCCESS;
 }
 
-static uint32_t getStartAngle(const leCircularSliderWidget* _this)
+static int32_t getStartAngle(const leCircularSliderWidget* _this)
 {
     LE_ASSERT_THIS();
         
@@ -238,7 +220,7 @@ static uint32_t getStartAngle(const leCircularSliderWidget* _this)
 }
 
 static leResult setStartAngle(leCircularSliderWidget* _this,
-                              uint32_t angle)
+                              int32_t angle)
 {
     LE_ASSERT_THIS();
         
@@ -246,8 +228,14 @@ static leResult setStartAngle(leCircularSliderWidget* _this,
         return LE_SUCCESS;
 
     if (angle > 360)
-        angle = angle % 360;
-    
+    {
+        angle = 360;
+    }
+    else if(angle < -360)
+    {
+        angle = -360;
+    }
+
     _this->startAngle = angle;
     
     _this->fn->invalidate(_this);
@@ -255,67 +243,34 @@ static leResult setStartAngle(leCircularSliderWidget* _this,
     return LE_SUCCESS;
 }
 
-static uint32_t getStartValue(const leCircularSliderWidget* _this)
+static int32_t getSpanAngle(const leCircularSliderWidget* _this)
 {
     LE_ASSERT_THIS();
-        
-    return _this->startValue;
+
+    return _this->spanAngle;
 }
 
-static leResult setStartValue(leCircularSliderWidget* _this,
-                              uint32_t value)
+static leResult setSpanAngle(leCircularSliderWidget* _this,
+                             int32_t angle)
 {
     LE_ASSERT_THIS();
-        
-    if(_this->startValue == value)
+
+    if(_this->spanAngle == angle)
         return LE_SUCCESS;
 
-    if (value > _this->endValue)
-        return LE_FAILURE;
-        
-    _this->startValue = value;
-
-    if (_this->endValue != _this->startValue)
-        _this->degPerUnit = (float) (360) / (float) (leAbsoluteValue(_this->endValue - _this->startValue));
-    else
-        _this->degPerUnit = 0;
-    
-    _this->fn->invalidate(_this);
-        
-    return LE_SUCCESS;
-}
-
-static uint32_t getEndValue(const leCircularSliderWidget* _this)
-{
-    LE_ASSERT_THIS();
-        
-    return _this->endValue;
-}
-
-static leResult setEndValue(leCircularSliderWidget* _this,
-                            uint32_t value)
-{
-    LE_ASSERT_THIS();
-        
-    if(_this->endValue == value)
-        return LE_SUCCESS;
-
-    if (value < _this->startValue)
-        return LE_FAILURE;
-        
-    _this->endValue = value;
-
-    if (_this->endValue != _this->startValue)
+    if (angle > 360)
     {
-        _this->degPerUnit = (float) (360) / (float) (leAbsoluteValue(_this->endValue - _this->startValue));
+        angle = 360;
     }
-    else
+    else if(angle < -360)
     {
-        _this->degPerUnit = 0;
+        angle = -360;
     }
-    
+
+    _this->spanAngle = angle;
+
     _this->fn->invalidate(_this);
-        
+
     return LE_SUCCESS;
 }
 
@@ -326,161 +281,18 @@ static uint32_t getValue(const leCircularSliderWidget* _this)
     return _this->value;
 }
 
-static leRect _getDamagedRect(leCircularSliderWidget* _this,
-                              uint32_t newValue)
-{
-    lePoint centerPtOld, centerPtNew;
-    leRect rect, damagedRect = leRect_Zero, widgetRect;
-    int32_t valueCenterAngleOld, valueCenterAngleNew, valueEndAngleOld, valueEndAngleNew;
-    uint32_t offset = 0;
-    uint32_t sliderThickness;
-    leArcDir dir = LE_CCW;
-    
-    valueCenterAngleOld = (int32_t) ((_this->value - _this->startValue)* _this->degPerUnit);
-    valueCenterAngleNew = (int32_t) ((newValue - _this->startValue)* _this->degPerUnit);
-    
-    if (_this->direction == LE_COUNTER_CLOCKWISE)
-    {
-        valueEndAngleOld = _this->startAngle + valueCenterAngleOld;
-        valueEndAngleNew = _this->startAngle + valueCenterAngleNew;
-    }
-    else
-    {
-        valueEndAngleOld = 360 + _this->startAngle - valueCenterAngleOld;
-        valueEndAngleNew = 360 + _this->startAngle - valueCenterAngleNew;
-    }
-
-    if (valueEndAngleOld < 0)
-        valueEndAngleOld = -valueEndAngleOld;
-
-    if (valueEndAngleOld > 360)
-        valueEndAngleOld %= 360;
-    
-    if (valueEndAngleNew < 0)
-        valueEndAngleNew = -valueEndAngleNew;
-
-    if (valueEndAngleNew > 360)
-        valueEndAngleNew %= 360;    
-    
-    centerPtOld = _leCircularSliderWidget_GetCircleCenterPointAtValue(_this, _this->value);
-    centerPtNew = _leCircularSliderWidget_GetCircleCenterPointAtValue(_this, newValue);
-    
-    sliderThickness = _this->outsideBorderArc.thickness +
-        _this->activeArc.thickness + _this->insideBorderArc.thickness;
-            
-    if (_this->circleButtonArc.visible == LE_TRUE)
-        offset = _this->circleButtonArc.radius;
-    
-    if (offset < sliderThickness/2)
-        offset = sliderThickness/2;
-    
-    //Combine the rects for old and new value
-    rect.x = centerPtOld.x - offset;
-    rect.y = centerPtOld.y - offset;
-    rect.width = rect.height = offset * 2;
-    
-    damagedRect = rect;
-        
-    rect.x = centerPtNew.x - offset;
-    rect.y = centerPtNew.y - offset;
-    rect.width = rect.height = offset * 2;
-    
-    damagedRect = leRectCombine(&damagedRect, &rect);
-    
-    //Combine the rects for traversed quadrants
-    widgetRect = _this->fn->localRect(_this);
-    leUtils_RectToScreenSpace((leWidget*)_this, &widgetRect);
-    
-    rect.width = _this->radius;
-    rect.height = _this->radius;
-    
-    if (_this->direction == LE_COUNTER_CLOCKWISE)
-    {
-        if (newValue < _this->value)
-        {
-            dir = LE_CW;
-        }
-        else
-        {
-            dir = LE_CCW;
-        }
-    }
-    else
-    {    
-        if (newValue < _this->value)
-        {
-            dir = LE_CCW;
-        }
-        else
-        {
-            dir = LE_CW;
-        }
-    }
-        
-    if (leArcsOverlapQuadrant(valueEndAngleOld, 
-                              valueEndAngleNew, 
-                              dir,
-                              LE_Q1) == LE_TRUE)
-    {
-        rect.x = widgetRect.x + widgetRect.width / 2;
-        rect.y = widgetRect.y + widgetRect.height / 2 - _this->radius;
-        
-        damagedRect = leRectCombine(&damagedRect, &rect);
-    }
-        
-    if (leArcsOverlapQuadrant(valueEndAngleOld, 
-                              valueEndAngleNew, 
-                              dir,
-                              LE_Q2) == LE_TRUE)
-    {
-        rect.x = widgetRect.x + widgetRect.width / 2 - _this->radius;
-        rect.y = widgetRect.y + widgetRect.height / 2 - _this->radius;
-        
-        damagedRect = leRectCombine(&damagedRect, &rect);
-    }
-        
-    if (leArcsOverlapQuadrant(valueEndAngleOld, 
-                              valueEndAngleNew, 
-                              dir,
-                              LE_Q3) == LE_TRUE)
-    {   
-        rect.x = widgetRect.x + widgetRect.width / 2 - _this->radius;
-        rect.y = widgetRect.y + widgetRect.height / 2;
-        
-        damagedRect = leRectCombine(&damagedRect, &rect);
-    }
-        
-    if (leArcsOverlapQuadrant(valueEndAngleOld, 
-                              valueEndAngleNew, 
-                              dir,
-                              LE_Q4) == LE_TRUE)
-
-    {
-        rect.x = widgetRect.x + widgetRect.width / 2;
-        rect.y = widgetRect.y + widgetRect.height / 2;
-        
-        damagedRect = leRectCombine(&damagedRect, &rect);
-    }
-            
-    return damagedRect;
-}
-
 static leResult setValue(leCircularSliderWidget* _this,
                          uint32_t value)
 {
-    leRect damagedRect;
-    
     LE_ASSERT_THIS();
         
     if(_this->value == value)
         return LE_SUCCESS;
 
-    if (value < _this->startValue || value > _this->endValue)
+    if (value > 100)
         return LE_FAILURE;
     
-    damagedRect = _getDamagedRect(_this, value);
-
-    _this->fn->_damageArea(_this, &damagedRect);
+    _this->fn->invalidate(_this);
 
     _this->value = value;
     
@@ -530,9 +342,44 @@ static leResult setStickyButton(leCircularSliderWidget* _this,
         return LE_SUCCESS;
         
     _this->sticky = sticky;
-    
-    //_this->fn->invalidate(_this);
+
+    if(_this->sticky == LE_TRUE)
+    {
+        _this->fn->setValue(_this,
+                            _calculateSnapValue(_this->snapDivisions,
+                                                _this->value));
+    }
         
+    return LE_SUCCESS;
+}
+
+static uint32_t getSnapDivisions(const leCircularSliderWidget* _this)
+{
+    LE_ASSERT_THIS();
+
+    return _this->sticky;
+}
+
+static leResult setSnapDivisions(leCircularSliderWidget* _this,
+                                 uint32_t div)
+{
+    LE_ASSERT_THIS();
+
+    if(_this->snapDivisions == div)
+        return LE_SUCCESS;
+
+    if(_this->snapDivisions == 0)
+        return LE_FAILURE;
+
+    _this->snapDivisions = div;
+
+    if(_this->sticky == LE_TRUE)
+    {
+        _this->fn->setValue(_this,
+                            _calculateSnapValue(_this->snapDivisions,
+                                                _this->value));
+    }
+
     return LE_SUCCESS;
 }
 
@@ -714,7 +561,6 @@ static leScheme* getArcScheme(const leCircularSliderWidget* _this,
             return (leScheme*)_this->circleButtonArc.scheme;
         default:
             return (leScheme*)_this->widget.scheme;
-            break;
     }
         
     return NULL;
@@ -879,170 +725,187 @@ static leResult setReleasedEventCallback(leCircularSliderWidget* _this,
     return LE_SUCCESS;
 }
 
-static uint32_t _getSliderValueAtPoint(leCircularSliderWidget* _this,
-                                       lePoint pnt)
+static leBool getPercent(leCircularSliderWidget* _this,
+                         lePoint pt,
+                         uint32_t* percent)
 {
-    uint32_t angle;
-    uint32_t value;
-    
-    if (pnt.x > 0 && pnt.y > 0)
+    int32_t startAngle;
+    int32_t endAngle;
+    lePoint centerPt;
+    float rad, mag, dot, det;
+    int32_t deg, adj;
+    float xf, yf;
+
+    // transform the vector
+    centerPt.x = _this->widget.rect.width / 2;
+    centerPt.y = _this->widget.rect.height / 2;
+
+    pt.x -= centerPt.x;
+    pt.y -= centerPt.y;
+    pt.y *= -1;
+
+    // normalize the vector
+    mag = leSqrt((pt.x * pt.x) + (pt.y * pt.y));
+
+    xf = (float)pt.x / mag;
+    yf = (float)pt.y / mag;
+
+    // calculate the angle
+    dot = (xf * 1.0f) + (yf * 0.0f);
+    det = (xf * 0.0f) - (yf * 1.0f);
+
+    rad = -atan2f(det, dot);
+
+    deg = (int32_t)(rad * 57.295827909f);
+
+    // normalize the angle
+    if(deg < 0)
     {
-        //Q1
-        angle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-    }
-    else if (pnt.x < 0 && pnt.y > 0)
-    {
-        //Q2
-        angle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        angle = 180 + angle;
-    }
-    else if (pnt.x > 0 && pnt.y < 0)
-    {
-        //Q4
-        angle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        angle = 360 + angle;
-    }
-    else if (pnt.x < 0 && pnt.y < 0)
-    {
-        //Q3
-        angle = (int32_t) ((double) leAtan((double) pnt.y / pnt.x) * (double)(180 / 3.1416));
-        angle = 180 + angle;
-    }
-    else if (pnt.x == 0 && pnt.y >= 0)
-    {
-        // +y
-        angle = 90;
-    }
-    else if (pnt.x == 0 && pnt.y < 0)
-    {
-        // -y
-        angle = 270;
-    }
-    else if (pnt.y == 0 && pnt.x > 0)
-    {
-        // +x
-        angle = 0;
-    }
-    else
-    {
-        // -x
-        angle = 180;
+        deg += 360;
     }
 
-    if (_this->direction == LE_COUNTER_CLOCKWISE)
+    // normalize the angles the angle span
+    leNormalizeAngles(_this->startAngle,
+                      _this->spanAngle,
+                      &startAngle,
+                      &endAngle);
+
+    adj = 360 - startAngle;
+
+    endAngle -= startAngle;
+    startAngle = 0;
+
+    deg += adj;
+
+    if(deg >= 360)
     {
-        if (angle > _this->startAngle)
-        {
-            value = _this->startValue + (_this->endValue - _this->startValue) * (angle - _this->startAngle)/ 360;
-        }
-        else //wrapped around
-        {
-            value = _this->startValue + (_this->endValue - _this->startValue) * (360 - _this->startAngle)/ 360 +
-                    (_this->endValue - _this->startValue) * angle/360;
-        }
+        deg -= 360;
+    }
+
+    // calculate the percent
+    startAngle = 0;
+
+    if(deg < 0)
+        return LE_FALSE;
+
+    if(deg > endAngle)
+        return LE_FALSE;
+
+    if(_this->spanAngle < 0)
+    {
+        *percent = 100 - lePercentWholeRounded(deg, endAngle);
     }
     else
     {
-        if (angle < _this->startAngle)
-        {
-            value = _this->startValue + (_this->endValue - _this->startValue) * (_this->startAngle - angle) / 360;
-        }
-        else
-        {
-            value = _this->startValue + (_this->endValue - _this->startValue) * _this->startAngle/360 +
-                    (_this->endValue - _this->startValue) * (360 - angle)/360;
-        }
+        *percent = lePercentWholeRounded(deg, endAngle);
     }
-    
-    return value;
-    
+
+    return LE_TRUE;
+}
+
+static leBool _pointInActiveArc(leCircularSliderWidget* _this,
+                                lePoint pt)
+{
+
+    uint32_t innerRadius;
+    uint32_t outerRadius;
+    lePoint centerPt;
+    uint32_t vecLength;
+    uint32_t percent;
+
+    // test the radius
+    innerRadius = _this->radius - _this->activeArc.thickness / 2;
+    outerRadius = _this->radius + _this->activeArc.thickness / 2;
+
+    centerPt.x = _this->widget.rect.width / 2;
+    centerPt.y = _this->widget.rect.height / 2;
+
+    pt.x -= centerPt.x;
+    pt.y -= centerPt.y;
+
+    vecLength = (pt.x * pt.x) + (pt.y * pt.y);
+
+    innerRadius *= innerRadius;
+    outerRadius *= outerRadius;
+
+    if(vecLength < innerRadius || vecLength > outerRadius)
+        return LE_FALSE;
+
+    return getPercent(_this, pt, &percent);
+}
+
+static leBool _pointInButton(leCircularSliderWidget* _this,
+                             lePoint pt)
+{
+    lePoint centerPt;
+    lePoint btnPnt;
+
+    uint32_t deg = leDegreesFromPercent(_this->value,
+                                        _this->spanAngle,
+                                        _this->startAngle);
+
+    lePointOnCircle(_this->radius,
+                    deg,
+                    &btnPnt);
+
+    btnPnt.y *= -1;
+
+    centerPt.x = _this->widget.rect.width / 2;
+    centerPt.y = _this->widget.rect.height / 2;
+
+    btnPnt.x += centerPt.x;
+    btnPnt.y += centerPt.y;
+
+    btnPnt.x -= pt.x;
+    btnPnt.y -= pt.y;
+
+    if((btnPnt.x * btnPnt.x + btnPnt.y * btnPnt.y) < (int32_t)(_this->circleButtonArc.radius * _this->circleButtonArc.radius))
+    {
+        return LE_TRUE;
+    }
+
+    return LE_FALSE;
 }
 
 static void handleTouchDownEvent(leCircularSliderWidget* _this,
                                  leWidgetEvent_TouchDown* evt)
 {
     lePoint pnt;
-    
+    uint32_t percent;
+
     LE_ASSERT_THIS();
 
     pnt.x = evt->x;
     pnt.y = evt->y;
 
-    //If circular button is visible, set button state touch is within circle
-    if (_this->circleButtonArc.visible == LE_TRUE)
+    if(_this->circleButtonArc.visible == LE_FALSE)
+        return;
+
+    leUtils_PointScreenToLocalSpace((leWidget*)_this, &pnt);
+
+    if(_pointInButton(_this, pnt) == LE_FALSE)
     {
-        leUtils_PointScreenToLocalSpace((leWidget*)_this, &pnt);
-        
-        if (_this->buttonTouch == LE_TRUE)
+        if(_this->buttonTouch == LE_FALSE && _pointInActiveArc(_this, pnt) == LE_FALSE)
         {
-            lePoint buttonCenter = _leCircularSliderWidget_GetCircleCenterPointAtValue(_this, _this->value);
+            _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
 
-            leUtils_PointScreenToLocalSpace((leWidget*)_this, &buttonCenter);
-
-            //Measure distance of point from center and see if it is within radius
-            if ((uint32_t)(((pnt.x - buttonCenter.x) * (pnt.x - buttonCenter.x)) + 
-                ((pnt.y - buttonCenter.y) * (pnt.y - buttonCenter.y))) <= 
-                (_this->circleButtonArc.radius * _this->circleButtonArc.radius))
-            {
-
-                _this->btnState = LE_CIRCULAR_SLIDER_STATE_DOWN;
-
-                if (_this->pressedCallback != NULL)
-                {
-                    _this->pressedCallback(_this, _this->value);
-                }
-
-                leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
-            }
-            else
-            {
-                _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
-            }
-        }
-        else
-        {
-            lePoint pntLocal;
-            uint32_t ptRadSqd;
-            uint32_t value;
-            
-            uint32_t touchOutRad = _this->radius - 
-                                   (_this->activeArc.thickness/2) + 
-                                   _this->circleButtonArc.radius;
-            
-            uint32_t touchInRad = _this->radius - 
-                                   (_this->activeArc.thickness/2) -
-                                   _this->circleButtonArc.radius;
-            
-            pntLocal.x = pnt.x - _this->widget.rect.width/2;
-            pntLocal.y = _this->widget.rect.height/2 - pnt.y;
-            
-            ptRadSqd = (pntLocal.x) * (pntLocal.x) + 
-                       (pntLocal.y) * (pntLocal.y);
-
-            //Measure distance of point from center and see if it is within radius            
-            if ((ptRadSqd <= (touchOutRad * touchOutRad)) &&
-                (ptRadSqd >= (touchInRad * touchInRad)))
-            {
-
-                _this->btnState = LE_CIRCULAR_SLIDER_STATE_DOWN;
-
-                if (_this->pressedCallback != NULL)
-                {
-                    _this->pressedCallback(_this, _this->value);
-                }
-
-                leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
-                
-                value = _getSliderValueAtPoint(_this, pntLocal);
-                
-                _this->fn->setValue(_this, value);
-            }
-            else
-            {
-                _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
-            }
+            return;
         }
     }
+
+    if(getPercent(_this, pnt, &percent) == LE_FALSE)
+        return;
+
+    _this->fn->setValue(_this, percent);
+
+    _this->btnState = LE_CIRCULAR_SLIDER_STATE_DOWN;
+
+    if (_this->pressedCallback != NULL)
+    {
+        _this->pressedCallback(_this, _this->value);
+    }
+
+    leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
 }
 
 static void handleTouchUpEvent(leCircularSliderWidget* _this,
@@ -1055,6 +918,13 @@ static void handleTouchUpEvent(leCircularSliderWidget* _this,
         leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
         
         _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
+
+        if(_this->sticky == LE_TRUE)
+        {
+            _this->fn->setValue(_this,
+                                _calculateSnapValue(_this->snapDivisions,
+                                                    _this->value));
+        }
     
         if (_this->releasedCallback != NULL)
         {
@@ -1065,64 +935,43 @@ static void handleTouchUpEvent(leCircularSliderWidget* _this,
 
 static void handleTouchMovedEvent(leCircularSliderWidget* _this, leWidgetEvent_TouchMove* evt)
 {
-//    uint32_t touchPntRadSqd;
     lePoint pnt;
-    uint32_t value;
-    uint32_t snapThreshold;
-    
-    LE_ASSERT_THIS();
+    uint32_t percent;
+
+    if(_this->btnState != LE_CIRCULAR_SLIDER_STATE_DOWN)
+        return;
 
     pnt.x = evt->x;
     pnt.y = evt->y;
 
-    snapThreshold = (_this->endValue > _this->startValue) ? 
-                     (_this->endValue - _this->startValue)/4 : 
-                     (_this->startValue - _this->endValue)/4;
-    
-    if (_this->circleButtonArc.visible == LE_TRUE && 
-        _this->btnState == LE_CIRCULAR_SLIDER_STATE_DOWN)
+    if(_this->circleButtonArc.visible == LE_FALSE)
+        return;
+
+    leUtils_PointScreenToLocalSpace((leWidget*)_this, &pnt);
+
+    if(_pointInButton(_this, pnt) == LE_FALSE)
     {
-        leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
-    
-        //Adjust point relative to widget local
-        leUtils_PointScreenToLocalSpace((leWidget*)_this, &pnt);
-
-        //Adjust point relative widget center/origin
-        pnt.x -= _this->widget.rect.width/2; 
-        pnt.y = _this->widget.rect.height/2 - pnt.y;
-    
-//        touchPntRadSqd = pnt.x * pnt.x + pnt.y * pnt.y;
-
-        //Limit move point to within the touch button only
-//        if ((touchPntRadSqd > ((_this->activeArc.radius + (_this->activeArc.thickness/2) + _this->circleButtonArc.radius) * 
-//                               (_this->activeArc.radius + (_this->activeArc.thickness/2) + _this->circleButtonArc.radius))) ||
-//            (touchPntRadSqd < 
-//             ((_this->activeArc.radius - (_this->activeArc.thickness/2) - _this->circleButtonArc.radius) * 
-//              (_this->activeArc.radius - (_this->activeArc.thickness/2) - _this->circleButtonArc.radius))))
-//        {
-//            //_this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
-//            return;
-//        }
-
-        value = _getSliderValueAtPoint(_this, pnt);
-
-        if (_this->sticky == LE_TRUE)
+        if(_this->buttonTouch == LE_FALSE && _pointInActiveArc(_this, pnt) == LE_FALSE)
         {
-            if ((_this->endValue - _this->value) < snapThreshold)
-            {
-                if ((value - _this->startValue) < snapThreshold)
-                    value = _this->endValue;
-            }
-            
-            else if ((_this->value - _this->startValue) < snapThreshold)
-            {
-                if ((_this->endValue - value) < snapThreshold)
-                    value = _this->startValue;
-            }
-        }
+            _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
 
-        _this->fn->setValue(_this, value);
+            return;
+        }
     }
+
+    if(getPercent(_this, pnt, &percent) == LE_FALSE)
+        return;
+
+    _this->fn->setValue(_this, percent);
+
+    _this->btnState = LE_CIRCULAR_SLIDER_STATE_DOWN;
+
+    if (_this->pressedCallback != NULL)
+    {
+        _this->pressedCallback(_this, _this->value);
+    }
+
+    leWidgetEvent_Accept((leWidgetEvent*)evt, (leWidget*)_this);
 }
 
 void _leCircularSliderWidget_Paint(leCircularSliderWidget* _this);
@@ -1130,7 +979,7 @@ void _leCircularSliderWidget_Paint(leCircularSliderWidget* _this);
 #if LE_DYNAMIC_VTABLES == 1
 void _leWidget_FillVTable(leWidgetVTable* tbl);
 
-void _leCircularSliderWidget_GenerateVTable()
+void _leCircularSliderWidget_GenerateVTable(void)
 {
     _leWidget_FillVTable((void*)&circularSliderWidgetVTable);
     
@@ -1146,6 +995,8 @@ void _leCircularSliderWidget_GenerateVTable()
     circularSliderWidgetVTable.setRadius = setRadius;
     circularSliderWidgetVTable.getStartAngle = getStartAngle;
     circularSliderWidgetVTable.setStartAngle = setStartAngle;
+    circularSliderWidgetVTable.getSpanAngle = getSpanAngle;
+    circularSliderWidgetVTable.setSpanAngle = setSpanAngle;
     circularSliderWidgetVTable.getArcThickness = getArcThickness;
     circularSliderWidgetVTable.setArcThickness = setArcThickness;
     circularSliderWidgetVTable.getArcRadius = getArcRadius;
@@ -1154,16 +1005,14 @@ void _leCircularSliderWidget_GenerateVTable()
     circularSliderWidgetVTable.setArcScheme = setArcScheme;
     circularSliderWidgetVTable.getArcVisible = getArcVisible;
     circularSliderWidgetVTable.setArcVisible = setArcVisible;
-    circularSliderWidgetVTable.getStartValue = getStartValue;
-    circularSliderWidgetVTable.setStartValue = setStartValue;
-    circularSliderWidgetVTable.getEndValue = getEndValue;
-    circularSliderWidgetVTable.setEndValue = setEndValue;
     circularSliderWidgetVTable.getValue = getValue;
     circularSliderWidgetVTable.setValue = setValue;
     circularSliderWidgetVTable.getRoundEdges = getRoundEdges;
     circularSliderWidgetVTable.setRoundEdges = setRoundEdges;
     circularSliderWidgetVTable.getStickyButton = getStickyButton;
     circularSliderWidgetVTable.setStickyButton = setStickyButton;
+    circularSliderWidgetVTable.getSnapDivisions = getSnapDivisions;
+    circularSliderWidgetVTable.setSnapDivisions = setSnapDivisions;
     circularSliderWidgetVTable.getTouchOnButtonOnly = getTouchOnButtonOnly;
     circularSliderWidgetVTable.setTouchOnButtonOnly = setTouchOnButtonOnly;
     circularSliderWidgetVTable.getDirection = getDirection;
@@ -1216,7 +1065,7 @@ static const leCircularSliderWidgetVTable circularSliderWidgetVTable =
     .getChildCount = (void*)_leWidget_GetChildCount,
     .getChildAtIndex = (void*)_leWidget_GetChildAtIndex,
     .getIndexOfChild = (void*)_leWidget_GetIndexOfChild,
-    .containsDescendent = (void*)_leWidget_ContainsDescendent,
+    .containsDescendant = (void*)_leWidget_ContainsDescendant,
     .getScheme = (void*)_leWidget_GetScheme,
     .setScheme = (void*)_leWidget_SetScheme,
     .getBorderType = (void*)_leWidget_GetBorderType,
@@ -1240,9 +1089,6 @@ static const leCircularSliderWidgetVTable circularSliderWidgetVTable =
 
     .update = (void*)_leWidget_Update,
 
-    .touchDownEvent = (void*)_leWidget_TouchDownEvent,
-    .touchUpEvent = (void*)_leWidget_TouchUpEvent,
-    .touchMoveEvent = (void*)_leWidget_TouchMoveEvent,
     .moveEvent = (void*)_leWidget_MoveEvent,
     .resizeEvent = (void*)_leWidget_ResizeEvent,
     .focusLostEvent = (void*)_leWidget_FocusLostEvent,
@@ -1269,6 +1115,8 @@ static const leCircularSliderWidgetVTable circularSliderWidgetVTable =
     .setRadius = setRadius,
     .getStartAngle = getStartAngle,
     .setStartAngle = setStartAngle,
+    .getSpanAngle = getSpanAngle,
+    .setSpanAngle = setSpanAngle,
     .getArcThickness = getArcThickness,
     .setArcThickness = setArcThickness,
     .getArcRadius = getArcRadius,
@@ -1277,16 +1125,14 @@ static const leCircularSliderWidgetVTable circularSliderWidgetVTable =
     .setArcScheme = setArcScheme,
     .getArcVisible = getArcVisible,
     .setArcVisible = setArcVisible,
-    .getStartValue = getStartValue,
-    .setStartValue = setStartValue,
-    .getEndValue = getEndValue,
-    .setEndValue = setEndValue,
     .getValue = getValue,
     .setValue = setValue,
     .getRoundEdges = getRoundEdges,
     .setRoundEdges = setRoundEdges,
     .getStickyButton = getStickyButton,
     .setStickyButton = setStickyButton,
+    .getSnapDivisions = getSnapDivisions,
+    .setSnapDivisions = setSnapDivisions,
     .getTouchOnButtonOnly = getTouchOnButtonOnly,
     .setTouchOnButtonOnly = setTouchOnButtonOnly,
     .getDirection = getDirection,

@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Legato User Interface Library
@@ -39,11 +37,14 @@
     This module implements a rotatable image widget.
 *******************************************************************************/
 
-// DOM-IGNORE-BEGIN
+/** \file legato_widget_imagerotate.h
+ * @brief Image rotate functions and definitions.
+ *
+ * @details This module implements a rotatable image widget.
+ */
 
 #ifndef LEGATO_IMAGEROTATE_H
 #define LEGATO_IMAGEROTATE_H
-//DOM-IGNORE-END
 
 #include "gfx/legato/common/legato_common.h"
 
@@ -60,17 +61,17 @@ typedef struct leImageRotateWidget leImageRotateWidget;
 // *****************************************************************************
 // *****************************************************************************
 
-// DOM-IGNORE-BEGIN
-typedef struct leImageRotateWidget leImageRotateWidget;
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */typedef struct leImageRotateWidget leImageRotateWidget;
 
 #define LE_IMAGEROTATEWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
     leImage*          (*getImage)(const THIS_TYPE* _this); \
     leResult          (*setImage)(THIS_TYPE* _this, const leImage* img); \
-    lePoint           (*getOrigin)(const THIS_TYPE* _this); \
-    leResult          (*setOriginX)(THIS_TYPE* _this, int32_t x); \
-    leResult          (*setOriginY)(THIS_TYPE* _this, int32_t y); \
     int32_t           (*getAngle)(const THIS_TYPE* _this); \
     leResult          (*setAngle)(THIS_TYPE* _this, int32_t a); \
     leImageFilterMode (*getFilter)(const THIS_TYPE* _this); \
@@ -96,6 +97,12 @@ typedef struct leImageRotateWidgetVTable
   Remarks:
     None.
 */
+
+/**
+ * @brief This struct represents a image rotate widget.
+ * @details An image rotate widget displays an image asset and can translate
+ * and resize that image.
+ */
 typedef struct leImageRotateWidget
 {
     leWidget widget; // widget base class
@@ -104,21 +111,24 @@ typedef struct leImageRotateWidget
 
     const leImage* image; // pointer to image asset
 
-    leRect imageRect;
-
-    lePoint origin;
     int32_t angle;
 
     leImageFilterMode filter;
 } leImageRotateWidget;
 
-// DOM-IGNORE-BEGIN
-// internal use only
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
 
 void _leImageRotateWidget_Destructor(leImageRotateWidget* img);
 
 void _leImageRotateWidget_Paint(leImageRotateWidget* img);
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 // *****************************************************************************
@@ -126,216 +136,159 @@ void _leImageRotateWidget_Paint(leImageRotateWidget* img);
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Function:
-    leImageRotateWidget* leImageRotateWidget_New()
+/**
+ * @brief Create widget.
+ * @details Creates a new leImageRotateWidget and allocates memory for the widget through the
+ * current active context.  Application is responsible for managing the widget
+ * pointer until the widget is added to a widget tree.
+ * @remark use leWidget_Delete() to free this pointer.
+ * @code
+ * leImageRotateWidget* wgt = leImageRotateWidget_New();
+ * @endcode
+ * @return a widget object pointer.
+ */
+leImageRotateWidget* leImageRotateWidget_New(void);
 
-  Summary:
-    Allocates memory for and initializes a new widget of this type.  The
-    application is responsible for the managment of this memory until the
-    widget is added to a widget tree.
+/**
+ * @brief Initialize widget.
+ * @details Initializes the leImageRotateWidget <span class="param">wgt</span>.
+ * @code
+ * leImageRotateWidget* wgt;
+ * leImageRotateWidget_Constructor(wgt);
+ * @endcode
+ * @param wgt is the widget to initialize
+ * @return void.
+ */
+void leImageRotateWidget_Constructor(leImageRotateWidget* wgt);
 
-  Description:
+#ifdef _DOXYGEN_
+#define THIS_TYPE struct leWidget
+
+/**
+ * @brief Get image pointer.
+ * @details Gets the image pointer for <span class="param">_this</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * leImage* img = _this->fn->getString(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the string pointer.
+ */
+virtual leImage* getImage(const leImageRotateWidget* _this);
 
 
-  Parameters:
-    void
+/**
+ * @brief Set image pointer.
+ * @details Sets the image pointer to
+ * <span class="param">str</span> for <span class="param">_this</span>.
+ * @code
+ * leImageRotateWidget* _this;
+ * leImage* img;
+ * leResult res = _this->fn->setString(_this, img);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param img is the string pointer.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setImage(leImageRotateWidget* _this,
+                          leImage* img);
 
-  Returns:
-    leImageRotateWidget* - the widget
 
-  Remarks:
-    Use leWidget_Delete() to free this pointer.
-*/
-LIB_EXPORT leImageRotateWidget* leImageRotateWidget_New();
+/**
+ * @brief Get rotation origin component.
+ * @details Gets the rotation origin component for <span class="param">_this</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * lePoint pnt = _this->fn->getOrigin(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the string pointer.
+ */
+virtual lePoint getOrigin(const leImageRotateWidget* _this);
 
-/* Function:
-    void leImageRotateWidget_Constructor(leImageRotateWidget* wgt)
 
-  Summary:
-    Initializes an leImageRotateWidget widget pointer.
-
-  Description:
-    Initializes an leImageRotateWidget widget pointer.
-
-  Parameters:
-    leImageRotateWidget* wgt - the pointer to initialize
-
-  Returns:
-    void
-
-  Remarks:
-
-*/
-LIB_EXPORT void leImageRotateWidget_Constructor(leImageRotateWidget* img);
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leImage* getImage(const leImageRotateWidget* _this)
-
-  Summary:
-     Gets the image pointer
-
-  Description:
-     Gets the image pointer
-
-  Parameters:
-    const leImageRotateWidget* _this - The image rotate widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getImage(_this);
-
-  Returns:
-    leImage* - the image pointer
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setImage(leImageRotateWidget* _this,
-                      const leImage* img)
-
-  Summary:
-     Sets the image pointer
-
-  Description:
-     Sets the image pointer
-
-  Parameters:
-    leImageRotateWidget* _this - The image rotate widget to operate on
-    const leImage* img - the image pointer
-
-  Remarks:
-    Usage - _this->fn->setImage(_this, img);
-
-  Returns:
-    leResult - the result of the operation
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    lePoint getOrigin(const leImageRotateWidget* _this)
-
-  Summary:
-     Gets the rotation origin component
-
-  Description:
-     Gets the rotation origin component
-
-  Parameters:
-    const leImageRotateWidget* _this - The image rotate widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getOrigin(_this);
-
-  Returns:
-    lePoint - the origin point
-*/
+/**
+ * @brief Set image pointer.
+ * @details Sets the image pointer to
+ * <span class="param">str</span> for <span class="param">_this</span>.
+ * @code
+ * leImageRotateWidget* _this;
+ * lePoint origin;
+ * leResult res = _this->fn->setOrigin(_this, origin);
+ * @endcode
+ * @param _this is the widget pointer to modify.
+ * @param origin is the origin point.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setOrigin(leImageRotateWidget* _this,
+                           lePoint origin);
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setOrigin(leImageRotateWidget* _this,
-                       lePoint origin)
+/**
+ * @brief Get rotation angle.
+ * @details Gets the rotation angle using <span class="param">_this</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * int32_t angle = _this->fn->getStartAngle(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the rotation angle.
+ */
+virtual int32_t getAngle(const leImageRotateWidget* _this);
 
-  Summary:
-     Sets the rotation origin
-
-  Description:
-     Sets the rotation origin
-
-  Parameters:
-    leImageRotateWidget* _this - The image rotate widget to operate on
-    lePoint origin - the origin point
-
-  Remarks:
-    Usage - _this->fn->setOrigin(_this, org);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    int32_t getAngle(const leImageRotateWidget* _this)
+/**
+ * @brief Set rotation angle.
+ * @details Sets the rotation angle using <span class="param">_this</span> to
+ * <span class="param">ang</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * int32_t angle;
+ * leResult res = _this->fn->setStartAngle(_this, angle);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param angle is the rotation angle.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setAngle(leImageRotateWidget* _this,
+                          int32_t angle);
 
-  Summary:
-     Gets the rotation angle
-
-  Description:
-     Gets the rotation angle
-
-  Parameters:
-    const leImageRotateWidget* _this - The image rotate widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getAngle(_this);
-
-  Returns:
-    int32_t - the angle value in degrees
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leResult setAngle(leImageRotateWidget* _this,
-                      int32_t angle)
+/**
+ * @brief Get current transform filter.
+ * @details Gets the current transform filter using <span class="param">_this</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * leImageFilter filter = _this->fn->getFilter(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the current filter.
+ */
+virtual leImageFilter getFilter(const leImageRotateWidget* _this);
 
-  Summary:
-     Sets the rotation angle
-
-  Description:
-     Sets the rotation angle
-
-  Parameters:
-    leImageRotateWidget* _this - The image rotate widget to operate on
-    int32_t angle - the rotation angle value in degrees
-
-  Remarks:
-    Usage - _this->fn->setAngle(_this, ang);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 // *****************************************************************************
-/* Virtual Member Function:
-    leImageFilter getFilter(const leImageRotateWidget* _this)
+/**
+ * @brief Set current transform filter.
+ * @details Sets the current transform filter using <span class="param">_this</span> to
+ * <span class="param">ang</span>.
+ * @code
+ * const leImageRotateWidget* _this;
+ * leImageFilter filter;
+ * leResult res = _this->fn->setFilter(_this, filter);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @param filter is the transform filter.
+ * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setFilter(leImageRotateWidget* _this,
+                           leImageFilter filter);
 
-  Summary:
-     Gets the current transform filter
+#undef THIS_TYPE
+#endif
 
-  Description:
-     Gets the current transform filter
-
-  Parameters:
-    const leImageRotateWidget* _this - The image rotate widget to operate on
-
-  Remarks:
-    Usage - _this->fn->getFilter(_this);
-
-  Returns:
-    leImageFilter - the current filter
-*/
-
-// *****************************************************************************
-/* Virtual Member Function:
-    leResult setFilter(leImageRotateWidget* _this,
-                       leImageFilter filter)
-
-  Summary:
-     Sets the current transform filter
-
-  Description:
-     Sets the current transform filter
-
-  Parameters:
-    leImageRotateWidget* _this - The image rotate widget to operate on
-    leImageFilter filter - the transform filter to use
-
-  Remarks:
-    Usage - _this->fn->setFilter(_this, filter);
-
-  Returns:
-    leResult - the result of the operation
-*/
 
 #endif // LE_IMAGEROTATE_WIDGET_ENABLED
 #endif /* LEGATO_IMAGEROTATE_H */

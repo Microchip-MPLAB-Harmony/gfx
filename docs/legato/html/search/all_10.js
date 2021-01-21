@@ -1,12 +1,22 @@
 var searchData=
 [
-  ['radialmenu_615',['RadialMenu',['../classscreen_1_1RadialMenu.html',1,'screen']]],
-  ['radialmenuitem_616',['RadialMenuItem',['../classscreen_1_1RadialMenuItem.html',1,'screen']]],
-  ['radiobuttongroup_617',['RadioButtonGroup',['../classscreen_1_1RadioButtonGroup.html',1,'screen']]],
-  ['radius_618',['radius',['../structleArcWidget.html#a717462214d2d8f1d768bccfb01a63d08',1,'leArcWidget']]],
-  ['rects_619',['rects',['../structleRectArray.html#aadc261088163bd7d347f0a3475c47d15',1,'leRectArray']]],
-  ['remove_620',['remove',['../legato__string_8h.html#a1dd047316d0fe21604866b78f268bddd',1,'legato_string.h']]],
-  ['right_621',['right',['../structleMargin.html#a61938d8fca0e953d39df2d9e06f55b10',1,'leMargin']]],
-  ['rootwidget_622',['rootWidget',['../structleState.html#ab1eed9fe79ab88d8375ac3a014f042e0',1,'leState']]],
-  ['roundedge_623',['roundEdge',['../structleArcWidget.html#a19dda259505c00e9a0b27f6b22b0947b',1,'leArcWidget']]]
+  ['setbuffer_679',['setBuffer',['../legato__fixedstring_8h.html#a7f3b9c3b0a5aedb00d618c2ab7d1e9dd',1,'legato_fixedstring.h']]],
+  ['setcapacity_680',['setCapacity',['../legato__dynamicstring_8h.html#ab6e6e438395a978e8ffce8224c21166d',1,'legato_dynamicstring.h']]],
+  ['setcenterangle_681',['setCenterAngle',['../legato__widget__arc_8h.html#a643312fd6c9a6913fe14bcfcc2137497',1,'legato_widget_arc.h']]],
+  ['setfont_682',['setFont',['../legato__string_8h.html#a68baefdc0091efb99d698cf2bd119465',1,'legato_string.h']]],
+  ['setfromchar_683',['setFromChar',['../legato__string_8h.html#ad1f70690230f9cf63c47ac61cf958ad4',1,'legato_string.h']]],
+  ['setfromcstr_684',['setFromCStr',['../legato__string_8h.html#a2e937c9ff34ff4e19cc7762839440068',1,'legato_string.h']]],
+  ['setfromstring_685',['setFromString',['../legato__string_8h.html#ab09e6804c81ccacd9589b931d73e9d94',1,'legato_string.h']]],
+  ['setid_686',['setID',['../legato__tablestring_8h.html#a347fb07918aa90e08c778db798c83f0d',1,'legato_tablestring.h']]],
+  ['setinvalidatecallback_687',['setInvalidateCallback',['../legato__string_8h.html#a5cb178234c04c49160285491ff35ca6d',1,'legato_string.h']]],
+  ['setpreinvalidatecallback_688',['setPreInvalidateCallback',['../legato__string_8h.html#a37ee38f319548b9ac9746c6cdd793f5f',1,'legato_string.h']]],
+  ['setradius_689',['setRadius',['../legato__widget__arc_8h.html#af44e3ea3b8244949bf1fccd8d7768613',1,'legato_widget_arc.h']]],
+  ['setroundedge_690',['setRoundEdge',['../legato__widget__arc_8h.html#a9649970ad886af31e53880c7592a331c',1,'legato_widget_arc.h']]],
+  ['setstartangle_691',['setStartAngle',['../legato__widget__arc_8h.html#a7499f9c30ea70e951ecf04cbecfea490',1,'legato_widget_arc.h']]],
+  ['setthickness_692',['setThickness',['../legato__widget__arc_8h.html#a50985a531195329fe73f8017b9b07d41',1,'legato_widget_arc.h']]],
+  ['size_693',['size',['../structleColorModeInfo.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leColorModeInfo::size()'],['../structleStreamDescriptor.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leStreamDescriptor::size()'],['../structleArray.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leArray::size()'],['../structleList.html#a854352f53b148adc24983a58a1866d66',1,'leList::size()'],['../structleRectArray.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'leRectArray::size()']]],
+  ['sizeinbytes_694',['sizeInBytes',['../legato__tablestring_8h.html#a5699af0b376f9872807c3717b4d99287',1,'legato_tablestring.h']]],
+  ['startangle_695',['startAngle',['../structleArcWidget.html#a9955df53e11cd767651fa1b9c703bf45',1,'leArcWidget']]],
+  ['stride_696',['stride',['../structn2d__buffer.html#a935cbecbc093426caa4fcd247773ae4b',1,'n2d_buffer']]],
+  ['stringtable_697',['stringTable',['../structleState.html#a9b5fb1a36ceceb0f944ebe6b621385bc',1,'leState']]]
 ];

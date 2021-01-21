@@ -33,9 +33,9 @@
 #define LE_RASTERFONT_GLYPH_CACHE_SIZE  256
 #endif
 
-static uint8_t glyphCache[LE_RASTERFONT_GLYPH_CACHE_SIZE];
+static LE_COHERENT_ATTR uint8_t glyphCache[LE_RASTERFONT_GLYPH_CACHE_SIZE];
 
-static struct
+struct FontStream
 {
     leFontStream fontStream;
 
@@ -47,10 +47,14 @@ static struct
     int32_t y;
     leColor clr;
     uint32_t a;
-} rasterStream;
+};
+
+static LE_COHERENT_ATTR struct FontStream rasterStream;
 
 static void streamDataReady(leStream* stream)
 {
+    (void)stream; // unused
+
     leFont_DrawGlyphData((leFont*)rasterStream.font,
                          &rasterStream.info,
                          glyphCache,
@@ -105,13 +109,11 @@ static leResult drawGlyph(const leFontGlyph* glyph,
 
     rasterStream.state = LE_STREAM_WAITING;
 
-    leStream_Read(&rasterStream.fontStream.stream,
-                  (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
-                  rasterStream.info.dataRowWidth * rasterStream.info.height,
-                  glyphCache,
-                  streamDataReady);
-
-    return LE_SUCCESS;
+    return leStream_Read(&rasterStream.fontStream.stream,
+                        (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
+                        rasterStream.info.dataRowWidth * rasterStream.info.height,
+                        glyphCache,
+                        streamDataReady);
 }
 
 static leResult drawGlyph_blocking(const leFontGlyph* glyph,
@@ -146,11 +148,12 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
     rasterStream.a = a;
     rasterStream.fontStream.cb = cb;
 
-    leStream_Read(&rasterStream.fontStream.stream,
-                  (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
-                  rasterStream.info.dataRowWidth * rasterStream.info.height,
-                  glyphCache,
-                  NULL);
+    while(leStream_Read(&rasterStream.fontStream.stream,
+                        (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
+                        rasterStream.info.dataRowWidth * rasterStream.info.height,
+                        glyphCache,
+                        NULL) != LE_SUCCESS)
+    { }
 
     leFont_DrawGlyphData((leFont*)rasterStream.font,
                          &rasterStream.info,
@@ -168,12 +171,12 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
     return LE_SUCCESS;
 }
 
-static leBool isDone()
+static leBool isDone(void)
 {
     return rasterStream.state == LE_STREAM_READY;
 }
 
-static void close()
+static void close(void)
 {
     if(rasterStream.state != LE_STREAM_CLOSED)
     {
@@ -183,7 +186,7 @@ static void close()
     memset(&rasterStream, 0, sizeof(rasterStream));
 }
 
-static leResult open()
+static leResult open(void)
 {
     if(rasterStream.state != LE_STREAM_CLOSED)
         return LE_FAILURE;

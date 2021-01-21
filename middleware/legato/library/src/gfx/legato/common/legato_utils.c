@@ -37,6 +37,7 @@ leWidget* leUtils_PickFromWidget(const leWidget* parent,
 {
     const leWidget* child;
     const leWidget* result;
+    const leWidget* childResult;
     lePoint pnt;
     uint32_t i;
 
@@ -47,165 +48,29 @@ leWidget* leUtils_PickFromWidget(const leWidget* parent,
 
     for(i = 0; i < parent->children.size; i++)
     {
-        child = parent->children.values[i];
+        child = leArray_Get(&parent->children, i);
 
         // widget must be enabled and visible
-        if(child->enabled == LE_TRUE &&
-           child->visible == LE_TRUE &&
+        if(LE_TEST_FLAG(child->flags, LE_WIDGET_ENABLED) == LE_TRUE &&
+           LE_TEST_FLAG(child->flags, LE_WIDGET_VISIBLE) == LE_TRUE &&
            leRectContainsPoint(&child->rect, &pnt) == LE_TRUE)
         {
-            result = leUtils_PickFromWidget(child, x - child->rect.x, y - child->rect.y);
+            childResult = leUtils_PickFromWidget(child, x - child->rect.x, y - child->rect.y);
+
+            if(childResult != NULL && LE_TEST_FLAG(childResult->flags, LE_WIDGET_IGNOREPICK) == LE_FALSE)
+            {
+                result = childResult;
+            }
         }
+    }
+
+    if(result != NULL && LE_TEST_FLAG(result->flags, LE_WIDGET_IGNOREPICK) == LE_TRUE)
+    {
+        result = NULL;
     }
 
     return (leWidget*)result;
 }
-
-leWidget* leUtils_Pick(int32_t x, int32_t y)
-{
-#if 0
-    leContext* context = leContext_GetActive();
-    leScreen* screen = NULL;
-    leLayer* layer = NULL;
-    leWidget* widget = NULL;
-    lePoint pnt;
-    leRect rect;
-    int32_t i;
-
-    if(context == NULL)
-        return NULL;
-
-    pnt.x = x;
-    pnt.y = y;
-
-    // get the active screen
-    screen = context->activeScreen;
-
-    rect = leContext_GetScreenRect();
-
-    // screen must contain point
-    if(leRectContainsPoint(&rect, &pnt) == LE_FALSE)
-        return NULL;
-
-    // find the topmost visible layer that contains the point
-    for(i = LE_MAX_LAYERS - 1; i >= 0; i--)
-    {
-        layer = screen->layers[i];
-
-        // layer must exist and be enabled
-        if(layer == NULL || layer->widget.enabled == LE_FALSE)
-           continue;
-
-        // layer zero has the lowest z order, always favor higher layers
-        if(leRectContainsPoint(&layer->widget.rect, &pnt) == LE_TRUE)
-        {
-            widget = pickChild((leWidget*)layer,
-                                x - layer->widget.rect.x,
-                                y - layer->widget.rect.y);
-                                
-            // no layer qualified
-            if(widget != NULL && widget != (leWidget*)layer)
-                return widget;
-        }
-    }
-#endif
-    // no widget qualified
-    return NULL;
-}
-
-/*static void pickChildRect(leWidget* parent, leRect rect, leList* list)
-{
-    leWidget* child;
-    leRect childRect;
-    uint32_t i;
-
-    for(i = 0; i < parent->children.size; i++)
-    {
-        child = parent->children.values[i];
-        
-        childRect = leWidget_RectToScreenSpace(child);
-        
-        if(leRectIntersects(&rect, &childRect) == LE_TRUE)
-            leList_PushBack(list, child);
-            
-        pickChildRect(child, rect, list);
-    }
-}*/
-
-/*void leUtils_PickRect(leLayer* layer, leRect rect, leList* list)
-{
-    leWidget* child;
-    leRect childRect;
-    uint32_t i;
-
-    if(layer == NULL ||
-       layer->widget.enabled == LE_FALSE ||
-       list == NULL)
-        return;
-        
-    leList_Clear(list);
-
-    // layer must contain rect
-    if(leRectIntersects(&layer->widget.rect, &rect) == LE_FALSE)
-        return;
-        
-    //leRectClip(&rect, &layer->widget.rect, &clippedRect);
-
-    for(i = 0; i < layer->widget.children.size; i++)
-    {
-        child = layer->widget.children.values[i];
-        
-        childRect = leWidget_RectToScreenSpace(child);
-        
-        if(leRectIntersects(&rect, &childRect) == LE_TRUE)
-            leList_PushBack(list, child);
-            
-        pickChildRect(child, rect, list);
-    }
-}*/
-
-#if 0
-leLayer* leUtils_GetLayer(leWidget* widget)
-{
-    leWidget* parent;
-    
-    if(widget == NULL)
-        return NULL;
-   
-    if(widget->type == LE_WIDGET_LAYER)
-        return (leLayer*)widget;
-        
-    parent = widget->parent;
-    
-    while(parent != NULL)
-    {
-        if(parent->parent == NULL)
-            break;
-            
-        parent = parent->parent;
-    }
-    
-    if(parent == NULL || parent->type != LE_WIDGET_LAYER)
-        return NULL;
-    
-    return (leLayer*)parent;
-}
-
-void leUtils_PointToLayerSpace(leWidget* widget, lePoint* pnt)
-{
-    if(widget == NULL || pnt == NULL)
-        return;
-        
-    while(widget != NULL &&
-          widget->type != LE_WIDGET_LAYER)
-    {
-        pnt->x += widget->rect.x;
-        pnt->y += widget->rect.y;
-        
-        widget = widget->parent;
-    }
-}
-#endif
 
 void leUtils_PointToScreenSpace(const leWidget* widget,
                                 lePoint* pnt)

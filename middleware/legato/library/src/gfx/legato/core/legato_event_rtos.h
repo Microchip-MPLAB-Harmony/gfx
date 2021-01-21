@@ -21,7 +21,6 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
 
 /*******************************************************************************
  Module for Microchip Graphics Library - Aria User Interface Library
@@ -39,6 +38,14 @@
 
 *******************************************************************************/
 
+/** \file legato_event_rtos.h
+ * @brief Legato RTOS event definitions.
+ *
+ * @details Defines events and APIs that can be safely used for
+ * communicating with the UI library in an RTOS environment. All RTOS
+ * tasks should use these APIs for thread-safe operation.
+ */
+
 
 #ifndef LIBARIA_EVENT_RTOS_H
 #define LIBARIA_EVENT_RTOS_H
@@ -50,8 +57,9 @@
     extern "C" {
 #endif
 
-// DOM-IGNORE-BEGIN
-
+/* internal use only */
+/**
+  * @cond INTERNAL
 typedef enum
 {
     LA_EXT_EVENT_NONE,
@@ -72,8 +80,9 @@ laResult laEvent_AddEvent_RTOS(laEvent* evt);
 laResult laEvent_SendEvent_Ext_RTOS(laEvent* evt);
 laResult laEvent_ProcessEvents_RTOS();
 
-// DOM-IGNORE-END
-
+* @endcond
+*
+*/
 #ifdef __cplusplus
     }
 #endif

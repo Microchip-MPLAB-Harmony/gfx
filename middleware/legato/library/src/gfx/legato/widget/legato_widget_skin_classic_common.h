@@ -38,6 +38,12 @@
   Description:
 *******************************************************************************/
 
+/** \file legato_widget_skin_classic_common.h
+* @brief Common functions for the classic widget skin.
+*
+* @details Common functions for the classic widget skin.
+*/
+
 // DOM-IGNORE-BEGIN
 
 #ifndef LEGATO_WIDGET_SKIN_CLASSIC_COMMON_H
@@ -119,10 +125,6 @@ void leWidget_SkinClassic_Draw1x2BeveledBorder(const leRect* rect,
                                               leColor bottomRightOuter,
                                               leColor bototmRightInner,
                                               uint32_t a);
-
-void leWidget_SkinClassic_DrawBlit(leWidget* wgt,
-                                   lePixelBuffer* buffer,
-                                   uint32_t a);
 
 void leWidget_SkinClassic_DrawStandardLineBorder(leWidget* wgt,
                                                  uint32_t a);

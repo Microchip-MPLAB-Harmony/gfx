@@ -36,7 +36,7 @@
 
 static char errorMsg[LE_ERRORMSG_SIZE];
 
-LIB_EXPORT const char* leGetErrorMessage()
+const char* leGetErrorMessage()
 {
     return errorMsg;
 }
@@ -62,11 +62,11 @@ void leSetErrorMessage(const char* msg)
         strcpy(errorMsg, msg);
     }
 
-#ifdef WIN32
+//#ifdef WIN32
     printf("%s\n", errorMsg);
-#endif
+//#endif
 
-    exit(0);
+    while(1){ }
 }
 
 void leSprintfErrorMessage(const char* fmt, ...)
@@ -78,16 +78,19 @@ void leSprintfErrorMessage(const char* fmt, ...)
 
     va_end(args);
 
-#ifdef WIN32
+//#ifdef WIN32
     printf("%s\n", errorMsg);
-#endif
+//#endif
 
-    exit(0);
+    while(1){ }
 }
 
 void leAssert()
 {
-    exit(0);
+    printf("%s\n", errorMsg);
+
+    while(1){ }
+    //exit(0);
 }
 
 #endif

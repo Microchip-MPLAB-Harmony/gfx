@@ -99,6 +99,10 @@
 #define DRV_GFX_LCC_DMA_CHANNEL_INDEX XDMAC_CHANNEL_${DMAChannel}
 #define DRV_GFX_DMA_EVENT_TYPE XDMAC_TRANSFER_EVENT
 </#if>
+<#if (BlitMode??) && (BlitMode == "DMA")>
+#define DRV_GFX_LCC_BLIT_DMA_CHANNEL_INDEX DMAC_CHANNEL_${DMABlitChannel}
+#define DRV_GFX_DMA_EVENT_TYPE DMAC_TRANSFER_EVENT
+</#if>
 
 <#if (Val_PaletteMode??) && (Val_PaletteMode == true)>
 #define FRAMEBUFFER_COLOR_MODE GFX_COLOR_MODE_GS_8
@@ -113,8 +117,6 @@
 #define FRAMEBUFFER_ATTRIBUTE __attribute__((coherent, aligned(FRAMEBUFFER_PIXEL_BYTES*8)))
 
 FRAMEBUFFER_TYPE FRAMEBUFFER_ATTRIBUTE frameBuffer[BUFFER_COUNT][DISPLAY_WIDTH * DISPLAY_HEIGHT];
-
-gfxPixelBuffer pixelBuffer;
 
 #ifndef GFX_DISP_INTF_PIN_RESET_Set
 #error "GFX_DISP_INTF_PIN_RESET GPIO must be defined in the Pin Settings"
@@ -145,10 +147,24 @@ enum
     RUN
 };
 
-static int DRV_GFX_LCC_Start();
-static void DRV_GFX_LCC_DisplayRefresh(void);
+<#if (BlitMode??) && (BlitMode == "DMA")>
+enum
+{
+  BLIT_DMA_START,
+  BLIT_DMA_ACTIVE,
+  BLIT_DMA_IDLE,
+};
+</#if>
+
+static int start(void);
+static void displayRefresh(void);
+static gfxResult lccBacklightBrightnessSet(uint32_t brightness);
 void dmaIntHandler (DRV_GFX_DMA_EVENT_TYPE status,
                     uintptr_t contextHandle);
+<#if (BlitMode??) && (BlitMode == "DMA")>
+void blitDMAIntHandler (DRV_GFX_DMA_EVENT_TYPE status,
+                    uintptr_t contextHandle);
+</#if>
 
 uint16_t HBackPorch;
 uint32_t VER_BLANK;
@@ -177,108 +193,15 @@ unsigned int vsyncCount = 0;
 
 static uint32_t state;
 
-gfxColorMode DRV_LCC_GetColorMode()
-{
-    return FRAMEBUFFER_COLOR_MODE;
-}
+gfxPixelBuffer pixelBuffer;
 
-uint32_t DRV_LCC_GetBufferCount()
-{
-    return 1;    
-}
+<#if (BlitMode??) && (BlitMode == "DMA")>
+static volatile int blitDMAState = BLIT_DMA_IDLE;
+static volatile int blitDMARow = 0;
+static int blitX, blitY;
+gfxPixelBuffer * blitDMAPixelBuff;
+</#if>
 
-uint32_t DRV_LCC_GetDisplayWidth()
-{
-    return DISP_HOR_RESOLUTION;
-}
-
-uint32_t DRV_LCC_GetDisplayHeight()
-{
-    return DISP_VER_RESOLUTION;
-}
-
-void DRV_LCC_Update()
-{
-    if(state == INIT)
-    {
-        if(DRV_GFX_LCC_Start() != 0)
-            return;
-        
-        memset(frameBuffer, 0x55, DISPLAY_WIDTH * DISPLAY_HEIGHT * 2);
-        
-        state = RUN;
-    }
-}
-
-uint32_t DRV_LCC_GetLayerCount()
-{
-	return 1;
-}
-
-uint32_t DRV_LCC_GetActiveLayer()
-{
-	return 0;
-}
-
-gfxResult DRV_LCC_SetActiveLayer(uint32_t idx)
-{
-        return GFX_SUCCESS;
-}
-
-void DRV_LCC_Swap(void)
-{
-    
-}
-
-uint32_t DRV_LCC_GetVSYNCCount(void)
-{
-	return vsyncCount;
-}
-
-gfxPixelBuffer * DRV_LCC_GetFrameBuffer(int32_t idx)
-{
-        return &pixelBuffer;
-}
-
-gfxResult DRV_LCC_BlitBuffer(int32_t x,
-                             int32_t y,
-                             gfxPixelBuffer* buf,
-                             gfxBlend gfx)
-{
-    void* srcPtr;
-    void* destPtr;
-    uint32_t row, rowSize;
-
-    if (state != RUN)
-        return GFX_FAILURE;
-    
-    rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
-    
-    for(row = 0; row < buf->size.height; row++)
-    {
-        srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
-        destPtr = gfxPixelBufferOffsetGet(&pixelBuffer, x, y + row);
-        
-        memcpy(destPtr, srcPtr, rowSize);
-    }
-    
-    return GFX_SUCCESS;
-}
-
-static gfxResult lccBacklightBrightnessSet(uint32_t brightness)
-{
-    if (brightness == 0)
-    {
-        GFX_DISP_INTF_PIN_BACKLIGHT_Clear();
-    }
-    else
-    {
-        GFX_DISP_INTF_PIN_BACKLIGHT_Set();
-    }
-
-    return GFX_SUCCESS;
-
-}
 
 gfxResult DRV_LCC_Initialize(void)
 {
@@ -309,57 +232,215 @@ gfxResult DRV_LCC_Initialize(void)
     return GFX_SUCCESS;
 }
 
+void DRV_LCC_Update(void)
+{
+    if(state == INIT)
+    {
+        if(start() != 0)
+            return;
+        
+        memset(frameBuffer, 0x55, DISPLAY_WIDTH * DISPLAY_HEIGHT * 2);
+        
+        state = RUN;
+    }
+}
+
+<#if (BlitMode??) && (BlitMode == "DMA")>
+void DRV_LCC_StartBlitDMA(void)
+{
+    void* srcPtr;
+    void* destPtr;
+    
+    srcPtr = gfxPixelBufferOffsetGet(blitDMAPixelBuff, 0, 0);
+    destPtr = gfxPixelBufferOffsetGet(&pixelBuffer, blitX, blitY);
+    
+    blitDMAState = BLIT_DMA_ACTIVE;
+    blitDMARow = 1;
+    
+    DMAC_ChannelTransfer(DRV_GFX_LCC_BLIT_DMA_CHANNEL_INDEX,
+                         srcPtr,
+                         blitDMAPixelBuff->size.width * 2,
+                         destPtr,
+                         blitDMAPixelBuff->size.width * 2,
+                         blitDMAPixelBuff->size.width * 2);
+    
+}
+</#if>
+
+gfxResult DRV_LCC_BlitBuffer(int32_t x,
+                             int32_t y,
+                             gfxPixelBuffer* buf)
+{
+    if (state != RUN)
+        return GFX_FAILURE;
+<#if (BlitMode??) && (BlitMode == "DMA")>
+    else if (blitDMAState == BLIT_DMA_IDLE)
+    {
+        blitX = x;
+        blitY = y;
+        blitDMAPixelBuff = buf;
+        
+        gfxPixelBuffer_SetLocked(blitDMAPixelBuff, LE_TRUE);
+        
+        blitDMAState = BLIT_DMA_START;
+     
+        DRV_LCC_StartBlitDMA();
+        
+        return GFX_SUCCESS;
+    }
+<#else>
+    else
+    {
+        void* srcPtr;
+        void* destPtr;
+        uint32_t row, rowSize;
+    
+        rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
+        
+        for(row = 0; row < buf->size.height; row++)
+        {
+            srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
+            destPtr = gfxPixelBufferOffsetGet(&pixelBuffer, x, y + row);
+            
+            memcpy(destPtr, srcPtr, rowSize);
+        }
+
+        return GFX_SUCCESS;
+    }
+</#if>
+
+    return GFX_FAILURE;
+}
+
+gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest request,
+                                     void* arg)
+{
+	gfxIOCTLArg_Value* val;
+	gfxIOCTLArg_DisplaySize* disp;
+	gfxIOCTLArg_LayerRect* rect;
+	
+	switch(request)
+	{
+		case GFX_IOCTL_GET_COLOR_MODE:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_colormode = FRAMEBUFFER_COLOR_MODE;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_BUFFER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_DISPLAY_SIZE:
+		{
+			disp = (gfxIOCTLArg_DisplaySize*)arg;			
+			
+			disp->width = DISP_HOR_RESOLUTION;
+			disp->height = DISP_VER_RESOLUTION;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 1;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_ACTIVE_LAYER:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = 0;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_LAYER_RECT:
+		{
+			rect = (gfxIOCTLArg_LayerRect*)arg;
+			
+			rect->base.id = 0;
+			rect->x = 0;
+			rect->y = 0;
+			rect->width = DISPLAY_WIDTH;
+			rect->height = DISPLAY_HEIGHT;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_VSYNC_COUNT:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_uint = vsyncCount;
+			
+			return GFX_IOCTL_OK;
+		}
+		case GFX_IOCTL_GET_FRAMEBUFFER:
+		{
+			val = (gfxIOCTLArg_Value*)arg;
+			
+			val->value.v_pbuffer = &pixelBuffer;
+			
+			return GFX_IOCTL_OK;
+		}
+		default:
+		{ }
+	}
+	
+	return GFX_IOCTL_UNSUPPORTED;
+}
+
+static gfxResult lccBacklightBrightnessSet(uint32_t brightness)
+{
+    if (brightness == 0)
+    {
+        GFX_DISP_INTF_PIN_BACKLIGHT_Clear();
+    }
+    else
+    {
+        GFX_DISP_INTF_PIN_BACKLIGHT_Set();
+    }
+
+    return GFX_SUCCESS;
+
+}
+
+
 /**** End Hardware Abstraction Interfaces ****/
 
 static void lccDMAStartTransfer(const void *srcAddr, size_t srcSize,
                                        const void *destAddr)
 {
-<#if DMAController?? && DMAController == "DMAC">
     DMAC_ChannelTransfer(DRV_GFX_LCC_DMA_CHANNEL_INDEX,
                          srcAddr,
                          srcSize,
                          destAddr,
                          FRAMEBUFFER_PIXEL_BYTES,
                          srcSize);
-<#else>
-    XDMAC_ChannelBlockLengthSet(DRV_GFX_LCC_DMA_CHANNEL_INDEX, (srcSize >> 1) - 1);
-
-<#if UseCachedFrameBuffer == true>
-    SCB_CleanInvalidateDCache_by_Addr(
-                    (uint32_t *)((uint32_t ) srcAddr & ~0x1F),
-                    srcSize + 32);
-</#if>
-
-    XDMAC_ChannelTransfer(DRV_GFX_LCC_DMA_CHANNEL_INDEX, srcAddr, destAddr, 1);
-</#if>
 }
 
-static int DRV_GFX_LCC_Start()
+static int start(void)
 {
-<#if DMAController?? && DMAController == "DMAC">
-    DMAC_ChannelCallbackRegister(DMAC_CHANNEL_0, dmaIntHandler, 0);
+    DMAC_ChannelCallbackRegister(DRV_GFX_LCC_DMA_CHANNEL_INDEX, dmaIntHandler, 0);
+<#if (BlitMode??) && (BlitMode == "DMA")>
+    DMAC_ChannelCallbackRegister(DRV_GFX_LCC_BLIT_DMA_CHANNEL_INDEX, blitDMAIntHandler, 0);
+</#if>
     
     lccDMAStartTransfer(frameBuffer, 
                         FRAMEBUFFER_PIXEL_BYTES, 
                         (const void*) EBI_BASE_ADDR);
-<#else>
-    XDMAC_ChannelCallbackRegister(DRV_GFX_LCC_DMA_CHANNEL_INDEX, dmaIntHandler, 0);
-
-<#if Val_PaletteMode == true>
-    lccDMAStartTransfer(frameLine,
-                        2,
-                        (const void *) EBI_BASE_ADDR);
-<#else>    
-    lccDMAStartTransfer(frameBuffer, 
-                        FRAMEBUFFER_PIXEL_BYTES,
-                        (const void *) EBI_BASE_ADDR);
-</#if>
-</#if>
 
     return 0;
 }
 
-static void DRV_GFX_LCC_DisplayRefresh(void)
+static void displayRefresh(void)
 {
     gfxPoint drawPoint;
 <#if (Val_PaletteMode??) && (Val_PaletteMode == true)>
@@ -404,12 +485,6 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
 
                 vsyncPulseUp = hSyncs + DISP_VER_PULSE_WIDTH;
                 vsyncState = VSYNC_PULSE;
-
-                /*if(cntxt->layer.active->vsync == GFX_TRUE
-                    && cntxt->layer.active->swap == GFX_TRUE)
-                {
-                    GFX_LayerSwap(cntxt->layer.active);
-                }*/
 
                 line = 0;
             }
@@ -551,5 +626,36 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
 void dmaIntHandler (DRV_GFX_DMA_EVENT_TYPE status,
                     uintptr_t contextHandle)
 {
-    DRV_GFX_LCC_DisplayRefresh();
+    displayRefresh();
 }
+
+<#if (BlitMode??) && (BlitMode == "DMA")>
+void blitDMAIntHandler (DRV_GFX_DMA_EVENT_TYPE status,
+                    uintptr_t contextHandle)
+{
+    void* srcPtr;
+    void* destPtr;
+    
+    if (blitDMARow < blitDMAPixelBuff->size.height)
+    {
+        srcPtr = gfxPixelBufferOffsetGet(blitDMAPixelBuff, 0, blitDMARow);
+        destPtr = gfxPixelBufferOffsetGet(&pixelBuffer, blitX, blitY + blitDMARow);
+        
+        DMAC_ChannelTransfer(DRV_GFX_LCC_BLIT_DMA_CHANNEL_INDEX,
+                         srcPtr,
+                         blitDMAPixelBuff->size.width * 2,
+                         destPtr,
+                         blitDMAPixelBuff->size.width * 2,
+                         blitDMAPixelBuff->size.width * 2);
+
+        blitDMARow++;
+    }
+    else
+    {
+        gfxPixelBuffer_SetLocked(blitDMAPixelBuff, LE_FALSE);
+
+        blitDMAState = BLIT_DMA_IDLE;
+    }
+}
+</#if>
+

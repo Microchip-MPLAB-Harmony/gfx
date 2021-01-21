@@ -235,6 +235,14 @@ gfxResult DRV_GFX2D_SetBlend(
     return GFX_SUCCESS;
 }
 
+gfxResult DRV_GFX2D_SetGlobalAlpha(const gfxAlpha srcGlobalAlpha,
+                                   const gfxAlpha dstGlobalAlpha,
+                                   uint32_t srcGlobalAlphaValue,
+                                   uint32_t dstGlobalAlphaValue)
+{
+    return GFX_SUCCESS;
+}
+
 gfxResult DRV_GFX2D_SetPalette(
                         uint32_t index_count,
                         gfxBuffer color_table,

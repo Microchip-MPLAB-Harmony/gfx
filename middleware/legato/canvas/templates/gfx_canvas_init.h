@@ -42,6 +42,12 @@
     None
 *******************************************************************************/
 
+/** \file gfx_canvas_init.h
+* @brief  GFX Canvas Virtual Display definitions and functions.
+*
+* @details The GFX Canvas provides a virtual display driver interface.
+*/
+
 #ifndef _GFX_CANVAS_INIT_H    /* Guard against multiple inclusion */
 #define _GFX_CANVAS_INIT_H
 

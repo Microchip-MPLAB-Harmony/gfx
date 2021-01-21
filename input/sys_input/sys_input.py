@@ -56,6 +56,21 @@ def instantiateComponent(component):
 	RTOSTaskDelay.setDefaultValue(10)
 	RTOSTaskDelay.setMin(0)
 
+	enableDemoMode = component.createBooleanSymbol("enableDemoMode", None)
+	enableDemoMode.setLabel("Enable Demo mode?")
+	enableDemoMode.setDescription("Indicates that Input Service should generate the code needed to run Legato in 'demo mode'.")
+	enableDemoMode.setDependencies(onDemoModeEnable, ["enableDemoMode"])
+
+	demoModeIdleTimeout = component.createIntegerSymbol("demoModeIdleTimeout", enableDemoMode)
+	demoModeIdleTimeout.setLabel("Idle Timeout (seconds)")
+	demoModeIdleTimeout.setDefaultValue(20)
+	demoModeIdleTimeout.setVisible(False)
+
+	demoModeReplayDelay = component.createIntegerSymbol("demoModeReplayDelay", enableDemoMode)
+	demoModeReplayDelay.setLabel("Replay Delay (seconds)")
+	demoModeReplayDelay.setDefaultValue(5)
+	demoModeReplayDelay.setVisible(False)
+
 	projectPath = "config/" + Variables.get("__CONFIGURATION_NAME") + "/system/input"
 	
 	SYS_INPUT_H = component.createFileSymbol("SYS_INPUT_H", None)
@@ -114,6 +129,23 @@ def instantiateComponent(component):
 	SYS_INPUT_LISTENER_C.setOutputName("sys_input_listener.c")
 	SYS_INPUT_LISTENER_C.setProjectPath(projectPath)
 	SYS_INPUT_LISTENER_C.setType("SOURCE")
+
+	INPUT_SYS_DEMO_MODE_H = component.createFileSymbol("INPUT_SYS_DEMO_MODE_H", None)
+	INPUT_SYS_DEMO_MODE_H.setSourcePath("templates/sys_input_demo_mode.h.ftl")
+	INPUT_SYS_DEMO_MODE_H.setDestPath("system/input/")
+	INPUT_SYS_DEMO_MODE_H.setOutputName("sys_input_demo_mode.h")
+	INPUT_SYS_DEMO_MODE_H.setProjectPath(projectPath)
+	INPUT_SYS_DEMO_MODE_H.setType("HEADER")
+	INPUT_SYS_DEMO_MODE_H.setMarkup(True)
+	INPUT_SYS_DEMO_MODE_H.setEnabled(False)
+
+	INPUT_SYS_DEMO_MODE_C = component.createFileSymbol("INPUT_SYS_DEMO_MODE_C", None)
+	INPUT_SYS_DEMO_MODE_C.setSourcePath("src/sys_input_demo_mode.c")
+	INPUT_SYS_DEMO_MODE_C.setDestPath("system/input/")
+	INPUT_SYS_DEMO_MODE_C.setOutputName("sys_input_demo_mode.c")
+	INPUT_SYS_DEMO_MODE_C.setProjectPath(projectPath)
+	INPUT_SYS_DEMO_MODE_C.setType("SOURCE")
+	INPUT_SYS_DEMO_MODE_C.setEnabled(False)
 	
 	INPUT_SYS_DEFINITIONS_H = component.createFileSymbol("INPUT_SYS_DEFINITIONS_H", None)
 	INPUT_SYS_DEFINITIONS_H.setType("STRING")
@@ -158,3 +190,9 @@ def showInputRTOSMenu(symbol, event):
 		symbol.setVisible(True)
 	else:
 		symbol.setVisible(False)
+		
+def onDemoModeEnable(enableDemoMode, event):
+	enableDemoMode.getComponent().getSymbolByID("demoModeIdleTimeout").setVisible(event["value"])
+	enableDemoMode.getComponent().getSymbolByID("demoModeReplayDelay").setVisible(event["value"])
+	event["source"].getSymbolByID("INPUT_SYS_DEMO_MODE_H").setEnabled(event["value"])
+	event["source"].getSymbolByID("INPUT_SYS_DEMO_MODE_C").setEnabled(event["value"])

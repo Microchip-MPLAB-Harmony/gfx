@@ -434,7 +434,7 @@ uint32_t _leFixedString_ToChar(const leFixedString* _this,
 #if LE_DYNAMIC_VTABLES == 1
 void _leString_FillVTable(leStringVTable* vt);
 
-void _leFixedString_GenerateVTable()
+void _leFixedString_GenerateVTable(void)
 {
     _leString_FillVTable((void*)&fixedStringVTable);
     
@@ -478,7 +478,6 @@ static const leFixedStringVTable fixedStringVTable =
     .getLineRect = (void*)_leString_GetLineRect,
     .getLineIndices = (void*)_leString_GetLineIndices,
     .getCharRect = (void*)_leString_GetCharRect,
-    .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     .getCharIndexAtPoint = (void*)_leString_GetCharIndexAtPoint,
     ._draw = (void*)_leString_Draw,
     .preinvalidate = (void*)_leString_PreInvalidate,

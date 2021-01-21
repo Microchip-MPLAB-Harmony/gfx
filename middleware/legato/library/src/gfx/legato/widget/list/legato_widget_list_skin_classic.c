@@ -54,7 +54,7 @@ static struct
 
     int32_t y;
 
-    uint32_t nextItem;
+    int32_t nextItem;
 
     uint32_t alpha;
 } paintState;
@@ -88,19 +88,19 @@ void _leListWidget_GetListRect(const leListWidget* lst,
     
     //if(lst->widget
     
-    if(lst->widget.borderType == LE_WIDGET_BORDER_NONE)
+    if(lst->widget.style.borderType == LE_WIDGET_BORDER_NONE)
     {
-        if(lst->scrollbar->widget.visible == LE_TRUE)
+        if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
         {
             rect->width -= lst->scrollbar->widget.rect.width;
         }
     }
-    else if(lst->widget.borderType == LE_WIDGET_BORDER_LINE)
+    else if(lst->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         rect->x += 1;
         rect->width -= 1;
         
-        if(lst->scrollbar->widget.visible == LE_TRUE)
+        if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
         {
             rect->width -= lst->scrollbar->widget.rect.width;
         }
@@ -112,12 +112,12 @@ void _leListWidget_GetListRect(const leListWidget* lst,
         rect->y += 1;
         rect->height -= 2;
     }
-    else if(lst->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(lst->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         rect->x += 2;
         rect->width -= 2;
         
-        if(lst->scrollbar->widget.visible == LE_TRUE)
+        if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
         {
             rect->width -= lst->scrollbar->widget.rect.width;
         }
@@ -152,7 +152,7 @@ void _leListWidget_GetRowRect(const leListWidget* lst,
     rect->x = 0;
     rect->width = lst->widget.rect.width;
     
-    if(lst->scrollbar->widget.visible == LE_TRUE)
+    if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
     {
         rect->width -= lst->scrollbar->widget.rect.width;
     }
@@ -190,7 +190,7 @@ void _leListWidget_GetTextRect(const leListWidget* lst,
     rowRect.x = 0;
     rowRect.width = lst->widget.rect.width;
     
-    if(lst->scrollbar->widget.visible == LE_TRUE)
+    if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
     {
         rowRect.width -= lst->scrollbar->widget.rect.width;
     }
@@ -210,7 +210,7 @@ void _leListWidget_GetTextRect(const leListWidget* lst,
     leUtils_ArrangeRectangleRelative(textRect,
                                      imageRect,
                                      rowRect,
-                                     lst->widget.halign,
+                                     lst->widget.style.halign,
                                      LE_VALIGN_MIDDLE,
                                      lst->iconPos,
                                      lst->widget.margin.left,
@@ -253,7 +253,7 @@ void _leListWidget_GetIconRect(const leListWidget* lst,
     rowRect.x = 0;
     rowRect.width = lst->widget.rect.width;
     
-    if(lst->scrollbar->widget.visible == LE_TRUE)
+    if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
     {
         rowRect.width -= lst->scrollbar->widget.rect.width;
     }
@@ -275,7 +275,7 @@ void _leListWidget_GetIconRect(const leListWidget* lst,
     leUtils_ArrangeRectangle(iconRect,
                              textRect,
                              rowRect,
-                             lst->widget.halign,
+                             lst->widget.style.halign,
                              LE_VALIGN_MIDDLE,
                              lst->iconPos,
                              lst->widget.margin.left,
@@ -284,7 +284,7 @@ void _leListWidget_GetIconRect(const leListWidget* lst,
                              lst->widget.margin.bottom,
                              lst->iconMargin);
                              
-    *iconRect = leRectClipAdj(iconRect, &rowRect, imgSrcRect); 
+    leRectClipAdj(iconRect, &rowRect, imgSrcRect, iconRect);
     
     leUtils_RectToScreenSpace((leWidget*)lst, iconRect);
     
@@ -310,7 +310,7 @@ void _leListWidget_RecalculateRowRect(leListWidget* lst,
     item->rowRect.x = 0;
     item->rowRect.width = lst->widget.rect.width;
 
-    if(lst->scrollbar->widget.visible == LE_TRUE)
+    if(LE_TEST_FLAG(lst->scrollbar->widget.flags, LE_WIDGET_VISIBLE) == LE_TRUE)
     {
         item->rowRect.width -= lst->scrollbar->widget.rect.width;
     }
@@ -358,7 +358,7 @@ static void drawBorder(leListWidget* lst);
 
 static void nextState(leListWidget* lst)
 {
-    switch(lst->widget.drawState)
+    switch(lst->widget.status.drawState)
     {
         case NOT_STARTED:
         {
@@ -371,7 +371,7 @@ static void nextState(leListWidget* lst)
             }
 #endif
 
-            lst->widget.drawState = DRAW_BACKGROUND;
+            lst->widget.status.drawState = DRAW_BACKGROUND;
             lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
 
             return;
@@ -383,12 +383,13 @@ static void nextState(leListWidget* lst)
                 paintState.nextItem = 0;
                 paintState.y = 0;
                 
-                lst->widget.drawState = DRAW_STRING;
+                lst->widget.status.drawState = DRAW_STRING;
                 lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
             
                 return;
             }
         }
+        // fall through
         case DRAW_STRING:
         {            
             if(lst->items.size > 0)
@@ -396,25 +397,27 @@ static void nextState(leListWidget* lst)
                 paintState.nextItem = 0;
                 paintState.y = 0;
                 
-                lst->widget.drawState = DRAW_ICON;
+                lst->widget.status.drawState = DRAW_ICON;
                 lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawIcon;
             
                 return;
             }
         }
+        // fall through
         case DRAW_ICON:
         {
-            if(lst->widget.borderType != LE_WIDGET_BORDER_NONE)
+            if(lst->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {
                 lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
-                lst->widget.drawState = DRAW_BORDER;
+                lst->widget.status.drawState = DRAW_BORDER;
                 
                 return;
             }
         }
+        // fall through
         case DRAW_BORDER:
         {
-            lst->widget.drawState = DONE;
+            lst->widget.status.drawState = DONE;
             lst->widget.drawFunc = NULL;
         }
     }
@@ -422,25 +425,25 @@ static void nextState(leListWidget* lst)
 
 static void drawBackground(leListWidget* lst)
 {
-    uint32_t i;
+    int32_t i;
     leRect widgetRect, rowRect;
     leColor clr;
     leListItem* item;
     
     // draw widget background
-    if(lst->widget.backgroundType == LE_WIDGET_BACKGROUND_FILL)
+    if(lst->widget.style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
     {
         leWidget_SkinClassic_DrawBackground((leWidget*)lst,
-                                            lst->widget.scheme->background,
+                                            leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_BACKGROUND),
                                             paintState.alpha);
     }
     
-    widgetRect = lst->fn->rectToScreen(lst);
+    lst->fn->rectToScreen(lst, &widgetRect);
 
     // draw item highlights
     if(lst->items.size > 0)
     {
-        for(i = 0; i < lst->items.size; i++)
+        for(i = 0; i < (int32_t)lst->items.size; i++)
         {
             item = lst->items.values[i];
             
@@ -450,11 +453,11 @@ static void drawBackground(leListWidget* lst)
             {        
                 if(i == lst->itemDown && item->enabled == LE_TRUE)
                 {
-                    clr = lst->widget.scheme->backgroundInactive;
+                    clr = leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_BACKGROUND_INACTIVE);
                 }
                 else if(item->selected == LE_TRUE)
                 {
-                    clr = lst->widget.scheme->textHighlight;
+                    clr = leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_TEXT_HIGHLIGHT);
                 }
                 else
                 {
@@ -479,7 +482,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 
     paintState.nextItem++;
 
-    lst->widget.drawState = DRAW_STRING;
+    lst->widget.status.drawState = DRAW_STRING;
     lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
 }
 #endif
@@ -489,7 +492,7 @@ static void drawString(leListWidget* lst)
     leRect textRect, drawRect;
     leColor clr;
     
-    if(paintState.nextItem == lst->items.size)
+    if(paintState.nextItem == (int32_t)lst->items.size)
     {
         nextState(lst);
 
@@ -512,16 +515,16 @@ static void drawString(leListWidget* lst)
         {
             if(paintState.item->enabled == LE_TRUE)
             {
-                clr = lst->widget.scheme->text;
+                clr = leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_TEXT);
             }
             else
             {
-                clr = lst->widget.scheme->textDisabled;
+                clr = leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_TEXT_DISABLED);
             }
         }
         else
         {
-            clr = lst->widget.scheme->textHighlightText;
+            clr = leScheme_GetRenderColor(lst->widget.scheme, LE_SCHM_TEXT_HIGHLIGHTTEXT);
         }
 
         paintState.item->string->fn->_draw(paintState.item->string,
@@ -537,7 +540,7 @@ static void drawString(leListWidget* lst)
             leGetActiveStream()->onDone = onStringStreamFinished;
             leGetActiveStream()->userData = lst;
 
-            lst->widget.drawState = WAIT_STRING;
+            lst->widget.status.drawState = WAIT_STRING;
 
             return;
         }
@@ -552,7 +555,7 @@ static void onImageStreamFinished(leStreamManager* strm)
 {
     leListWidget* lst = (leListWidget*)strm->userData;
 
-    lst->widget.drawState = DRAW_ICON;
+    lst->widget.status.drawState = DRAW_ICON;
 
     nextState(lst);
 }
@@ -562,7 +565,7 @@ static void drawIcon(leListWidget* lst)
 {
     leRect imgRect, imgSrcRect;
     
-    if(paintState.nextItem == lst->items.size)
+    if(paintState.nextItem == (int32_t)lst->items.size)
     {
         nextState(lst);
 
@@ -576,7 +579,7 @@ static void drawIcon(leListWidget* lst)
     {
         paintState.nextItem++;
         
-        if(paintState.nextItem == lst->items.size)
+        if(paintState.nextItem == (int32_t)lst->items.size)
         {
             nextState(lst);
         }
@@ -598,7 +601,7 @@ static void drawIcon(leListWidget* lst)
         leGetActiveStream()->onDone = onImageStreamFinished;
         leGetActiveStream()->userData = lst;
 
-        lst->widget.drawState = WAIT_ICON;
+        lst->widget.status.drawState = WAIT_ICON;
 
         return;
     }
@@ -611,14 +614,14 @@ static void drawBorder(leListWidget* lst)
 {
     // kind of a hack to make sure the border types stay in sync
     // without having to create an event to override
-    lst->scrollbar->fn->setBackgroundType(lst->scrollbar, lst->widget.borderType);
+    lst->scrollbar->fn->setBackgroundType(lst->scrollbar, lst->widget.style.borderType);
    
-    if(lst->widget.borderType == LE_WIDGET_BORDER_LINE)
+    if(lst->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
         leWidget_SkinClassic_DrawStandardLineBorder((leWidget*)lst,
                                                     paintState.alpha);
     }
-    else if(lst->widget.borderType == LE_WIDGET_BORDER_BEVEL)
+    else if(lst->widget.style.borderType == LE_WIDGET_BORDER_BEVEL)
     {
         leWidget_SkinClassic_DrawStandardLoweredBorder((leWidget*)lst,
                                                        paintState.alpha);
@@ -629,19 +632,12 @@ static void drawBorder(leListWidget* lst)
 
 void _leListWidget_Paint(leListWidget* lst)
 {
-    if(lst->widget.scheme == NULL)
-    {
-        lst->widget.drawState = DONE;
-        
-        return;
-    }
-    
-    if(lst->widget.drawState == NOT_STARTED)
+    if(lst->widget.status.drawState == NOT_STARTED)
     {
         nextState(lst);
     }
     
-    while(lst->widget.drawState != DONE)
+    while(lst->widget.status.drawState != DONE)
     {
         lst->widget.drawFunc((leWidget*)lst);
         
@@ -650,8 +646,8 @@ void _leListWidget_Paint(leListWidget* lst)
 #endif
    
 #if LE_STREAMING_ENABLED == 1
-        if(lst->widget.drawState == WAIT_STRING ||
-           lst->widget.drawState == WAIT_ICON)
+        if(lst->widget.status.drawState == WAIT_STRING ||
+           lst->widget.status.drawState == WAIT_ICON)
             break;
 #endif
     }

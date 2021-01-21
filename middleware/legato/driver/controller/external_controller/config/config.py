@@ -116,7 +116,7 @@ InitCommandsCount.setDescription("<html> The number of initialization commands t
 
 CommandList = comp.createListSymbol("CommandList", None)
 
-for x in range(numCommands - 1):
+for x in range(numCommands):
 	Command = comp.createHexSymbol("Command" + str(x), InitCommandsCount)
 	Command.setLabel("CMD[" + str(x) + "]")
 	Command.setMax(0xff)
@@ -141,7 +141,7 @@ for x in range(numCommands - 1):
 	CommandParmsCount.setDependencies(onInitCommandParmsCountChanged, ["Command" + str(x) + "ParmsCount"])
 	CommandParmsCount.setDescription("<html> Number of parameters for command. </html>")
 
-	for y in range(numParms - 1):
+	for y in range(numParms):
 		Parm = comp.createHexSymbol("Command" + str(x) + "Parm" + str(y), CommandParmsCount)
 		Parm.setLabel("PARM[" + str(y) + "]")
 		Parm.setMax(0xff)
@@ -162,6 +162,19 @@ BlitBufferFunctionGenerateMode.setDescription("<html> Set to generate a blit buf
 								"a subsection of the frame to the display controller.<br>"
 								"'Use Bulk Write' will generate a function that sets the UL and LR points of the subframe, then write the pixel data in burst.<br>"
 								"'Stub' will generate an empty blit function that will need to be defined based on the controller's memory write operation. </html>")
+								
+BlitType = comp.createComboSymbol("BlitType", BlitBufferFunctionSettings, ["Synchronous", "Driver Asynchronous", "Interface Asynchronous"])
+BlitType.setLabel("Blit Transfer Type")
+BlitType.setDefaultValue("Synchronous")
+BlitType.setDependencies(onBlitTypeChanged, ["BlitType"])
+BlitType.setDescription("<html> Set the blit transfer type<br>"
+								"Synchronous - blocking transfer. The blit function will block until the buffer is completely written to the display.<br>"
+								"Driver Asynchronous - non-blocking transfer. The blit function will not block, and will return immediately.<br>"
+								"                    Buffer blits will be managed thru the display driver task. <br>"
+								"                    Interface driver must be non-blocking.<br>"
+								"Interface Asynchronous - non-blocking transfer. the blit function will not block, and will return immediately.<br>"
+								"                    Buffer blits will be managed by the display interface, thru the interface callback.<br>"
+								"                    Make sure that the interface driver is non-blocking.</html>")
 
 PixelDataSettingsMenu = comp.createMenuSymbol("PixelDataSettingsMenu", BlitBufferFunctionSettings)
 PixelDataSettingsMenu.setLabel("Pixel Data Settings")

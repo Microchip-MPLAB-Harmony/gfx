@@ -21,6 +21,7 @@
 # ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
+import re
 
 def instantiateComponent(comp):
 	GFX_INTF_H = comp.createFileSymbol("GFX_INTF_H", None)
@@ -61,9 +62,20 @@ def instantiateComponent(comp):
 	DriverSettingsMenu.setLabel("Driver Settings")
 	
 	TransferMode = comp.createComboSymbol("TransferMode", DriverSettingsMenu, ["Bit-bang", "DMA-CCL"])
-	TransferMode.setLabel("TransferMode")
+	TransferMode.setLabel("Transfer Mode")
 	TransferMode.setDescription("Transfer Mode")
 	TransferMode.setDependencies(onTransferModeSet, ["TransferMode"])
+	
+	UseTimerTrigger = comp.createBooleanSymbol("UseTimerTrigger", TransferMode)
+	UseTimerTrigger.setLabel("Use Timer Trigger")
+	UseTimerTrigger.setDescription("<html>Use Timer Trigger. Enable to set interface write speed.<br> Use with a TC peripheral in 8-bit Counter Mode, and Compare Operating Mode </html>")
+	UseTimerTrigger.setVisible(False)
+	UseTimerTrigger.setDependencies(onUseTimerTrigger, ["UseTimerTrigger"])
+	
+	TimerTriggerIndex = comp.createIntegerSymbol("TimerTriggerIndex", UseTimerTrigger)
+	TimerTriggerIndex.setLabel("Timer Index")
+	TimerTriggerIndex.setDescription("Index of Timer Peripheral")
+	TimerTriggerIndex.setDefaultValue(0)
 
 	UseSyncBarriers = comp.createBooleanSymbol("UseSyncBarriers", DriverSettingsMenu)
 	UseSyncBarriers.setLabel("Use Synchronization Barriers")
@@ -151,6 +163,7 @@ def onTransferModeSet(source, event):
 	source.getComponent().getSymbolByID("PortGroupQuadrant").setVisible(event['value'] == "Bit-bang")
 	source.getComponent().getSymbolByID("PortGroupDMAComment").setVisible(event['value'] == "DMA-CCL")
 	source.getComponent().getSymbolByID("TransferModeSettingsMenu").setVisible(event['value'] == "DMA-CCL")
+	source.getComponent().getSymbolByID("UseTimerTrigger").setVisible(event['value'] == "DMA-CCL")
 	
 	source.getComponent().getSymbolByID("GFX_INTF_PORTGROUP").setEnabled(event['value'] == "Bit-bang")
 	source.getComponent().getSymbolByID("GFX_INTF_PORTGROUP_DMA").setEnabled(event['value'] == "DMA-CCL")
@@ -161,3 +174,15 @@ def onTransferModeSet(source, event):
 	else:
 		source.getComponent().clearSymbolValue("ReadStrobeControl")
 		source.getComponent().clearSymbolValue("WriteStrobeControl")
+
+def onUseTimerTrigger(source, event):
+	print("onUseTimerTrigger " + str(event['value']))
+	source.getComponent().setDependencyEnabled("TMR", event['value'])
+
+def onAttachmentConnected(source, target):
+	print(source["component"].getID() + ": " + target["id"] + " dependent component added ")
+	if (source["id"] == "TMR"):
+		index = re.search(r'\d+', target["id"]).group(0)
+		if (index):
+			source["component"].setSymbolValue("TimerTriggerIndex", int(index))
+	

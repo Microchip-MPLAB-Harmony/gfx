@@ -1,4 +1,3 @@
-// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -21,7 +20,11 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
-// DOM-IGNORE-END
+/** \file legato_renderer.h
+  * @brief .
+  *
+  * @details .
+  */
 
 #ifndef LEGATO_RENDERER_H
 #define LEGATO_RENDERER_H
@@ -34,15 +37,13 @@
 #include "gfx/driver/gfx_driver.h"
 #include "gfx/legato/widget/legato_widget.h"
 
-// DOM-IGNORE-BEGIN
 
 // *****************************************************************************
-/* Enumeration:
-    enum leFrameState
-
-  Summary:
-    Defines the state of the renderer
-*/
+/**
+ * @brief This enum represents state of the renderer.
+ * @details This enum type describes the state at which a
+ * widget is being drawn.
+ */
 typedef enum leFrameState
 {
     LE_FRAME_READY = 0,
@@ -58,73 +59,36 @@ typedef enum leFrameState
     LE_FRAME_POSTFRAME,
 } leFrameState;
 
-// *****************************************************************************
-/* Structure:
-    struct leRenderState
-
-  Summary:
-    Defines the global state of the renderer
-
-  Description:
-    const gfxDisplayDriver* dispDriver - the display driver pointer
-
-    uint32_t layerIdx - the current layer index
-
-    leRect displayRect - the driver physical display rectangle
-    uint32_t bufferCount - the number of scratch buffers the library supports
-
-    leRectArray prevDamageRects - previous damaged rectangle list
-    leRectArray currentDamageRects - queued damaged rectangle list
-    leRectArray pendingDamageRects - pending damaged rectangle list
-                                     these are rectangles added during
-                                     a frame in progress
-
-    leRectArray scratchRectList - used for rectangle culling phase
-    leRectArray frameRectList - this of rects to draw for a frame
-
-    uint32_t frameRectIdx - the current frame draw rectangle index
-    leWidget* currentWidget - the widget that is currently drawing
-
-    leRect drawRect - the current damage rectangle clipped to the currently
-                      rendering widget
-
-    leBool drawingPrev - indicates if the layer is currently drawing from its
-                         previous rectangle array
-
-    leFrameState frameState - the current frame render state
-
-    uint32_t drawCount - the number of times the screen has drawn
-
-    uint32_t frameDrawCount - the number of widgets that have rendered
-                              on the screen
-
-    uint32_t deltaTime - stores delta time for updates that happen
-                         during rendering
-
-    leBool alphaEnable - the global alpha enabled flag
-    uint8_t alpha - the current global alpha value
-
-    lePalette* globalPalette - the pointer to the global palette
-
-    lePixelBuffer* renderBuffer - the current scratch buffer
-*/
-typedef struct leRenderState
+typedef struct leRenderLayerState
 {
-    const gfxDisplayDriver* dispDriver;  // the display driver pointer
-    
-    uint32_t layerIdx;           // the current layer index
-    
-    leRect displayRect;          // the driver physical display rectangle
-    uint32_t bufferCount;        // the number of scratch buffers the library supports
-    
-    leRectArray prevDamageRects; // previous damaged rectangle list
+    leRectArray prevDamageRects;    // previous damaged rectangle list
     leRectArray currentDamageRects; // queued damaged rectangle list
     leRectArray pendingDamageRects; // pending damaged rectangle list
                                     // these are rectangles added during
                                     // a frame in progress
 
     leRectArray scratchRectList; // used for rectangle culling phase
-    leRectArray frameRectList;   // this of rects to draw for a frame
+    leRectArray frameRectList;   // rects to draw for a frame
+
+    leBool drawingPrev;           // indicates if the layer is currently
+                                  // drawing from its previous rectangle
+                                  // array
+} leRenderLayerState;
+
+/**
+ * @brief This structs represents global state of the renderer.
+ * @details This struct type describes the state at which a
+ * widget is being drawn.
+ */
+typedef struct leRenderState
+{
+    const gfxDisplayDriver* dispDriver;  // the display driver pointer
+    const gfxGraphicsProcessor* gpuDriver; // the gpu driver pointer
+    
+    uint32_t layerIdx;           // the current layer index
+
+    //leRect displayRect;          // the driver physical display rectangle
+    uint32_t bufferCount;        // the number of scratch buffers the library supports
 
     uint32_t frameRectIdx;       // the current frame draw rectangle index
     leWidget* currentWidget;     // the widget that is currently drawing
@@ -132,9 +96,7 @@ typedef struct leRenderState
     leRect drawRect;              // the current damage rectangle clipped
                                   // to the currently rendering widget
 
-    leBool drawingPrev;           // indicates if the layer is currently
-                                  // drawing from its previous rectangle
-                                  // array
+    leRenderLayerState layerStates[LE_LAYER_COUNT];
 
     leFrameState frameState;      // the current frame render state
 
@@ -153,7 +115,9 @@ typedef struct leRenderState
                                   
     lePalette* globalPalette;     // the pointer to the global palette
 
-    lePixelBuffer* renderBuffer;  // the current scratch buffer
+    int32_t currentScratchBuffer; // the index of the current scratch buffer
+
+    gfxIOCTLArg_Value val;
 } leRenderState;
 
 typedef struct leGradient
@@ -164,34 +128,45 @@ typedef struct leGradient
     leColor c3;
 } leGradient;
 
-// internal use only
-leResult leRenderer_Initialize(const gfxDisplayDriver* dispDriver);
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
+leResult leRenderer_Initialize(const gfxDisplayDriver* dispDriver,
+                               const gfxGraphicsProcessor* gpuDriver);
 
 // internal use only
-void leRenderer_Shutdown();
+void leRenderer_Shutdown(void);
+/**
+  * @endcond
+  *
+  */
+
 
 // *****************************************************************************
 /* Function:
     leResult leRenderer_DamageArea(const leRect* rect)
 
   Summary:
-    Damages a section of the display.  The renderer will redraw it as part
+    Damages a section of a display layer.  The renderer will redraw it as part
     of the next draw cycle.
 
   Description:
-    Damages a section of the display.  The renderer will redraw it as part
+    Damages a section of a display layer.  The renderer will redraw it as part
     of the next draw cycle.
 
   Parameters:
     const leRect* rect - the rectangle area to damage
+    uint32_t layerIdx - the layer to damage
 
   Returns:
     leResult
 */
-leResult leRenderer_DamageArea(const leRect* rect);
+leResult leRenderer_DamageArea(const leRect* rect, uint32_t layerIdx);
 
 // internal use only
-void leRenderer_Paint();
+void leRenderer_Paint(void);
 
 // *****************************************************************************
 /* Function:
@@ -208,7 +183,41 @@ void leRenderer_Paint();
   Returns:
     leRenderState* - the current render state
 */
-LIB_EXPORT leRenderState* leGetRenderState();
+leRenderState* leGetRenderState(void);
+
+// *****************************************************************************
+/* Function:
+    lePixelBuffer* leGetRenderBuffer();
+
+  Summary:
+    Gets a pointer to the current render buffer.  Use with caution.
+
+  Description:
+    Gets a pointer to the current render buffer.  Use with caution.
+
+  Parameters:
+
+  Returns:
+    lePixelBuffer* - the current render buffer
+*/
+lePixelBuffer* leGetRenderBuffer(void);
+
+// *****************************************************************************
+/* Function:
+    leColorMode leRenderer_CurrentColorMode();
+
+  Summary:
+    Gets the color mode of the current rendering layer.
+
+  Description:
+    Gets the color mode of the current rendering layer.
+
+  Parameters:
+
+  Returns:
+    leColorMode - the current render color mode
+*/
+leColorMode leRenderer_CurrentColorMode(void);
 
 // *****************************************************************************
 /* Function:
@@ -225,7 +234,7 @@ LIB_EXPORT leRenderState* leGetRenderState();
   Returns:
     lePalette* - the current global palette
 */
-lePalette* leRenderer_GetGlobalPalette();
+lePalette* leRenderer_GetGlobalPalette(void);
 
 // *****************************************************************************
 /* Function:
@@ -268,10 +277,10 @@ leColor leRenderer_GlobalPaletteLookup(uint32_t idx);
     leColor leRenderer_ConvertColor(leColor inColor, leColorMode inMode)
 
   Summary:
-    Converts a color to the current library render color.
+    Converts a color from the input mode to the current layer render color.
 
   Description:
-    Converts a color to the current library render color.
+    Converts a color from the input mode to the current layer render color.
 
   Parameters:
     leColor inColor - the input color
@@ -284,24 +293,7 @@ leColor leRenderer_ConvertColor(leColor inColor, leColorMode inMode);
 
 // *****************************************************************************
 /* Function:
-    leRect leRenderer_GetDisplayRect()
-
-  Summary:
-    Gets the current display rectangle.
-
-  Description:
-    Gets the current display rectangle.
-
-  Parameters:
-
-  Returns:
-    leRect - the display rectangle
-*/
-leRect leRenderer_GetDisplayRect();
-
-// *****************************************************************************
-/* Function:
-    leRect leRenderer_GetDrawRect()
+    void leRenderer_GetDrawRect(leRect* rect)
 
   Summary:
     Gets the current draw rectangle.
@@ -312,9 +304,9 @@ leRect leRenderer_GetDisplayRect();
   Parameters:
 
   Returns:
-    leRect - the draw rectangle
+    void
 */
-leRect leRenderer_GetDrawRect();
+void leRenderer_GetDrawRect(leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -828,9 +820,6 @@ leResult leRenderer_VertGradientRect(const leRect* rect,
     leResult
 */
 leResult leRenderer_CircleDraw(const leRect* rect,
-                               int32_t x,
-                               int32_t y,
-                               uint32_t radius,
                                uint32_t thickness,
                                leColor clr,
                                uint32_t alpha);
@@ -865,9 +854,6 @@ leResult leRenderer_CircleDraw(const leRect* rect,
     leResult
 */
 leResult leRenderer_CircleFill(const leRect* rect,
-                               int32_t x,
-                               int32_t y,
-                               uint32_t radius,
                                uint32_t thickness,
                                leColor borderClr,
                                leColor fillClr,
@@ -912,12 +898,10 @@ leResult leRenderer_ArcLine(int32_t x,
 // *****************************************************************************
 /* Function:
     leResult leRenderer_ArcFill(const leRect* drawRect,
-                                int32_t x,
-                                int32_t y,
-                                int32_t radius,
                                 int32_t startAngle,
                                 int32_t centerAngle,
                                 uint32_t thickness,
+                                leBool rounded,
                                 leColor clr,
                                 leBool antialias,
                                 uint32_t a)
@@ -934,7 +918,8 @@ leResult leRenderer_ArcLine(int32_t x,
     int32_t y - the y component of the origin (bound space)
     uint32_t radius - the radius of the arc
     uint32_t startAngle - the arc starting angle
-    uint32_t centerAngle - the arc center angle
+    uint32_t spanAngle - the arc span/center angle
+    leBool rounded - indicates that the arc should draw rounded ends
     leColor clr - the color to write
     leBool antialias - indicates that an antialiased arc should be drawn (not supported yet)
     uint32_t a - the global alpha blending value to use
@@ -943,12 +928,10 @@ leResult leRenderer_ArcLine(int32_t x,
     leResult
 */
 leResult leRenderer_ArcFill(const leRect* drawRect,
-                            int32_t x,
-                            int32_t y,
-                            int32_t radius,
                             int32_t startAngle,
-                            int32_t centerAngle,
+                            int32_t spanAngle,
                             uint32_t thickness,
+                            leBool rounded,
                             leColor clr,
                             leBool antialias,
                             uint32_t a);
@@ -995,6 +978,9 @@ leResult leRenderer_EllipseLine(int32_t x,
                                 leColor clr,
                                 uint32_t alpha);                                                                         
                              
-// DOM-IGNORE-END
+/**
+  * @endcond
+  *
+  */
 
 #endif // LEGATO_RENDERER_H
