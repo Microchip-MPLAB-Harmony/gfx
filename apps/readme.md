@@ -11,4 +11,5 @@ Microchip MPLAB® Harmony Graphics Suite provides various application examples f
 | [gfx_apps_sam_c20_c21](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_c20_c21) | Graphics Application examples for SAM C20/C21 Family |
 | [gfx_apps_sam_d5x_e5x](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_d5x_e5x) | Graphics Application examples for SAM D5x/E5x family|
 | [gfx_apps_sam_e70_s70_v70_v71](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_e70_s70_v70_v71) | Graphics Application examples for SAM E70/S70/V70/V71 Family |
+
 ***

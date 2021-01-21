@@ -53,7 +53,7 @@ The key features of the MPLAB® Harmony Graphics Suite are the following:
 |------------|----------------------------------------------|
 | Legato   | Legato graphics library, drivers, applications, and tools. |
 | Blank    | Blank graphics interface for third-party graphics libraries |
-***
+
 ## Legato Graphics
 
 The performance improved graphics for MPLAB® Harmony Graphics Suite. Supports Microchip PIC32 and SAM microcontrollers.

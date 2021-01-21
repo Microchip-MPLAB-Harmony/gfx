@@ -8,6 +8,12 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.8.1
+### Issues Fixed
+
+* MH3-44910 Fixes issue with application page rendering with Jerkyll
+* MH3-44911 Fixes issue with Composer failing to launch in Windows 10
+
 ## Graphics Release v3.8.0
 ### New Features
 
