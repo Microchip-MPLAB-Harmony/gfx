@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_hal" id="407D2212-779A-4791-9318-1F6CC2EC1C2A" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

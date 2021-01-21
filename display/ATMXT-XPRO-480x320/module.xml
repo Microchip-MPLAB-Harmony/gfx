@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_generic_controller" id="077FF04E-A520-4524-BBCD-AE3AF1BECA6F" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

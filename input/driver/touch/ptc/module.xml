@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_ptc" id="AE136C95-1EFE-4577-A38A-6BE1C463070A" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

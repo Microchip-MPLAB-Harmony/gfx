@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="legato_gfx_mxt_cpro" id="200C0E8C-5458-4097-9561-9E6FB7991A41" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

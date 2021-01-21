@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="aria_gfx_xplained_pro" id="248A850E-2181-475C-B123-0F524C222BA6" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

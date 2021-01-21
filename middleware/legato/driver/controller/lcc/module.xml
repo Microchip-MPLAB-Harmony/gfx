@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_le_lcc_controller" id="48132D45-CD1F-47C8-AA40-815D7080376B" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

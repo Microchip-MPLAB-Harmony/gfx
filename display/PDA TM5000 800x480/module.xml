@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_display_pdatm5000" id="DBFBDB8E-68E8-48AD-85FD-7A72294ECBF7" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

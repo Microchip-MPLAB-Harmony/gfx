@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Image Assets</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '03063.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="03083.html" target="topic">Designer</a> &gt; <a href="03058.html" target="topic">Microchip Aria Designer</a> &gt; <a href="03057.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="03063.html" target="topic">Image Assets</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="03044.html" target="topic">Previous</a> | <a href="03057.html" target="topic">Up</a> | <a href="03038.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Image Assets Topic Title: Image Assets)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Image Assets</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+The Image Assets window is launched from the Graphics Composer’s Asset menu.&nbsp;</p>
+<p class="Element10">
+The Image Assets window supports import images, select different image formats/color modes for each image, select compression methods (for example, RLE) for each image, and displays the memory footprint of each. Images can be imported as a BMP, GIF, JPEG, and PNG (but not TIFF). Images can be stored as Raw (BMP, GIF), JPEG, and PNG. </p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""> <strong>Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+MHGC does not support image motion that can be found in GIF (<span class="Element146">.gif</span>) files. GIF images are stored in the raw image format, meaning that there is no image header information stored with the image.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+When an image is imported into MGHC, the Graphics Asset Converter (GAC) stores the input format and color mode along with any relevant header data. The image’s pixel data is then promoted from its native format into a Java Image using 32 bits/pixel (8 bits for each color, RGB, and 8 bits for Alpha Blending). If the image contains Alpha Blending then this information is stored in the “A” of RGBA, otherwise the “A” is set to maximum opacity. When the application is built each image is stored in the image format and color mode selected. Images displayed in the Screen Designer are converted from Java Image format into the format/color mode selected so that the Screen Designer accurately represents what the application will show when running.&nbsp;</p>
+<p class="Element10">
+The images are decoded on the fly by the graphics library and rendered on the screen. This provides the designer with considerable flexibility to import using one format and store resources using another format, thus exploring and maximizing the best memory utilization for their application and hardware. This supports trading a smaller memory footprint at the cost of additional processing (for static or drawn-once) or reducing processing at the cost of a larger memory footprint (dynamic or drawn many times).&nbsp;</p>
+<p class="Element10">
+The following figure shows the Image Assets window for the <a href="00001.html" target="topic">Aria Quickstart</a> demonstration. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG ImageAssetsWindow.png" border="0" alt="" title=""></p><div class="Element15">
+Window Toolbar</div>
+<p class="Element10">
+There are five icons on the toolbar below the Images tab:</p>
+<ol class="Element630">
+<li value="1" class="Element600"><strong>Add Image Asset</strong> – Brings up “Import Image File” dialog window to select image file to add to the graphics application.</li>
+<li value="2" class="Element600"><strong>Replace Existing Image with New Image File</strong> – Brings up the same “Import Image File” dialog but instead of creating a new image, the file’s content replaces the currently selected image.</li>
+<li value="3" class="Element600"><strong>Rename Selected Image</strong> – Renames the selected image.</li>
+<li value="4" class="Element600"><strong>Create New Virtual Folder</strong> – Creates a new virtual folder, organizes images in a hierarchy.</li>
+<li value="5" class="Element600"><strong>Delete Selected Images</strong> – removes the selected images from the application.</li>
+</ol><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Selecting the Add Image Asset or Replace Existing Image icon opens the Import Image File dialog that can be used to select and import an image. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Import Image File dialog.png" border="0" alt="" title=""></p><p class="Element10">
+After selecting the file and clicking <strong>Open</strong>, the Image Assets window opens. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Image Assets window.png" border="0" alt="" title=""></p><p class="Element10">
+The size of the memory used for this image based on its color mode, format, compression, and global palette usage is shown by Size (bytes). See Image Format Options below for more details.&nbsp;</p>
+<p class="Element10">
+The File Name of the original source file is also shown, but may be blank if the image was imported under MPLAB Harmony v2.03b or earlier. The format and color mode of the stored image can be changed to reduce the image’s memory footprint. (If using an LCC controller, you can also turn on the Global Palette, replacing each pixel in the image with just an 8 bit LUT index.)&nbsp;</p>
+<p class="Element10">
+The three internal image formats are:</p>
+<ul class="Element630">
+<li class="Element600"><strong>Raw</strong> – binary bit map with no associated header information. GIF and BMP images are imported into this format.</li>
+<li class="Element600"><strong>PNG</strong> – lossless image format with compression, 24 bits/pixel (RBG_888) or 32bits/pixel (RGBA_8888). A good choice for line drawings, text, and icons.</li>
+<li class="Element600"><strong>JPEG (JPG)</strong> – loss compressed format, uses much less storage than the equivalent bit map (raw). Good for photos and realistic images.</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+New to Harmony 2.06 is the option to preprocess an image into raw pixels at boot-up, which will greatly improve image draw/redraw times though the use of the high performance 2-D graphics processing unit (GPU) that is available on DDR-enabled DA devices. Be sure that this feature is enabled in MPLAB Harmony Configurator. Install a graphics hardware accelerator in MHC's Project Graph. For the GFX Core component, do a right mouse click on the Graphics Processor component and then select among the available Graphics Processors. Select the &quot;Nano2D&quot; processor from the Satisfiers list: </p><p class="Element10">
+Next, click on the Aria Graphics Library component and in its Configuration Panel enable display acceleration: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Aria Graphics Library Component.png" border="0" alt="" title=""> <img src="MHGC UG EnableDisplayAccel.png" border="0" alt="" title=""></p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""><strong> Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+Do not enable image preprocessing except on DDR-enabled DA devices with the 2D GPU graphics processor enabled (which uses the Nano 2D Driver).<br><strong>To do so will produce an application that builds but does not run.</strong>&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+With Preprocessing of the image enabled, additional options become available:</p>
+<ul class="Element630">
+<li class="Element600">DDR Memory allocation for the image is automatically handled when the <strong>Managed</strong> option is selected</li>
+<li class="Element600">The <strong>Output Mode</strong> should be selected to match the GLCD’s color mode, typically RGBA_8888</li>
+<li class="Element600">The <strong>Padding</strong> option expands the image size to the nearest power of two. For example, a 480x212 image would be increased to 512x256 pixels.</li>
+<li class="Element600">The expected size of the preprocessed image in DDR memory is shown in the <strong>Expected Size</strong> entry</li>
+</ul><p class="Element10">
+For more information on how images are stored within DDR memory, see the section on the Asset Management DDR Memory tool above. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG image assets preprocessing.png" border="0" alt="" title=""></p><p class="Element10">
+The Image Assets window supports resizing, cropping, or resetting an image:</p>
+<ul class="Element630">
+<li class="Element600"><strong>Resize</strong> – Brings up a dialog window to change the pixel dimensions of the image. The image is interpolated from the original pixel array into the new pixel array.</li>
+</ul><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Image Asset Resize dialog.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600"><strong>Crop</strong> – Places a cropping rectangle on the image. Click and drag a rectangle across the image to select the new image. Then click <strong>Ok</strong> to crop the image.</li>
+</ul><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Lena Crop.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+
+<ul class="Element630">
+<li class="Element600"><strong>Reset</strong> – Allows undoing of a resize or crop. The original image is always stored in the project, so a Reset is always available to return the image to its original state.</li>
+</ul><p class="Element10">
+Original images are retained by MHGC by the superset Java Image format. So an image crop will change how the image is stored in the application but not how it is stored in MHGC. Reset will always restore the image back to the original pixels. (Reset is not an “undo”.)</p><div class="Element15">
+Example Images</div>
+<p class="Element10">
+Example images are available from many sites on the internet. One of the best sites is found at the USC-SIPI Image Database (<a href="#" onclick="openExternalLink('http://sipi.usc.edu/database');"><img src="indicator_external_link.gif" border="0" alt="" title="">http://sipi.usc.edu/database/</a>). There are many canonical test images, such as Lena, The Mandrill (Baboon), and other favorites, all in the TIFF format. The TIFF format is not supported by the Graphics Composer, but it can be easily convert from TIFF to BMP, GIF, JPEG, or PNG using the export feature found in the GNU Image Manipulation Program (GIMP), which is available for free download at: <a href="#" onclick="openExternalLink('https://www.gimp.org');"><img src="indicator_external_link.gif" border="0" alt="" title="">https://www.gimp.org</a>. GIMP also allows the user to change the pixel size of these images, usually 512x512, to something that will fit on the MEB II display (either 256x256 or smaller).&nbsp;</p>
+<p class="Element10">
+The following figure shows the Graphics Composer Screen Designer for the pic32mz_da_sk_meb2 configuration of the <a href="00001.html" target="topic">Aria Quick Start</a> project after adding three images. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Mandrill Baboon.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+The following figure shows the Optimization Tab after adding these images. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Optimization Subtab After Adding Images.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Selecting the Baboon_GIF image and the Edit Selected Asset icon ( <img src="MHGC UG Image Assets Edit Icon.png" border="0" alt="" title="">) opens an Image Assets window, as shown in the following figure. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Image Assets with Mandrill Baboon.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10">
+Because this image had only 253 unique pixel colors (Unique Pixel Count = 253) the Enable Palette option was automatically enabled. This feature, which works on an image by image basis, is separate from enabling a Global Palette. The image is stored using 8 bits of indexing into an image-specific lookup table (LUT). If the image has more than 256 unique colors then the Enable Palette option is not available and is not shown.</p><div class="Element15">
+Image Format Options</div>
+<p class="Element10">
+<strong>Raw Format Images</strong>&nbsp;</p>
+<p class="Element10">
+Raw format images have the following options: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Image Output Settings.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p><p class="Element10">
+Regardless of the Color Mode of the imported the image, the stored image can be stored in a different color mode. For example, a JPEG image could be in 24 bits/pixel RGB format but stored in the application using RGB_565 or even RBG_332 to save space. The Project Color Mode (set through the <i>File &gt; Settings</i> menu) is different from the Color Mode of images. This is determined by the capabilities of the projects graphics controller. The graphics library converts images from the stored color mode to the project’s color mode before output.&nbsp;</p>
+<p class="Element10">
+If the image has 256 or less unique pixel colors an option to Enable Palette is set by default. If the image has more than 256 unique colors this option is not displayed. This replaces the palette pixels with 8-bit indices into the image’s palette look up table (LUT). NOTE: Enabling the Global Palette disables this for all images and all image pixels are replaced by 8-bit indices into the global palette LUT.&nbsp;</p>
+<p class="Element10">
+The Compression Mode for a raw format image is either None (no compression) or RLE for run-length encoding.&nbsp;</p>
+<p class="Element10">
+Image masking is a form of cheap blending. For example, given the following image, you may want to show the image without having to match the lime green background. With image masking the user can specify that the lime green color as the “mask color”, causing it to be ignored when drawing this image. The rasterizer will simply match a pixel to be drawn with the mask. If they match, the pixel is not rendered. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Red Button with Green Background.png" border="0" alt="" title=""></p><div class="Element15">
+PNG Format Images</div>
+<p class="Element10">
+For PNG format images, the user can change the image format and the image color mode: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG PNG Format Images.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+JPEG Format Images</div>
+<p class="Element10">
+For JPEG format images, the user can change from JPEG format to Raw or PNG: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG JPEG Format Images.png" border="0" alt="" title=""></p><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+Once changed from JPEG into another format, the new format will have other options.</p><div class="Element15">
+Managing Complex Designs</div>
+<p class="Element10">
+The Image assets tool lists the images in the order of their creation. In a future version of MPLAB Harmony this will be sortable by image name. For now, it is recommended that the user use the Memory Locations asset tool, and use the Optimization sub-tab instead to manage a complex set of images. The Optimization sub-tab allows the user to sort graphics assets (fonts, images, binaries) by Name, Size, and number of widget References. This makes it much easier to find and edit an image by its name rather than order of creation.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="03083.html" target="topic">Designer</a> &gt; <a href="03058.html" target="topic">Microchip Aria Designer</a> &gt; <a href="03057.html" target="topic">Graphics Composer Asset Management</a> &gt; <a href="03063.html" target="topic">Image Assets</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="03044.html" target="topic">Previous</a> | <a href="03057.html" target="topic">Up</a> | <a href="03038.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Image Assets Topic Title: Image Assets)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

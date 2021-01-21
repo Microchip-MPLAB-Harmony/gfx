@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="display_manager" id="9FE418BF-ED3D-4891-833C-39E35BEDC7A5" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

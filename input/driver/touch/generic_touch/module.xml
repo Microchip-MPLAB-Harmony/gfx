@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="input_generic_touch" id="E79FC8F4-2AC6-43A0-9FC8-496482F8D718" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

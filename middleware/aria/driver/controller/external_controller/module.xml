@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_ext_controller" id="453F58F1-5A4B-4A3A-A11B-A2D05A008504" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_maxtouch_controller" id="91A5B6CE-A542-4181-868A-0F148EA6F6A5" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

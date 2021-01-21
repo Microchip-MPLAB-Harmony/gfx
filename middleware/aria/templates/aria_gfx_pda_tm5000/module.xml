@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="aria_gfx_pda_tm5000" id="B53642B6-6870-4360-811F-2B63903262AA" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

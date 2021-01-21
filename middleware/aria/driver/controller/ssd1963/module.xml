@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_ssd1963_controller" id="DE7B26BE-0DFD-4EFF-A847-93B0FE4EC652" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="legato_gfx_pda_7000b" id="2E3D2FE5-3CA8-4D57-BADB-EAC159E72B37" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

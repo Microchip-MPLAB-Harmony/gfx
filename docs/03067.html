@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>Menus</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '03067.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="03083.html" target="topic">Designer</a> &gt; <a href="03058.html" target="topic">Microchip Aria Designer</a> &gt; <a href="03067.html" target="topic">Menus</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="03073.html" target="topic">Previous</a> | <a href="03058.html" target="topic">Up</a> | <a href="03069.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Menus Topic Title: Menus)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+Menus</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<div class="Element15">
+File Menu</div>
+<p class="Element10">
+<img src="MHGC UG File Pull-Down Menu.png" border="0" alt="" title=""></p>
+<ul class="Element630">
+<li class="Element600"><strong>New</strong> – Same as the Create New Design tool icon.</li>
+<li class="Element600"><strong>Save</strong> – Same as the Save Design tool icon.</li>
+<li class="Element600"><strong>Save As</strong> – Supports exporting the design under a new name. By default, the name is <span class="Element146">composer_export.xml</span>. See <a href="03064.html" target="topic">Importing and Exporting Graphics Data</a> for more information.</li>
+<li class="Element600"><strong>Import</strong> - Reads in (imports) a previously exported design or a .<span class="Element146">/framework/src/system_config/{board_config}/configuration.xml</span> file that contains the graphics design to be imported. See <a href="03064.html" target="topic">Importing and Exporting Graphics Data</a> for more information.</li>
+<li class="Element600"><strong>Export</strong> – Same as Save As. See <a href="03064.html" target="topic">Importing and Exporting Graphics Data</a> for more information.</li>
+<li class="Element600"><strong>Settings</strong> – Brings up Project and User Settings dialog, including:
+<ul class="Element631">
+<li class="Element601">Color Settings &gt; Project Color Mode - How colors are managed</li>
+<li class="Element601">Color Settings &gt; Using a Global Palette</li>
+<li class="Element601">General &gt; Show Welcome Dialog</li>
+<li class="Element601">General &gt; Pre-emption Level – Allows for sharing of the device’s cycles with other parts of the application</li>
+<li class="Element601">General &gt; Hardware Acceleration – Is graphics hardware accelerator enabled in software?</li>
+</ul></li>
+<li class="Element600"><strong>Exit</strong> – Closes the MHGC window and exits</li>
+</ul><p class="Element10">
+&nbsp;</p>
+<p class="Element10">
+The choices for<i> </i>Project Color Mode are:</p>
+<ul class="Element630">
+<li class="Element600"><strong>GS_8</strong> - 8-bit gray scale</li>
+<li class="Element600"><strong>RGB_332</strong> - Red/Green/Blue, 3 bits Red/Green, 2 bits Blue</li>
+<li class="Element600"><strong>RGB_565</strong> - Red/Green/Blue, 5 bits Red, 6 bits Green, 5 bits Blue</li>
+<li class="Element600"><strong>RGBA_5551</strong> - Red/Green/Blue/Alpha, 5 bits Red/ Green/Blue, 1 bit for Alpha Blending</li>
+<li class="Element600"><strong>RGB_888</strong> - Red/Green/Blue, 8 bits Red/Green/Blue</li>
+<li class="Element600"><strong>RGBA_8888</strong> - Red/Green/Blue/Alpha, 8 bits Red/Green/Blue/Alpha Blending</li>
+<li class="Element600"><strong>ARGB_8888</strong> - Alpha/Red/Green/Blue, 8 bits Alpha Blending/Red/Green/Blue</li>
+</ul><p class="Element10">
+Ensure that the Project Color Mode chosen is compatible with the display hardware being used; otherwise, the colors shown on the display will not match those shown on the Graphics Composer Screen Designer.&nbsp;</p>
+<p class="Element10">
+Using a Global Palette enables frame buffer compression for applications using the Low-Cost Controllerless (LCC) Graphics Controller. If the global palette is enabled here, make sure to check the &quot;Enable Global Palette Mode?&quot; in the Configuration Option for the Aria Graphics Library component in MHC's Project Graph: </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Aria Graphics Library Component.png" border="0" alt="" title=""> <img src="MHGC UG Enable Global Palette Mode in Aria Config.png" border="0" alt="" title=""></p><p class="Element10">
+If <strong>Using a Global Palette</strong> is enabled, the following warning appears. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Global Palette Warning.png" border="0" alt="" title=""></p><p class="Element10">
+If <strong>Show Welcome Dialog</strong> is enabled, the following welcome screen appears when launching MHGC. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Show Welcome Dialog Welcome Screen.png" border="0" alt="" title=""></p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""> <strong>Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+  <br>This window's sole purpose is to support creating a new MHGC project.&nbsp;</div></td></tr></table></div></div>
+<p class="Element10">
+When the <strong>Preemption Level</strong> is set to zero, all dirty graphics objects are refreshed before the graphics process relinquishes control of the device. (Dirty means needing a redraw.) With the level set to two, graphics provides maximum sharing with the rest of the application, at the cost of slower display refreshes. A level of one provides an intermediate level of sharing.&nbsp;</p>
+<p class="Element10">
+The <strong>Hardware Acceleration</strong> check box determines whether the device’s built-in graphics hardware accelerator is used. </p><div class="Element63">
+<div class="TableDiv">
+<table cellspacing="0" class="Table0">
+<tr>
+<td class="Element67" valign="top" width="10%" style="border:none;">
+<div class="Element68">
+<img src="Note Icon.png" border="0" alt="" title=""> <strong>Note:</strong>&nbsp;</div></td><td class="Element67" valign="top" width="90%" style="border:none;">
+<div class="Element68">
+Optionally, a graphics hardware accelerator may also be installed in the MHC's Project Graph. For the GFX Core component, do a right mouse click on the Graphics Processor component and then select among the available Graphics Processors:<br><br>Next, click on the Aria Graphics Library component and in its Configuration Panel enable display acceleration:<br><img src="MHGC UG Aria Graphics Library Component.png" border="0" alt="" title=""> <img src="MHGC UG EnableDisplayAccel.png" border="0" alt="" title="">&nbsp;</div></td></tr></table></div></div>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+Edit Menu</div>
+<p class="Element10">
+This menu implements the same functions as the first seven tool icons. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Edit Menu.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+View Menu</div>
+<p class="Element10">
+This implements the same functions as the remaining tool icons. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG View Menu.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+Asset Menu</div>
+<p class="Element10">
+These menu features are discussed in <a href="03057.html" target="topic">Graphics Composer Asset Management</a>. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG NewAssetMenu.png" border="0" alt="" title="">&nbsp;</p>
+<p class="Element10" style="text-align: center;">
+&nbsp;</p>
+<div class="Element15">
+Tools Menu</div>
+<p class="Element10">
+The Event Manager, Global Palette, and Heap Estimator are discussed in <a href="03068.html" target="topic">MHGC Tools</a>. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Tools Menu.png" border="0" alt="" title=""></p><div class="Element15">
+Window Menu</div>
+<p class="Element10">
+Selecting <strong>Console</strong> opens the Output Console for the Graphics Composer. This console panel can be used to debug problems when the Graphics Composer boots up or during its operation.&nbsp;</p>
+<p class="Element10">
+Selecting <strong>Reset Dock Areas</strong> restores the MHGC panel configuration to the default setup by redocking all of the panels that have been undocked into separate windows. </p><p class="Element10" style="text-align: center;">
+<img src="MHGC UG Window Menu.png" border="0" alt="" title=""></p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="03083.html" target="topic">Designer</a> &gt; <a href="03058.html" target="topic">Microchip Aria Designer</a> &gt; <a href="03067.html" target="topic">Menus</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="03073.html" target="topic">Previous</a> | <a href="03058.html" target="topic">Up</a> | <a href="03069.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: MHGC UG Menus Topic Title: Menus)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>

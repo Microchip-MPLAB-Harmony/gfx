@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_ili9488_controller" id="D8BB1E19-5080-4303-97F5-E2E254D90DF3" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

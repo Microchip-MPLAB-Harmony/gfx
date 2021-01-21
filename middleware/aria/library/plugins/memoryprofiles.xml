@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ComposerMemoryProfiles>
+    <Profile name="PIC32MZDA External DDR 128MB" start="A8000000" size="8000000">
+        <Blocks>
+        </Blocks>
+    </Profile>
+    <Profile name="PIC32MZDA Internal DDR 32MB" start="A8000000" size="2000000">
+        <Blocks>
+        </Blocks>
+    </Profile>
+</ComposerMemoryProfiles>

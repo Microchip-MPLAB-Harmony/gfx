@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="le_gfx_intf_parallel_portgroup" id="99B46E9A-887A-43D9-A0EE-270C9975C9B5" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="le_gfx_intf_parallel_ebi" id="6C830772-EAC4-442C-8517-6AFC4F1F8395" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="le_gfx_intf_parallel_smc" id="5E0B84FC-DFAD-4B09-9968-10BE158CC36D" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

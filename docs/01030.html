@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
+<html>
+<head>
+<title>laContext_t Structure</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="Doc-O-Matic" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <link rel="STYLESHEET" href="default.css" type="text/css" />
+
+<script type="text/javascript" src="scripts.js"></script>
+</head>
+<body class="Element700" onload="onBodyLoadEx('frames.html', 'topic', '01030.html');" onmousedown="onBodyMouseDown();">
+
+<!-- Begin Popups -->
+
+<!-- End Popups -->
+
+<!-- Begin Page Header -->
+<div class="Element710" id="areafixed">
+<div class="Element94">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00527.html" target="topic">Graphics Library</a> &gt; <a href="00508.html" target="topic">Aria Graphics Library</a> &gt; <a href="00507.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01030.html" target="topic">laContext_t Structure</a></div>
+<div class="Element92">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element1">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element2">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element90">
+<a href="01013.html" target="topic">Previous</a> | <a href="00507.html" target="topic">Up</a> | <a href="01052.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element96">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laContext_t Topic Title: laContext_t Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table><div class="Element5">
+laContext_t Structure</div>
+</div>
+</div>
+
+<!-- End Page Header -->
+
+<!-- Begin Client Area -->
+<div class="Element720" id="areascroll">
+<div class="Element721">
+
+<!-- Begin Page Content -->
+<a name="PageContent"></a><div class="Element58">
+<a name="4465736372697074696F6E"></a><div class="Element11">
+<div class="Element10">
+<p class="Element10">
+Structure: <a href="00992.html" target="topic">laContext</a>&nbsp;</p>
+<p class="Element10">
+The context represents an discrete instance of Aria user interface library. The library is designed to be multi-instance and fully re-entrant. The entire state of the library is stored and referenced through the context pointer.</p></div>
+</div>
+<a name="43"></a><div class="Element99">
+C</div>
+<div class="Element101"><div class="Element100"><pre class="Element100"><strong><span style="color: #000080">struct</span></strong> <strong><span style="color: #000000">laContext_t</span></strong> {
+  GFX_Display <strong><span style="color: #000000">displayIndex</span></strong>;
+  <strong><span style="color: #000080">void</span></strong>* <strong><span style="color: #000000">gfxContext</span></strong>;
+  GFXU_MemoryIntf <strong><span style="color: #000000">memIntf</span></strong>;
+  <a href="01880.html" target="topic">laPreemptionLevel</a> <strong><span style="color: #000000">preemptLevel</span></strong>;
+  <a href="00571.html" target="topic">laArray</a> <strong><span style="color: #000000">screenList</span></strong>;
+  <a href="02102.html" target="topic">laScreen</a>* <strong><span style="color: #000000">activeScreen</span></strong>;
+  <a href="03113.html" target="topic">uint32_t</a> <strong><span style="color: #000000">frameState</span></strong>;
+  <a href="03113.html" target="topic">uint32_t</a> <strong><span style="color: #000000">currentLayer</span></strong>;
+  <a href="01265.html" target="topic">laInputState</a> <strong><span style="color: #000000">input</span></strong>;
+  <a href="00542.html" target="topic">GFXU_StringTableAsset</a>* <strong><span style="color: #000000">stringTable</span></strong>;
+  <a href="03113.html" target="topic">uint32_t</a> <strong><span style="color: #000000">languageID</span></strong>;
+  <a href="03113.html" target="topic">uint32_t</a> <strong><span style="color: #000000">widgetIDs</span></strong>;
+  <a href="02083.html" target="topic">laScheme</a> <strong><span style="color: #000000">defaultScheme</span></strong>;
+  <a href="00131.html" target="topic">GFX_ColorMode</a> <strong><span style="color: #000000">colorMode</span></strong>;
+  <a href="02346.html" target="topic">laWidget</a>* <strong><span style="color: #000000">focus</span></strong>;
+  <a href="01076.html" target="topic">laEditWidget</a>* <strong><span style="color: #000000">edit</span></strong>;
+  <a href="00993.html" target="topic">laContext_ActiveScreenChangedCallback_FnPtr</a> <strong><span style="color: #000000">screenChangedCB</span></strong>;
+  <a href="01013.html" target="topic">laContext_LanguageChangedCallback_FnPtr</a> <strong><span style="color: #000000">languageChangedCB</span></strong>;
+  <a href="01014.html" target="topic">laContext_PreprocessAssetsStateChangedCallback_FnPtr</a> <strong><span style="color: #000000">preprocessStateChangedCB</span></strong>;
+};</pre></div></div>
+<a name="4D656D62657273"></a><div class="Element14">
+Members</div>
+<div class="Element11">
+<div class="Element10">
+<div class="Element272">
+<div class="TableDiv">
+<table cellspacing="0" class="Table4">
+<tr>
+<td class="Element260" valign="top" width="35%">
+<div class="Element261">
+Members&nbsp;</div></td><td class="Element264" valign="top" width="65%">
+<div class="Element265">
+Description&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_Display displayIndex;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the display the library is using&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+void* gfxContext;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the HAL context the library owns&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_MemoryIntf memIntf;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the memory interface the library is using&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laPreemptionLevel preemptLevel;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the preemption level the library is using&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laArray screenList;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the list of the screens in the context&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laScreen* activeScreen;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the currently active screen&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t frameState;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the context frame state&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t currentLayer;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the current drawing layer&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laInputState input;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the input state of the instance&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFXU_StringTableAsset* stringTable;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the string table for the instance&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t languageID;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the currently active language&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+uint32_t widgetIDs;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the next unique widget ID&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laScheme defaultScheme;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+an internal default scheme that widgets use by default if the user doesn't set one&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+GFX_ColorMode colorMode;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the color mode the library uses for all layers&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laWidget* focus;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the widget that currently has focus&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laEditWidget* edit;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+the widget that is currently receiving edit events&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laContext_ActiveScreenChangedCallback_FnPtr screenChangedCB;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+screen changed callback&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laContext_LanguageChangedCallback_FnPtr languageChangedCB;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+language changed callback&nbsp;</div></td></tr><tr>
+<td class="Element262" valign="top" width="35%">
+<div class="Element263">
+laContext_PreprocessAssetsStateChangedCallback_FnPtr preprocessStateChangedCB;&nbsp;</div></td><td class="Element266" valign="top" width="65%">
+<div class="Element267">
+asset preprocess state changed callback&nbsp;</div></td></tr></table></div></div>
+</div>
+</div>
+<a name="52656D61726B73"></a><div class="Element14">
+Remarks</div>
+<div class="Element11">
+<div class="Element10">
+<p class="Element10">
+None.</p></div>
+</div>
+</div>
+<!-- End Page Content -->
+
+<!-- Begin Page Footer -->
+<div class="Element95">
+<a href="00410.html" target="topic">MPLAB® Harmony Graphics Suite</a> &gt; <a href="00527.html" target="topic">Graphics Library</a> &gt; <a href="00508.html" target="topic">Aria Graphics Library</a> &gt; <a href="00507.html" target="topic">Aria User Interface Library Interface</a> &gt; b) Data Types and Constants &gt; <a href="01030.html" target="topic">laContext_t Structure</a></div>
+<div class="Element93">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr><td width="25%">
+<div class="Element3">
+MPLAB® Harmony Graphics Suite</div>
+</td><td width="25%">
+<div class="Element4">
+<a href="contents.html" target="tocidx">Contents</a> | <a href="00410.html" target="topic">Home</a></div>
+</td><td width="25%">
+<div class="Element91">
+<a href="01013.html" target="topic">Previous</a> | <a href="00507.html" target="topic">Up</a> | <a href="01052.html" target="topic">Next</a></div>
+</td><td width="25%">
+<div class="Element97">
+<a href="mailto:docerrors@microchip.com&subject=MPLAB Harmony Documentation Feedback (Topic ID: laContext_t Topic Title: laContext_t Structure)&body=Thank you for your feedback! Please include a description of your feedback, and indicate whether you are reporting an an error in the documentation or an enhancement.">Documentation Feedback</a><br> <a href="http://support.microchip.com" target="_blank">Microchip Support</a></div>
+</td></tr></table></div>
+
+<!-- End Page Footer -->
+</div>
+</div>
+
+<!-- End Client Area -->
+</body></html>
