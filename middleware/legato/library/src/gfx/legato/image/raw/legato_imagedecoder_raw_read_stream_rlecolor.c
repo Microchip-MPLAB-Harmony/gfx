@@ -26,6 +26,8 @@
 
 #include "gfx/legato/image/raw/legato_imagedecoder_raw.h"
 
+#if LE_ENABLE_RAW_DECODER == 1
+
 #if LE_STREAMING_ENABLED == 1
 
 #include "gfx/legato/renderer/legato_renderer.h"
@@ -358,3 +360,5 @@ leResult _leRawImageDecoder_ReadStage_StreamRLE(leRawDecodeState* state)
 }
 
 #endif
+
+#endif /* LE_ENABLE_RAW_DECODER */

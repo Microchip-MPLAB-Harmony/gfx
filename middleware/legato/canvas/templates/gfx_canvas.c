@@ -80,14 +80,12 @@ static unsigned int displayHeight = 0;
 
 
 <#if GPUBlitEnabled == true && GraphicsProcessorDriverName != "NULL">
-extern const gfxGraphicsProcessor gfxGPUInterface;
 const gfxGraphicsProcessor * gfxcGPU = &gfxGPUInterface;
 <#else>
 const gfxGraphicsProcessor * gfxcGPU = NULL;
 </#if>
 
 <#if DisplayDriverName != "NULL">
-extern const gfxDisplayDriver ${DisplayDriverName};
 const gfxDisplayDriver * gfxDispCtrlr = &${DisplayDriverName};
 <#else>
 const gfxDisplayDriver * gfxDispCtrlr = NULL;
@@ -392,50 +390,50 @@ GFXC_RESULT _gfxcStopEffects(void)
 
 <#if EffectsEnabled == true>
 <#if FadeEffectsEnabled == true>
-static GFXC_RESULT gfxcProcessFadeEffect(GFXC_CANVAS * canvas)
+static GFXC_RESULT gfxcProcessFadeEffect(GFXC_CANVAS * cnvs)
 {
     GFXC_RESULT retval = GFX_FAILURE;
     
     //Fade out
-    if (canvas->effects.fade.startAlpha > canvas->effects.fade.endAlpha)
+    if (cnvs->effects.fade.startAlpha > cnvs->effects.fade.endAlpha)
     {
-        if (canvas->layer.alpha > canvas->effects.fade.endAlpha + 
-                                  canvas->effects.fade.delta)
+        if (cnvs->layer.alpha > cnvs->effects.fade.endAlpha + 
+                                  cnvs->effects.fade.delta)
         {
-            canvas->layer.alpha -= canvas->effects.fade.delta;
+            cnvs->layer.alpha -= cnvs->effects.fade.delta;
             
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.alpha = canvas->effects.fade.endAlpha;
-            canvas->effects.fade.status = GFXC_FX_DONE;
+            cnvs->layer.alpha = cnvs->effects.fade.endAlpha;
+            cnvs->effects.fade.status = GFXC_FX_DONE;
         }
     }
     //Fade in
-    else if (canvas->effects.fade.startAlpha < canvas->effects.fade.endAlpha)
+    else if (cnvs->effects.fade.startAlpha < cnvs->effects.fade.endAlpha)
     {
-        if (canvas->layer.alpha < canvas->effects.fade.endAlpha - 
-                                  canvas->effects.fade.delta)
+        if (cnvs->layer.alpha < cnvs->effects.fade.endAlpha - 
+                                  cnvs->effects.fade.delta)
         {
-            canvas->layer.alpha += canvas->effects.fade.delta;
+            cnvs->layer.alpha += cnvs->effects.fade.delta;
             
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.alpha = canvas->effects.fade.endAlpha;
-            canvas->effects.fade.status = GFXC_FX_DONE;
+            cnvs->layer.alpha = cnvs->effects.fade.endAlpha;
+            cnvs->effects.fade.status = GFXC_FX_DONE;
         }
     }
     
-    gfxcCanvasUpdate(canvas->id);
+    gfxcCanvasUpdate(cnvs->id);
     
-    if (retval == GFX_FAILURE && canvas->effects.cb != NULL)
-        canvas->effects.cb(canvas->id,
+    if (retval == GFX_FAILURE && cnvs->effects.cb != NULL)
+        cnvs->effects.cb(cnvs->id,
                            GFXC_FX_FADE,
                            GFXC_FX_DONE,
-                           canvas->effects.parm);            
+                           cnvs->effects.parm);            
         
 
         
@@ -444,110 +442,110 @@ static GFXC_RESULT gfxcProcessFadeEffect(GFXC_CANVAS * canvas)
 </#if>
 
 <#if MoveEffectsEnabled == true>
-static GFXC_RESULT gfxcProcessMoveEffect(GFXC_CANVAS * canvas)
+static GFXC_RESULT gfxcProcessMoveEffect(GFXC_CANVAS * cnvs)
 {
     GFXC_RESULT retval = GFX_FAILURE;
     int deltaX, deltaY;
     
-    switch(canvas->effects.move.type)
+    switch(cnvs->effects.move.type)
     {
         case GFXC_FX_MOVE_ACC:
         {
-            deltaX = (canvas->effects.move.startX != canvas->effects.move.endX) ? 
-                      abs(canvas->layer.pos.xpos - canvas->effects.move.startX) /
-                      canvas->effects.move.delta + 1 : 0;
-            deltaY = (canvas->effects.move.startY != canvas->effects.move.endY) ? 
-                      abs(canvas->layer.pos.ypos - canvas->effects.move.startY) /
-                        canvas->effects.move.delta + 1 : 0;
+            deltaX = (cnvs->effects.move.startX != cnvs->effects.move.endX) ? 
+                      abs(cnvs->layer.pos.xpos - cnvs->effects.move.startX) /
+                      cnvs->effects.move.delta + 1 : 0;
+            deltaY = (cnvs->effects.move.startY != cnvs->effects.move.endY) ? 
+                      abs(cnvs->layer.pos.ypos - cnvs->effects.move.startY) /
+                        cnvs->effects.move.delta + 1 : 0;
             break;
         }
         case GFXC_FX_MOVE_DEC:
         {
-            deltaX = (canvas->effects.move.startX != canvas->effects.move.endX) ? 
-                     abs(canvas->effects.move.endX - canvas->layer.pos.xpos) /
-                        canvas->effects.move.delta + 1 : 0;
-            deltaY = (canvas->effects.move.startY != canvas->effects.move.endY) ? 
-                     abs(canvas->effects.move.endY - canvas->layer.pos.ypos) /
-                        canvas->effects.move.delta + 1 : 0;
+            deltaX = (cnvs->effects.move.startX != cnvs->effects.move.endX) ? 
+                     abs(cnvs->effects.move.endX - cnvs->layer.pos.xpos) /
+                        cnvs->effects.move.delta + 1 : 0;
+            deltaY = (cnvs->effects.move.startY != cnvs->effects.move.endY) ? 
+                     abs(cnvs->effects.move.endY - cnvs->layer.pos.ypos) /
+                        cnvs->effects.move.delta + 1 : 0;
             break;
         }
         case GFXC_FX_MOVE_FIXED:
         default:
         {
-            deltaX = deltaY = canvas->effects.move.delta;
+            deltaX = deltaY = cnvs->effects.move.delta;
             break;
         }
     }
     
     //Move right
-    if (canvas->effects.move.startX < canvas->effects.move.endX)
+    if (cnvs->effects.move.startX < cnvs->effects.move.endX)
     {
-        if (canvas->layer.pos.xpos < canvas->effects.move.endX -
+        if (cnvs->layer.pos.xpos < cnvs->effects.move.endX -
                                   deltaX)
         {
-            canvas->layer.pos.xpos += deltaX;
+            cnvs->layer.pos.xpos += deltaX;
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.pos.xpos = canvas->effects.move.endX;
+            cnvs->layer.pos.xpos = cnvs->effects.move.endX;
         }
     }
     //Move left
-    else if (canvas->effects.move.startX > canvas->effects.move.endX)
+    else if (cnvs->effects.move.startX > cnvs->effects.move.endX)
     {
-        if (canvas->layer.pos.xpos > canvas->effects.move.endX +
+        if (cnvs->layer.pos.xpos > cnvs->effects.move.endX +
                                   deltaX)
         {
-            canvas->layer.pos.xpos -= deltaX;
+            cnvs->layer.pos.xpos -= deltaX;
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.pos.xpos = canvas->effects.move.endX;
+            cnvs->layer.pos.xpos = cnvs->effects.move.endX;
         }
     }
     
         //Move down
-    if (canvas->effects.move.startY < canvas->effects.move.endY)
+    if (cnvs->effects.move.startY < cnvs->effects.move.endY)
     {
-        if (canvas->layer.pos.ypos < canvas->effects.move.endY -
+        if (cnvs->layer.pos.ypos < cnvs->effects.move.endY -
                                   deltaY)
         {
-            canvas->layer.pos.ypos += deltaY;
+            cnvs->layer.pos.ypos += deltaY;
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.pos.ypos = canvas->effects.move.endY;
+            cnvs->layer.pos.ypos = cnvs->effects.move.endY;
         }
     }
     //Move up
-    else if (canvas->effects.move.startY > canvas->effects.move.endY)
+    else if (cnvs->effects.move.startY > cnvs->effects.move.endY)
     {
-        if (canvas->layer.pos.ypos > canvas->effects.move.endY +
+        if (cnvs->layer.pos.ypos > cnvs->effects.move.endY +
                                   deltaY)
         {
-            canvas->layer.pos.ypos -= deltaY;
+            cnvs->layer.pos.ypos -= deltaY;
             retval = GFX_SUCCESS;
         }
         else
         {
-            canvas->layer.pos.ypos = canvas->effects.move.endY;
+            cnvs->layer.pos.ypos = cnvs->effects.move.endY;
         }
     }
     
-    gfxcCanvasUpdate(canvas->id);
+    gfxcCanvasUpdate(cnvs->id);
     
     if (retval == GFX_FAILURE)
     {
-        canvas->effects.move.status = GFXC_FX_DONE;
+        cnvs->effects.move.status = GFXC_FX_DONE;
         
-        if (canvas->effects.cb != NULL)
-           canvas->effects.cb(canvas->id,
+        if (cnvs->effects.cb != NULL)
+           cnvs->effects.cb(cnvs->id,
                                GFXC_FX_MOVE,
                                GFXC_FX_DONE,
-                               canvas->effects.parm);
+                               cnvs->effects.parm);
     }
     
     return retval;

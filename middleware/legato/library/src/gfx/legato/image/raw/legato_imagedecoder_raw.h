@@ -48,10 +48,15 @@
 
 // DOM-IGNORE-BEGIN
 
+
+
 #ifndef LE_IMAGEDECODER_RAW_H
 #define LE_IMAGEDECODER_RAW_H
 
 #include "gfx/legato/image/legato_image.h"
+
+#if LE_ENABLE_RAW_DECODER == 1
+
 #include "gfx/legato/common/legato_pixelbuffer.h"
 
 #define LE_IMAGEDECODER_RAW_MAX_STAGES 16
@@ -181,4 +186,7 @@ typedef struct leRawDecodeState
 
 } leRawDecodeState;
 
+#endif /* LE_ENABLE_RAW_DECODER */
+
 #endif /* LE_IMAGEDECODER_RAW_H */
+

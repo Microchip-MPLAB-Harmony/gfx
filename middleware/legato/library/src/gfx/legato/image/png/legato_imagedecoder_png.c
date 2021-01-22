@@ -26,6 +26,8 @@
 
 #include "gfx/legato/image/png/legato_imagedecoder_png.h"
 
+#if LE_ENABLE_PNG_DECODER == 1
+
 #include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/core/legato_stream.h"
@@ -300,3 +302,5 @@ leImageDecoder* _lePNGImageDecoder_Init(void)
 
     return &decoder;
 }
+
+#endif /* LE_ENABLE_PNG_DECODER */

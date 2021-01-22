@@ -35,17 +35,35 @@
 
 static leImageDecoder* decoders[MAX_IMAGE_DECODER_COUNT];
 
+#if LE_ENABLE_RAW_DECODER == 1
 leImageDecoder* _leRawImageDecoder_Init(void);
+#endif
+
+#if LE_ENABLE_PNG_DECODER == 1
 leImageDecoder* _lePNGImageDecoder_Init(void);
+#endif
+
+#if LE_ENABLE_JPEG_DECODER == 1
 leImageDecoder* _leJPEGImageDecoder_Init(void);
+#endif
 
 void leImage_InitDecoders()
 {
+#if LE_ENABLE_RAW_DECODER == 1 || LE_ENABLE_PNG_DECODER == 1 || LE_ENABLE_JPEG_DECODER == 1
     uint32_t decIdx = 0;
+#endif
 
+#if LE_ENABLE_RAW_DECODER == 1
     decoders[decIdx++] = _leRawImageDecoder_Init();
+#endif
+
+#if LE_ENABLE_PNG_DECODER == 1
     decoders[decIdx++] = _lePNGImageDecoder_Init();
+#endif
+
+#if LE_ENABLE_JPEG_DECODER == 1
     decoders[decIdx++] = _leJPEGImageDecoder_Init();
+#endif
 }
 
 leResult leImage_Create(leImage* img,

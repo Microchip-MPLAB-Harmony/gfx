@@ -78,6 +78,8 @@ static void _invalidateListArea(const leListWidget* _this)
     leRect listArea;
     
     _leListWidget_GetListRect(_this, &listArea);
+
+    leUtils_RectToScreenSpace((leWidget*)_this->widget.parent, &listArea);
     
     _this->fn->_damageArea(_this, &listArea);
 }                         
@@ -401,6 +403,7 @@ static int32_t appendItem(leListWidget* _this)
 
     item->enabled = LE_TRUE;
     item->string = NULL;
+    item->icon = NULL;
     item->selected = LE_FALSE;
         
     leArray_PushBack(&_this->items, item);
@@ -436,6 +439,7 @@ static int32_t insertItem(leListWidget* _this,
         
     item->enabled = LE_TRUE;
     item->string = NULL;
+    item->icon = NULL;
     item->selected = LE_FALSE;    
         
     leArray_InsertAt(&_this->items, idx, item);
@@ -947,6 +951,8 @@ static leResult setItemIcon(leListWidget* _this,
     _leListWidget_RecalculateRowRect(_this, idx);
 
     _recalculateScrollBarValues(_this);
+
+    _invalidateListArea(_this);
     
     return LE_SUCCESS;
 }

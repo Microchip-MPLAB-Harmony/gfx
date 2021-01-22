@@ -29,7 +29,7 @@
   <td id="projectlogo"><img alt="Logo" src="mhgs.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MPLAB® Harmony Graphics Suite
-   &#160;<span id="projectnumber">GFX v3.8.0</span>
+   &#160;<span id="projectnumber">GFX v3.8.2</span>
    </div>
    <div id="projectbrief">Legato API Documentation</div>
   </td>
@@ -137,11 +137,15 @@ $(document).ready(function(){initNavTree('legato__imagedecoder__jpeg_8h_source.h
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#define LE_IMAGEDECODER_JPEG_H</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="legato__image_8h.html">gfx/legato/image/legato_image.h</a>&quot;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="legato__pixelbuffer_8h.html">gfx/legato/common/legato_pixelbuffer.h</a>&quot;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &quot;gfx/legato/image/jpeg/legato_imagedecoder_jpeg_common.h&quot;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#if LE_ENABLE_JPEG_DECODER == 1</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* LE_IMAGEDECODER_JPEG_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="legato__pixelbuffer_8h.html">gfx/legato/common/legato_pixelbuffer.h</a>&quot;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;gfx/legato/image/jpeg/legato_imagedecoder_jpeg_common.h&quot;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* LE_ENABLE_JPEG_DECODER */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* LE_IMAGEDECODER_JPEG_H */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="alegato__math_8h_html"><div class="ttname"><a href="legato__math_8h.html">legato_math.h</a></div><div class="ttdoc">Defines common math functions for general use.</div></div>
@@ -151,7 +155,6 @@ $(document).ready(function(){initNavTree('legato__imagedecoder__jpeg_8h_source.h
 <div class="ttc" id="alegato__font_8h_html_ab915c5dd71aa54e3755ac7e7e77120bf"><div class="ttname"><a href="legato__font_8h.html#ab915c5dd71aa54e3755ac7e7e77120bf">leFont_DrawGlyphData</a></div><div class="ttdeci">leResult leFont_DrawGlyphData(const leFont *fnt, const leFontGlyph *glyph, const uint8_t *data, int32_t x, int32_t y, leColor clr, uint32_t a)</div><div class="ttdoc">Draws a glyph.</div><div class="ttdef"><b>Definition:</b> legato_font.c:290</div></div>
 <div class="ttc" id="alegato__font_8h_html_ac9489802a2f34ed6b9efb8d9978046d9a8464516346e4a5d8ab0f5e6a0e6cc4ac"><div class="ttname"><a href="legato__font_8h.html#ac9489802a2f34ed6b9efb8d9978046d9a8464516346e4a5d8ab0f5e6a0e6cc4ac">LE_FONT_BPP_8</a></div><div class="ttdeci">@ LE_FONT_BPP_8</div><div class="ttdef"><b>Definition:</b> legato_font.h:60</div></div>
 <div class="ttc" id="alegato__image_8h_html"><div class="ttname"><a href="legato__image_8h.html">legato_image.h</a></div><div class="ttdoc">Image functions and defintions.</div></div>
-<div class="ttc" id="astruct__JPEGDECODER_html"><div class="ttname"><a href="struct__JPEGDECODER.html">_JPEGDECODER</a></div><div class="ttdef"><b>Definition:</b> legato_imagedecoder_jpeg_common.h:119</div></div>
 <div class="ttc" id="alegato__pixelbuffer_8h_html"><div class="ttname"><a href="legato__pixelbuffer_8h.html">legato_pixelbuffer.h</a></div><div class="ttdoc">Pixel Buffer functions and definitions.</div></div>
 <div class="ttc" id="alegato__memory_8h_html"><div class="ttname"><a href="legato__memory_8h.html">legato_memory.h</a></div><div class="ttdoc">Memory functions and definitions.</div></div>
 <div class="ttc" id="alegato__font_8h_html_ac9489802a2f34ed6b9efb8d9978046d9a69d1fcbba21c4c53aa85ab2c4adf3b98"><div class="ttname"><a href="legato__font_8h.html#ac9489802a2f34ed6b9efb8d9978046d9a69d1fcbba21c4c53aa85ab2c4adf3b98">LE_FONT_BPP_1</a></div><div class="ttdeci">@ LE_FONT_BPP_1</div><div class="ttdef"><b>Definition:</b> legato_font.h:59</div></div>
@@ -168,15 +171,14 @@ $(document).ready(function(){initNavTree('legato__imagedecoder__jpeg_8h_source.h
 <div class="ttc" id="alegato__stream_8h_html"><div class="ttname"><a href="legato__stream_8h.html">legato_stream.h</a></div><div class="ttdoc">Defines a common header for all stream operations.</div></div>
 <div class="ttc" id="astructleFontGlyph_html"><div class="ttname"><a href="structleFontGlyph.html">leFontGlyph</a></div><div class="ttdoc">This struct represents a font glyph.</div><div class="ttdef"><b>Definition:</b> legato_font.h:90</div></div>
 <div class="ttc" id="alegato__common_8h_html_acd3365f0b79c37d8894559b5afed374ba4c0b054924a260bd75cb267c59a46014"><div class="ttname"><a href="legato__common_8h.html#acd3365f0b79c37d8894559b5afed374ba4c0b054924a260bd75cb267c59a46014">LE_FALSE</a></div><div class="ttdeci">@ LE_FALSE</div><div class="ttdef"><b>Definition:</b> legato_common.h:147</div></div>
-<div class="ttc" id="alegato__pixelbuffer_8h_html_ab54318f592907f8e87212a45830ae4eb"><div class="ttname"><a href="legato__pixelbuffer_8h.html#ab54318f592907f8e87212a45830ae4eb">lePixelBufferSet</a></div><div class="ttdeci">leResult lePixelBufferSet(const lePixelBuffer *const buffer, uint32_t x, uint32_t y, leColor color)</div><div class="ttdoc">Pixel set.</div><div class="ttdef"><b>Definition:</b> legato_pixelbuffer.c:332</div></div>
-<div class="ttc" id="alegato__pixelbuffer_8h_html_af63ae8ca48e5e5b0b38ada5f66575e41"><div class="ttname"><a href="legato__pixelbuffer_8h.html#af63ae8ca48e5e5b0b38ada5f66575e41">lePixelBufferGet_Unsafe</a></div><div class="ttdeci">leColor lePixelBufferGet_Unsafe(const lePixelBuffer *const buffer, uint32_t x, uint32_t y)</div><div class="ttdoc">Get pixel at point.</div><div class="ttdef"><b>Definition:</b> legato_pixelbuffer.c:279</div></div>
+<div class="ttc" id="alegato__pixelbuffer_8h_html_ab54318f592907f8e87212a45830ae4eb"><div class="ttname"><a href="legato__pixelbuffer_8h.html#ab54318f592907f8e87212a45830ae4eb">lePixelBufferSet</a></div><div class="ttdeci">leResult lePixelBufferSet(const lePixelBuffer *const buffer, uint32_t x, uint32_t y, leColor color)</div><div class="ttdoc">Pixel set.</div><div class="ttdef"><b>Definition:</b> legato_pixelbuffer.c:331</div></div>
+<div class="ttc" id="alegato__pixelbuffer_8h_html_af63ae8ca48e5e5b0b38ada5f66575e41"><div class="ttname"><a href="legato__pixelbuffer_8h.html#af63ae8ca48e5e5b0b38ada5f66575e41">lePixelBufferGet_Unsafe</a></div><div class="ttdeci">leColor lePixelBufferGet_Unsafe(const lePixelBuffer *const buffer, uint32_t x, uint32_t y)</div><div class="ttdoc">Get pixel at point.</div><div class="ttdef"><b>Definition:</b> legato_pixelbuffer.c:278</div></div>
 <div class="ttc" id="alegato__color_8h_html_a5f142487bcef408dbae02c63061292ed"><div class="ttname"><a href="legato__color_8h.html#a5f142487bcef408dbae02c63061292ed">leColorConvert</a></div><div class="ttdeci">leColor leColorConvert(leColorMode mode_in, leColorMode mode_out, leColor color)</div><div class="ttdoc">Convert to color value.</div><div class="ttdef"><b>Definition:</b> legato_color_convert.c:579</div></div>
 <div class="ttc" id="astructleStreamDescriptor_html"><div class="ttname"><a href="structleStreamDescriptor.html">leStreamDescriptor</a></div><div class="ttdoc">This struct represents a stream descriptor.</div><div class="ttdef"><b>Definition:</b> legato_stream.h:57</div></div>
 <div class="ttc" id="alegato__common_8h_html_acd3365f0b79c37d8894559b5afed374ba1657003cf978c872cb6396fefaa710d1"><div class="ttname"><a href="legato__common_8h.html#acd3365f0b79c37d8894559b5afed374ba1657003cf978c872cb6396fefaa710d1">LE_TRUE</a></div><div class="ttdeci">@ LE_TRUE</div><div class="ttdef"><b>Definition:</b> legato_common.h:148</div></div>
 <div class="ttc" id="alegato__font_8h_html"><div class="ttname"><a href="legato__font_8h.html">legato_font.h</a></div><div class="ttdoc">Font functions and definitions.</div></div>
 <div class="ttc" id="alegato__common_8h_html"><div class="ttname"><a href="legato__common_8h.html">legato_common.h</a></div><div class="ttdoc">Common macros and definitions used by Legato.</div></div>
 <div class="ttc" id="alegato__state_8h_html"><div class="ttname"><a href="legato__state_8h.html">legato_state.h</a></div></div>
-<div class="ttc" id="astructleStreamDescriptor_html_ab96816d317aa5196e2ef198d9a8d621b"><div class="ttname"><a href="structleStreamDescriptor.html#ab96816d317aa5196e2ef198d9a8d621b">leStreamDescriptor::address</a></div><div class="ttdeci">void * address</div><div class="ttdef"><b>Definition:</b> legato_stream.h:59</div></div>
 <div class="ttc" id="astructleSize_html_a5d8006e753a3e76ff637a4e092bbed71"><div class="ttname"><a href="structleSize.html#a5d8006e753a3e76ff637a4e092bbed71">leSize::height</a></div><div class="ttdeci">int32_t height</div><div class="ttdef"><b>Definition:</b> legato_common.h:372</div></div>
 <div class="ttc" id="astructlePixelBuffer_html"><div class="ttname"><a href="structlePixelBuffer.html">lePixelBuffer</a></div><div class="ttdef"><b>Definition:</b> legato_pixelbuffer.h:91</div></div>
 <!-- start footer part -->

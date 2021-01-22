@@ -6,6 +6,7 @@
 **/nbproject/private
 **/nbproject/Makefile-*
 **/nbproject/Package-*
+**/*.X/.generated_files
 **/*.X/debug
 **/*.X/dist
 **/*.X/build

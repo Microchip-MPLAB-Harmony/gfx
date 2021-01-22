@@ -26,6 +26,10 @@ freely, subject to the following restrictions:
 #ifndef LODEPNG_H
 #define LODEPNG_H
 
+#include "gfx/legato/image/legato_image.h"
+
+#if LE_ENABLE_PNG_DECODER == 1
+
 #include <string.h> /*for size_t*/
 
 extern const char* LODEPNG_VERSION_STRING;
@@ -492,6 +496,7 @@ buffer and *outsize its size in bytes. out must be freed by user after usage.
 unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize,
                                  const unsigned char* in, size_t insize,
                                  const LodePNGDecompressSettings* settings);
+
 #endif /*LODEPNG_COMPILE_DECODER*/
 #endif /*LODEPNG_COMPILE_ZLIB*/
 
@@ -511,6 +516,8 @@ TODO:
 [ ] allow user to provide custom color conversion functions, e.g. for premultiplied alpha, padding bits or not, ...
 [ ] allow user to give data (void*) to custom allocator
 */
+
+#endif /* LE_ENABLE_PNG_DECODER */
 
 #endif /*LODEPNG_H inclusion guard*/
 

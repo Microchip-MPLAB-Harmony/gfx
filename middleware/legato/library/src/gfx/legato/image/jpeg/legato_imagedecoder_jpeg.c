@@ -24,7 +24,10 @@
 // DOM-IGNORE-END
 
 
-#include <gfx/legato/image/legato_image.h>
+#include "gfx/legato/image/legato_image.h"
+
+#if LE_ENABLE_JPEG_DECODER == 1
+
 #include "gfx/legato/image/jpeg/legato_imagedecoder_jpeg.h"
 #include "gfx/legato/image/jpeg/legato_imagedecoder_jpeg_common.h"
 
@@ -427,3 +430,5 @@ leImageDecoder* _leJPEGImageDecoder_Init(void)
 
     return &decoder;
 }
+
+#endif /* LE_ENABLE_JPEG_DECODER */

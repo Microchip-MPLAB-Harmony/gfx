@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ucvector_836',['ucvector',['../structucvector.html',1,'']]]
+  ['widgetdefault_805',['WidgetDefault',['../classwidget_1_1WidgetDefault.html',1,'widget']]]
 ];

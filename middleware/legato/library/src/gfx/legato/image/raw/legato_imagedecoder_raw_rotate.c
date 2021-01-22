@@ -26,6 +26,8 @@
 
 #include "gfx/legato/image/raw/legato_imagedecoder_raw.h"
 
+#if LE_ENABLE_RAW_DECODER == 1
+
 #include "gfx/legato/common/legato_math.h"
 
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
@@ -258,3 +260,5 @@ leResult _leRawImageDecoder_RotateBilinearPostReadStage(leRawDecodeState* state)
 
     return LE_SUCCESS;
 }
+
+#endif /* LE_ENABLE_RAW_DECODER */

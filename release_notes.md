@@ -8,6 +8,20 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.8.2
+### Issues Fixed
+
+* MH3-45434 Composer Font Import C-Friendly field
+* MH3-45242 Customer Suggested Fixes for Legato Library
+* MH3-45223 Fixes Composer Legato Jave Project Import Default Language
+* MH3-45206	Legato Composer: Set Composer window to foreground when closed thru MPLABX/MHC
+* MH3-45183	le_string callback variable using LE_MALLOC uninitialized
+* MH3-45173	Event Manager Typo: On_Update typo as On_Hide
+* MH3-45161	gfx2d and libnano compile errors with -wlong-long flag
+* MH3-44905	Allow user to disable image decoders
+* MH3-44890	Replace casting of lePixelBuffer to gfxPixelBuffer in gfx_driver
+* MH3-44692	Legato Composer - can't pan or zoom designer screen if design dimension exceeds designer screen size
+
 ## Graphics Release v3.8.1
 ### Issues Fixed
 
@@ -54,10 +68,10 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 
 ### Development Tools
 
-* [MPLAB® X IDE v5.40 or above](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® X IDE v5.45 or above](https://www.microchip.com/mplab/mplab-x-ide)
 * [MPLAB® XC32 C/C++ Compiler v2.50](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * MPLAB® Harmony Configurator (MHC) v3.4.2 and above.
+    * MPLAB® Harmony Configurator (MHC) v3.6.0 and above.
 
 ### Dependent Components
 

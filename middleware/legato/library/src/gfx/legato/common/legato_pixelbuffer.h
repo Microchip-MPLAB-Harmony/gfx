@@ -65,7 +65,7 @@
 enum BufferFlags
 {
     BF_NONE = 0,
-    BF_LOCKED = 1 << 0,
+    //BF_LOCKED = 1 << 0,
 };
 
 // *****************************************************************************
@@ -97,7 +97,7 @@ typedef struct lePixelBuffer
     uint32_t buffer_length;
     leBuffer pixels;
 
-    uint32_t flags;
+    uint32_t reserved;
 } lePixelBuffer;
 
 // *****************************************************************************

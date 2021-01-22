@@ -26,6 +26,8 @@
 
 #include "gfx/legato/image/raw/legato_imagedecoder_raw.h"
 
+#if LE_ENABLE_RAW_DECODER == 1
+
 #include "gfx/legato/renderer/legato_renderer.h"
 
 void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
@@ -132,3 +134,5 @@ void _leRawImageDecoder_BlendStage_Internal(leRawDecodeState* state)
 
     _leRawImageDecoder_InjectStage(state, (void*)&blendStage);
 }
+
+#endif /* LE_ENABLE_RAW_DECODER */

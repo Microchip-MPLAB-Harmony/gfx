@@ -50,6 +50,9 @@
 #define LE_IMAGEDECODER_JPEG_COMMON_H
 
 #include "gfx/legato/common/legato_common.h"
+
+#if LE_ENABLE_JPEG_DECODER == 1
+
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/core/legato_stream.h"
 
@@ -305,5 +308,7 @@ static const uint8_t abZigzag[64] =
   58, 59, 52, 45, 38, 31, 39, 46,
   53, 60, 61, 54, 47, 55, 62, 63
 };
+
+#endif /* LE_ENABLE_JPEG_DECODER */
 
 #endif // LE_IMAGEDECODER_JPEG_COMMON_H

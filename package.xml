@@ -4,6 +4,6 @@
         <Dependency name="core" version="v3.8.1"/>
         <Dependency name="bsp" version="v3.8.1"/>
         <Dependency name="usb" version="v3.6.0"/>
-        <Dependency name="mhc" version="v3.5.1"/>
+        <Dependency name="mhc" version="v3.6.0"/>
     </Dependencies>
 </Package>

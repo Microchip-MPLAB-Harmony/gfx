@@ -57,12 +57,11 @@ var NAVTREEINDEX =
 "gfx__driver_8h_8ftl.html#a2ad24a342d9da211d27f696ea53b0d76a60c327009fc9106be08519f1668ec455",
 "legato__color_8h.html#a9a4439f13bbc1ce88017b20a61ec6956af8d3e646b7faccb083c379a6613ea984",
 "legato__input_8h.html#a62a87ae69175b75991aca6a6ff7c95b3a48e7f8451e9031a9243bca0d7f09e71a",
-"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ab274fc2b2f25c1404b22135311f5ed1a",
-"legato__widget_8h.html#a7bd8b0c5abfd956b75474ed78ea3a132",
-"structArcDrawState.html",
-"structgfxColorModeInfo.html#a53a8420604396a8bf861e16ec3d09253",
-"structleImageMap.html#ae3a24d3b309923028dea24c149345ad0",
-"structn2d__buffer.html#a81011b79683fab64ce3aff71114f8fdd"
+"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ac61eb5ca590a65f1b2d899d203adba66",
+"legato__widget_8h.html#a7bec460eb4c10f3b29172cdfd2edf42d",
+"structArcDrawState.html#a1264aae9a5f38be0f11d9305ec73de1e",
+"structleArcQuadrantQuery.html#ac160e910ecc9891e5f452d8bee79baf1",
+"structleStringTableIndex.html#a741d09f58009829d20f60b5d0e75d2b7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -27,6 +27,9 @@
  */
  
 #include "gfx/legato/common/legato_common.h"
+
+#if LE_ENABLE_JPEG_DECODER == 1
+
 /*
  * This module is specialized to the case DCTSIZE = 8.
  */
@@ -335,3 +338,5 @@ void jpeg_idct_islow (short *inbuf, uint16_t *quantptr)
     wsptr += DCTSIZE;		/* advance pointer to next row */
   }
 }
+
+#endif /* LE_ENABLE_JPEG_DECODER */

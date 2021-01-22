@@ -1,6 +1,5 @@
 var NAVTREEINDEX4 =
 {
-"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ab274fc2b2f25c1404b22135311f5ed1a":[2,0,0,0,0,2,0,0,0,6,2,7,1],
 "legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ac61eb5ca590a65f1b2d899d203adba66":[2,0,0,0,0,2,0,0,0,6,2,7,3],
 "legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ad15fcc185422a1b1538db5ba6740aa9d":[2,0,0,0,0,2,0,0,0,6,2,7,6],
 "legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985aefb2e4a42293c59de1c4a1ba6398af3e":[2,0,0,0,0,2,0,0,0,6,2,7,4],
@@ -249,5 +248,6 @@ var NAVTREEINDEX4 =
 "legato__widget_8h.html#a664598ffe64162ee1ec93722015f9776":[2,0,0,0,0,2,0,0,0,8,31,68],
 "legato__widget_8h.html#a6735a6f931fb7aed5d656240271355d9":[2,0,0,0,0,2,0,0,0,8,31,97],
 "legato__widget_8h.html#a71904789aa265a691d2e05a3a253c44f":[2,0,0,0,0,2,0,0,0,8,31,88],
-"legato__widget_8h.html#a71eaa8d6549ed4d2599188d0938a3220":[2,0,0,0,0,2,0,0,0,8,31,75]
+"legato__widget_8h.html#a71eaa8d6549ed4d2599188d0938a3220":[2,0,0,0,0,2,0,0,0,8,31,75],
+"legato__widget_8h.html#a7bd8b0c5abfd956b75474ed78ea3a132":[2,0,0,0,0,2,0,0,0,8,31,43]
 };

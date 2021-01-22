@@ -52,6 +52,11 @@
 #define LE_IMAGEDECODER_PNG_H
 
 #include "gfx/legato/image/legato_image.h"
+
+#if LE_ENABLE_PNG_DECODER == 1
+
 #include "gfx/legato/common/legato_pixelbuffer.h"
+
+#endif /* LE_ENABLE_PNG_DECODER */
 
 #endif /* LE_IMAGEDECODER_PNG_H */

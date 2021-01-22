@@ -29,6 +29,9 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 */
 
 #include "gfx/legato/image/png/lodepng.h"
+
+#if LE_ENABLE_PNG_DECODER == 1
+
 #include "gfx/legato/memory/legato_memory.h"
 
 #include <limits.h>
@@ -6226,3 +6229,5 @@ unsigned encode(const std::string& filename,
 #endif /* LODEPNG_COMPILE_PNG */
 } /* namespace lodepng */
 #endif /*LODEPNG_COMPILE_CPP*/
+
+#endif /* LE_ENABLE_PNG_DECODER */

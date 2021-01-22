@@ -3,8 +3,7 @@ var legato__pixelbuffer_8h =
     [ "lePixelBuffer", "structlePixelBuffer.html", "structlePixelBuffer" ],
     [ "lePixelBuffer", "legato__pixelbuffer_8h.html#ad1a04df38a41a83064c96c81b5fbbb74", null ],
     [ "BufferFlags", "legato__pixelbuffer_8h.html#a19cab0989f730daa7ad67f06f483712f", [
-      [ "BF_NONE", "legato__pixelbuffer_8h.html#a19cab0989f730daa7ad67f06f483712fa56bcbe6f723de8f81d35d38964aab421", null ],
-      [ "BF_LOCKED", "legato__pixelbuffer_8h.html#a19cab0989f730daa7ad67f06f483712fa029070d26b1c1d95bb26a791f14ee8d5", null ]
+      [ "BF_NONE", "legato__pixelbuffer_8h.html#a19cab0989f730daa7ad67f06f483712fa56bcbe6f723de8f81d35d38964aab421", null ]
     ] ],
     [ "lePixelBuffer_IsLocked", "legato__pixelbuffer_8h.html#aa7b4b3d962fb78edb0bb0fc1a7e68b6f", null ],
     [ "lePixelBuffer_SetLocked", "legato__pixelbuffer_8h.html#afe09bfb04507467fb5bf309b20e20d5e", null ],

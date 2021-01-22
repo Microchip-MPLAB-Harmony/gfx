@@ -43,17 +43,16 @@ static leStringVTable stringVTable;
 
 void _leString_Constructor(leString* _this)
 {
-    (void)_this; // unused
-}
-
-void _leString_Destructor(leString* _this)
-{
     _this->preCBUserData = NULL;
     _this->preInvCallback = NULL;
     _this->invCBUserData = NULL;
     _this->invCallback = NULL;
 }
 
+void _leString_Destructor(leString* _this)
+{
+    (void)_this; // unused
+}
 
 leResult _leString_GetRect(const leString* _this,
                            leRect* rect)
