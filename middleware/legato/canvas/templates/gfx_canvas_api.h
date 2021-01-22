@@ -173,6 +173,51 @@ GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
 
 // *****************************************************************************
 /* Function:
+    GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
+                           unsigned int destID,
+                           const gfxRect * srcRect,
+                           const gfxRect * destRect);
+
+  Summary:
+    Copies the contents of a canvas pixelbuffer to another
+
+  Parameters:
+	srcID - ID of source canvas
+    destID - ID of destination canvas
+	srcRect - rect area in source canvas, must be the same size as destRect
+	destRect - rect area in destination canvas, must be same size srcRect
+
+  Returns:
+    GFX_SUCCESS - success
+    GFX_FAILURE - fail
+*/							   
+GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
+                           unsigned int destID,
+                           const gfxRect * srcRect,
+                           const gfxRect * destRect);
+    							   
+
+// *****************************************************************************
+/* Function:
+    GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base)
+
+  Summary:
+    Sets the starting canvas ID for all succeeding library layer operations. 
+    Ex. All library operations on (layer 1) will target canvas (base + 1).
+    Use API to assign starting canvas ID for a specific screen in a multi-screen
+    project, that way the library can draw to the right canvas for a screen layer.
+
+  Parameters:
+    base - starting canvas ID 
+    
+  Returns:
+    GFX_SUCCESS - success
+    GFX_FAILURE - fail
+*/
+GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base);
+    							   
+// *****************************************************************************
+/* Function:
     GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID);
 
   Summary:

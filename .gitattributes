@@ -23,7 +23,4 @@
 *.otf binary
 *.pdf binary
 *.dot binary
-middleware/legato/composer/assets/** binary
-middleware/legato/composer/linux/** binary
-middleware/legato/composer/macos/** binary
-middleware/legato/composer/windows/** binary
+middleware/legato/composer/** binary

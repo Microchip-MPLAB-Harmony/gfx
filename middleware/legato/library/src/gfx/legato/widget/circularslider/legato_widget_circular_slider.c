@@ -71,8 +71,9 @@ static uint32_t _calculateSnapValue(uint32_t divisions,
     if(divisions > 1)
     {
         uint32_t stepAmt = 100 / divisions;
+        uint32_t lastStep;
 
-        for(uint32_t lastStep = 0; lastStep < 100; lastStep += stepAmt)
+        for(lastStep = 0; lastStep < 100; lastStep += stepAmt)
         {
             clmp = lastStep + stepAmt;
 

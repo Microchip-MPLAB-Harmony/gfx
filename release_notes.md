@@ -8,6 +8,26 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.1
+
+### IMPORTANT UPDATE
+
+**The GIT log (history of all commits) has been rewritten, including the release version tags, in order to reduce the time required to publish new releases.**
+**To update to the new version, the existing copy (clone) of this repository on your development system will need to be deleted and you will need to download (clone) the new repository version in its entirety. We are sorry for any inconvenience this causes.**
+
+### New Features
+
+* MH3-47394 Add 8-bit LUT support for LCC on Legato for MZ EF
+
+### Issues Fixed
+
+* MH3-47099 Legato GFX Composer crashes when clicking on a Bar Graph widget or Line Graph widget
+* MH3-47054 Legato Composer: Parented widgets gets foreground in screen preview
+* Fixed Textfield Widget use str instead of hintText for getting string charRect
+* Fixed Circular Widget C99 compiler error
+* Legato Composer Linux/PC Build v1.13.5b
+* Legato Composer Mac Build v1.13.5b
+
 ## Graphics Release v3.9.0
 ### Issues Fixed
 

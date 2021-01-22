@@ -53,15 +53,16 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"gfx__driver_8h_8ftl.html#a2ad24a342d9da211d27f696ea53b0d76ac86285d1e94c60df4f3d10ac9d8e30f1",
-"legato__color_8h.html#abf8fa246d2e25b62abe3183dc806dabc",
-"legato__input_8h.html#a62a87ae69175b75991aca6a6ff7c95b3a54249cfb873b3e7ae0432bbec5bc0d6f",
-"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985aefb2e4a42293c59de1c4a1ba6398af3e",
-"legato__widget_8h.html#a7bec460eb4c10f3b29172cdfd2edf42d",
-"structArcDrawState.html#a1264aae9a5f38be0f11d9305ec73de1e",
-"structleArcQuadrantQuery.html",
-"structleStringTableHeader.html#a4ea2a73f2783d1f125b7f58220b43029"
+"2dgpu_2templates_2system_2system__config_8h_8ftl_source.html",
+"drv__gfx__disp__intf_8h.html#ac96bed34f09f93bf19de75ab89d4a5b5a8349e98b2bfed370616971431263a7bf",
+"gfx__driver_8h_8ftl.html#ae02cfd742b5afcb664b8afedcd983e31a07d3a434f6a0f1aad4d7c0c20fb3525f",
+"legato__editwidget_8h.html#a975adb23963e844ed15646854b0d8ca2",
+"legato__input_8h.html#a62a87ae69175b75991aca6a6ff7c95b3a8fac7544348119c21cb45ecf179b5b9b",
+"legato__renderer_8h.html#af25140185a935b0973d55d49eb480fcd",
+"legato__widget_8h.html#a71eaa8d6549ed4d2599188d0938a3220",
+"plib__glcd_8h.html#a177c5ed74f9b9f18648a164a60b600ada90a57a7cd759c29f83680e557924dea8",
+"structgfxIOCTLArg__Palette.html#abb0900c2c0ce47d0936fbb959b99e6cd",
+"structleRectArray.html#ab2c6b258f02add8fdf4cfc7c371dd772"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

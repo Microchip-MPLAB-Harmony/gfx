@@ -9,5 +9,6 @@ var dir_9f5729dad30c3a99415d090dcffece40 =
     [ "renderer", "dir_977386f5bd74067e0b2f13954126b0fc.html", "dir_977386f5bd74067e0b2f13954126b0fc" ],
     [ "string", "dir_1060b961a9688bff165f50f454b84f76.html", "dir_1060b961a9688bff165f50f454b84f76" ],
     [ "widget", "dir_08e5c2531b4cfc75c531d5c20b249084.html", "dir_08e5c2531b4cfc75c531d5c20b249084" ],
-    [ "legato.h", "legato_8h.html", null ]
+    [ "legato.h", "legato_8h.html", null ],
+    [ "legato_config.h.ftl", "legato__config_8h_8ftl_source.html", null ]
 ];

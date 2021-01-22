@@ -145,7 +145,7 @@ void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* txt,
         // middle of the text
         else
         {
-            txt->hintText->fn->getCharRect(str, txt->cursorPos, &charRect);
+            str->fn->getCharRect(str, txt->cursorPos, &charRect);
 
             cursorRect->x = textRect.x + charRect.x;
         }

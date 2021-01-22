@@ -29,7 +29,7 @@
   <td id="projectlogo"><img alt="Logo" src="mhgs.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MPLAB® Harmony Graphics Suite
-   &#160;<span id="projectnumber">GFX v3.9.0</span>
+   &#160;<span id="projectnumber">GFX v3.9.1</span>
    </div>
    <div id="projectbrief">Legato API Documentation</div>
   </td>
@@ -104,9 +104,18 @@ $(document).ready(function(){initNavTree('gfx__canvas__api_8h.html',''); initRes
 Include dependency graph for gfx_canvas_api.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__canvas__api_8h__incl.png" border="0" usemap="#agfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8h" alt=""/></div>
-<map name="gfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8h" id="gfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8h">
+<map name="gfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8h" id="agfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8h">
 <area shape="rect" title="GFX Canvas Virtual Display definitions and functions." alt="" coords="5,5,153,61"/>
 <area shape="rect" title=" " alt="" coords="8,109,151,136"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+This graph shows which files directly or indirectly include this file:</div>
+<div class="dyncontent">
+<div class="center"><img src="gfx__canvas__api_8h__dep__incl.png" border="0" usemap="#agfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8hdep" alt=""/></div>
+<map name="gfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8hdep" id="agfx_2middleware_2legato_2canvas_2templates_2gfx__canvas__api_8hdep">
+<area shape="rect" title="GFX Canvas Virtual Display definitions and functions." alt="" coords="5,5,153,61"/>
+<area shape="rect" href="gfx__canvas__init_8c_source.html" title=" " alt="" coords="5,109,153,165"/>
 </map>
 </div>
 </div>
@@ -156,6 +165,12 @@ GFXC_RESULT&#160;</td><td class="memItemRight" valign="bottom"><b>gfxcDestroy</b
 <tr class="memitem:a321d091d4aaf452e55cdc3c75737653c"><td class="memItemLeft" align="right" valign="top"><a id="a321d091d4aaf452e55cdc3c75737653c"></a>
 GFXC_RESULT&#160;</td><td class="memItemRight" valign="bottom"><b>gfxcSetPixelBuffer</b> (unsigned int canvasID, unsigned int width, unsigned int height, const GFXC_COLOR_FORMAT format, void *buf)</td></tr>
 <tr class="separator:a321d091d4aaf452e55cdc3c75737653c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45496ec76a2b6d4915ca937258ad2775"><td class="memItemLeft" align="right" valign="top"><a id="a45496ec76a2b6d4915ca937258ad2775"></a>
+GFXC_RESULT&#160;</td><td class="memItemRight" valign="bottom"><b>gfxcCopyBuffer</b> (unsigned int srcID, unsigned int destID, const <a class="el" href="structgfxRect.html">gfxRect</a> *srcRect, const <a class="el" href="structgfxRect.html">gfxRect</a> *destRect)</td></tr>
+<tr class="separator:a45496ec76a2b6d4915ca937258ad2775"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf8e3fcfd32eb14e169ffc246032e14f"><td class="memItemLeft" align="right" valign="top"><a id="acf8e3fcfd32eb14e169ffc246032e14f"></a>
+GFXC_RESULT&#160;</td><td class="memItemRight" valign="bottom"><b>gfxcSetBaseCanvasID</b> (unsigned int base)</td></tr>
+<tr class="separator:acf8e3fcfd32eb14e169ffc246032e14f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3f6fd17585358859bbbb871e98908f4"><td class="memItemLeft" align="right" valign="top"><a id="ae3f6fd17585358859bbbb871e98908f4"></a>
 GFXC_RESULT&#160;</td><td class="memItemRight" valign="bottom"><b>gfxcSetLayer</b> (unsigned int canvasID, unsigned int layerID)</td></tr>
 <tr class="separator:ae3f6fd17585358859bbbb871e98908f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,6 +226,8 @@ const <a class="el" href="structgfxDisplayDriver.html">gfxDisplayDriver</a>&#160
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>GFX Canvas Virtual Display definitions and functions. </p>
 <p>The GFX Canvas provides a virtual display driver interface. </p>
+
+<p class="definition">Definition in file <a class="el" href="gfx__canvas__api_8h_source.html">gfx_canvas_api.h</a>.</p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

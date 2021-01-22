@@ -30,7 +30,11 @@ var dir_08e5c2531b4cfc75c531d5c20b249084 =
     [ "textfield", "dir_62e6dfb8f472357b7aaeeafcccbf9637.html", "dir_62e6dfb8f472357b7aaeeafcccbf9637" ],
     [ "touchtest", "dir_ddba954e0c4eef49ae32aa2908820821.html", "dir_ddba954e0c4eef49ae32aa2908820821" ],
     [ "window", "dir_7b9600ee6a2402e97d8f59239654c614.html", "dir_7b9600ee6a2402e97d8f59239654c614" ],
+    [ "legato_editwidget.c", "legato__editwidget_8c_source.html", null ],
     [ "legato_editwidget.h", "legato__editwidget_8h.html", "legato__editwidget_8h" ],
+    [ "legato_widget.c", "legato__widget_8c_source.html", null ],
     [ "legato_widget.h", "legato__widget_8h.html", "legato__widget_8h" ],
+    [ "legato_widget_skin_classic.c", "legato__widget__skin__classic_8c_source.html", null ],
+    [ "legato_widget_skin_classic_common.c", "legato__widget__skin__classic__common_8c_source.html", null ],
     [ "legato_widget_skin_classic_common.h", "legato__widget__skin__classic__common_8h.html", "legato__widget__skin__classic__common_8h" ]
 ];

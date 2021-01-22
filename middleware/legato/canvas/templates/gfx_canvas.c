@@ -66,6 +66,7 @@ GFXC_CANVAS canvas[CONFIG_NUM_CANVAS_OBJ];
 unsigned int numLayers = CONFIG_NUM_LAYERS;
 
 static unsigned int activeCanvasID = 0;
+static unsigned int baseCanvasID = 0;
 static GFXC_STATE gfxcState;
 
 <#if EffectsEnabled == true>
@@ -153,6 +154,7 @@ void GFX_CANVAS_Initialize(void)
 {
     unsigned int i;
     gfxcState = GFXC_INIT;
+    baseCanvasID = 0;	
     
     //Initialize canvas objects
     for (i = 0; i < CONFIG_NUM_CANVAS_OBJ; i++)
@@ -198,7 +200,7 @@ void GFXC_Update()
 
 gfxPixelBuffer * GFXC_GetPixelBuffer(int32_t idx)
 {
-    return &canvas[activeCanvasID].pixelBuffer;
+    return &canvas[baseCanvasID + activeCanvasID].pixelBuffer;
 }
 
 gfxResult GFXC_BlitBuffer(int32_t x,
@@ -229,7 +231,7 @@ gfxResult GFXC_BlitBuffer(int32_t x,
 
     gfxcGPU->blitBuffer(buf,
                        &srcRect,
-                       &canvas[activeCanvasID].pixelBuffer,
+                       &canvas[baseCanvasID + activeCanvasID].pixelBuffer,
                        &destRect);
 <#else>
     rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
@@ -237,7 +239,7 @@ gfxResult GFXC_BlitBuffer(int32_t x,
     for(row = 0; row < buf->size.height; row++)
     {
         srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
-        destPtr = gfxPixelBufferOffsetGet(&canvas[activeCanvasID].pixelBuffer,
+        destPtr = gfxPixelBufferOffsetGet(&canvas[baseCanvasID + activeCanvasID].pixelBuffer,
                                           x, y + row);
 
         memcpy(destPtr, srcPtr, rowSize);
@@ -247,13 +249,63 @@ gfxResult GFXC_BlitBuffer(int32_t x,
     return GFX_SUCCESS;
 }
 
+GFXC_RESULT _gfxcCopyBuffer(unsigned int srcID,
+                         unsigned int destID,
+                         const gfxRect * srcRect,
+                         const gfxRect * destRect)
+{
+<#if GPUBlitEnabled == false>    
+    void* srcPtr;
+    void* destPtr;
+    uint32_t row, rowSize; 
+</#if>
+    
+    if (canvas[srcID].pixelBuffer.mode != canvas[destID].pixelBuffer.mode ||
+            srcRect->height != destRect->height ||
+            srcRect->width != destRect->width)
+        return GFX_FAILURE;
+    
+<#if GPUBlitEnabled == true>
+    return gfxcGPU->blitBuffer(&canvas[srcID].pixelBuffer,
+                       srcRect,
+                       &canvas[destID].pixelBuffer,
+                       destRect);
+<#else>
+    rowSize = canvas[srcID].pixelBuffer.size.width * 
+              gfxColorInfoTable[canvas[srcID].pixelBuffer.mode].size;
+
+    for(row = 0; row < canvas[srcID].pixelBuffer.size.height; row++)
+    {
+        srcPtr = gfxPixelBufferOffsetGet(&canvas[srcID].pixelBuffer, 
+                                          srcRect->x, srcRect->y + row);
+        destPtr = gfxPixelBufferOffsetGet(&canvas[destID].pixelBuffer,
+                                          destRect->x, destRect->y + row);
+
+        memcpy(destPtr, srcPtr, rowSize);
+    }
+    
+    return GFX_SUCCESS;
+        
+</#if>
+}
+
+GFXC_RESULT _gfxcSetBaseCanvasID(uint32_t base)
+{
+    if (baseCanvasID >= CONFIG_NUM_CANVAS_OBJ)
+        return GFX_FAILURE;
+    
+    baseCanvasID = base;
+    
+    return GFX_SUCCESS;
+}
+
 gfxResult GFXC_GetLayerState(uint32_t idx, gfxLayerState* st)
 {
-    st->rect.x = canvas[idx].layer.pos.xpos;
-    st->rect.y = canvas[idx].layer.pos.ypos;
-    st->rect.width = canvas[idx].layer.size.width;
-    st->rect.height = canvas[idx].layer.size.height;
-    st->enabled = canvas[idx].active;
+    st->rect.x = canvas[baseCanvasID + idx].layer.pos.xpos;
+    st->rect.y = canvas[baseCanvasID + idx].layer.pos.ypos;
+    st->rect.width = canvas[baseCanvasID + idx].layer.size.width;
+    st->rect.height = canvas[baseCanvasID + idx].layer.size.height;
+    st->enabled = canvas[baseCanvasID + idx].active;
 
     return GFX_SUCCESS;
 }
@@ -667,8 +719,8 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             disp = (gfxIOCTLArg_DisplaySize*)arg;
             
-            disp->width = canvas[activeCanvasID].pixelBuffer.size.width;
-            disp->height = canvas[activeCanvasID].pixelBuffer.size.height;
+            disp->width = canvas[baseCanvasID + activeCanvasID].pixelBuffer.size.width;
+            disp->height = canvas[baseCanvasID + activeCanvasID].pixelBuffer.size.height;
             
             return GFX_IOCTL_OK;
         }
@@ -676,7 +728,7 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             val = (gfxIOCTLArg_Value*)arg;
             
-            val->value.v_uint = CONFIG_NUM_CANVAS_OBJ;
+            val->value.v_uint = CONFIG_NUM_CANVAS_OBJ - baseCanvasID;
             
             return GFX_IOCTL_OK;
         }
@@ -692,7 +744,7 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             val = (gfxIOCTLArg_Value*)arg;
             
-            if(val->value.v_uint >= CONFIG_NUM_CANVAS_OBJ)
+            if(val->value.v_uint >= baseCanvasID + CONFIG_NUM_CANVAS_OBJ)
             {
                 return GFX_IOCTL_ERROR_UNKNOWN;
             }
@@ -707,13 +759,13 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             rect = (gfxIOCTLArg_LayerRect*)arg;
             
-            if(rect->base.id >= CONFIG_NUM_CANVAS_OBJ)        
+            if(rect->base.id >= baseCanvasID + CONFIG_NUM_CANVAS_OBJ)        
                 return GFX_IOCTL_ERROR_UNKNOWN;
             
-            rect->x = canvas[rect->base.id].layer.pos.xpos;
-            rect->y = canvas[rect->base.id].layer.pos.ypos;
-            rect->width = canvas[rect->base.id].layer.size.width;
-            rect->height = canvas[rect->base.id].layer.size.height;
+            rect->x = canvas[baseCanvasID + rect->base.id].layer.pos.xpos;
+            rect->y = canvas[baseCanvasID + rect->base.id].layer.pos.ypos;
+            rect->width = canvas[baseCanvasID + rect->base.id].layer.size.width;
+            rect->height = canvas[baseCanvasID + rect->base.id].layer.size.height;
             
             return GFX_IOCTL_OK;
         }
@@ -729,7 +781,7 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             val = (gfxIOCTLArg_Value*)arg;
             
-            val->value.v_pbuffer = &canvas[activeCanvasID].pixelBuffer;
+            val->value.v_pbuffer = &canvas[baseCanvasID + activeCanvasID].pixelBuffer;
                         
             return GFX_IOCTL_OK;
         }

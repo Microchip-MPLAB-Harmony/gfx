@@ -7,7 +7,7 @@
 	<key>CFBundleIconFile</key>
 	<string>lc.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.microchip.composer</string>
+	<string>com.yourcompany.composer</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>

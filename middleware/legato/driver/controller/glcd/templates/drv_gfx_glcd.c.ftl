@@ -441,7 +441,7 @@ void DRV_GLCD_Initialize()
     hsyncLength     = ${Val_HorzPulseWidth};
     vsyncLength     = ${Val_VertPulseWidth};
     upperMargin     = ${Val_VertBackPorch};
-    lowerMargin     = ${Val_VertPulseWidth};
+    lowerMargin     = ${Val_VertFrontPorch};
 
 
     /* glcd initialization */

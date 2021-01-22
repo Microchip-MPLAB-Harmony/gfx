@@ -132,6 +132,11 @@ typedef struct
 GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID);
 GFXC_RESULT _gfxcSetEffectsIntervalMS(unsigned int ms);
 GFXC_RESULT _gfxcStartEffects(void);
+GFXC_RESULT _gfxcCopyBuffer(unsigned int srcID,
+                            unsigned int destID,
+                            const gfxRect * srcRect,
+                            const gfxRect * destRect);
+GFXC_RESULT _gfxcSetBaseCanvasID(uint32_t base);
 
 
 //private variables 

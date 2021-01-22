@@ -205,6 +205,19 @@ GFXC_RESULT gfxcHideCanvas(unsigned int canvasID)
     return GFX_FAILURE;    
 }
 
+GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
+                         unsigned int destID,
+                         const gfxRect * srcRect,
+                         const gfxRect * destRect)
+{
+    return _gfxcCopyBuffer(srcID, destID, srcRect, destRect);
+}
+
+GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base)
+{
+    return _gfxcSetBaseCanvasID(base);
+}
+
 GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID)
 {
     if (canvasID < CONFIG_NUM_CANVAS_OBJ)

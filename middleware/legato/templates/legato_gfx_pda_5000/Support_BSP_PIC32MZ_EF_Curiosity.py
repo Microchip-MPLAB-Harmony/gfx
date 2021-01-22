@@ -22,6 +22,23 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+############ LCC + TOUCH I2C CONFIG ######################################################
+bsp_pic32mzef_cu_ActivateList_LCC = ["le_gfx_driver_lcc", "i2c2", "drv_i2c", "drv_i2c0", "core_timer", "sys_time", "ebi"]
+bsp_pic32mzef_cu_AutoConnectList_LCC = [["gfx_legato", "gfx_driver", "le_gfx_driver_lcc", "gfx_driver_lcc"],
+										["le_gfx_driver_lcc", "Graphics Display", "gfx_disp_pdatm5000_800x480", "gfx_display"],
+										["drv_i2c_0", "drv_i2c_I2C_dependency", "i2c2", "I2C2_I2C"],
+										["gfx_maxtouch_controller", "i2c", "drv_i2c_0", "drv_i2c"],
+										["sys_time", "sys_time_TMR_dependency", "core_timer", "CORE_TIMER_TMR"],
+										["le_gfx_driver_lcc", "EBI_CS", "ebi", "ebi_cs0"]]
+bsp_pic32mzef_cu_PinConfig_LCC = [{"pin": 104, "name": "BSP_MAXTOUCH_CHG", "type": "GPIO", "direction": "In", "latch": "", "abcd": ""}, #RD0
+				{"pin": 53, "name": "GFX_DISP_INTF_PIN_DE", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #RK3
+				{"pin": 51, "name": "GFX_DISP_INTF_PIN_HSYNC", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #RK1
+				{"pin": 52, "name": "GFX_DISP_INTF_PIN_VSYNC", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #RK2
+				{"pin": 57, "name": "GFX_DISP_INTF_PIN_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RF13
+				{"pin": 106, "name": "OLD_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RC14
+				{"pin": 29, "name": "GFX_DISP_INTF_PIN_RESET", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RJ14
+##################################################################################
+
 ############ SSD1963 + TOUCH I2C CONFIG ######################################################
 bsp_pic32mzef_cu_ActivateList_SSD = ["le_gfx_driver_ssd1963", "le_gfx_intf_parallel_ebi", "i2c2", "drv_i2c", "drv_i2c0", "core_timer", "sys_time", "ebi"]
 bsp_pic32mzef_cu_AutoConnectList_SSD = [["gfx_legato", "gfx_driver", "le_gfx_driver_ssd1963", "gfx_driver_ssd1963"],
@@ -39,7 +56,20 @@ bsp_pic32mzef_cu_PinConfig_SSD = [{"pin": 104, "name": "BSP_MAXTOUCH_CHG", "type
 				{"pin": 12, "name": "GFX_DISP_INTF_PIN_WR", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RC3
 ##########################################################################################
 
-def bsp_pic32mzef_cu_EventHandler(event):
+def bsp_pic32mzef_cu_lcc_EventHandler(event):
+	global pinConfigureFxn
+	if (event == "configure"):
+		#Override default pin configur function w/ PIC32M specific one
+		pinConfigureFxn = configurePinsPIC32M
+		try:
+			### Enable 8-bit palette support
+			Database.setSymbolValue("le_gfx_driver_lcc", "PaletteMode", True, 1)
+			### Slow down I2C2 to 10kHz
+			Database.setSymbolValue("i2c2", "I2C_CLOCK_SPEED", 10000L, 1)
+		except:
+			return
+
+def bsp_pic32mzef_cu_ssd_EventHandler(event):
 	global pinConfigureFxn
 	if (event == "configure"):
 		#Override default pin configur function w/ PIC32M specific one
@@ -50,14 +80,21 @@ def bsp_pic32mzef_cu_EventHandler(event):
 		except:
 			return
 
-bsp_pic32mzef_cu_DisplayInterfaceList = ["SSD1963"]
+bsp_pic32mzef_cu_DisplayInterfaceList = ["LCC", "SSD1963"]
+
+bsp_pic32mzef_cu_obj_LCC = bspSupportObj(bsp_pic32mzef_cu_PinConfig_LCC,
+										bsp_pic32mzef_cu_ActivateList_LCC,
+										None,
+										bsp_pic32mzef_cu_AutoConnectList_LCC,
+										bsp_pic32mzef_cu_lcc_EventHandler)
 
 bsp_pic32mzef_cu_obj_SSD = bspSupportObj(bsp_pic32mzef_cu_PinConfig_SSD,
 										bsp_pic32mzef_cu_ActivateList_SSD,
 										None,
 										bsp_pic32mzef_cu_AutoConnectList_SSD,
-										bsp_pic32mzef_cu_EventHandler)
+										bsp_pic32mzef_cu_ssd_EventHandler)
 
 addDisplayIntfSupport("BSP_PIC32MZ_EF_Curiosity_2.0", bsp_pic32mzef_cu_DisplayInterfaceList)
+addBSPSupport("BSP_PIC32MZ_EF_Curiosity_2.0", "LCC", bsp_pic32mzef_cu_obj_LCC)
 addBSPSupport("BSP_PIC32MZ_EF_Curiosity_2.0", "SSD1963", bsp_pic32mzef_cu_obj_SSD)
 
