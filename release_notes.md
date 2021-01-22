@@ -8,6 +8,11 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.8.3
+### Issues Fixed
+
+* MH3-45463 Fixes wrong apps/readme.md file publish in v3.8.2
+
 ## Graphics Release v3.8.2
 ### Issues Fixed
 
@@ -36,8 +41,7 @@ nav_order: 99
 * MH3-44483 Add GFX2D setGlobalAlpha stub interface
 * MH3-44301 Add asynchronous blit interface to 2D GPU
 * MH3-31839 Put device filters in various modules such that only the ones supported are loaded
-* MH3-44244 added some more coherency flags
-generation
+* MH3-44244 added some more coherency flags generation
 * MH3-44162 updated leString_Delete code documentation
 * MH3-38627 added screen events to screen manager window
 * MH3-44290 fixes text field widget cursor placement issue
