@@ -276,8 +276,14 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
         
         root->rect.x = 0;
         root->rect.y = 0;
+
+#if LE_RENDER_ORIENTATION == 0 || LE_RENDER_ORIENTATION == 180
         root->rect.width = disp.width;
         root->rect.height = disp.height;
+#else
+        root->rect.width = disp.height;
+        root->rect.height = disp.width;
+#endif
 
         root->fn->invalidate(root);
         root->flags |= LE_WIDGET_ISROOT;
@@ -372,9 +378,15 @@ leResult leUpdate(uint32_t dt)
                                                0,
                                                0);
 
+#if LE_RENDER_ORIENTATION == 90 || LE_RENDER_ORIENTATION == 270
+        _state.rootWidget[itr].fn->setSize(&_state.rootWidget[itr],
+                                           layerRect.height,
+                                           layerRect.width);
+#else
         _state.rootWidget[itr].fn->setSize(&_state.rootWidget[itr],
                                            layerRect.width,
                                            layerRect.height);
+#endif
     }
 #endif
 

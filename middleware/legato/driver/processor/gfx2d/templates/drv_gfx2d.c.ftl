@@ -112,6 +112,9 @@ gfxResult DRV_GFX2D_Fill(gfxPixelBuffer* dest,
 {
     GFX2D_BUFFER    dest_buffer;
     GFX2D_RECTANGLE dest_rect;
+    
+    if(dest->orientation != GFX_ORIENT_0)
+		return GFX_FAILURE;
 
     dest_buffer.width = dest->size.width;
     dest_buffer.height = dest->size.height;
@@ -143,6 +146,10 @@ gfxResult DRV_GFX2D_Blit(const gfxPixelBuffer* source,
     GFX2D_RECTANGLE dest_rect;
     GFX2D_BUFFER    src_buffer;
     GFX2D_RECTANGLE src_rect;
+    
+    if(source->orientation != GFX_ORIENT_0 ||
+       dest->orientation != GFX_ORIENT_0)
+		return GFX_FAILURE;
     
     dest_buffer.width = dest->size.width;
     dest_buffer.height = dest->size.height;

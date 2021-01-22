@@ -3,6 +3,7 @@
 *.elf
 *.map
 *.d
+*.DS_Store
 **/nbproject/private
 **/nbproject/Makefile-*
 **/nbproject/Package-*

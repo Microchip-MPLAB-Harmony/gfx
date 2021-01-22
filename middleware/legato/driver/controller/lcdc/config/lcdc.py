@@ -322,15 +322,30 @@ def instantiateComponent(comp):
 	OtherSettingsMenu = comp.createMenuSymbol("OtherMenu", None)
 	OtherSettingsMenu.setLabel("Other Settings")
 
+	CanvasModeOnly = comp.createBooleanSymbol("CanvasModeOnly", OtherSettingsMenu)
+	CanvasModeOnly.setLabel("Canvas Mode")
+	CanvasModeOnly.setDefaultValue(False)
+	CanvasModeOnly.setDescription("<html>Enables Canvas Mode in the driver. Only the GFX Canvas interface will be enabled. </html>")
+
 	UseGPU = comp.createBooleanSymbol("UseGPU", OtherSettingsMenu)
 	UseGPU.setLabel("Use GPU for Blits?")
 	UseGPU.setDefaultValue(True)
 	UseGPU.setDescription("<html>Uses the GPU for buffer blits.</html>")
+
+	VblankBlit = comp.createBooleanSymbol("VblankBlit", UseGPU)
+	VblankBlit.setLabel("Blit on Vblank")
+	VblankBlit.setDefaultValue(False)
+	VblankBlit.setVisible(True)
+	VblankBlit.setDescription("<html>Schedule blits during vblank.</html>")
+	
 	if ("A5D2" in str(Variables.get("__PROCESSOR"))):
 		UseGPU.setDefaultValue(False)
 		UseGPU.setVisible(False)
+		VblankBlit.setDefaultValue(False)
+		VblankBlit.setVisible(False)
 	else:	
 		UseGPU.setVisible(True)
+		VblankBlit.setVisible(True)
 
 	### Unsupported symbols, but may be queried by GFX HAL
 	UnsupportedOptionsMenu = comp.createMenuSymbol("UnsupportedOptionsMenu", None)
@@ -400,12 +415,12 @@ def instantiateComponent(comp):
 	GFX_LCDC_C.setMarkup(True)
 	
 	GFX_LCDC_H = comp.createFileSymbol("GFX_LCDC_H", None)
-	GFX_LCDC_H.setSourcePath("templates/drv_gfx_lcdc.h")
+	GFX_LCDC_H.setSourcePath("templates/drv_gfx_lcdc.h.ftl")
 	GFX_LCDC_H.setDestPath("gfx/driver/controller/lcdc/")
 	GFX_LCDC_H.setOutputName("drv_gfx_lcdc.h")
 	GFX_LCDC_H.setProjectPath(projectPath)
 	GFX_LCDC_H.setType("HEADER")
-	#GFX_LCDC_H.setMarkup(True)
+	GFX_LCDC_H.setMarkup(True)
 	
 	### Update the layers count - do this last
 	numLayers = 0

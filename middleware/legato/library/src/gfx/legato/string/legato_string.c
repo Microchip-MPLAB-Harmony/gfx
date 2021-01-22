@@ -41,6 +41,16 @@ static leStringVTable stringVTable;
 #define LE_STRING_SPACE     0x20 // ' '
 #define LE_STRING_LINEBREAK 0xA // '\n'
 
+void leString_Delete(leString* str)
+{
+    if(str == NULL)
+        return;
+
+    str->fn->destructor(str);
+
+    LE_FREE(str);
+}
+
 void _leString_Constructor(leString* _this)
 {
     _this->preCBUserData = NULL;

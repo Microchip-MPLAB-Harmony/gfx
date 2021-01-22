@@ -111,5 +111,6 @@ var menudata={children:[
 {text:"g",url:"globals_enum.html#index_g"},
 {text:"l",url:"globals_enum.html#index_l"}]},
 {text:"Enumerator",url:"globals_eval.html",children:[
+{text:"g",url:"globals_eval.html#index_g"},
 {text:"l",url:"globals_eval.html#index_l"}]},
 {text:"Macros",url:"globals_defs.html"}]}]}]}

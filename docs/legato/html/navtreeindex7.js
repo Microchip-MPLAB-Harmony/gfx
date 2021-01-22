@@ -1,5 +1,8 @@
 var NAVTREEINDEX7 =
 {
+"structleArcQuadrantQuery.html":[1,0,46],
+"structleArcQuadrantQuery.html#a7f04321d090d9c02f592e1e2ac11a883":[1,0,46,2],
+"structleArcQuadrantQuery.html#aa7fc278217bd7d4382d94d4353ac1238":[1,0,46,0],
 "structleArcQuadrantQuery.html#ac160e910ecc9891e5f452d8bee79baf1":[1,0,46,1],
 "structleArcQuadrantQuery.html#ade4ee76e95f7a531b4dc8caeb0be9977":[1,0,46,3],
 "structleArcWidget.html":[1,0,47],
@@ -198,9 +201,8 @@ var NAVTREEINDEX7 =
 "structleScheme.html":[1,0,78],
 "structleScheme.html#a7c967d5d7f28a6727ef31d944eb7d4af":[1,0,78,0],
 "structleScratchBuffer.html":[1,0,80],
-"structleScratchBuffer.html#a0359f24f73f4ed3622de819453c47dc0":[1,0,80,0],
-"structleScratchBuffer.html#a548d86c842db2c00543428472d154429":[1,0,80,1],
-"structleScratchBuffer.html#ada0bfd80553342918ffde53dcdd55966":[1,0,80,2],
+"structleScratchBuffer.html#a548d86c842db2c00543428472d154429":[1,0,80,0],
+"structleScratchBuffer.html#ada0bfd80553342918ffde53dcdd55966":[1,0,80,1],
 "structleSize.html":[1,0,81],
 "structleSize.html#a395d15e7c2b09961c1bfd1da6179b64c":[1,0,81,1],
 "structleSize.html#a5d8006e753a3e76ff637a4e092bbed71":[1,0,81,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX7 =
 "structleStringTableEntry.html#abe222f6d3581e7920dcad5306cc906a8":[1,0,88,0],
 "structleStringTableEntry.html#aebb70c2aab3407a9f05334c47131a43b":[1,0,88,1],
 "structleStringTableHeader.html":[1,0,89],
-"structleStringTableHeader.html#a13642c784b708593d13d82d62233a63a":[1,0,89,1],
-"structleStringTableHeader.html#a4ea2a73f2783d1f125b7f58220b43029":[1,0,89,0],
-"structleStringTableIndex.html":[1,0,90]
+"structleStringTableHeader.html#a13642c784b708593d13d82d62233a63a":[1,0,89,1]
 };

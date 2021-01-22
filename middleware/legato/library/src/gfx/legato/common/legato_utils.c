@@ -27,6 +27,7 @@
 #include "gfx/legato/common/legato_utils.h"
 
 #include "gfx/legato/datastructure/legato_list.h"
+#include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/widget/legato_widget.h"
 
 #include "gfx/legato/common/legato_rect.h"
@@ -532,3 +533,75 @@ leBool leUtils_WidgetIsOccluded(const leWidget* wgt, const leRect* rect)
     return LE_FALSE;
 }
 #endif
+
+void leUtils_PointLogicalToScratch(int16_t* x,
+                                   int16_t* y)
+{
+    int32_t rotX, rotY;
+
+#if LE_RENDER_ORIENTATION == 0
+    rotX = *x;
+    rotY = *y;
+#elif LE_RENDER_ORIENTATION == 90
+    lePixelBuffer* buf = leGetRenderBuffer();
+
+    rotY = *x;
+    rotX = buf->size.width - 1 - *y;
+#elif LE_RENDER_ORIENTATION == 180
+    lePixelBuffer* buf = leGetRenderBuffer();
+
+    rotX = buf->size.width - 1 - *x;
+    rotY = buf->size.height - 1 - *y;
+#else
+    lePixelBuffer* buf = leGetRenderBuffer();
+
+    rotY = buf->size.height - *x;
+    rotX = *y;
+#endif
+
+    *x = rotX;
+    *y = rotY;
+}
+
+void leUtils_RectLogicalToScratch(leRect* rect)
+{
+    int32_t rotX, rotY;
+
+
+#if LE_RENDER_ORIENTATION != 0
+
+#endif
+
+#if LE_RENDER_ORIENTATION == 0
+    rotX = rect->x;
+    rotY = rect->y;
+#elif LE_RENDER_ORIENTATION == 90
+    lePixelBuffer* buf = leGetRenderBuffer();
+    int16_t t;
+
+    rotY = rect->x;
+    rotX = buf->size.width - (rect->y + rect->height);
+
+    t = rect->width;
+    rect->width = rect->height;
+    rect->height = t;
+#elif LE_RENDER_ORIENTATION == 180
+    lePixelBuffer* buf = leGetRenderBuffer();
+
+    rotX = buf->size.width - rect->width - rect->x;
+    rotY = buf->size.height - rect->height - rect->y;
+#else
+    lePixelBuffer* buf = leGetRenderBuffer();
+    int16_t t;
+
+    rotY = buf->size.height - rect->width - rect->x;
+    rotX = rect->y;
+
+    t = rect->width;
+    rect->width = rect->height;
+    rect->height = t;
+#endif
+
+    rect->x = rotX;
+    rect->y = rotY;
+}

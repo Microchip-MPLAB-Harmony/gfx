@@ -5,10 +5,6 @@ dependencies must be installed before it can be run.
 
 Dependencies:
 
-Qt 5.14.1 - https://download.qt.io/archive/qt/5.14/5.14.1/
-			
-			LGC is using the 5.14.1 LGPL version of Qt.
-
 FreeType2
 FreeImage
 

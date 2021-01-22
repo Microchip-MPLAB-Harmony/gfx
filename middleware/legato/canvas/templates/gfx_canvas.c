@@ -104,12 +104,17 @@ const gfxDisplayDriver gfxDriverInterface =
 <#assign HEIGHT = "Canvas" + i + "Height">
 <#assign WIDTH = "Canvas" + i + "Width">
 <#assign MODE = "Canvas" + i + "Mode">
-<#if .vars[MODE] == "GS_8">
-uint8_t __attribute__ ((coherent, aligned (32))) canvasfb${i}[${.vars[WIDTH]} * ${.vars[HEIGHT]}] = {0};
-<#elseif .vars[MODE] == "RGB_565">
-uint16_t __attribute__ ((coherent, aligned (32))) canvasfb${i}[${.vars[WIDTH]} * ${.vars[HEIGHT]}] = {0};
+<#if __PROCESSOR?matches("PIC32MZ.*") == true>
+<#assign ATTR_COHERENT = "__attribute__ ((coherent, aligned (32)))">
 <#else>
-uint32_t __attribute__ ((coherent, aligned (32))) canvasfb${i}[${.vars[WIDTH]} * ${.vars[HEIGHT]}] = {0};
+<#assign ATTR_COHERENT = "__attribute__ ((section(\".region_nocache\"), aligned (32)))">
+</#if>
+<#if .vars[MODE] == "GS_8">
+uint8_t ${ATTR_COHERENT} canvasfb${ i }[${ .vars[WIDTH] } *${ .vars[HEIGHT] }] = { 0 };
+<#elseif .vars[MODE] == "RGB_565">
+uint16_t ${ATTR_COHERENT} canvasfb${ i }[${ .vars[WIDTH] } *${ .vars[HEIGHT] }] = { 0 };
+<#else>
+uint32_t ${ATTR_COHERENT} canvasfb${ i }[${ .vars[WIDTH] } *${ .vars[HEIGHT] }] = { 0 };
 </#if>
 </#if>
 </#list>
@@ -333,7 +338,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
         //Lock layer and apply layer properties
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_LOCK, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
 
-        if (setBaseAddressParm.value.v_uint != NULL)
+        if (setBaseAddressParm.value.v_uint != 0)
             gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_BASE_ADDRESS, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
         
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_COLOR_MODE, (gfxIOCTLArg_LayerValue *) &setColorModeParm);

@@ -29,7 +29,7 @@
   <td id="projectlogo"><img alt="Logo" src="mhgs.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MPLAB® Harmony Graphics Suite
-   &#160;<span id="projectnumber">GFX v3.8.2</span>
+   &#160;<span id="projectnumber">GFX v3.9.0</span>
    </div>
    <div id="projectbrief">Legato API Documentation</div>
   </td>
@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('legato__utils_8h.html',''); initResiza
 Include dependency graph for legato_utils.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="legato__utils_8h__incl.png" border="0" usemap="#agfx_2middleware_2legato_2library_2src_2gfx_2legato_2common_2legato__utils_8h" alt=""/></div>
-<map name="gfx_2middleware_2legato_2library_2src_2gfx_2legato_2common_2legato__utils_8h" id="agfx_2middleware_2legato_2library_2src_2gfx_2legato_2common_2legato__utils_8h">
+<map name="gfx_2middleware_2legato_2library_2src_2gfx_2legato_2common_2legato__utils_8h" id="gfx_2middleware_2legato_2library_2src_2gfx_2legato_2common_2legato__utils_8h">
 <area shape="rect" title="General internal utilities for the library." alt="" coords="247,5,405,61"/>
 <area shape="rect" href="legato__common_8h.html" title="Common macros and definitions used by Legato." alt="" coords="241,109,411,151"/>
 <area shape="rect" title=" " alt="" coords="5,199,175,225"/>
@@ -165,6 +165,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a78acf9fdd2b18d98a3b4b2c2fad1d2fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="legato__utils_8h.html#a78acf9fdd2b18d98a3b4b2c2fad1d2fa">leUtils_ArrangeRectangleRelative</a> (<a class="el" href="structleRect.html">leRect</a> *sub, <a class="el" href="structleRect.html">leRect</a> obj, <a class="el" href="structleRect.html">leRect</a> bounds, <a class="el" href="legato__common_8h.html#aa99598706cf044d45a11026397558e1b">leHAlignment</a> hAlignment, <a class="el" href="legato__common_8h.html#a169e44baabeda5a3657e3e2e0e7f3c50">leVAlignment</a> vAlignment, <a class="el" href="legato__common_8h.html#a7287966e977230339d485f034044709b">leRelativePosition</a> position, uint8_t leftMargin, uint8_t topMargin, uint8_t rightMargin, uint8_t bottomMargin, uint16_t rectMargin)</td></tr>
 <tr class="memdesc:a78acf9fdd2b18d98a3b4b2c2fad1d2fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the position of a rectangle within the given bounds.  <a href="legato__utils_8h.html#a78acf9fdd2b18d98a3b4b2c2fad1d2fa">More...</a><br /></td></tr>
 <tr class="separator:a78acf9fdd2b18d98a3b4b2c2fad1d2fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a567b50a2adaf17ae5ea76faa395f8840"><td class="memItemLeft" align="right" valign="top"><a id="a567b50a2adaf17ae5ea76faa395f8840"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>leUtils_PointLogicalToScratch</b> (int16_t *x, int16_t *y)</td></tr>
+<tr class="separator:a567b50a2adaf17ae5ea76faa395f8840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a234b3bf06c2a35bf33808a0337bf9b0f"><td class="memItemLeft" align="right" valign="top"><a id="a234b3bf06c2a35bf33808a0337bf9b0f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>leUtils_RectLogicalToScratch</b> (<a class="el" href="structleRect.html">leRect</a> *rect)</td></tr>
+<tr class="separator:a234b3bf06c2a35bf33808a0337bf9b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>General internal utilities for the library. </p>
@@ -415,7 +421,7 @@ Functions</h2></td></tr>
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="legato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph.png" border="0" usemap="#alegato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph" alt=""/></div>
-<map name="legato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph" id="alegato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph">
+<map name="legato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph" id="legato__utils_8h_ab7f6a109ac5051792d54dba716b8b9a1_cgraph">
 <area shape="rect" title="Determines if parent and child intersect." alt="" coords="5,5,195,32"/>
 <area shape="rect" href="legato__rect_8h.html#a3ae2e8d6ed6a3a5af11b9273fb02195d" title="Determines if two rectangles are intersecting." alt="" coords="243,5,359,32"/>
 </map>
@@ -465,7 +471,7 @@ Here is the call graph for this function:</div>
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="legato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph.png" border="0" usemap="#alegato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph" alt=""/></div>
-<map name="legato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph" id="alegato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph">
+<map name="legato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph" id="legato__utils_8h_aa795e1d58a8b183aae7e9f1e35fa9034_cgraph">
 <area shape="rect" title="Clips a rectangle to the parent of a widge." alt="" coords="5,5,172,32"/>
 <area shape="rect" href="legato__rect_8h.html#ac19d2a378a0bed1eb149afa2c07256be" title="Clips a rectangle to the space of another rectangle." alt="" coords="220,5,301,32"/>
 </map>
@@ -549,7 +555,7 @@ Here is the call graph for this function:</div>
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="legato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph.png" border="0" usemap="#alegato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph" alt=""/></div>
-<map name="legato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph" id="alegato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph">
+<map name="legato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph" id="legato__utils_8h_aec11d7a3c0d6b6a8fd0d40d0cadacaae_cgraph">
 <area shape="rect" title="Finds the top&#45;most visible widget in a layer at the given coordinates." alt="" coords="5,5,168,32"/>
 <area shape="rect" href="legato__array_8h.html#aedb731b582ce445bee6a70797a789942" title="Get entry at index." alt="" coords="216,5,307,32"/>
 </map>
@@ -765,17 +771,17 @@ Here is the call graph for this function:</div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="alegato__utils_8h_html_ad46d48a5cd5ee89cc3dbe756fc750754"><div class="ttname"><a href="legato__utils_8h.html#ad46d48a5cd5ee89cc3dbe756fc750754">leUtils_PointScreenToLocalSpace</a></div><div class="ttdeci">void leUtils_PointScreenToLocalSpace(const leWidget *widget, lePoint *pnt)</div><div class="ttdoc">Convert point from layer space into the local space of a widget.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:90</div></div>
+<div class="ttc" id="alegato__utils_8h_html_ad46d48a5cd5ee89cc3dbe756fc750754"><div class="ttname"><a href="legato__utils_8h.html#ad46d48a5cd5ee89cc3dbe756fc750754">leUtils_PointScreenToLocalSpace</a></div><div class="ttdeci">void leUtils_PointScreenToLocalSpace(const leWidget *widget, lePoint *pnt)</div><div class="ttdoc">Convert point from layer space into the local space of a widget.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:91</div></div>
 <div class="ttc" id="astructleRect_html"><div class="ttname"><a href="structleRect.html">leRect</a></div><div class="ttdoc">This struct represents a rectangle.</div><div class="ttdef"><b>Definition:</b> legato_common.h:394</div></div>
-<div class="ttc" id="alegato__utils_8h_html_a88b0a9cc7d02727f2a53f0b64b3b4e00"><div class="ttname"><a href="legato__utils_8h.html#a88b0a9cc7d02727f2a53f0b64b3b4e00">leUtils_RectToParentSpace</a></div><div class="ttdeci">void leUtils_RectToParentSpace(const leWidget *widget, leRect *rect)</div><div class="ttdoc">Convert rectangle from widget local space to widget parent space.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:131</div></div>
-<div class="ttc" id="alegato__utils_8h_html_afc430126e5f8dc264fc71dca47938836"><div class="ttname"><a href="legato__utils_8h.html#afc430126e5f8dc264fc71dca47938836">leUtils_PointToScreenSpace</a></div><div class="ttdeci">void leUtils_PointToScreenSpace(const leWidget *widget, lePoint *pnt)</div><div class="ttdoc">Converts a point from widget space into screen space.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:75</div></div>
-<div class="ttc" id="alegato__utils_8h_html_ab7f6a109ac5051792d54dba716b8b9a1"><div class="ttname"><a href="legato__utils_8h.html#ab7f6a109ac5051792d54dba716b8b9a1">leUtils_ChildIntersectsParent</a></div><div class="ttdeci">leBool leUtils_ChildIntersectsParent(const leWidget *parent, const leWidget *child)</div><div class="ttdoc">Determines if parent and child intersect.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:166</div></div>
-<div class="ttc" id="alegato__utils_8h_html_aec11d7a3c0d6b6a8fd0d40d0cadacaae"><div class="ttname"><a href="legato__utils_8h.html#aec11d7a3c0d6b6a8fd0d40d0cadacaae">leUtils_PickFromWidget</a></div><div class="ttdeci">leWidget * leUtils_PickFromWidget(const leWidget *wgt, int32_t x, int32_t y)</div><div class="ttdoc">Finds the top-most visible widget in a layer at the given coordinates.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:34</div></div>
+<div class="ttc" id="alegato__utils_8h_html_a88b0a9cc7d02727f2a53f0b64b3b4e00"><div class="ttname"><a href="legato__utils_8h.html#a88b0a9cc7d02727f2a53f0b64b3b4e00">leUtils_RectToParentSpace</a></div><div class="ttdeci">void leUtils_RectToParentSpace(const leWidget *widget, leRect *rect)</div><div class="ttdoc">Convert rectangle from widget local space to widget parent space.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:132</div></div>
+<div class="ttc" id="alegato__utils_8h_html_afc430126e5f8dc264fc71dca47938836"><div class="ttname"><a href="legato__utils_8h.html#afc430126e5f8dc264fc71dca47938836">leUtils_PointToScreenSpace</a></div><div class="ttdeci">void leUtils_PointToScreenSpace(const leWidget *widget, lePoint *pnt)</div><div class="ttdoc">Converts a point from widget space into screen space.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:76</div></div>
+<div class="ttc" id="alegato__utils_8h_html_ab7f6a109ac5051792d54dba716b8b9a1"><div class="ttname"><a href="legato__utils_8h.html#ab7f6a109ac5051792d54dba716b8b9a1">leUtils_ChildIntersectsParent</a></div><div class="ttdeci">leBool leUtils_ChildIntersectsParent(const leWidget *parent, const leWidget *child)</div><div class="ttdoc">Determines if parent and child intersect.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:167</div></div>
+<div class="ttc" id="alegato__utils_8h_html_aec11d7a3c0d6b6a8fd0d40d0cadacaae"><div class="ttname"><a href="legato__utils_8h.html#aec11d7a3c0d6b6a8fd0d40d0cadacaae">leUtils_PickFromWidget</a></div><div class="ttdeci">leWidget * leUtils_PickFromWidget(const leWidget *wgt, int32_t x, int32_t y)</div><div class="ttdoc">Finds the top-most visible widget in a layer at the given coordinates.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:35</div></div>
 <div class="ttc" id="astructleWidget_html"><div class="ttname"><a href="structleWidget.html">leWidget</a></div><div class="ttdoc">Used to define a widget.</div><div class="ttdef"><b>Definition:</b> legato_widget.h:623</div></div>
-<div class="ttc" id="alegato__utils_8h_html_aa795e1d58a8b183aae7e9f1e35fa9034"><div class="ttname"><a href="legato__utils_8h.html#aa795e1d58a8b183aae7e9f1e35fa9034">leUtils_ClipRectToParent</a></div><div class="ttdeci">void leUtils_ClipRectToParent(const leWidget *widget, leRect *rect)</div><div class="ttdoc">Clips a rectangle to the parent of a widge.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:112</div></div>
-<div class="ttc" id="alegato__utils_8h_html_aa467fab76bac89abd0fa020f59b7b8fb"><div class="ttname"><a href="legato__utils_8h.html#aa467fab76bac89abd0fa020f59b7b8fb">leUtils_GetNextHighestWidget</a></div><div class="ttdeci">leWidget * leUtils_GetNextHighestWidget(const leWidget *wgt)</div><div class="ttdoc">Get next highest Z order widget in the tree from 'wgt'.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:182</div></div>
-<div class="ttc" id="alegato__utils_8h_html_a7022d4874a4d07146e888f752d0d4879"><div class="ttname"><a href="legato__utils_8h.html#a7022d4874a4d07146e888f752d0d4879">leUtils_ArrangeRectangle</a></div><div class="ttdeci">void leUtils_ArrangeRectangle(leRect *sub, leRect obj, leRect bounds, leHAlignment hAlignment, leVAlignment vAlignment, leRelativePosition position, uint8_t leftMargin, uint8_t topMargin, uint8_t rightMargin, uint8_t bottomMargin, uint16_t rectMargin)</div><div class="ttdoc">Calculates the position of a rectangle within the given bound.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:213</div></div>
-<div class="ttc" id="alegato__utils_8h_html_a78acf9fdd2b18d98a3b4b2c2fad1d2fa"><div class="ttname"><a href="legato__utils_8h.html#a78acf9fdd2b18d98a3b4b2c2fad1d2fa">leUtils_ArrangeRectangleRelative</a></div><div class="ttdeci">void leUtils_ArrangeRectangleRelative(leRect *sub, leRect obj, leRect bounds, leHAlignment hAlignment, leVAlignment vAlignment, leRelativePosition position, uint8_t leftMargin, uint8_t topMargin, uint8_t rightMargin, uint8_t bottomMargin, uint16_t rectMargin)</div><div class="ttdoc">Calculates the position of a rectangle within the given bounds.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:286</div></div>
+<div class="ttc" id="alegato__utils_8h_html_aa795e1d58a8b183aae7e9f1e35fa9034"><div class="ttname"><a href="legato__utils_8h.html#aa795e1d58a8b183aae7e9f1e35fa9034">leUtils_ClipRectToParent</a></div><div class="ttdeci">void leUtils_ClipRectToParent(const leWidget *widget, leRect *rect)</div><div class="ttdoc">Clips a rectangle to the parent of a widge.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:113</div></div>
+<div class="ttc" id="alegato__utils_8h_html_aa467fab76bac89abd0fa020f59b7b8fb"><div class="ttname"><a href="legato__utils_8h.html#aa467fab76bac89abd0fa020f59b7b8fb">leUtils_GetNextHighestWidget</a></div><div class="ttdeci">leWidget * leUtils_GetNextHighestWidget(const leWidget *wgt)</div><div class="ttdoc">Get next highest Z order widget in the tree from 'wgt'.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:183</div></div>
+<div class="ttc" id="alegato__utils_8h_html_a7022d4874a4d07146e888f752d0d4879"><div class="ttname"><a href="legato__utils_8h.html#a7022d4874a4d07146e888f752d0d4879">leUtils_ArrangeRectangle</a></div><div class="ttdeci">void leUtils_ArrangeRectangle(leRect *sub, leRect obj, leRect bounds, leHAlignment hAlignment, leVAlignment vAlignment, leRelativePosition position, uint8_t leftMargin, uint8_t topMargin, uint8_t rightMargin, uint8_t bottomMargin, uint16_t rectMargin)</div><div class="ttdoc">Calculates the position of a rectangle within the given bound.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:214</div></div>
+<div class="ttc" id="alegato__utils_8h_html_a78acf9fdd2b18d98a3b4b2c2fad1d2fa"><div class="ttname"><a href="legato__utils_8h.html#a78acf9fdd2b18d98a3b4b2c2fad1d2fa">leUtils_ArrangeRectangleRelative</a></div><div class="ttdeci">void leUtils_ArrangeRectangleRelative(leRect *sub, leRect obj, leRect bounds, leHAlignment hAlignment, leVAlignment vAlignment, leRelativePosition position, uint8_t leftMargin, uint8_t topMargin, uint8_t rightMargin, uint8_t bottomMargin, uint16_t rectMargin)</div><div class="ttdoc">Calculates the position of a rectangle within the given bounds.</div><div class="ttdef"><b>Definition:</b> legato_utils.c:287</div></div>
 <div class="ttc" id="astructlePoint_html"><div class="ttname"><a href="structlePoint.html">lePoint</a></div><div class="ttdoc">This structure represents a integer Cartesian point.</div><div class="ttdef"><b>Definition:</b> legato_common.h:346</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

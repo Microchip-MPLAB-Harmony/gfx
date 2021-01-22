@@ -23,7 +23,7 @@
 ##############################################################################
 
 def loadModule():	
-    if ("PIC32MZ" in str(Variables.get("__PROCESSOR")) and "DA" in str(Variables.get("__PROCESSOR"))):
+    if ( ("PIC32MZ" in str(Variables.get("__PROCESSOR")) and "DA" in str(Variables.get("__PROCESSOR"))) or "A5D2" in str(Variables.get("__PROCESSOR")) or "9X60" in str(Variables.get("__PROCESSOR"))):
         print("GFX Canvas module loaded to support " + str(Variables.get("__PROCESSOR")))
         cntlComponent = Module.CreateComponent("gfx_canvas", "Graphics Canvas ", "/Graphics/Virtual Display", "config/canvas.py")
         cntlComponent.setDisplayType("GFX Canvas Virtual Display")

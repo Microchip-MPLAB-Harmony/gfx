@@ -50,7 +50,6 @@ uint32_t __attribute__((coherent, aligned(32))) commandBuffer[CMD_BUFFER_SIZE];
 #define CMD_BUFFER_DDR_ADDRESS 0xA9E00000
 
 n2d_module_parameters_t gpu_params;
-n2d_orientation_t gpu_orientation = N2D_0;
 
 static n2d_buffer_format_t n2dFormats[GFX_COLOR_MODE_LAST + 1] =
 {
@@ -66,7 +65,8 @@ static n2d_buffer_format_t n2dFormats[GFX_COLOR_MODE_LAST + 1] =
     -1, //GFX_COLOR_MODE_INDEX_8
 };
 
-static  gfxBlend blendState = GFX_BLEND_NONE;
+static gfxBlend blendState = GFX_BLEND_NONE;
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -455,7 +455,7 @@ gfxResult DRV_2DGPU_Line(gfxPixelBuffer * dest,
     dest_buffer.height = dest->size.height;
     dest_buffer.stride = dest->size.width * gfxColorInfoTable[dest->mode].size;
     dest_buffer.format = n2dFormats[dest->mode];
-    dest_buffer.orientation = gpu_orientation;
+    dest_buffer.orientation = dest->orientation;
     dest_buffer.handle = NULL;
     dest_buffer.memory = dest->pixels;
     dest_buffer.gpu = KVA_TO_PA(dest->pixels);
@@ -503,7 +503,7 @@ gfxResult DRV_2DGPU_Fill(gfxPixelBuffer * dest,
     dest_buffer.height = dest->size.height;
     dest_buffer.stride = dest->size.width * gfxColorInfoTable[dest->mode].size;
     dest_buffer.format = n2dFormats[dest->mode];
-    dest_buffer.orientation = gpu_orientation;
+    dest_buffer.orientation = dest->orientation;
     dest_buffer.handle = NULL;
     dest_buffer.memory = dest->pixels;
     dest_buffer.gpu = KVA_TO_PA(dest->pixels);
@@ -529,7 +529,7 @@ gfxResult DRV_2DGPU_Blit(const gfxPixelBuffer* source,
     src_buffer.height = source->size.height;
     src_buffer.stride = source->size.width * gfxColorInfoTable[source->mode].size;
     src_buffer.format = n2dFormats[source->mode];
-    src_buffer.orientation = gpu_orientation;
+    src_buffer.orientation = source->orientation;
     src_buffer.handle = NULL;
     src_buffer.memory = source->pixels;
     src_buffer.gpu = KVA_TO_PA(source->pixels);
@@ -546,7 +546,7 @@ gfxResult DRV_2DGPU_Blit(const gfxPixelBuffer* source,
     dest_buffer.height = dest->size.height;
     dest_buffer.stride = dest->size.width * gfxColorInfoTable[dest->mode].size;
     dest_buffer.format = n2dFormats[dest->mode];
-    dest_buffer.orientation = gpu_orientation;
+    dest_buffer.orientation = dest->orientation;
     dest_buffer.handle = NULL;
     dest_buffer.memory = dest->pixels;
     dest_buffer.gpu = KVA_TO_PA(dest->pixels);

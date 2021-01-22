@@ -196,8 +196,7 @@ def onNumCanvasObjectsChanged(source, event):
 	global maxNumCanvas
 	print("Canvas count : " + str(event["value"]))
 	for x in range(maxNumCanvas - 1):
-		if (x < int(event["value"])):
-			source.getComponent().getSymbolByID("Canvas" + str(x)).setVisible(x < int(event["value"]))
+		source.getComponent().getSymbolByID("Canvas" + str(x)).setVisible(x < int(event["value"]))
 
 def onFrameBufferAllocChanged(source, event):
 	sub = re.search('Canvas(.*)FrameBufferAlloc', str(event["id"]))

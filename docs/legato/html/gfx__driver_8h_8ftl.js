@@ -69,6 +69,7 @@ var gfx__driver_8h_8ftl =
     [ "gfxIOCTLArg_Palette", "gfx__driver_8h_8ftl.html#a5effe89b10c9172ef059205f94db9617", null ],
     [ "gfxIOCTLArg_Value", "gfx__driver_8h_8ftl.html#a1b4850977168bfb6d9b75b9e5225f035", null ],
     [ "gfxLayerState", "gfx__driver_8h_8ftl.html#a2b1e2f2254f7ee842e220f9b38a3c2b4", null ],
+    [ "gfxOrientation", "gfx__driver_8h_8ftl.html#a4efcc3d4f888cc73dd7c1426376dc195", null ],
     [ "gfxPaletteSelect", "gfx__driver_8h_8ftl.html#a1d7602be2919d38c45145787739d4726", null ],
     [ "gfxPixelBuffer", "gfx__driver_8h_8ftl.html#a514dd30ea2566a22948ff40c96f879a3", null ],
     [ "gfxPoint", "gfx__driver_8h_8ftl.html#a9d034287b7f63228a682c2cf63401493", null ],
@@ -162,6 +163,12 @@ var gfx__driver_8h_8ftl =
       [ "GFX_IOCTL_UNSUPPORTED", "gfx__driver_8h_8ftl.html#ad3a0d1e4d373dd1933f7dac3c44c49c5aa0a2681ebd9aa08f77047fa7db59871d", null ],
       [ "GFX_IOCTL_OK", "gfx__driver_8h_8ftl.html#ad3a0d1e4d373dd1933f7dac3c44c49c5a04b60a5134b80c3f2898633ec66c8f26", null ],
       [ "GFX_IOCTL_ERROR_UNKNOWN", "gfx__driver_8h_8ftl.html#ad3a0d1e4d373dd1933f7dac3c44c49c5af939663162154a09cdd78f0247533231", null ]
+    ] ],
+    [ "gfxOrientation", "gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c", [
+      [ "GFX_ORIENT_0", "gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5cae1e8b89fe1526a580dcc46ea5ad69b30", null ],
+      [ "GFX_ORIENT_90", "gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5ca3250950843858a5c3a1c87ef437ff8b2", null ],
+      [ "GFX_ORIENT_180", "gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5ca6e0e1edb8c9ad3ab6449c1c2c95fff4d", null ],
+      [ "GFX_ORIENT_270", "gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5cad39c98d3cd235d2ba8ff2eb19202cca1", null ]
     ] ],
     [ "gfxPaletteSelect", "gfx__driver_8h_8ftl.html#a1e124c32d0603869a69c97bf7fd1cb05", [
       [ "GFX_PALETTE_ONE", "gfx__driver_8h_8ftl.html#a1e124c32d0603869a69c97bf7fd1cb05a57cfee7e8e0303b5229d2ec397d93a24", null ],

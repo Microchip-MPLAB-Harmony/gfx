@@ -352,4 +352,9 @@ void leUtils_ArrangeRectangleRelative(leRect* sub,
                                       uint8_t bottomMargin,
                                       uint16_t rectMargin);
 
+void leUtils_PointLogicalToScratch(int16_t* x,
+                                   int16_t* y);
+
+void leUtils_RectLogicalToScratch(leRect* rect);
+
 #endif // LEGATO_UTILS_H

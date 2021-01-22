@@ -87,7 +87,7 @@ GFXC_RESULT gfxcDestroy(unsigned int canvasID)
     return GFX_FAILURE;
 }
 
-int gfxcSetPixelBuffer(unsigned int canvasID,
+GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
                        const unsigned int width,
                        const unsigned int height,
                        const GFXC_COLOR_FORMAT format,

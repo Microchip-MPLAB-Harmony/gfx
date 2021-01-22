@@ -1033,7 +1033,7 @@ gfxDriverIOCTLResponse DRV_GLCD_IOCTL(gfxDriverIOCTLRequest request,
         default:
         {
             if (request >= GFX_IOCTL_LAYER_REQ_START && 
-                request < GFX_IOCTL_LAYER_REQ_END)
+                request <= GFX_IOCTL_LAYER_REQ_END)
             {
                 return DRV_GLCD_LayerConfig(request, (gfxIOCTLArg_LayerArg*)arg);
             }

@@ -33,11 +33,6 @@
 
 #include <string.h>
 
-#ifdef LEGATO_SIM
-#undef LE_TOUCH_ORIENTATION
-#define LE_TOUCH_ORIENTATION 0
-#endif
-
 static leInputState _state; // the global input state
 
 leInputState* _leGetInputState()
@@ -98,14 +93,14 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
     pnt.x = x;
     pnt.y = y;
 #elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
-    pnt.y = x;
-	pnt.x = dispSize.width - 1 - y;
+    pnt.y = dispSize.width - 1 - x;
+	pnt.x = y;
 #elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
     pnt.x = dispSize.width - 1 - x;
     pnt.y = dispSize.height - 1 - y;
 #else // 270 degrees
-    pnt.y = dispSize.height - 1 - x;
-    pnt.x = y;
+    pnt.y = x;
+    pnt.x = dispSize.height - 1 - y;
 #endif
 
     // dispatch the event
@@ -166,14 +161,14 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     pnt.x = x;
     pnt.y = y;
 #elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
-    pnt.y = x;
-    pnt.x = dispSize.width - 1 - y;
+    pnt.y = dispSize.width - 1 - x;
+	pnt.x = y;
 #elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
     pnt.x = dispSize.width - 1 - x;
     pnt.y = dispSize.height - 1 - y;
 #else // 270 degrees
-    pnt.y = dispSize.height - 1 - x;
-    pnt.x = y;
+    pnt.y = x;
+    pnt.x = dispSize.height - 1 - y;
 #endif
 
     // dispatch event
@@ -238,21 +233,21 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
             {   
 #ifdef INPUT_EVENT_DEBUG
                 printf("overwriting previous move event\n");
-#endif                
+#endif
 
                 // reorient touch coordinates if the user interface is rotated
 #if LE_TOUCH_ORIENTATION == 0
                 pnt.x = x;
                 pnt.y = y;
 #elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
-                pnt.y = x;
-                pnt.x = dispSize.width - 1 - y;
+                pnt.y = dispSize.width - 1 - x;
+	            pnt.x = y;
 #elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
                 pnt.x = dispSize.width - 1 - x;
                 pnt.y = dispSize.height - 1 - y;
 #else // 270 degrees
-                pnt.y = dispSize.height - 1 - x;
-                pnt.x = y;
+                pnt.y = x;
+                pnt.x = dispSize.height - 1 - y;
 #endif
                 
                 evt->x = x;
@@ -281,14 +276,14 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
     pnt.x = x;
     pnt.y = y;
 #elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
-    pnt.y = x;
-    pnt.x = dispSize.width - 1 - y;
+    pnt.y = dispSize.width - 1 - x;
+	pnt.x = y;
 #elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
     pnt.x = dispSize.width - 1 - x;
     pnt.y = dispSize.height - 1 - y;
 #else // 270 degrees
-    pnt.y = dispSize.height - 1 - x;
-    pnt.x = y;
+    pnt.y = x;
+    pnt.x = dispSize.height - 1 - y;
 #endif
 
     evt->event.owner = NULL;

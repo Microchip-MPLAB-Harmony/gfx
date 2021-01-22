@@ -277,6 +277,9 @@ n2d_buffer_format_t;
  * @brief This enum represents orientations.
  * @details List of of buffer orientations. Orientation is orthogonal.
  * Rotation which is not parallel to the x or y axis is not supported.
+ * @attention These are part specific register definitions. <span class="param">gfx_orientation</span>
+ * enumeration in gfx_driver, is dependent on the position of these definitions. If these are changed, you must also
+ * update gfx_orientation accordingly.
 */
 typedef enum n2d_orientation
 {

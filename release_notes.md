@@ -8,6 +8,44 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.0
+### Issues Fixed
+
+* MH3-45475 Update LCDC IOCTLS for Canvas Support
+* MH3-45728 Windows Path/Java Path resolve issue
+* MH3-45722 Add GPU interface for setting orientation
+* MH3-45765 Fixes blending of alpha channels
+* MH3-45432 Add Legato Composer Mac OS support
+* MH3-45433 LNF for property buttons and line entries
+* MH3-45614 button setstring nullptr
+* MH3-24676 Composer: Allow multi-image select and change property using Image Asset Manager
+* MH3-45619 Add Legato double-buffer & multi-layer support for 9X60
+* MH3-45678 Missing leString_Free function
+* MH3-45636 fixes hierarchy culling in pre-rendering stages
+* MH3-46556 Legato Composer Radial Menu widget does not save the items number
+* MH3-46491 Unable to change the root screen size
+* MH3-46628 Add screen orientation feature for legato on sam9x60
+* MH3-45721 Composer: Add hide/show option for layers
+* MH3-46528 Legato Composer crashes when adding a new string (in some condition)
+* MH3-45763 Legato Composer - RLE image data is in the wrong color mode
+* MH3-45761 Legato - Asynchronous Screen State Machine
+* MH3-45762 Legato - Harmony Delta Time support
+* MH3-45541 Composer Image Manager does not support import image with chinese path or filename
+* MH3-45459 Composer crashes when using arrow keys to move widgets
+* MH3-45680 Legato - Circular Gauge Widget Live Update
+* MH3-36848 add Batch image manipulation for MHGC
+* MH3-45679 Legato - Group selection box arrow keys don't move all selected widgets
+* MH3-45525 legato composer crash when dragging& moving widget in screen tree with mouse
+* MH3-45530 legato composer crash when after adding data category for bar graph widget
+* MH3-44633 Strings window under the Assets Tab in Legato Graphics Composer does not close
+* MH3-44333 GFX - composer fails to load palettized PNGs
+* MH3-18067 Legato Composer - Virtual sliders for properties
+* Fix canvas objects limit check
+* Fix IOCTL range check in GLCD driver
+* Fixes CRLF broken CJK fonts
+* Legato Composer Linux/PC Build v1.13.3
+* Legato Composer Mac Build v1.13.3
+
 ## Graphics Release v3.8.3
 ### Issues Fixed
 
@@ -75,14 +113,15 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 * [MPLAB® X IDE v5.45 or above](https://www.microchip.com/mplab/mplab-x-ide)
 * [MPLAB® XC32 C/C++ Compiler v2.50](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * MPLAB® Harmony Configurator (MHC) v3.6.0 and above.
+    * MPLAB® Harmony Configurator (MHC) v3.6.3 and above.
 
 ### Dependent Components
 
-* [BSP v3.8.1](https://github.com/Microchip-MPLAB-Harmony/bsp/releases/tag/v3.8.1)
+* [MHC v3.6.5](https://github.com/Microchip-MPLAB-Harmony/mhc/releases/tag/v3.6.5)
+* [BSP v3.8.2](https://github.com/Microchip-MPLAB-Harmony/bsp/releases/tag/v3.8.2)
 * [Core v3.8.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.8.1)
-* [dev_packs v3.8.0 ](https://github.com/Microchip-MPLAB-Harmony/dev_packs/releases/tag/v3.8.0)
-* [Harmony 3 USB v3.6.0](https://github.com/Microchip-MPLAB-Harmony/usb/releases/tag/v3.6.0)
+* [dev_packs v3.8.0](https://github.com/Microchip-MPLAB-Harmony/dev_packs/releases/tag/v3.8.0)
+* [Harmony 3 USB v3.7.0](https://github.com/Microchip-MPLAB-Harmony/usb/releases/tag/v3.7.0)
 * [Harmony 3 CMSIS-FreeRTOS v10.3.1](https://github.com/ARM-software/CMSIS-FreeRTOS)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 

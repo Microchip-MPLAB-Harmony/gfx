@@ -54,14 +54,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"gfx__driver_8h_8ftl.html#a2ad24a342d9da211d27f696ea53b0d76a60c327009fc9106be08519f1668ec455",
-"legato__color_8h.html#a9a4439f13bbc1ce88017b20a61ec6956af8d3e646b7faccb083c379a6613ea984",
-"legato__input_8h.html#a62a87ae69175b75991aca6a6ff7c95b3a48e7f8451e9031a9243bca0d7f09e71a",
-"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985ac61eb5ca590a65f1b2d899d203adba66",
+"gfx__driver_8h_8ftl.html#a2ad24a342d9da211d27f696ea53b0d76ac86285d1e94c60df4f3d10ac9d8e30f1",
+"legato__color_8h.html#abf8fa246d2e25b62abe3183dc806dabc",
+"legato__input_8h.html#a62a87ae69175b75991aca6a6ff7c95b3a54249cfb873b3e7ae0432bbec5bc0d6f",
+"legato__renderer_8h.html#abbd66364d459d75aa0e83cc7f2834985aefb2e4a42293c59de1c4a1ba6398af3e",
 "legato__widget_8h.html#a7bec460eb4c10f3b29172cdfd2edf42d",
 "structArcDrawState.html#a1264aae9a5f38be0f11d9305ec73de1e",
-"structleArcQuadrantQuery.html#ac160e910ecc9891e5f452d8bee79baf1",
-"structleStringTableIndex.html#a741d09f58009829d20f60b5d0e75d2b7"
+"structleArcQuadrantQuery.html",
+"structleStringTableHeader.html#a4ea2a73f2783d1f125b7f58220b43029"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

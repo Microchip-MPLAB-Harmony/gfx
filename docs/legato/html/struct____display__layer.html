@@ -29,7 +29,7 @@
   <td id="projectlogo"><img alt="Logo" src="mhgs.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MPLAB® Harmony Graphics Suite
-   &#160;<span id="projectnumber">GFX v3.8.2</span>
+   &#160;<span id="projectnumber">GFX v3.9.0</span>
    </div>
    <div id="projectbrief">Legato API Documentation</div>
   </td>
@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('struct____display__layer.html',''); in
 Collaboration diagram for __display_layer:</div>
 <div class="dyncontent">
 <div class="center"><img src="struct____display__layer__coll__graph.png" border="0" usemap="#a____display__layer_coll__map" alt="Collaboration graph"/></div>
-<map name="____display__layer_coll__map" id="a____display__layer_coll__map">
+<map name="____display__layer_coll__map" id="____display__layer_coll__map">
 <area shape="rect" title=" " alt="" coords="163,184,275,211"/>
 <area shape="rect" href="structgfxPixelBuffer.html" title="This struct represents a pixel buffer." alt="" coords="26,95,127,121"/>
 <area shape="rect" href="structgfxSize.html" title="This struct represents a size." alt="" coords="5,5,71,32"/>
@@ -165,18 +165,18 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>enabled</b></td></tr>
 <tr class="memitem:aa4e6cd37071c58fac8d7bcd99688c31f"><td class="memItemLeft" align="right" valign="top"><a id="aa4e6cd37071c58fac8d7bcd99688c31f"></a>
 volatile LAYER_LOCK_STATUS&#160;</td><td class="memItemRight" valign="bottom"><b>updateLock</b></td></tr>
 <tr class="separator:aa4e6cd37071c58fac8d7bcd99688c31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e1b49e7a1bb8cab283f1cb3780c1623"><td class="memItemLeft" align="right" valign="top"><a id="a4e1b49e7a1bb8cab283f1cb3780c1623"></a>
+<tr class="memitem:a2c190ecea5ada30340de88fa5a03e8f6"><td class="memItemLeft" align="right" valign="top"><a id="a2c190ecea5ada30340de88fa5a03e8f6"></a>
 <a class="el" href="structgfxPixelBuffer.html">gfxPixelBuffer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>pixelBuffer</b> [BUFFER_PER_LAYER]</td></tr>
-<tr class="separator:a4e1b49e7a1bb8cab283f1cb3780c1623"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a2c190ecea5ada30340de88fa5a03e8f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71bda77a5cfd992214f434b5fba3dbfa"><td class="memItemLeft" align="right" valign="top"><a id="a71bda77a5cfd992214f434b5fba3dbfa"></a>
 volatile unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>frontBufferIdx</b></td></tr>
 <tr class="separator:a71bda77a5cfd992214f434b5fba3dbfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2415a5be3fe4535e731906ee9db632a"><td class="memItemLeft" align="right" valign="top"><a id="ae2415a5be3fe4535e731906ee9db632a"></a>
 volatile unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>backBufferIdx</b></td></tr>
 <tr class="separator:ae2415a5be3fe4535e731906ee9db632a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcaf1b92b62abe841cc9b0cee7028ad6"><td class="memItemLeft" align="right" valign="top"><a id="adcaf1b92b62abe841cc9b0cee7028ad6"></a>
+<tr class="memitem:a46ab79e792ac622b79c673c903842775"><td class="memItemLeft" align="right" valign="top"><a id="a46ab79e792ac622b79c673c903842775"></a>
 &lt;#if DoubleBuffer==true &gt; <a class="el" href="structgfxRect.html">gfxRect</a>&#160;</td><td class="memItemRight" valign="bottom"><b>syncRect</b> [SYNC_RECT_COUNT+1]</td></tr>
-<tr class="separator:adcaf1b92b62abe841cc9b0cee7028ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a46ab79e792ac622b79c673c903842775"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe21c1393921d7ab0a8f48aa8f009b8e"><td class="memItemLeft" align="right" valign="top"><a id="afe21c1393921d7ab0a8f48aa8f009b8e"></a>
 volatile unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>syncRectIndex</b></td></tr>
 <tr class="separator:afe21c1393921d7ab0a8f48aa8f009b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,6 +189,12 @@ LCDC_LAYER_ID&#160;</td><td class="memItemRight" valign="bottom"><b>hwLayerID</b
 <tr class="memitem:a5befb1715866b99d39b448ad0f90fe2f"><td class="memItemLeft" align="right" valign="top"><a id="a5befb1715866b99d39b448ad0f90fe2f"></a>
 FRAMEBUFFER_PIXEL_TYPE *&#160;</td><td class="memItemRight" valign="bottom"><b>baseaddr</b> [BUFFER_PER_LAYER]</td></tr>
 <tr class="separator:a5befb1715866b99d39b448ad0f90fe2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69f38bfe370d9ae3e35651ee9651e6e9"><td class="memItemLeft" align="right" valign="top"><a id="a69f38bfe370d9ae3e35651ee9651e6e9"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>startx</b></td></tr>
+<tr class="separator:a69f38bfe370d9ae3e35651ee9651e6e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a915c3c902d1d053dc2f8585e0d5d34fb"><td class="memItemLeft" align="right" valign="top"><a id="a915c3c902d1d053dc2f8585e0d5d34fb"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>starty</b></td></tr>
+<tr class="separator:a915c3c902d1d053dc2f8585e0d5d34fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36b66fef922aad36d8d149db197fd7a3"><td class="memItemLeft" align="right" valign="top"><a id="a36b66fef922aad36d8d149db197fd7a3"></a>
 <a class="el" href="structLCDC__DMA__DESC.html">LCDC_DMA_DESC</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>desc</b></td></tr>
 <tr class="separator:a36b66fef922aad36d8d149db197fd7a3"><td class="memSeparator" colspan="2">&#160;</td></tr>

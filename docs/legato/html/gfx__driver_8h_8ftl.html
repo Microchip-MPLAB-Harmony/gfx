@@ -29,7 +29,7 @@
   <td id="projectlogo"><img alt="Logo" src="mhgs.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MPLAB® Harmony Graphics Suite
-   &#160;<span id="projectnumber">GFX v3.8.2</span>
+   &#160;<span id="projectnumber">GFX v3.9.0</span>
    </div>
    <div id="projectbrief">Legato API Documentation</div>
   </td>
@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('gfx__driver_8h_8ftl.html',''); initRes
 Include dependency graph for gfx_driver.h.ftl:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl__incl.png" border="0" usemap="#agfx_2middleware_2legato_2driver_2templates_2gfx__driver_8h_8ftl" alt=""/></div>
-<map name="gfx_2middleware_2legato_2driver_2templates_2gfx__driver_8h_8ftl" id="agfx_2middleware_2legato_2driver_2templates_2gfx__driver_8h_8ftl">
+<map name="gfx_2middleware_2legato_2driver_2templates_2gfx__driver_8h_8ftl" id="gfx_2middleware_2legato_2driver_2templates_2gfx__driver_8h_8ftl">
 <area shape="rect" title="GFX driver functions and definitions." alt="" coords="105,5,251,61"/>
 <area shape="rect" title=" " alt="" coords="5,109,73,136"/>
 <area shape="rect" title=" " alt="" coords="98,109,167,136"/>
@@ -318,6 +318,9 @@ typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:a6ba25c562dc17b6eb815d066cfca524e"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structgfxColorModeInfo.html">gfxColorModeInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfx__driver_8h_8ftl.html#a6ba25c562dc17b6eb815d066cfca524e">gfxColorModeInfo</a></td></tr>
 <tr class="memdesc:a6ba25c562dc17b6eb815d066cfca524e"><td class="mdescLeft">&#160;</td><td class="mdescRight">This struct represents color mode information.  <a href="gfx__driver_8h_8ftl.html#a6ba25c562dc17b6eb815d066cfca524e">More...</a><br /></td></tr>
 <tr class="separator:a6ba25c562dc17b6eb815d066cfca524e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4efcc3d4f888cc73dd7c1426376dc195"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">gfxOrientation</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfx__driver_8h_8ftl.html#a4efcc3d4f888cc73dd7c1426376dc195">gfxOrientation</a></td></tr>
+<tr class="memdesc:a4efcc3d4f888cc73dd7c1426376dc195"><td class="mdescLeft">&#160;</td><td class="mdescRight">This enum represents orientation modes.  <a href="gfx__driver_8h_8ftl.html#a4efcc3d4f888cc73dd7c1426376dc195">More...</a><br /></td></tr>
+<tr class="separator:a4efcc3d4f888cc73dd7c1426376dc195"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac301a4dd452715da6f19db770acebd33"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="gfx__driver_8h_8ftl.html#ae02cfd742b5afcb664b8afedcd983e31">gfxBlend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfx__driver_8h_8ftl.html#ac301a4dd452715da6f19db770acebd33">gfxBlend</a></td></tr>
 <tr class="memdesc:ac301a4dd452715da6f19db770acebd33"><td class="mdescLeft">&#160;</td><td class="mdescRight">This enum represents blend modes.  <a href="gfx__driver_8h_8ftl.html#ac301a4dd452715da6f19db770acebd33">More...</a><br /></td></tr>
 <tr class="separator:ac301a4dd452715da6f19db770acebd33"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -414,6 +417,13 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a114773cf490efdfabe00294585d48191"><td class="mdescLeft">&#160;</td><td class="mdescRight">This enum represents bits per pixel (BPP).  <a href="gfx__driver_8h_8ftl.html#a114773cf490efdfabe00294585d48191">More...</a><br /></td></tr>
 <tr class="separator:a114773cf490efdfabe00294585d48191"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeede84396f4d2469846eadb52a426e5c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">gfxOrientation</a> { <a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5cae1e8b89fe1526a580dcc46ea5ad69b30">GFX_ORIENT_0</a>, 
+<a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5ca3250950843858a5c3a1c87ef437ff8b2">GFX_ORIENT_90</a>, 
+<a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5ca6e0e1edb8c9ad3ab6449c1c2c95fff4d">GFX_ORIENT_180</a>, 
+<a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5cad39c98d3cd235d2ba8ff2eb19202cca1">GFX_ORIENT_270</a>
+ }</td></tr>
+<tr class="memdesc:aeede84396f4d2469846eadb52a426e5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This enum represents orientation modes.  <a href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">More...</a><br /></td></tr>
+<tr class="separator:aeede84396f4d2469846eadb52a426e5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae02cfd742b5afcb664b8afedcd983e31"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfx__driver_8h_8ftl.html#ae02cfd742b5afcb664b8afedcd983e31">gfxBlend</a> { <br />
 &#160;&#160;<b>GFX_BLEND_NONE</b>, 
 <b>GFX_BLEND_SRC_OVER</b>, 
@@ -810,6 +820,23 @@ const <a class="el" href="structgfxColorModeInfo.html">gfxColorModeInfo</a>&#160
 
 </div>
 </div>
+<a id="a4efcc3d4f888cc73dd7c1426376dc195"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4efcc3d4f888cc73dd7c1426376dc195">&#9670;&nbsp;</a></span>gfxOrientation</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum <a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">gfxOrientation</a> <a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">gfxOrientation</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This enum represents orientation modes. </p>
+<p>List of buffer orientations. Orientation is orthogonal. Rotation which is not parallel to the x or y axis is not supported. </p><dl class="section attention"><dt>Attention</dt><dd>These definitions are an abstraction of GPU register definitions. Each GPU driver will perform the correct mapping to actual register set values. </dd></dl>
+
+</div>
+</div>
 <a id="a514dd30ea2566a22948ff40c96f879a3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a514dd30ea2566a22948ff40c96f879a3">&#9670;&nbsp;</a></span>gfxPixelBuffer</h2>
 
@@ -1063,6 +1090,33 @@ const <a class="el" href="structgfxColorModeInfo.html">gfxColorModeInfo</a>&#160
 
 <p>This enum represents the possible IOCTL responses for a gfx driver. </p>
 <p>This enum represents the possible IOCTL responses for a gfx driver. </p>
+
+</div>
+</div>
+<a id="aeede84396f4d2469846eadb52a426e5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeede84396f4d2469846eadb52a426e5c">&#9670;&nbsp;</a></span>gfxOrientation</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="gfx__driver_8h_8ftl.html#aeede84396f4d2469846eadb52a426e5c">gfxOrientation</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This enum represents orientation modes. </p>
+<p>List of buffer orientations. Orientation is orthogonal. Rotation which is not parallel to the x or y axis is not supported. </p><dl class="section attention"><dt>Attention</dt><dd>These definitions are an abstraction of GPU register definitions. Each GPU driver will perform the correct mapping to actual register set values. </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aeede84396f4d2469846eadb52a426e5cae1e8b89fe1526a580dcc46ea5ad69b30"></a>GFX_ORIENT_0&#160;</td><td class="fielddoc"><p>Buffer is 0 degrees rotated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aeede84396f4d2469846eadb52a426e5ca3250950843858a5c3a1c87ef437ff8b2"></a>GFX_ORIENT_90&#160;</td><td class="fielddoc"><p>Buffer is 90 degrees rotated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aeede84396f4d2469846eadb52a426e5ca6e0e1edb8c9ad3ab6449c1c2c95fff4d"></a>GFX_ORIENT_180&#160;</td><td class="fielddoc"><p>Buffer is 180 degrees rotated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aeede84396f4d2469846eadb52a426e5cad39c98d3cd235d2ba8ff2eb19202cca1"></a>GFX_ORIENT_270&#160;</td><td class="fielddoc"><p>Buffer is 270 degrees rotated. </p>
+</td></tr>
+</table>
 
 </div>
 </div>
@@ -1398,7 +1452,7 @@ const <a class="el" href="structgfxColorModeInfo.html">gfxColorModeInfo</a>&#160
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph.png" border="0" usemap="#agfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph" alt=""/></div>
-<map name="gfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph" id="agfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph">
+<map name="gfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph" id="gfx__driver_8h_8ftl_a2c8b424c2953f784e2d64cf82f827902_icgraph">
 <area shape="rect" title="Create pixel buffer." alt="" coords="188,5,327,32"/>
 <area shape="rect" href="drv__gfx__lcc_8h_8ftl.html#a185feb0e9b58a6dc1dc771ad19e8015d" title="Initialize driver." alt="" coords="5,5,140,32"/>
 </map>
@@ -1455,7 +1509,7 @@ Here is the caller graph for this function:</div>
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph.png" border="0" usemap="#agfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph" alt=""/></div>
-<map name="gfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph" id="agfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph">
+<map name="gfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph" id="gfx__driver_8h_8ftl_af94d3140fbd811f4fc0e052518ae37b8_cgraph">
 <area shape="rect" title="Get pixel." alt="" coords="5,5,128,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af4d0efb6aa8ffc1ab4ca855acce8f25e" title="Get pixel." alt="" coords="176,5,345,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af4cf06aa9341136b86fc1390256698fb" title="Get buffer offset." alt="" coords="393,5,549,32"/>
@@ -1514,7 +1568,7 @@ Here is the call graph for this function:</div>
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph.png" border="0" usemap="#agfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph" alt=""/></div>
-<map name="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph" id="agfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph">
+<map name="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph" id="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_cgraph">
 <area shape="rect" title="Get pixel." alt="" coords="5,5,175,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af4cf06aa9341136b86fc1390256698fb" title="Get buffer offset." alt="" coords="223,5,379,32"/>
 </map>
@@ -1523,7 +1577,7 @@ Here is the call graph for this function:</div>
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph.png" border="0" usemap="#agfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph" alt=""/></div>
-<map name="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph" id="agfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph">
+<map name="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph" id="gfx__driver_8h_8ftl_af4d0efb6aa8ffc1ab4ca855acce8f25e_icgraph">
 <area shape="rect" title="Get pixel." alt="" coords="176,5,345,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af94d3140fbd811f4fc0e052518ae37b8" title="Get pixel." alt="" coords="5,5,128,32"/>
 </map>
@@ -1662,7 +1716,7 @@ Here is the caller graph for this function:</div>
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="gfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph.png" border="0" usemap="#agfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph" alt=""/></div>
-<map name="gfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph" id="agfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph">
+<map name="gfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph" id="gfx__driver_8h_8ftl_af4cf06aa9341136b86fc1390256698fb_icgraph">
 <area shape="rect" title="Get buffer offset." alt="" coords="393,5,549,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af4d0efb6aa8ffc1ab4ca855acce8f25e" title="Get pixel." alt="" coords="176,5,345,32"/>
 <area shape="rect" href="gfx__driver_8h_8ftl.html#af94d3140fbd811f4fc0e052518ae37b8" title="Get pixel." alt="" coords="5,5,128,32"/>

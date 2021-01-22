@@ -410,6 +410,22 @@ typedef struct gfxColorModeInfo
  */
 extern const gfxColorModeInfo gfxColorInfoTable[];
 
+/**
+ * @brief This enum represents orientation modes.
+ * @details List of buffer orientations. Orientation is orthogonal.
+ * Rotation which is not parallel to the x or y axis is not supported.
+ * @attention These definitions are an abstraction of GPU register
+ * definitions. Each GPU driver will perform the correct mapping
+ * to actual register set values.
+*/
+typedef enum gfxOrientation
+{
+    GFX_ORIENT_0,      /**< Buffer is 0 degrees rotated. */
+    GFX_ORIENT_90,     /**< Buffer is 90 degrees rotated. */
+    GFX_ORIENT_180,    /**< Buffer is 180 degrees rotated. */
+    GFX_ORIENT_270,    /**< Buffer is 270 degrees rotated. */
+}
+gfxOrientation;
 
 // *****************************************************************************
 /* Structure:
@@ -510,6 +526,7 @@ typedef struct gfxPixelBuffer
     
     uint32_t buffer_length;
     gfxBuffer pixels;
+    gfxOrientation orientation;
 
     uint32_t flags;
 } gfxPixelBuffer;

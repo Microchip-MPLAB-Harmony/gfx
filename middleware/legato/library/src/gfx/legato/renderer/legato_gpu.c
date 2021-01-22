@@ -1,6 +1,19 @@
 #include "gfx/legato/renderer/legato_gpu.h"
 
+#include "gfx/legato/common/legato_utils.h"
+#include "gfx/legato/core/legato_state.h"
+
 extern leRenderState _rendererState;
+
+#if LE_RENDER_ORIENTATION == 0
+#define GPU_ORIENTATION GFX_ORIENT_0
+#elif LE_RENDER_ORIENTATION == 90
+#define GPU_ORIENTATION GFX_ORIENT_90
+#elif LE_RENDER_ORIENTATION == 180
+#define GPU_ORIENTATION GFX_ORIENT_180
+#else
+#define GPU_ORIENTATION GFX_ORIENT_270
+#endif
 
 static gfxColorMode _convertColorMode(leColorMode mode)
 {
@@ -46,6 +59,7 @@ leResult leGPU_DrawLine(int32_t x0,
     buf.buffer_length = leGetRenderBuffer()->buffer_length;
     buf.flags = 0;
     buf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
+    buf.orientation = GPU_ORIENTATION;
 
     p0.x = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x - x0;
     p0.y = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y - y0;
@@ -56,6 +70,27 @@ leResult leGPU_DrawLine(int32_t x0,
     clipRect.y = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y - clip->y;
     clipRect.width = clip->width;
     clipRect.height = clip->height;
+
+#if LE_RENDER_ORIENTATION != 0
+    leUtils_PointLogicalToScratch((int16_t*)&p0.x,
+                                  (int16_t*)&p0.y);
+
+    leUtils_PointLogicalToScratch((int16_t*)&p1.x,
+                                  (int16_t*)&p1.y);
+
+    leRect rotRect;
+    rotRect.x = clipRect.x;
+    rotRect.y = clipRect.y;
+    rotRect.width = clipRect.width;
+    rotRect.height = clipRect.height;
+
+    leUtils_RectLogicalToScratch(&rotRect);
+
+    clipRect.x = rotRect.x;
+    clipRect.y = rotRect.y;
+    clipRect.width = rotRect.width;
+    clipRect.height = rotRect.height;
+#endif
 
     drawClr = clr;
 
@@ -108,11 +143,27 @@ leResult leGPU_FillRect(const leRect* rect,
     buf.buffer_length = leGetRenderBuffer()->buffer_length;
     buf.flags = 0;
     buf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
+    buf.orientation = GPU_ORIENTATION;
 
     fillRect.x = rect->x;
     fillRect.y = rect->y;
     fillRect.width = rect->width;
     fillRect.height = rect->height;
+
+#if LE_RENDER_ORIENTATION != 0
+    leRect rotRect;
+    rotRect.x = fillRect.x;
+    rotRect.y = fillRect.y;
+    rotRect.width = fillRect.width;
+    rotRect.height = fillRect.height;
+
+    leUtils_RectLogicalToScratch(&rotRect);
+
+    fillRect.x = rotRect.x;
+    fillRect.y = rotRect.y;
+    fillRect.width = rotRect.width;
+    fillRect.height = rotRect.height;
+#endif
 
     drawClr = clr;
 
@@ -168,6 +219,7 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
     sourceBuf.buffer_length = sourceBuffer->buffer_length;
     sourceBuf.flags = 0;
     sourceBuf.pixels = (gfxBuffer)sourceBuffer->pixels;
+    sourceBuf.orientation = GFX_ORIENT_0;
 
     destBuf.pixel_count = leGetRenderBuffer()->pixel_count;
     destBuf.size.width = leGetRenderBuffer()->size.width;
@@ -176,6 +228,7 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
     destBuf.buffer_length = leGetRenderBuffer()->buffer_length;
     destBuf.flags = 0;
     destBuf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
+    destBuf.orientation = GPU_ORIENTATION;
 
     gfxDestRect.x = destRect->x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
     gfxDestRect.y = destRect->y - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
@@ -235,6 +288,7 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
     sourceBuf.buffer_length = sourceBuffer->buffer_length;
     sourceBuf.flags = 0;
     sourceBuf.pixels = (gfxBuffer)sourceBuffer->pixels;
+    sourceBuf.orientation = GFX_ORIENT_0;
 
     destBuf.pixel_count = leGetRenderBuffer()->pixel_count;
     destBuf.size.width = leGetRenderBuffer()->size.width;
@@ -243,6 +297,7 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
     destBuf.buffer_length = leGetRenderBuffer()->buffer_length;
     destBuf.flags = 0;
     destBuf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
+    destBuf.orientation = GPU_ORIENTATION;
 
     gfxDestRect.x = destRect->x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
     gfxDestRect.y = destRect->y - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
