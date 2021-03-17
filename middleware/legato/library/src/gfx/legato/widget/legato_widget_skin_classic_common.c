@@ -670,7 +670,7 @@ void leWidget_SkinClassic_DrawStandardHybridBorder(leWidget* wgt,
                                               alpha);
 }
 
-void leWidget_SkinClassic_InvalidateBorderAreas(leWidget* wgt)
+void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget* wgt)
 {
 	leRect rect, dmgRect;
 	int32_t width, height;

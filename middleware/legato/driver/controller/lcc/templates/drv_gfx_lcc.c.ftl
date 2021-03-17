@@ -88,16 +88,33 @@
 </#if>
 </#if>
 
+<#if (PaletteMode??) && (PaletteMode == true)>
+#define FRAMEBUFFER_COLOR_MODE GFX_COLOR_MODE_PALETTE
+#define FRAMEBUFFER_TYPE uint8_t
+#define FRAMEBUFFER_PIXEL_BYTES 1
+#define LINEBUFFER_COLOR_MODE GFX_COLOR_MODE_RGB_565
+#define LINEBUFFER_TYPE uint16_t
+#define LINEBUFFER_PIXEL_BYTES 2
+
+#define FRAMEBUFFER_ATTRIBUTE __attribute__((aligned(FRAMEBUFFER_PIXEL_BYTES*8)))
+#define LINEBUFFER_ATTRIBUTE __attribute__((aligned(LINEBUFFER_PIXEL_BYTES*8)))
+
+#define GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT 256
+uint16_t lut[GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT];
+<#else>
 #define FRAMEBUFFER_TYPE uint16_t
 #define FRAMEBUFFER_PIXEL_BYTES 2
 
-<#if (UseCachedFrameBuffer??) && (UseCachedFrameBuffer == true)>
 #define FRAMEBUFFER_ATTRIBUTE __attribute__((aligned(FRAMEBUFFER_PIXEL_BYTES*8)))
-<#else>
-#define FRAMEBUFFER_ATTRIBUTE __attribute__((coherent, aligned(FRAMEBUFFER_PIXEL_BYTES*8)))
 </#if>
 
+
+<#if (PaletteMode??) && (PaletteMode == true)>
 FRAMEBUFFER_TYPE FRAMEBUFFER_ATTRIBUTE frameBuffer[BUFFER_COUNT][DISPLAY_WIDTH * DISPLAY_HEIGHT];
+LINEBUFFER_TYPE LINEBUFFER_ATTRIBUTE lineBuffer[DISPLAY_WIDTH];
+<#else>
+FRAMEBUFFER_TYPE FRAMEBUFFER_ATTRIBUTE frameBuffer[BUFFER_COUNT][DISPLAY_WIDTH * DISPLAY_HEIGHT];
+</#if>
 
 <#if (DMAController??) && (DMAController == "DMAC")>
 #define DRV_GFX_LCC_DMA_CHANNEL_INDEX DMAC_CHANNEL_${DMAChannel}
@@ -201,7 +218,7 @@ gfxResult DRV_LCC_Initialize(void)
 
     gfxPixelBufferCreate(DISP_HOR_RESOLUTION,
                         DISP_VER_RESOLUTION,
-                        GFX_COLOR_MODE_RGB_565,
+                        GFX_COLOR_MODE_PALETTE,
                         frameBuffer,
                         &pixelBuffer);
     
@@ -234,7 +251,7 @@ void DRV_LCC_Update(void)
         if(start() != 0)
             return;
         
-        memset(frameBuffer, 0x55, DISPLAY_WIDTH * DISPLAY_HEIGHT * 2);
+        memset(frameBuffer, 0x55, DISPLAY_WIDTH * DISPLAY_HEIGHT * FRAMEBUFFER_PIXEL_BYTES);
         
         state = RUN;
     }
@@ -314,6 +331,33 @@ gfxResult DRV_LCC_BlitBuffer(int32_t x,
     return GFX_FAILURE;
 }
 
+<#if (PaletteMode??) && (PaletteMode == true)>
+gfxDriverIOCTLResponse DRV_LCC_SetPalette(gfxIOCTLArg_Palette* pal)
+{
+    uint32_t colorIndex = 0;
+    gfxPixelBuffer buffer;
+    
+    if (pal->palette == NULL)
+        return GFX_IOCTL_ERROR_UNKNOWN;
+    
+    if (pal->colorCount > GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT)
+        pal->colorCount = GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT;
+
+    gfxPixelBufferCreate(pal->colorCount, 1, pal->mode, pal->palette, &buffer);
+    
+    for( colorIndex = 0;
+         colorIndex < pal->colorCount;
+         colorIndex++ )
+    {
+        lut[colorIndex] = (uint16_t)gfxColorConvert(pal->mode,
+                                          GFX_COLOR_MODE_RGB_565,
+                                          gfxPixelBufferGetIndex(&buffer, colorIndex));
+    }
+    
+    return GFX_IOCTL_OK;
+}
+</#if>
+
 gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest request,
                                      void* arg)
 {
@@ -392,6 +436,12 @@ gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest request,
 			
 			return GFX_IOCTL_OK;
 		}
+<#if (PaletteMode??) && (PaletteMode == true)>
+        case GFX_IOCTL_SET_PALETTE:
+        {
+            return DRV_LCC_SetPalette((gfxIOCTLArg_Palette*)arg);
+        }
+</#if>
 		default:
 		{ }
 	}
@@ -443,7 +493,11 @@ static gfxResult lccBacklightBrightnessSet(uint32_t brightness)
 static void lccDMAStartTransfer(const void *srcAddr, size_t srcSize,
                                        const void *destAddr)
 {
+<#if (PaletteMode??) && (PaletteMode == true)>
+    XDMAC_ChannelBlockLengthSet(DRV_GFX_LCC_DMA_CHANNEL_INDEX, (srcSize / LINEBUFFER_PIXEL_BYTES) - 1);
+<#else>
     XDMAC_ChannelBlockLengthSet(DRV_GFX_LCC_DMA_CHANNEL_INDEX, (srcSize / FRAMEBUFFER_PIXEL_BYTES) - 1);
+</#if>
 
 <#if UseCachedFrameBuffer == true>
     SYS_CACHE_CleanDCache_by_Addr(
@@ -461,16 +515,27 @@ static int start(void)
     XDMAC_ChannelCallbackRegister(DRV_GFX_LCC_BLIT_DMA_CHANNEL_INDEX, blitDMAIntHandler, 0);
 </#if>
 
+<#if (PaletteMode??) && (PaletteMode == true)>
+    lccDMAStartTransfer(lineBuffer, 
+                        LINEBUFFER_PIXEL_BYTES, 
+                        (const void*) EBI_BASE_ADDR);
+<#else>   
     lccDMAStartTransfer(frameBuffer, 
                         FRAMEBUFFER_PIXEL_BYTES,
                         (const void *) EBI_BASE_ADDR);
+</#if>
     return 0;
 }
 
 static void displayRefresh(void)
 {
     gfxPoint drawPoint;
+<#if (PaletteMode??) && (PaletteMode == true)>
+    static uint8_t* destPtr;
+    static gfxPoint lutPoint;
+<#else>
     gfxBuffer* buffer_to_tx = (void*) frameBuffer;
+</#if>
 
     typedef enum
     {
@@ -614,8 +679,16 @@ static void displayRefresh(void)
                 drawPoint.x = 0;
                 drawPoint.y = line++;
 
-                buffer_to_tx = gfxPixelBufferOffsetGet_Unsafe(&pixelBuffer, drawPoint.x, drawPoint.y);
+<#if (PaletteMode??) && (PaletteMode == true)>
+                destPtr = (uint8_t*)gfxPixelBufferOffsetGet_Unsafe(&pixelBuffer, drawPoint.x, drawPoint.y);
 
+                for(lutPoint.x = 0; lutPoint.x < DISPLAY_WIDTH; ++lutPoint.x)
+                {
+                    lineBuffer[lutPoint.x] = lut[destPtr[lutPoint.x]];
+                }
+<#else>
+                buffer_to_tx = gfxPixelBufferOffsetGet_Unsafe(&pixelBuffer, drawPoint.x, drawPoint.y);
+</#if>
             }
 
             pixels = DISP_HOR_RESOLUTION;
@@ -631,9 +704,15 @@ static void displayRefresh(void)
         }
     }
 
+<#if (PaletteMode??) && (PaletteMode == true)>
+    lccDMAStartTransfer(lineBuffer,
+                        (pixels * LINEBUFFER_PIXEL_BYTES), //1 byte per pixel
+                        (uint32_t*) EBI_BASE_ADDR);
+<#else>
     lccDMAStartTransfer(buffer_to_tx,
                         (pixels * FRAMEBUFFER_PIXEL_BYTES), //2 bytes per pixel
                         (uint32_t*) EBI_BASE_ADDR);
+</#if>
 }
 
 void dmaIntHandler (DRV_GFX_DMA_EVENT_TYPE status,

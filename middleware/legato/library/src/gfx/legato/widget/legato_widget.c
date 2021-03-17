@@ -1474,7 +1474,7 @@ void _leWidget_ClearDirtyState(leWidget* _this)
 
 void _leWidget_InvalidateBorderAreas(const leWidget* _this)
 {
-    (void)_this; // unused
+	leWidget_SkinClassic_InvalidateBorderAreas(_this);
 }
 
 void _leWidget_DamageArea(const leWidget* _this, leRect* rect)

@@ -34,8 +34,8 @@
 
 #include <string.h>
 
-#define SYS_INP_MAX_LISTENERS        2  // max number of listeners
-#define SYS_INP_MAX_GENERAL_EVENTS   32 // max number of pending events
+#define SYS_INP_MAX_LISTENERS        ${MaxListeners}  // max number of listeners
+#define SYS_INP_MAX_GENERAL_EVENTS   ${MaxEvents} // max number of pending events
 
 // event type values
 enum
@@ -51,7 +51,8 @@ enum
     GESTURE_FLICK_EVENT,
     GESTURE_PINCH_EVENT,
     GESTURE_STRETCH_EVENT,
-    GESTURE_ROTATE_EVENT
+    GESTURE_ROTATE_EVENT,
+    GESTURE_GENERIC_EVENT,
 };
 
 // generic struct for storing input events
@@ -69,6 +70,7 @@ typedef struct InputEvent_t
         SYS_INP_PinchGestureEvent pinchGesture;
         SYS_INP_StretchGestureEvent stretchGesture;
         SYS_INP_RotateGestureEvent rotateGesture;
+        SYS_INP_GenericGestureEvent genericGesture;
     } event;
 } InputEvent;
 
@@ -146,62 +148,84 @@ void SYS_INP_Tasks(void)
             {
                 case KEY_DOWN_EVENT:
                 {
-                    listeners[j].handleKeyDown((const SYS_INP_KeyEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleKeyDown != NULL)
+                        listeners[j].handleKeyDown((const SYS_INP_KeyEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case KEY_UP_EVENT:
                 {
-                    listeners[j].handleKeyUp((const SYS_INP_KeyEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleKeyUp != NULL)
+                        listeners[j].handleKeyUp((const SYS_INP_KeyEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case MOUSE_MOVE_EVENT:
                 {
-                    listeners[j].handleMouseMove((const SYS_INP_MouseMoveEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleMouseMove != NULL)
+                        listeners[j].handleMouseMove((const SYS_INP_MouseMoveEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case MOUSE_DOWN_EVENT:
                 {
-                    listeners[j].handleMouseButtonDown((const SYS_INP_MouseButtonEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleMouseButtonDown != NULL)
+                        listeners[j].handleMouseButtonDown((const SYS_INP_MouseButtonEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case MOUSE_UP_EVENT:
                 {
-                    listeners[j].handleMouseButtonUp((const SYS_INP_MouseButtonEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleMouseButtonUp != NULL)
+                        listeners[j].handleMouseButtonUp((const SYS_INP_MouseButtonEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case TOUCH_MOVE_EVENT:
                 {
-                    listeners[j].handleTouchMove((const SYS_INP_TouchMoveEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleTouchMove != NULL)
+                        listeners[j].handleTouchMove((const SYS_INP_TouchMoveEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case TOUCH_DOWN_EVENT:
                 {
-                    listeners[j].handleTouchDown((const SYS_INP_TouchStateEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleTouchDown != NULL)
+                        listeners[j].handleTouchDown((const SYS_INP_TouchStateEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case TOUCH_UP_EVENT:
                 {
-                    listeners[j].handleTouchUp((const SYS_INP_TouchStateEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleTouchUp != NULL)
+                        listeners[j].handleTouchUp((const SYS_INP_TouchStateEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case GESTURE_FLICK_EVENT:
                 {
-                    listeners[j].handleFlickGesture((const SYS_INP_FlickGestureEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleFlickGesture != NULL)
+                        listeners[j].handleFlickGesture((const SYS_INP_FlickGestureEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case GESTURE_PINCH_EVENT:
                 {
-                    listeners[j].handlePinchGesture((const SYS_INP_PinchGestureEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handlePinchGesture != NULL)
+                        listeners[j].handlePinchGesture((const SYS_INP_PinchGestureEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case GESTURE_STRETCH_EVENT:
                 {
-                    listeners[j].handleStretchGesture((const SYS_INP_StretchGestureEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleStretchGesture != NULL)
+                        listeners[j].handleStretchGesture((const SYS_INP_StretchGestureEvent* const)&generalEvents[i].event);
                     break;
                 }
                 case GESTURE_ROTATE_EVENT:
                 {
-                    listeners[j].handleRotateGesture((const SYS_INP_RotateGestureEvent* const)&generalEvents[i].event);
+                    if (listeners[j].handleRotateGesture != NULL)
+                        listeners[j].handleRotateGesture((const SYS_INP_RotateGestureEvent* const)&generalEvents[i].event);
+                    break;
+                }
+                case GESTURE_GENERIC_EVENT:
+                {
+                    if (listeners[j].handleGenericGesture != NULL)
+                        listeners[j].handleGenericGesture((const SYS_INP_GenericGestureEvent* const)&generalEvents[i].event);
+                    break;
+                }
+                default:
+                {
                     break;
                 }
             }
@@ -622,6 +646,38 @@ int32_t SYS_INP_InjectRotateGesture(uint16_t x,
 <#if RTOSEnabled == true>
     OSAL_MUTEX_Unlock(&eventsLock);
 </#if>
+    
+    return 0;
+}
+
+int32_t SYS_INP_InjectGenericGesture(uint16_t gest,
+                                     uint16_t x,
+                                     uint16_t y,
+                                     void * parm)
+{
+<#if RTOSEnabled == true>
+    OSAL_MUTEX_Lock(&eventsLock, OSAL_WAIT_FOREVER);
+</#if>
+        // add the event to the next empty slot
+    if(eventCount >= SYS_INP_MAX_GENERAL_EVENTS)
+    {
+<#if RTOSEnabled == true>
+        OSAL_MUTEX_Unlock(&eventsLock);
+</#if>	
+        return -1;
+    }
+    
+    generalEvents[eventCount].type = GESTURE_GENERIC_EVENT;
+    generalEvents[eventCount].event.genericGesture.gest = gest;
+    generalEvents[eventCount].event.genericGesture.x = x;
+    generalEvents[eventCount].event.genericGesture.y = y;
+    generalEvents[eventCount].event.genericGesture.parm = parm;
+    
+    eventCount++;
+	
+<#if RTOSEnabled == true>
+        OSAL_MUTEX_Unlock(&eventsLock);
+</#if>	
     
     return 0;
 }

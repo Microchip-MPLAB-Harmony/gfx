@@ -375,5 +375,31 @@ int32_t SYS_INP_InjectRotateGesture(uint16_t x,
                                     uint16_t angle,
                                     uint16_t sep,
                                     uint16_t dir);
+									
+// *****************************************************************************
+/* Function:
+    int32_t SYS_INP_InjectGenericGesture(uint_t gest, uint16_t x, uint16_t y, void * parm);
+
+  Summary:
+    Injects a generic gesture into the system. This event will then be broadcast
+    to any registered listeners during a later task service event
+    
+  Parameters:
+    gest - the gesture ID
+    x - the gesture x position
+    y - the gesture y position
+    parm - gesture parameters
+        
+  Returns:
+    int32_t - Non-zero value indicates an error during registeration
+    
+  Remarks:
+    Use this to inject any other gestures not specifically supported by an 
+    inject API. 
+*/
+int32_t SYS_INP_InjectGenericGesture(uint16_t gest,
+                                     uint16_t x,
+                                     uint16_t y,
+                                     void * parm);
 
 #endif /* SYS_INPUT_H */

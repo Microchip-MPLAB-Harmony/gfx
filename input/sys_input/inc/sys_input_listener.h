@@ -87,6 +87,7 @@ typedef struct SYS_INP_InputListener_t
     SYS_INP_HandlePinchGestureEvent handlePinchGesture;
     SYS_INP_HandleStretchGestureEvent handleStretchGesture;
     SYS_INP_HandleRotateGestureEvent handleRotateGesture;
+	SYS_INP_HandleGenericGestureEvent handleGenericGesture;
     
 } SYS_INP_InputListener;
 

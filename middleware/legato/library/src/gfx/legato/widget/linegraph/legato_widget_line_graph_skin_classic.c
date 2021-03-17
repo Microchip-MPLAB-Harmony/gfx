@@ -229,6 +229,8 @@ static void _getCategoryLabelMaxDrawRect(const leLineGraphWidget* graph,
     leLineGraphCategory* cat;
     leRect strRect;
 
+    *labelRect = leRect_Zero;
+
     for(uint32_t i = 0; i < graph->categories.size; ++i)
     {
         cat = (leLineGraphCategory*)graph->categories.values[i];
@@ -240,12 +242,12 @@ static void _getCategoryLabelMaxDrawRect(const leLineGraphWidget* graph,
 
         //strRect.adjust(0, 0, 0, 1);
 
-        if(strRect.height > labelRect->height)
+        if(strRect.height > (int)labelRect->height)
         {
             labelRect->height = strRect.height;
         }
 
-        if(strRect.width > labelRect->width)
+        if(strRect.width > (int)labelRect->width)
         {
             labelRect->width = strRect.width;
         }
@@ -260,11 +262,11 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
     if(graph->ticksLabelFont == NULL)
         return;
 
-    sprintf(paintState.strbuff, "%i", graph->minValue);
+    sprintf(paintState.strbuff, "%ld", graph->minValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &minRect);
 
-    sprintf(paintState.strbuff, "%i", graph->maxValue);
+    sprintf(paintState.strbuff, "%ld", graph->maxValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxRect);
 

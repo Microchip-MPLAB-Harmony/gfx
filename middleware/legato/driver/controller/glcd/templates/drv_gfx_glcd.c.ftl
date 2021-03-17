@@ -206,6 +206,11 @@ static unsigned int blitLayer = 0;
 </#if>
 static unsigned int vsyncCount = 0;
 static unsigned int activeLayer = 0;
+<#if VblankUpdate == true>
+static bool vblankSync = true;
+<#else>
+static bool vblankSync = false;
+</#if>
 <#if DoubleBuffer == true>
 static volatile unsigned int syncLayer = 0;
 </#if>
@@ -571,6 +576,10 @@ void GLCD_Interrupt_Handler(void)
     unsigned int i = 0;
     
     EVIC_SourceStatusClear(INT_SOURCE_GLCD);
+	
+    //Sync on vblank?
+    if (vblankSync && PLIB_GLCD_IsVerticalBlankingActive() == true)
+        return;    	
 
     PLIB_GLCD_VSyncInterruptDisable();
 
@@ -1030,6 +1039,12 @@ gfxDriverIOCTLResponse DRV_GLCD_IOCTL(gfxDriverIOCTLRequest request,
         {
             return DRV_GLCD_SetPalette((gfxIOCTLArg_Palette*)arg);
         }
+        case GFX_IOCTL_SET_VBLANK_SYNC:
+        {
+            vblankSync = ((gfxIOCTLArg_Value*)arg)->value.v_bool;
+            
+            return GFX_IOCTL_OK;
+        }		
         default:
         {
             if (request >= GFX_IOCTL_LAYER_REQ_START && 

@@ -707,4 +707,26 @@ leResult leImage_RotateDraw(const leImage* src,
                             uint32_t a);
 
 
+/**
+ * @brief Process an image to another location.
+ * @details Processes an image from one location (typically an external source)
+ * to an internally accessible memory address.  The source image <span class="param">img</span>
+ * will be uncompressed and rendered in a raw format to the address
+ * <span class="param">addr</span> using the color mode <span class="param">mode</span>.
+ * This operation is typically used to transform an image into a GPU-compatible
+ * state.
+ * @code
+ * leImage* img;
+ * uint32_t addr = 0xA0000000;
+ * leColorMode mode = LE_COLOR_MODE_RGBA8888;
+ * leProcessImage(img, addr, mode);
+ * @endcode
+ * @param img the source image to process.
+ * @param addr the address of the location for the new image data
+ * @param mode the new color mode of the image
+ */
+void leProcessImage(leImage* img,
+                    uint32_t addr,
+                    leColorMode mode);
+
 #endif /* LE_IMAGE_H */

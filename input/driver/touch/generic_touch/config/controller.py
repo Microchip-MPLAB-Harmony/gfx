@@ -37,6 +37,9 @@ def onAttachmentDisconnected(source, target):
 
 def showRTOSMenu(source, event):
 	source.setVisible(event["value"] != "BareMetal")
+    
+def onEventNotifEnabled(source, event):
+    source.getComponent().getSymbolByID("EventNotifComment").setVisible(event['value'] == True)
 
 def onInitCommandsCountChanged(source, event):
 	global numCommands

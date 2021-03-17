@@ -398,3 +398,38 @@ leResult leImage_RotateDraw(const leImage* src,
 
     return LE_FAILURE;
 }
+
+void leProcessImage(leImage* img,
+                    uint32_t addr,
+                    leColorMode mode)
+{
+    leImage newImage;
+    leRect srcRect;
+
+    if(img == NULL)
+        return;
+
+    leImage_Create(&newImage,
+                   img->buffer.size.width,
+                   img->buffer.size.height,
+                   mode,
+                   (void*)addr,
+                   LE_STREAM_LOCATION_ID_INTERNAL);
+
+    srcRect.x = 0;
+    srcRect.y = 0;
+    srcRect.width = img->buffer.size.width;
+    srcRect.height = img->buffer.size.height;
+
+    leImage_Render(img,
+                   &srcRect,
+                   0,
+                   0,
+                   LE_TRUE,
+                   LE_TRUE,
+                   &newImage);
+
+    img->header = newImage.header;
+    img->format = LE_IMAGE_FORMAT_RAW;
+    img->buffer = newImage.buffer;
+}

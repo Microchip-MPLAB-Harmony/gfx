@@ -298,6 +298,21 @@ TouchGestureSettings.setDescription("Check if touch gestures will be parsed from
 TouchGestureSettings.setVisible(False)
 TouchGestureSettings.setDefaultValue(False)
 
+TouchDriverSettings = comp.createMenuSymbol("TouchDriverSettings", None)
+TouchDriverSettings.setLabel("Driver Settings")
+
+EventNotifEnabled = comp.createBooleanSymbol("EventNotifEnabled", TouchDriverSettings)
+EventNotifEnabled.setLabel("Use Event Notification?")
+EventNotifEnabled.setDefaultValue(False)
+EventNotifEnabled.setDescription("<html> Driver will be notified of touch event interrupt using a callback function <br> "
+"instead of polling the interrupt line. The callback function drv_touch_int() must be called to notify the driver. <br>"
+"The application must register the callback function to the project's event notification system or ISR. </html>")
+EventNotifEnabled.setDependencies(onEventNotifEnabled, ["EventNotifEnabled"])
+
+EventNotifComment = comp.createCommentSymbol("EventNotifComment", EventNotifEnabled)
+EventNotifComment.setLabel("The application must register the drv_touch_int() callback function to the Touch Interrupt Pin ISR.")
+EventNotifComment.setVisible(False)
+
 RTOSMenu = comp.createMenuSymbol("RTOSMenu", None)
 RTOSMenu.setLabel("RTOS Settings")
 RTOSMenu.setDescription("RTOS Settings")

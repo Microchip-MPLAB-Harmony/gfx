@@ -158,13 +158,16 @@ static leResult setString(leLabelWidget* _this,
 
     _this->string = str;
 
-    _this->string->fn->setPreInvalidateCallback((leString*)_this->string,
-                                                (leString_InvalidateCallback)stringPreinvalidate,
-                                                _this);
+    if(_this->string != NULL)
+    {   
+        _this->string->fn->setPreInvalidateCallback((leString*)_this->string,
+                                                    (leString_InvalidateCallback)stringPreinvalidate,
+                                                    _this);
 
-    _this->string->fn->setInvalidateCallback((leString*)_this->string,
-                                             (leString_InvalidateCallback)stringInvalidate,
-                                             _this);
+        _this->string->fn->setInvalidateCallback((leString*)_this->string,
+                                                 (leString_InvalidateCallback)stringInvalidate,
+                                                 _this);
+	}
 
     invalidateContents(_this);
         

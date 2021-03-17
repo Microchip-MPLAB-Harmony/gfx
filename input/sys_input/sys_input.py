@@ -26,6 +26,18 @@ def instantiateComponent(component):
 	component.setHelpFile("../../docs/help_harmony_gfx_html_alias.h")
 	#component.setHelp("IDH_HTML_GFX_CMP__7__Input_System_Service_Component")
 
+	MaxListeners = component.createIntegerSymbol("MaxListeners", None)
+	MaxListeners.setLabel("Max Listeners")
+	MaxListeners.setMin(1)
+	MaxListeners.setMax(32)
+	MaxListeners.setDefaultValue(2)
+
+	MaxEvents = component.createIntegerSymbol("MaxEvents", None)
+	MaxEvents.setLabel("Max Events")
+	MaxEvents.setMin(16)
+	MaxEvents.setMax(256)
+	MaxEvents.setDefaultValue(32)
+
 	RTOSMenu = component.createMenuSymbol("RTOSMenu", None)
 	RTOSMenu.setLabel("RTOS Settings")
 	RTOSMenu.setDescription("RTOS Settings")

@@ -3,11 +3,11 @@ projectPath = "config/" + Variables.get("__CONFIGURATION_NAME") + "/driver/input
 
 DRV_TOUCH_PTC_C = comp.createFileSymbol("DRV_TOUCH_PTC_C", None)
 DRV_TOUCH_PTC_C.setDestPath("driver/input/")
-DRV_TOUCH_PTC_C.setSourcePath("templates/drv_touch_ptc.c")
+DRV_TOUCH_PTC_C.setSourcePath("templates/drv_touch_ptc.c.ftl")
 DRV_TOUCH_PTC_C.setOutputName("drv_touch_ptc.c")
 DRV_TOUCH_PTC_C.setProjectPath(projectPath)
 DRV_TOUCH_PTC_C.setType("SOURCE")
-#DRV_TOUCH_PTC_C.setMarkup(True)
+DRV_TOUCH_PTC_C.setMarkup(True)
 
 DRV_TOUCH_PTC_H = comp.createFileSymbol("DRV_TOUCH_PTC_H", None)
 DRV_TOUCH_PTC_H.setDestPath("driver/input/")

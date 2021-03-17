@@ -76,6 +76,12 @@ ResetEnable.setDefaultValue(True)
 ResetEnable.setDescription("<html> Enabling Reset will generate code that will toggle (active low) the reset pin to the device.<br>"
 						"The reset pin must be defined in the Pin Settings as GFX_DISP_INTF_PIN_RESET</html>")
 
+PreResetDelay = comp.createIntegerSymbol("PreResetDelay", ResetMenu)
+PreResetDelay.setLabel("Pre Reset Delay(ms)")
+PreResetDelay.setDefaultValue(0)
+PreResetDelay.setMin(0)
+PreResetDelay.setDescription("<html> The delay added before the reset signal is pulled low (deasserted). <br>"
+                                                                                                        "Set this to create a delay between pin control and reset. If 0, the deassart will not be generated.</html>")
 ResetAssertDuration = comp.createIntegerSymbol("ResetAssertDuration", ResetMenu)
 ResetAssertDuration.setLabel("Reset Duration (ms)")
 ResetAssertDuration.setDefaultValue(10)

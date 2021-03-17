@@ -354,6 +354,12 @@ def instantiateComponent(comp):
 	OtherSettingsMenu = comp.createMenuSymbol("OtherMenu", None)
 	OtherSettingsMenu.setLabel("Other Settings")
 	
+	VblankUpdate = comp.createBooleanSymbol("VblankUpdate", OtherSettingsMenu)
+	VblankUpdate.setLabel("Update on Vblank")
+	VblankUpdate.setDefaultValue(True)
+	VblankUpdate.setVisible(True)
+	VblankUpdate.setDescription("<html>Schedule register updates in vblank.</html>")
+    
 	CanvasModeOnly = comp.createBooleanSymbol("CanvasModeOnly", OtherSettingsMenu)
 	CanvasModeOnly.setLabel("Canvas Mode")
 	CanvasModeOnly.setDefaultValue(False)

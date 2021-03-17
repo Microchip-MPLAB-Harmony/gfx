@@ -58,6 +58,12 @@ TouchDataSettings = comp.createMenuSymbol("TouchDataSettings", None)
 TouchDataSettings.setLabel("Touch Position Settings")
 TouchDataSettings.setDescription("Touch Position Settings")
 
+TouchPoints = comp.createIntegerSymbol("TouchPoints", TouchDataSettings)
+TouchPoints.setLabel("Max Touch Points")
+TouchPoints.setMin(1)
+TouchPoints.setMax(2)
+TouchPoints.setDefaultValue(1)
+
 HorzTouchDataFlip = comp.createBooleanSymbol("HorzTouchDataFlip", TouchDataSettings)
 HorzTouchDataFlip.setLabel("Flip Horizontal Position")
 HorzTouchDataFlip.setDescription("Flip/Mirror the horizontal position data")
@@ -69,6 +75,20 @@ VertTouchDataFlip.setDescription("Flip/Mirror the vertical position data")
 DataResolutionBits = comp.createComboSymbol("DataResolutionBits", TouchDataSettings, ["8", "10", "12"])
 DataResolutionBits.setLabel("Touch Data Resolution (Bits)")
 DataResolutionBits.setDescription("The resolution of the PTC touch data (bits). This should match the PTC library configuration.")
+
+DriverSettings = comp.createMenuSymbol("DriverSettings", None)
+DriverSettings.setLabel("Driver Settings")
+DriverSettings.setDescription("Driver Settings")
+
+GestureSupport = comp.createBooleanSymbol("GestureSupport", DriverSettings)
+GestureSupport.setLabel("Enable Gestures")
+GestureSupport.setDescription("Enable Touch Gestures")
+GestureSupport.setDefaultValue(False)
+
+MultiTouchSupport = comp.createBooleanSymbol("MultiTouchSupport", DriverSettings)
+MultiTouchSupport.setLabel("Enable Multi-Touch")
+MultiTouchSupport.setDescription("Report Multiple Touch Points")
+MultiTouchSupport.setDefaultValue(False)
 
 RTOSMenu = comp.createMenuSymbol("RTOSMenu", None)
 RTOSMenu.setLabel("RTOS Settings")

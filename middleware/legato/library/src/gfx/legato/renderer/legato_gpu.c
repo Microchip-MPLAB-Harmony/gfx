@@ -59,7 +59,7 @@ leResult leGPU_DrawLine(int32_t x0,
     buf.buffer_length = leGetRenderBuffer()->buffer_length;
     buf.flags = 0;
     buf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
-    buf.orientation = GPU_ORIENTATION;
+    buf.orientation = GFX_ORIENT_0;
 
     p0.x = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x - x0;
     p0.y = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y - y0;
@@ -143,7 +143,7 @@ leResult leGPU_FillRect(const leRect* rect,
     buf.buffer_length = leGetRenderBuffer()->buffer_length;
     buf.flags = 0;
     buf.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
-    buf.orientation = GPU_ORIENTATION;
+    buf.orientation = GFX_ORIENT_0;
 
     fillRect.x = rect->x;
     fillRect.y = rect->y;

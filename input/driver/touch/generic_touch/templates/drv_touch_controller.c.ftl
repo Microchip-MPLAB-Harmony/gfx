@@ -168,6 +168,19 @@ DRV_TOUCH_OBJ drv_touch =
     .tx_count = 0,
 };
 
+<#if EventNotifEnabled == true>
+volatile unsigned int touch_int_count = 0;
+
+void drv_touch_int(int pin, uintptr_t context)
+{
+    if (DRV_TOUCH_PIN_INT_Get() == DRV_TOUCH_INT_VALUE)
+    {
+        touch_int_count++;
+    }
+}
+</#if>
+
+<#if ResetEnable == true>
 void drv_touch_delayms(int ms)
 {
     SYS_TIME_HANDLE timer = SYS_TIME_HANDLE_INVALID;
@@ -197,7 +210,6 @@ static void drv_touch_timer_callback (uintptr_t context)
     }
 }
 
-<#if ResetEnable == true>
 static void drv_touch_reset(void)
 {
     DRV_TOUCH_PIN_RESET_Assert();
@@ -260,6 +272,9 @@ void drv_touch_process_data(void)
 {
 <#if TouchDataProcessFunctionGenerateMode == "Generate">
     uint32_t pos_x, pos_y, event;
+<#if TouchPointPosSize == "2">
+    uint32_t pos_xh, pos_xl, pos_yh, pos_yl;
+</#if>	
 
 <#if TouchGestureSettings == true>
     switch ((drv_touch.read_buffer[DRV_TOUCH_DATA_GESTURE_INDEX] & 
@@ -283,18 +298,23 @@ void drv_touch_process_data(void)
 </#if>
     event = (drv_touch.read_buffer[DRV_TOUCH_DATA_EVENT_INDEX] & 
             DRV_TOUCH_DATA_EVENT_MASK) >> DRV_TOUCH_DATA_EVENT_SHIFT;
+
 <#if TouchPointPosSize == "2">
-    pos_x = (((drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE1_INDEX] &
-             DRV_TOUCH_DATA_POSX_BYTE1_MASK) >> DRV_TOUCH_DATA_POSX_BYTE1_SHIFT) <<
-            8) |
-            ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE0_INDEX] &
-             DRV_TOUCH_DATA_POSX_BYTE0_MASK) >> DRV_TOUCH_DATA_POSX_BYTE0_SHIFT);
+    pos_xh = drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE1_INDEX] & DRV_TOUCH_DATA_POSX_BYTE1_MASK;
+    pos_xh >>= DRV_TOUCH_DATA_POSX_BYTE1_SHIFT;
     
-    pos_y = (((drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE1_INDEX] &
-             DRV_TOUCH_DATA_POSY_BYTE1_MASK) >> DRV_TOUCH_DATA_POSY_BYTE1_SHIFT) <<
-            8) |
-            ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE0_INDEX] &
-             DRV_TOUCH_DATA_POSY_BYTE0_MASK) >> DRV_TOUCH_DATA_POSY_BYTE0_SHIFT);
+    pos_xl = drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE0_INDEX] & DRV_TOUCH_DATA_POSX_BYTE0_MASK;
+    pos_xh >>= DRV_TOUCH_DATA_POSX_BYTE0_SHIFT;
+
+    pos_x = ((pos_xh << 8) | pos_xl);
+    
+    pos_yh = drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE1_INDEX] & DRV_TOUCH_DATA_POSY_BYTE1_MASK;
+    pos_yh >>= DRV_TOUCH_DATA_POSY_BYTE1_SHIFT;
+    
+    pos_yl = drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE0_INDEX] & DRV_TOUCH_DATA_POSY_BYTE0_MASK;
+    pos_yh >>= DRV_TOUCH_DATA_POSY_BYTE0_SHIFT;
+    
+    pos_y = ((pos_yh << 8) | pos_yl);
 <#else>
     pos_x = ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE0_INDEX] &
              DRV_TOUCH_DATA_POSX_BYTE0_MASK) >> DRV_TOUCH_DATA_POSX_BYTE0_SHIFT);
@@ -347,12 +367,16 @@ void drv_touch_controller_task(void)
                                      (uintptr_t) &drv_touch);
 
             drv_touch.prev_state = DRV_TOUCH_STATE_INIT;
+<#if ResetEnable == true>			
             drv_touch.state = DRV_TOUCH_STATE_WAIT;
 
             drv_touch.timer_handle = SYS_TIME_CallbackRegisterMS(drv_touch_timer_callback, 
                         (uintptr_t) &drv_touch,
                         DRV_TOUCH_POST_RESET_DELAY_MS,
                         SYS_TIME_SINGLE);
+<#else>
+			drv_touch.state = DRV_TOUCH_STATE_CONFIGURE;
+</#if>
             break;
         }
         case DRV_TOUCH_STATE_CONFIGURE:
@@ -388,11 +412,21 @@ void drv_touch_controller_task(void)
         }
         case DRV_TOUCH_STATE_IDLE:
         {
+<#if EventNotifEnabled == true>
+            static int touch_int_processed_count = 0;
+			
+            if (touch_int_processed_count != touch_int_count)
+            {
+                touch_int_processed_count++;
+                drv_touch.state = DRV_TOUCH_STATE_GET_TOUCH_DATA;
+            }
+<#else>		
             //Poll notification pin
             if (DRV_TOUCH_PIN_INT_Get() == DRV_TOUCH_INT_VALUE)
             {
                 drv_touch.state = DRV_TOUCH_STATE_GET_TOUCH_DATA;
             }
+</#if>
             break;
         }
         case DRV_TOUCH_STATE_GET_TOUCH_DATA:

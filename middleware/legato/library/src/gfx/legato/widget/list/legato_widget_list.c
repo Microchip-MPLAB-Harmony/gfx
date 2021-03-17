@@ -539,7 +539,7 @@ static leResult setItemSelected(leListWidget* _this,
     
     LE_ASSERT_THIS();
     
-    if(idx == -1 || idx >= (int32_t)_this->items.size)
+    if(idx < 0 || idx >= (int32_t)_this->items.size)
         return LE_FAILURE;
         
     count = _this->fn->getSelectionCount(_this);
@@ -712,7 +712,7 @@ static leResult toggleItemSelected(leListWidget* _this,
     
     LE_ASSERT_THIS();
     
-    if(idx >= (int32_t)_this->items.size)
+    if(idx < 0 || idx >= (int32_t)_this->items.size)
         return LE_FAILURE;
     
     item = (leListItem*)_this->items.values[idx];
@@ -881,7 +881,7 @@ static leResult setItemString(leListWidget* _this,
     
     LE_ASSERT_THIS();
     
-    if(idx >= (int32_t)_this->items.size)
+    if(idx < 0 || idx >= (int32_t)_this->items.size)
         return LE_FAILURE;
        
     item = _this->items.values[idx];
@@ -941,7 +941,7 @@ static leResult setItemIcon(leListWidget* _this,
     
     LE_ASSERT_THIS();
     
-    if(idx >= (int32_t)_this->items.size)
+    if(idx < 0 || idx >= (int32_t)_this->items.size)
         return LE_FAILURE;
         
     item = _this->items.values[idx];

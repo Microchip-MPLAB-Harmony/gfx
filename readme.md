@@ -3,7 +3,7 @@ title: Harmony 3 Graphics Package
 nav_order: 1
 ---
 
-# ![Microchip Technology](./docs/legato/html/mhgs.png) MPLAB® Harmony 3 Graphics Support Package
+# ![Microchip Technology](./docs/legato/images/mhgs.png) MPLAB® Harmony 3 Graphics Support Package
 
 MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating
 embedded firmware solutions for Microchip 32-bit SAM and PIC® microcontroller
@@ -13,15 +13,16 @@ and microprocessor devices.  Refer to the following links for more information:
  - [Microchip MPLAB® X IDE](https://www.microchip.com/mplab/mplab-x-ide)
  - [Microchip MPLAB® Harmony](https://www.microchip.com/mplab/mplab-harmony)
  - [Microchip MPLAB® Harmony Pages](https://microchip-mplab-harmony.github.io/)
+ - [MPLAB® Discover](https://mplab-discover.microchip.com/v1/itemtype/com.microchip.ide.project?s0=Legato)
 
 This repository contains the MPLAB® Harmony Graphics Suite.  The
 suite supports a free fast to market, graphics software development environment for Microchip MPLAB® 32-bit SAM and PIC® microprocessor devices.  Refer to
 the following graphics links for release notes, home page, training materials, framework and application help.
-Graphics application examples can be found at various [device-family specific repositories](./apps/readme.md).
+Graphics application examples can be found at various [device-family specific repositories](./apps/readme.md) and at [MPLAB® Discover](https://mplab-discover.microchip.com/v1/itemtype/com.microchip.ide.project?s0=Legato)
  - [Release Notes](./release_notes.md)
  - [MPLAB® Harmony License](./mplab_harmony_license.md)
- - [MPLAB® Harmony 3 Graphics Wiki](https://github.com/Microchip-MPLAB-Harmony/gfx/wiki)
- - [MPLAB® Harmony 3 Graphics API Help](./docs/legato/html/index.html)
+ - [MPLAB® Harmony 3 Graphics User Guides Wiki](https://github.com/mchpgfx/legato.docs/wiki)
+ - [MPLAB® Harmony 3 Graphics API Help](https://mchpgfx.github.io/legato.docs/html/index.html)
  - [MPLAB® Harmony 3 Graphics Applications](./apps/readme.md)
  - [MPLAB® Harmony 3 Graphics Videos](https://www.youtube.com/playlist?list=PL9B4edd-p2ag5xsIIHhja-caKYY7AKPxe)
 
@@ -45,6 +46,7 @@ The key features of the MPLAB® Harmony Graphics Suite are the following:
 - Multi-image support for industry standard formats, compression choices, external memory accessibility
 - Fully functional demonstrations and quick-starts to enable new development
 - Low memory and low power configurable
+- Segmented LCD Controller driver
 
 
 # Contents Summary
@@ -65,6 +67,7 @@ The performance improved graphics for MPLAB® Harmony Graphics Suite. Supports M
 |      |   lcc |  Driver for the LCC software display controller| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   gfx2d | Driver for the GFX2D graphics processor| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   lcdc | Driver for the LCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   slcd | Driver for the Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   external controller |  Driver generator for external display controllers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   ssd1963 | Driver for the ssd1963 display controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |
 |      |   ili9488  | Display Driver for the ili9488 controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |

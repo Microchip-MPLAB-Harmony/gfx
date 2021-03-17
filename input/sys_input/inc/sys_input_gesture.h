@@ -180,10 +180,34 @@ typedef struct SYS_INP_RotateGestureEvent_t
     uint16_t dir;
 } SYS_INP_RotateGestureEvent;
 
+/* Structure:
+    SYS_INP_GenericGestureEvent
+
+  Summary:
+    Defines a generic gesture event
+
+  Description:
+    id - the gesture ID
+    x - gesture x position
+    y - gesture y position
+    parm - other gesture parameters
+    
+  Remarks:
+    None.
+*/
+typedef struct SYS_INP_GenericGestureEvent_t
+{
+    uint16_t gest;
+    uint16_t x;
+    uint16_t y;    
+    void * parm;
+} SYS_INP_GenericGestureEvent;
+
 /* Event handler function defintions */
 typedef void (*SYS_INP_HandleFlickGestureEvent)(const SYS_INP_FlickGestureEvent* const);
 typedef void (*SYS_INP_HandlePinchGestureEvent)(const SYS_INP_PinchGestureEvent* const);
 typedef void (*SYS_INP_HandleStretchGestureEvent)(const SYS_INP_StretchGestureEvent* const);
 typedef void (*SYS_INP_HandleRotateGestureEvent)(const SYS_INP_RotateGestureEvent* const);
+typedef void (*SYS_INP_HandleGenericGestureEvent)(const SYS_INP_GenericGestureEvent* const);
 
 #endif /* SYS_INPUT_GESTURE_H */

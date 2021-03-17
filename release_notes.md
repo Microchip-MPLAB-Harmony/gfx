@@ -8,6 +8,31 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.2
+
+### New Features
+
+* MH3-50862	Add Image Preprocessing UI and code generation support
+* MH3-51432	Add 8-bit LUT support for LCC on Legato for SAM E70
+* MH3-46945	H3 Segment LCD support for SAML22
+
+### Issues Fixed
+
+* MH3-46974	Reset sequence not proper for OLED C click
+* MH3-46942	No test for invalid index parameter in list widget code
+* MH3-50874	Legato Radio button widget doesn't work after destroying it
+* MH3-50912	Scroll Bar Widget "swapDimensions" incorrect
+* MH3-50961	Selecting more than one widget in the designer crashes Composer
+* MH3-50971	Line Graph Widget Skin Classic Compile Error
+* MH3-50972	Legato Widget InvalidateBorderAreas function has unused code
+* MH3-51106	Legato GFX - The Radio button CallbackEvent function are not generated
+* MH3-51130	Legato Composer - Image Manager Tree Drag Crash
+* MH3-51402	GFX Legato "Uses Cache" option for LCC doesn't work if is unchecked for ATSAME70Q21B
+* 
+* Legato Composer Linux/PC Build v1.14.4b
+* Legato Composer Mac Build v1.14.4b
+
+
 ## Graphics Release v3.9.1
 
 ### IMPORTANT UPDATE
@@ -133,16 +158,12 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 * [MPLAB® X IDE v5.45 or above](https://www.microchip.com/mplab/mplab-x-ide)
 * [MPLAB® XC32 C/C++ Compiler v2.50](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * MPLAB® Harmony Configurator (MHC) v3.6.3 and above.
+    * [MPLAB® Harmony Configurator (MHC) v3.6.3 and above](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
 
 ### Dependent Components
 
-* [MHC v3.6.5](https://github.com/Microchip-MPLAB-Harmony/mhc/releases/tag/v3.6.5)
-* [BSP v3.8.2](https://github.com/Microchip-MPLAB-Harmony/bsp/releases/tag/v3.8.2)
-* [Core v3.8.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.8.1)
-* [dev_packs v3.8.0](https://github.com/Microchip-MPLAB-Harmony/dev_packs/releases/tag/v3.8.0)
-* [Harmony 3 USB v3.7.0](https://github.com/Microchip-MPLAB-Harmony/usb/releases/tag/v3.7.0)
-* [Harmony 3 CMSIS-FreeRTOS v10.3.1](https://github.com/ARM-software/CMSIS-FreeRTOS)
+* [Core v3.9.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.9.0)
+* [Harmony 3 USB v3.7.1](https://github.com/Microchip-MPLAB-Harmony/usb/releases/tag/v3.7.1)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 
 

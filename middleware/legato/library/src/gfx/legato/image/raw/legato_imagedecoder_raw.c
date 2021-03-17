@@ -764,7 +764,7 @@ static leResult _render(const leImage* src,
 #endif
     }
 
-    if(ignoreAlpha == LE_TRUE && _initBlendStage(&_state) == LE_FAILURE)
+    if(ignoreAlpha == LE_FALSE && _initBlendStage(&_state) == LE_FAILURE)
         return LE_FAILURE;
 
     // convert and write

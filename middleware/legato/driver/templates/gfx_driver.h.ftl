@@ -1037,6 +1037,7 @@ typedef enum gfxDriverIOCTLRequest
     GFX_IOCTL_GET_VSYNC_COUNT, // gets the current driver vsync count, arg = gfxIOCTLArg_Value
     GFX_IOCTL_GET_FRAMEBUFFER, // gets a pointer to the internal driver frame buffer, arg = gfxIOCTLArg_Value
     GFX_IOCTL_SET_PALETTE, // sets the current driver palette, arg = gfxIOCTLArg_Palette
+    GFX_IOCTL_SET_VBLANK_SYNC, // sets the driver to sync update w/ vblank or not, arg = gfxIOCTLArg_Value	
     
     GFX_IOCTL_GET_LAYER_COUNT, // gets the driver layer count, arg = gfxIOCTLArg_Value
     GFX_IOCTL_GET_ACTIVE_LAYER, // gets the active driver layer, arg = gfxIOCTLArg_Value

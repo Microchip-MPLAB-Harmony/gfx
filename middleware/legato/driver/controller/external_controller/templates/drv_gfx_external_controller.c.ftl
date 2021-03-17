@@ -173,6 +173,10 @@ static inline void DRV_${ControllerName}_DelayMS(int ms)
 */
 static void DRV_${ControllerName}_Reset(void)
 {
+    <#if PreResetDelay != 0>
+    DRV_${ControllerName}_Reset_Deassert();
+    DRV_${ControllerName}_DelayMS(${PreResetDelay});
+    </#if>
     DRV_${ControllerName}_Reset_Assert();
     DRV_${ControllerName}_DelayMS(${ResetAssertDuration});
     DRV_${ControllerName}_Reset_Deassert();

@@ -141,7 +141,7 @@ void leWidget_SkinClassic_DrawStandardLoweredBorder(leWidget* wgt,
 void leWidget_SkinClassic_DrawStandardHybridBorder(leWidget* wgt,
                                                    uint32_t a);
 
-void leWidget_SkinClassic_InvalidateBorderAreas(leWidget*);
+void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget*);
 
 // DOM-IGNORE-END
 

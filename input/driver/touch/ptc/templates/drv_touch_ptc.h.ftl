@@ -56,15 +56,30 @@
 #define TOUCH_SCREEN_ACTIVE_WIDTH (TOUCH_SCREEN_WIDTH - TOUCH_SCREEN_WIDTH_EDGE_ADJUST)
 #define TOUCH_SCREEN_ACTIVE_HEIGHT (TOUCH_SCREEN_HEIGHT - TOUCH_SCREEN_HEIGHT_EDGE_ADJUST)
 
-#define PTC_TOUCH_ID 0
+#define TOUCH_POINTS_COUNT ${TouchPoints}
+
 #define PTC_SURFACE_CS_RESOLUTION_BITS ${DataResolutionBits}
 
+<#if GestureSupport == true>
+#define GESTURES_ENABLED 1
+</#if>
+<#if MultiTouchSupport == true>	
+#define MULTITOUCH_ENABLED 1
+</#if>	
 <#if HorzTouchDataFlip == true>
 #define FLIP_X  1
 </#if>
 <#if VertTouchDataFlip == true>
 #define FLIP_Y  1
 </#if>
+
+typedef enum
+{
+    PTC_TOUCH_ID,
+<#if MultiTouchSupport == true>	
+    PTC_TOUCH_ID_2,
+</#if>	
+} PTC_TOUCH_IDS;
 
 typedef enum
 {

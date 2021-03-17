@@ -47,6 +47,9 @@
 //DOM-IGNORE-END
 
 void drv_touch_controller_task(void);
+<#if EventNotifEnabled == true>
+void drv_touch_int(int pin, uintptr_t context);
+</#if>
 
 #ifdef __cplusplus
     }

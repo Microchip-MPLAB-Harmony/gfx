@@ -721,10 +721,7 @@ static leResult setDataInSeries(leLineGraphWidget* _this,
 {
 
     leLineGraphDataSeries* series;
-    int32_t* data;
 
-    (void)value; // unused
-    
     LE_ASSERT_THIS();
     
     if(seriesID >= (int32_t) _this->dataSeries.size)
@@ -735,15 +732,13 @@ static leResult setDataInSeries(leLineGraphWidget* _this,
     if(index >= (int32_t) series->data.size)
         return LE_FAILURE;
     
-    data = leArray_Get(&series->data, index);
-    
     getValueDamagedRect(_this,
                         seriesID,
                         index,
                         &prevDamagedRect);
-    
-    *data = value;
-    
+
+    series->data.values[index] = (void*)value;
+
     getValueDamagedRect(_this,
                         seriesID,
                         index,

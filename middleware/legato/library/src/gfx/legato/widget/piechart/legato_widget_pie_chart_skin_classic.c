@@ -131,7 +131,7 @@ static void drawSliceLabel(lePieChartWidget* chart,
     
     leRect textRect, bounds, drawRect;
 
-    sprintf(strbuff, "%i", (int32_t)pie->value);
+    sprintf(strbuff, "%ld", (int32_t)pie->value);
 
     leFixedString_Constructor(&str, charbuff, MAX_TICK_LABEL_DIGITS);
     str.fn->setFromCStr(&str, strbuff);
