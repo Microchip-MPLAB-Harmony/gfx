@@ -40,6 +40,14 @@
 
 #include "definitions.h"
 
+<#if gfx_hal_le??>
+<#assign Val_Width = gfx_hal_le.DisplayWidth>
+<#assign Val_Height = gfx_hal_le.DisplayHeight>
+<#else>
+<#assign Val_Width = DisplayWidth>
+<#assign Val_Height = DisplayHeight>
+</#if>
+
 #define DRV_TOUCH_I2C_INDEX ${I2CIndex}
 #define DRV_TOUCH_I2C_SLAVE_ADDRESS 0x${DeviceAddress}
 #define DRV_TOUCH_CONFIG_NUM ${InitCommandsCount}
@@ -321,7 +329,25 @@ void drv_touch_process_data(void)
     
     pos_y = ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE0_INDEX] &
              DRV_TOUCH_DATA_POSY_BYTE0_MASK) >> DRV_TOUCH_DATA_POSY_BYTE0_SHIFT);
+
+    pos_x = ${Val_Width} - pos_y;
+    pos_y = ${Val_Height} - pos_x;
+
 </#if>
+
+#if LE_TOUCH_ORIENTATION == 0
+    pos_x = pos_x;
+    pos_y = pos_y;
+#elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
+    pos_y = ${Val_Width} - 1 - pos_x;
+    pos_x = pos_y;
+#elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
+    pos_x = ${Val_Width} - 1 - pos_x;
+    pos_y = ${Val_Height} - 1 - pos_y;
+#else // 270 degrees
+    pnt.y = pos_x;
+    pnt.x = ${Val_Height} - 1 - pos_y;
+#endif
             
     switch(event)
     {

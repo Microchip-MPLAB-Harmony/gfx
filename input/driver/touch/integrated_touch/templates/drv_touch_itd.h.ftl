@@ -24,23 +24,23 @@
 // DOM-IGNORE-END
 
 /*******************************************************************************
- Input driver for the Peripheral Touch Controller Library
+ Input driver for the Integrated Touch Controller Library
 
   File Name:
-    drv_touch_ptc.h
+    drv_touch_itd.h
 
   Summary:
-    Input driver for the peripheral touch controller header file
+    Header file for the integrated touch library input driver
 
   Description:
     This header file describes the macros, data structure and prototypes of the 
-    input driver for the peripheral touch controller (PTC).
+    input driver for the integrated touch library (QTouch).
  ******************************************************************************/
 
 // DOM-IGNORE-BEGIN
 
-#ifndef DRV_TOUCH_PTC_H
-#define DRV_TOUCH_PTC_H
+#ifndef DRV_TOUCH_ITD_H
+#define DRV_TOUCH_ITD_H
 
 #ifdef __cplusplus
     extern "C" {
@@ -58,7 +58,7 @@
 
 #define TOUCH_POINTS_COUNT ${TouchPoints}
 
-#define PTC_SURFACE_CS_RESOLUTION_BITS ${DataResolutionBits}
+#define ITD_SURFACE_CS_RESOLUTION_BITS ${DataResolutionBits}
 
 <#if GestureSupport == true>
 #define GESTURES_ENABLED 1
@@ -73,34 +73,42 @@
 #define FLIP_Y  1
 </#if>
 
+<#if GestureSupport == true>   
+#define TAP_SINGLE				(TAP | 0x01u)
+#define DOUBLE_TAP_SINGLE       (TAP | 0x02u)
+#define SINGLE_TAP_DUAL         (TAP_DUAL | 0x01u)
+#define DOUBLE_TAP_DUAL         (TAP_DUAL | 0x02u)
+</#if>
+
+
 typedef enum
 {
-    PTC_TOUCH_ID,
+    ITD_TOUCH_ID,
 <#if MultiTouchSupport == true>	
-    PTC_TOUCH_ID_2,
+    ITD_TOUCH_ID_2,
 </#if>	
-} PTC_TOUCH_IDS;
+} ITD_TOUCH_IDS;
 
 typedef enum
 {
-  DRV_TOUCH_PTC_INIT,
-  DRV_TOUCH_PTC_CHECK, //checking status
-  DRV_TOUCH_PTC_PROCESS, //processing positions
+  DRV_TOUCH_ITD_INIT,
+  DRV_TOUCH_ITD_CHECK, //checking status
+  DRV_TOUCH_ITD_PROCESS, //processing positions
   
-} DRV_TOUCH_PTC_STATE;
+} DRV_TOUCH_ITD_STATE;
 
 typedef enum
 {
-    DRV_TOUCH_PTC_TOUCH_RELEASED,
-    DRV_TOUCH_PTC_TOUCH_PRESSED,            
-} DRV_TOUCH_PTC_TOUCH_STATE;
+    DRV_TOUCH_ITD_TOUCH_RELEASED,
+    DRV_TOUCH_ITD_TOUCH_PRESSED,            
+} DRV_TOUCH_ITD_TOUCH_STATE;
 
 
-void drv_touch_ptc_init (void);
-void drv_touch_ptc_task (void);
+void drv_touch_itd_init (void);
+void drv_touch_itd_task (void);
 
 #ifdef __cplusplus
     }
 #endif
 
-#endif //DRV_TOUCH_PTC_H
+#endif //DRV_TOUCH_ITD_H

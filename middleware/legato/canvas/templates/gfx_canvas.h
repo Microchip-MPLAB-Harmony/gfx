@@ -137,6 +137,7 @@ GFXC_RESULT _gfxcCopyBuffer(unsigned int srcID,
                             const gfxRect * srcRect,
                             const gfxRect * destRect);
 GFXC_RESULT _gfxcSetBaseCanvasID(uint32_t base);
+GFXC_STATUS _gfxcGetStatus(void);
 
 
 //private variables 

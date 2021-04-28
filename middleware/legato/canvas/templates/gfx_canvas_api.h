@@ -24,22 +24,22 @@
 // DOM-IGNORE-END
 
 /*******************************************************************************
-  GFX GLCD Driver Interface Declarations for Static Single Instance Driver
+GFX GLCD Driver Interface Declarations for Static Single Instance Driver
 
-  Company:
-    Microchip Technology Inc.
+Company:
+Microchip Technology Inc.
 
-  File Name:
-    gfx_canvas_api.h
+File Name:
+gfx_canvas_api.h
 
-  Summary:
-    GFX Canvas Virtual Display Component private header file
+Summary:
+GFX Canvas Virtual Display Component private header file
 
-  Description:
-    The GFX Canvas provides a virtual display driver interface. 
+Description:
+The GFX Canvas provides a virtual display driver interface.
 
-  Remarks:
-    None
+Remarks:
+None
 *******************************************************************************/
 
 /** \file gfx_canvas_api.h
@@ -57,451 +57,522 @@
 #ifdef __cplusplus  // Provide C++ Compatibility
 extern "C" {
 #endif
-// DOM-IGNORE-END
-    
+	// DOM-IGNORE-END
+
 #define GFXC_COLOR_FORMAT gfxColorMode 
 #define GFXC_RESULT gfxResult
 
-// *****************************************************************************
-/* Enumeration:
-    GFXC_FX_TYPE
+	// *****************************************************************************
+	/* Enumeration:
+	GFXC_FX_TYPE
 
-  Summary:
-    Canvas effects types
-*/
-typedef enum 
-{
-    GFXC_FX_FADE,       //Fade effect
-    GFXC_FX_MOVE,       //Move effect
-} GFXC_FX_TYPE;
+	Summary:
+	Canvas effects types
+	*/
+	typedef enum
+	{
+		GFXC_FX_FADE,       //Fade effect
+		GFXC_FX_MOVE,       //Move effect
+	} GFXC_FX_TYPE;
 
-// *****************************************************************************
-/* Enumeration:
-    GFXC_FX_MOVE_TYPE
+	// *****************************************************************************
+	/* Enumeration:
+	GFXC_STATUS
 
-  Summary:
-    Canvas move effects type.
-*/
-typedef enum 
-{
-    GFXC_FX_MOVE_FIXED,      //Fixed speed move
-    GFXC_FX_MOVE_ACC,       //Accelerating move
-    GFXC_FX_MOVE_DEC,       //Decelerating move
-} GFXC_FX_MOVE_TYPE;
+	Summary:
+	Canvas status types
+	*/
+	typedef enum
+	{
+		GFXC_STAT_IDLE = 0,
+		GFXC_STAT_BUSY,
+	} GFXC_STATUS;
 
-// *****************************************************************************
-/* Enumeration:
-    GFXC_FX_STATUS
+	// *****************************************************************************
+	/* Enumeration:
+	GFXC_FX_MOVE_TYPE
 
-  Summary:
-    Canvas effects status.
-*/
-typedef enum 
-{
-    GFXC_FX_IDLE,                   //Done or idle, no active effects
-    GFXC_FX_DONE = GFXC_FX_IDLE,
-    GFXC_FX_START,                  //Starting effect
-    GFXC_FX_RUN,                    //effect in progress
-} GFXC_FX_STATUS;
+	Summary:
+	Canvas move effects type.
+	*/
+	typedef enum
+	{
+		GFXC_FX_MOVE_FIXED,      //Fixed speed move
+		GFXC_FX_MOVE_ACC,       //Accelerating move
+		GFXC_FX_MOVE_DEC,       //Decelerating move
+	} GFXC_FX_MOVE_TYPE;
 
-typedef void (*gfxcCallback) (unsigned int canvasID,
-                              GFXC_FX_TYPE effect,
-                              GFXC_FX_STATUS status,
-                              void * parm);
+	// *****************************************************************************
+	/* Enumeration:
+	GFXC_FX_STATUS
 
-extern const gfxDisplayDriver gfxDriverInterface;
+	Summary:
+	Canvas effects status.
+	*/
+	typedef enum
+	{
+		GFXC_FX_IDLE,                   //Done or idle, no active effects
+		GFXC_FX_DONE = GFXC_FX_IDLE,
+		GFXC_FX_START,                  //Starting effect
+		GFXC_FX_RUN,                    //effect in progress
+	} GFXC_FX_STATUS;
 
-// *****************************************************************************
-/* Function:
-    int gfxcCreate(void);
+	typedef void(*gfxcCallback) (unsigned int canvasID,
+		GFXC_FX_TYPE effect,
+		GFXC_FX_STATUS status,
+		void * parm);
 
-  Summary:
-    Reserves an instance of the canvas object. An instance must be available
-    in the canvas list, otherwise this will fail.
+	extern const gfxDisplayDriver gfxDriverInterface;
 
-  Parameters:
-    None
+	// *****************************************************************************
+	/* Function:
+	int gfxcCreate(void);
 
-  Returns:
-    int - the index of the canvas object if successful, -1 if failed
-*/
-int gfxcCreate(void);
+	Summary:
+	Reserves an instance of the canvas object. An instance must be available
+	in the canvas list, otherwise this will fail.
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcDestroy(unsigned int canvasID);
+	Parameters:
+	None
 
-  Summary:
-    Releases a reserved canvas object and makes it available    
+	Returns:
+	int - the index of the canvas object if successful, -1 if failed
+	*/
+	int gfxcCreate(void);
 
-  Parameters:
-    canvasID - the index of the canvas object
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcDestroy(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcDestroy(unsigned int canvasID);
+	Summary:
+	Releases a reserved canvas object and makes it available
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID, 
-                                   unsigned int width,
-                                   unsigned int height,
-                                   const GFXC_COLOR_FORMAT format,
-                                   void * buf);
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Summary:
-    Initializes the pixel/frame buffer of the canvas
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcDestroy(unsigned int canvasID);
 
-  Parameters:
-    canvasID - the index of the canvas object
-    width - the horizontal resolution of the frame buffer in pixels
-    height - the vertical resolution of the frame buffer in pixels
-    format - the color format of the frame buffer in pixels
-    buf - address of the frame buffer
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
+	unsigned int width,
+	unsigned int height,
+	const GFXC_COLOR_FORMAT format,
+	void * buf);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID, 
-                               unsigned int width,
-                               unsigned int height,
-                               const GFXC_COLOR_FORMAT format,
-                               void * buf);
+	Summary:
+	Initializes the pixel/frame buffer of the canvas
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
-                           unsigned int destID,
-                           const gfxRect * srcRect,
-                           const gfxRect * destRect);
+	Parameters:
+	canvasID - the index of the canvas object
+	width - the horizontal resolution of the frame buffer in pixels
+	height - the vertical resolution of the frame buffer in pixels
+	format - the color format of the frame buffer in pixels
+	buf - address of the frame buffer
 
-  Summary:
-    Copies the contents of a canvas pixelbuffer to another
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
+		unsigned int width,
+		unsigned int height,
+		const GFXC_COLOR_FORMAT format,
+		void * buf);
 
-  Parameters:
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
+	unsigned int destID,
+	const gfxRect * srcRect,
+	const gfxRect * destRect);
+
+	Summary:
+	Copies the contents of a canvas pixelbuffer to another
+
+	Parameters:
 	srcID - ID of source canvas
-    destID - ID of destination canvas
+	destID - ID of destination canvas
 	srcRect - rect area in source canvas, must be the same size as destRect
 	destRect - rect area in destination canvas, must be same size srcRect
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/							   
-GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
-                           unsigned int destID,
-                           const gfxRect * srcRect,
-                           const gfxRect * destRect);
-    							   
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcCopyBuffer(unsigned int srcID,
+		unsigned int destID,
+		const gfxRect * srcRect,
+		const gfxRect * destRect);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base)
 
-  Summary:
-    Sets the starting canvas ID for all succeeding library layer operations. 
-    Ex. All library operations on (layer 1) will target canvas (base + 1).
-    Use API to assign starting canvas ID for a specific screen in a multi-screen
-    project, that way the library can draw to the right canvas for a screen layer.
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base)
 
-  Parameters:
-    base - starting canvas ID 
-    
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base);
-    							   
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID);
+	Summary:
+	Sets the starting canvas ID for all succeeding library layer operations.
+	Ex. All library operations on (layer 1) will target canvas (base + 1).
+	Use API to assign starting canvas ID for a specific screen in a multi-screen
+	project, that way the library can draw to the right canvas for a screen layer.
 
-  Summary:
-    Sets the display controller layer that will be used to show the canvas. The
-    display controller must support layers for this function to work.
+	Parameters:
+	base - starting canvas ID
 
-  Parameters:
-    canvasID - the index of the canvas object
-    layerID - the layer index
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID);
 
-// *****************************************************************************
-/* Function:
-    int gfxcGetlayer(unsigned int canvasID);
+	Summary:
+	Sets the display controller layer that will be used to show the canvas. The
+	display controller must support layers for this function to work.
 
-  Summary:
-    Returns the index of the layer used to display the canvas objects
+	Parameters:
+	canvasID - the index of the canvas object
+	layerID - the layer index
 
-  Parameters:
-    canvasID - the index of the canvas object
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID);
 
-  Returns:
-    int - the index of the layer
-*/
-int gfxcGetlayer(unsigned int canvasID);
+	// *****************************************************************************
+	/* Function:
+	int gfxcGetlayer(unsigned int canvasID);
 
-// *****************************************************************************
-/* Function:
-    int gfxcClearLayer(unsigned int canvasID);
+	Summary:
+	Returns the index of the layer used to display the canvas objects
 
-  Summary:
-    Resets/Clears the layer assigned to the canvas object.
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Parameters:
-    canvasID - the index of the canvas object
+	Returns:
+	int - the index of the layer
+	*/
+	int gfxcGetlayer(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcClearLayer(unsigned int canvasID);
+	// *****************************************************************************
+	/* Function:
+	int gfxcClearLayer(unsigned int canvasID);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha);
+	Summary:
+	Resets/Clears the layer assigned to the canvas object.
 
-  Summary:
-    Sets the window alpha value of the canvas. The display controller layer for 
-    the canvas must support per-layer, global alpha values
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Parameters:
-    canvasID - the index of the canvas object
-    alpha - the alpha value
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcClearLayer(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetWindowPosition(unsigned int canvasID, int xpos, int ypos);
+	Summary:
+	Sets the window alpha value of the canvas. The display controller layer for
+	the canvas must support per-layer, global alpha values
 
-  Summary:
-    Sets the window alpha value of the canvas. The display controller layer for 
-    the canvas must support per-layer, positioning of the frame
+	Parameters:
+	canvasID - the index of the canvas object
+	alpha - the alpha value
 
-  Parameters:
-    canvasID - the index of the canvas object
-    xpos - the x position
-    ypos - the y position
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetWindowPosition(unsigned int canvasID, int xpos, int ypos);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetWindowPosition(unsigned int canvasID, int xpos, int ypos);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetWindowSize(unsigned int canvasID,
-                                  unsigned int width,
-                                  unsigned int height);
+	Summary:
+	Sets the window alpha value of the canvas. The display controller layer for
+	the canvas must support per-layer, positioning of the frame
 
-  Summary:
-    Sets the window size for canvas. The display controller layer for 
-    the canvas must support per-layer size setting. If the window is smaller
-    than the canvas size, the canvas will be cropped
+	Parameters:
+	canvasID - the index of the canvas object
+	xpos - the x position
+	ypos - the y position
 
-  Parameters:
-    canvasID - the index of the canvas object
-    width - the horizontal size
-    height - the vertical size
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetWindowPosition(unsigned int canvasID, int xpos, int ypos);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetWindowSize(unsigned int canvasID, unsigned int width, unsigned int height);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcGetWindowPosition(unsigned int canvasID, int* xpos, int* ypos);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void * parm);
+	Summary:
+	Gets the window position value of the canvas. The display controller layer for
+	the canvas must support per-layer, positioning of the frame
 
-  Summary:
-    Sets the callback function called to notify of effects status
+	Parameters:
+	canvasID - the index of the canvas object
+	xpos - pointer reference to the x position container
+	ypos - pointer reference to the y position container
 
-  Parameters:
-    canvasID - the index of the canvas object
-    cb - the callback function
-    parm - the callback function parameter
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcGetWindowPosition(unsigned int canvasID, int* xpos, int* ypos);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void * parm);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetWindowSize(unsigned int canvasID,
+	unsigned int width,
+	unsigned int height);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcShowCanvas(unsigned int canvasID);
+	Summary:
+	Sets the window size for canvas. The display controller layer for
+	the canvas must support per-layer size setting. If the window is smaller
+	than the canvas size, the canvas will be cropped
 
-  Summary:
-    Displays the canvas on the screen. The layer used to display the canvas must
-    be set, otherwise it will not be shown.
+	Parameters:
+	canvasID - the index of the canvas object
+	width - the horizontal size
+	height - the vertical size
 
-  Parameters:
-    canvasID - the index of the canvas object
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetWindowSize(unsigned int canvasID, unsigned int width, unsigned int height);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcShowCanvas(unsigned int canvasID);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcGetWindowSize(unsigned int canvasID,
+	unsigned int* width,
+	unsigned int* height);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcHideCanvas(unsigned int canvasID);
+	Summary:
+	Gets the window size for canvas. The display controller layer for
+	the canvas must support per-layer size setting. If the window is smaller
+	than the canvas size, the canvas will be cropped
 
-  Summary:
-    Hides the canvas
+	Parameters:
+	canvasID - the index of the canvas object
+	width - pointer reference to the horizontal size container
+	height - pointer reference to the vertical size container
 
-  Parameters:
-    canvasID - the index of the canvas object
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcGetWindowSize(unsigned int canvasID, unsigned int* width, unsigned int* height);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcHideCanvas(unsigned int canvasID);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void * parm);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID);
+	Summary:
+	Sets the callback function called to notify of effects status
 
-  Summary:
-    Updates the assigned layer with the canvas properties
+	Parameters:
+	canvasID - the index of the canvas object
+	cb - the callback function
+	parm - the callback function parameter
 
-  Parameters:
-    canvasID - the index of the canvas object
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void * parm);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcShowCanvas(unsigned int canvasID);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcStartEffectFade(unsigned int canvasID,
-                                uint8_t startAlpha,
-                                uint8_t endAlpha,
-                                uint8_t delta);
+	Summary:
+	Displays the canvas on the screen. The layer used to display the canvas must
+	be set, otherwise it will not be shown.
 
-  Summary:
-    Fades in/out the canvas. A valid display controller layer must be assigned 
-    to the canvas, and the layer must support per-layer, global alpha blending
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Parameters:
-    canvasID - the index of the canvas object
-    startAlpha - the starting alpha value
-    endAlpha - the ending alpha value
-    delta - the step value
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcShowCanvas(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcStartEffectFade(unsigned int canvasID,
-                                uint8_t startAlpha,
-                                uint8_t endAlpha,
-                                uint8_t delta);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcHideCanvas(unsigned int canvasID);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
-                                    GFXC_FX_MOVE_TYPE type,
-                                    int startX, int startY,
-                                    int endX,
-                                    int endY,
-                                    unsigned int delta);
+	Summary:
+	Hides the canvas
 
-  Summary:
-    Moves the canvas from a start position to the end position using the 
-    display controller functions. The layer for the canvas must support 
-    window positioning.
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Parameters:
-    canvasID - the index of the canvas object
-    type - the move type
-    startX - the starting x position
-    startY - the starting y position
-    endX - the end x position
-    endY - the end y position
-    delta - the move delta. For FIXED moves, a small delta will move slower.
-            For ACC moves, a small delta will accelerate faster.
-            For DEC moves, a small delta will decelerate faster.
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcHideCanvas(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
-                                GFXC_FX_MOVE_TYPE type,
-                                int startX,
-                                int startY,
-                                int endX,
-                                int endY,
-                                unsigned int delta);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID);
 
-// *****************************************************************************
-/* Function:
-    GFXC_RESULT gfxcStopEffect(unsigned int canvasID, GFXC_FX_TYPE effect);
+	Summary:
+	Updates the assigned layer with the canvas properties
 
-  Summary:
-    Stops the specified effect, if active
+	Parameters:
+	canvasID - the index of the canvas object
 
-  Parameters:
-    canvasID - the index of the canvas object
-    effect - the effect
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID);
 
-  Returns:
-    GFX_SUCCESS - success
-    GFX_FAILURE - fail
-*/
-GFXC_RESULT gfxcStopEffect(unsigned int canvasID, GFXC_FX_TYPE effect);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcStartEffectFade(unsigned int canvasID,
+	uint8_t startAlpha,
+	uint8_t endAlpha,
+	uint8_t delta);
 
-// *****************************************************************************
-/* Function:
-    void GFX_CANVAS_Initialize(void);
+	Summary:
+	Fades in/out the canvas. A valid display controller layer must be assigned
+	to the canvas, and the layer must support per-layer, global alpha blending
 
-  Summary:
-    Initializes the GFX canvas framework
+	Parameters:
+	canvasID - the index of the canvas object
+	startAlpha - the starting alpha value
+	endAlpha - the ending alpha value
+	delta - the step value
 
-  Parameters:
-    None
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcStartEffectFade(unsigned int canvasID,
+		uint8_t startAlpha,
+		uint8_t endAlpha,
+		uint8_t delta);
 
-  Returns:
-    None
-*/
-void GFX_CANVAS_Initialize(void);
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
+	GFXC_FX_MOVE_TYPE type,
+	int startX, int startY,
+	int endX,
+	int endY,
+	unsigned int delta);
 
-// *****************************************************************************
-/* Function:
-    void GFX_CANVAS_Task(void);
+	Summary:
+	Moves the canvas from a start position to the end position using the
+	display controller functions. The layer for the canvas must support
+	window positioning.
 
-  Summary:
-    The canvas task
+	Parameters:
+	canvasID - the index of the canvas object
+	type - the move type
+	startX - the starting x position
+	startY - the starting y position
+	endX - the end x position
+	endY - the end y position
+	delta - the move delta. For FIXED moves, a small delta will move slower.
+	For ACC moves, a small delta will accelerate faster.
+	For DEC moves, a small delta will decelerate faster.
 
-  Parameters:
-    None
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
+		GFXC_FX_MOVE_TYPE type,
+		int startX,
+		int startY,
+		int endX,
+		int endY,
+		unsigned int delta);
 
-  Returns:
-    None
-*/
-void GFX_CANVAS_Task(void);
-    
-    /* Provide C++ Compatibility */
+	// *****************************************************************************
+	/* Function:
+	GFXC_RESULT gfxcStopEffect(unsigned int canvasID, GFXC_FX_TYPE effect);
+
+	Summary:
+	Stops the specified effect, if active
+
+	Parameters:
+	canvasID - the index of the canvas object
+	effect - the effect
+
+	Returns:
+	GFX_SUCCESS - success
+	GFX_FAILURE - fail
+	*/
+	GFXC_RESULT gfxcStopEffect(unsigned int canvasID, GFXC_FX_TYPE effect);
+
+	// *****************************************************************************
+	/* Function:
+	GFXC_STATUS gfxcGetStatus(void);
+
+	Summary:
+	Returns the status of the Canvas framework, if any canvas object is busy
+	with pending updates or idle. Use to make sure that all canvas update request
+	are done before sending another update request.
+
+	Parameters:
+	None
+
+	Returns:
+	GFXC_STATUS
+	*/
+	GFXC_STATUS gfxcGetStatus(void);
+
+	// *****************************************************************************
+	/* Function:
+	void GFX_CANVAS_Initialize(void);
+
+	Summary:
+	Initializes the GFX canvas framework
+
+	Parameters:
+	None
+
+	Returns:
+	None
+	*/
+	void GFX_CANVAS_Initialize(void);
+
+	// *****************************************************************************
+	/* Function:
+	void GFX_CANVAS_Task(void);
+
+	Summary:
+	The canvas task
+
+	Parameters:
+	None
+
+	Returns:
+	None
+	*/
+	void GFX_CANVAS_Task(void);
+
+	/* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif
@@ -509,5 +580,5 @@ void GFX_CANVAS_Task(void);
 #endif /* _GFX_CANVAS_API_H */
 
 /* *****************************************************************************
- End of File
- */
+End of File
+*/

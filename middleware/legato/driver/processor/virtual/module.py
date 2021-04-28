@@ -22,5 +22,7 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
-def instantiateComponent(ctrlComponent):
-	print("Instantiated generic driver component")
+def loadModule():
+	cntlComponent = Module.CreateComponent("le_gfx_virtual_gpu", "LE Virtual GPU", "/Graphics/Processor", "virtual.py")
+	cntlComponent.setDisplayType("LE Graphics Processor")
+	cntlComponent.addCapability("gfx_driver_vgpu", "LE GPU Driver", False)

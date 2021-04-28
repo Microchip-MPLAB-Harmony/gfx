@@ -1044,6 +1044,25 @@ gfxDriverIOCTLResponse DRV_GLCD_IOCTL(gfxDriverIOCTLRequest request,
             vblankSync = ((gfxIOCTLArg_Value*)arg)->value.v_bool;
             
             return GFX_IOCTL_OK;
+        }
+        case GFX_IOCTL_GET_STATUS:
+        {
+            unsigned int i;
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 0;
+            
+            for (i = 0; i < GFX_GLCD_LAYERS; i++)
+            {
+                if (drvLayer[i].updateLock != LAYER_UNLOCKED)
+                {
+                    val->value.v_uint = 1;
+
+                    break;
+                }
+            }
+
+            return GFX_IOCTL_OK;
         }		
         default:
         {

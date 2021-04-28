@@ -1,6 +1,6 @@
 <#--
 /*******************************************************************************
-* Copyright (C) 2019 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2018 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -22,17 +22,7 @@
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
 -->
-<#if HarmonyCore.SELECT_RTOS == "BareMetal">
-    <#lt>    drv_touch_ptc_task();
-<#elseif HarmonyCore.SELECT_RTOS == "FreeRTOS">
-    <#lt>    xTaskCreate( _drv_touch_controller_task,
-    <#lt>        "drv_touch_ptc_task",
-    <#lt>        ${RTOSStackSize},
-    <#lt>        (void*)NULL,
-    <#lt>        ${RTOSTaskPriority},
-    <#lt>        (TaskHandle_t*)NULL
-    <#lt>    );
-</#if>
+#include "gfx/driver/processor/vgpu/drv_gfx_vgpu.h"
 <#--
 /*******************************************************************************
  End of File

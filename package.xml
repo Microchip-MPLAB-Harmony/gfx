@@ -2,6 +2,6 @@
 <Package name="gfx">
     <Dependencies>
         <Dependency name="core" version="v3.9.0"/>
-        <Dependency name="usb" version="v3.7.1"/>
+        <Dependency name="touch" version="v3.9.2"/>
     </Dependencies>
 </Package>

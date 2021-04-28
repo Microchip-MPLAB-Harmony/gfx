@@ -26,7 +26,7 @@
 
 #include "system/input/sys_input_listener.h"
 
-static void defaultKeyDownHandler(const const SYS_INP_KeyEvent* evt) { }
+static void defaultKeyDownHandler(const SYS_INP_KeyEvent* const evt) { }
 static void defaultKeyUpHandler(const SYS_INP_KeyEvent* const evt) { }
 
 static void defaultMouseMoveHandler(const SYS_INP_MouseMoveEvent* const evt) { }

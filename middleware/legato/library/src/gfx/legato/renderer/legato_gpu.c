@@ -238,10 +238,12 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
 #if LE_ALPHA_BLENDING_ENABLED == 1
     if(a <= 255)
     {
-        _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_ON,
+        _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_SCALE,
                                                  GFX_GLOBAL_ALPHA_OFF,
                                                  a,
                                                  255);
+
+        _rendererState.gpuDriver->setBlend(GFX_BLEND_SRC_OVER);
     }
 #endif
 
@@ -257,6 +259,8 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
                                                  GFX_GLOBAL_ALPHA_OFF,
                                                  255,
                                                  255);
+
+        _rendererState.gpuDriver->setBlend(GFX_BLEND_NONE);
     }
 #endif
 

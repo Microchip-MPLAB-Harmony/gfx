@@ -341,6 +341,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
         setColorModeParm.base.id = canvas[canvasID].layer.id;
         setColorModeParm.value.v_uint = (unsigned int) canvas[canvasID].pixelBuffer.mode;
         
+		//This is the physical resolution of the layer pixel buffer
         setResParm.base.id = canvas[canvasID].layer.id;
         setResParm.width = canvas[canvasID].pixelBuffer.size.width;
         setResParm.height = canvas[canvasID].pixelBuffer.size.height;
@@ -610,6 +611,15 @@ static GFXC_RESULT gfxcProcessMoveEffect(GFXC_CANVAS * cnvs)
 </#if>
 </#if>
 
+GFXC_STATUS _gfxcGetStatus(void)
+{
+    gfxIOCTLArg_Value val;
+    
+    GFX_CANVAS_IOCTL(GFX_IOCTL_GET_STATUS, &val);
+            
+    return (val.value.v_uint == 0) ? GFXC_STAT_IDLE : GFXC_STAT_BUSY;
+}
+
 void GFX_CANVAS_Task(void)
 {
     switch(gfxcState)
@@ -793,6 +803,33 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
             else
                 return GFX_FAILURE;
         }
+        case GFX_IOCTL_GET_STATUS:
+        {
+            unsigned int i = CANVAS_ID_INVALID;
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            val->value.v_uint = 0;
+
+            //Try to allocate from static canvas objects
+            for (i = 0; i < CONFIG_NUM_CANVAS_OBJ; i++)
+            {
+                if (canvas[i].effects.fade.status != GFXC_FX_IDLE ||
+                    canvas[i].effects.move.status != GFXC_FX_IDLE)
+                {
+                    val->value.v_uint = 1;
+                    break;
+                }
+
+                if (canvas[i].active == GFX_TRUE)
+                {
+                    if (gfxDispCtrlr != NULL)
+                        return gfxDispCtrlr->ioctl(GFX_IOCTL_GET_STATUS, 
+                                                   (gfxIOCTLArg_Value*) arg);
+                }
+            }
+
+            return GFX_IOCTL_OK;        
+        }		
         default:
         {
             if (request >= GFX_IOCTL_LAYER_REQ_START && 

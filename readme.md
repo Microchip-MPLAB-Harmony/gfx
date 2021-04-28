@@ -18,13 +18,13 @@ and microprocessor devices.  Refer to the following links for more information:
 This repository contains the MPLAB® Harmony Graphics Suite.  The
 suite supports a free fast to market, graphics software development environment for Microchip MPLAB® 32-bit SAM and PIC® microprocessor devices.  Refer to
 the following graphics links for release notes, home page, training materials, framework and application help.
-Graphics application examples can be found at various [device-family specific repositories](./apps/readme.md) and at [MPLAB® Discover](https://mplab-discover.microchip.com/v1/itemtype/com.microchip.ide.project?s0=Legato)
- - [Release Notes](./release_notes.md)
- - [MPLAB® Harmony License](./mplab_harmony_license.md)
+Graphics application examples can be found at various [device-family specific repositories](https://microchip-mplab-harmony.github.io/gfx/apps/) and at [MPLAB® Discover](https://mplab-discover.microchip.com/v1/itemtype/com.microchip.ide.project?s0=Legato)
+ - [Release Notes](https://microchip-mplab-harmony.github.io/gfx/release_notes.html)
+ - [MPLAB® Harmony License](https://microchip-mplab-harmony.github.io/gfx/mplab_harmony_license.html)
  - [MPLAB® Harmony 3 Graphics User Guides Wiki](https://github.com/mchpgfx/legato.docs/wiki)
  - [MPLAB® Harmony 3 Graphics API Help](https://mchpgfx.github.io/legato.docs/html/index.html)
- - [MPLAB® Harmony 3 Graphics Applications](./apps/readme.md)
- - [MPLAB® Harmony 3 Graphics Videos](https://www.youtube.com/playlist?list=PL9B4edd-p2ag5xsIIHhja-caKYY7AKPxe)
+ - [MPLAB® Harmony 3 Graphics Applications](https://microchip-mplab-harmony.github.io/gfx/apps/readme.html)
+ - [MPLAB® Harmony 3 Graphics Videos](https://www.youtube.com/channel/UCwGbrIuty-pHCyjuVRAyP5Q)
 
 # Features
 
@@ -81,7 +81,7 @@ The performance improved graphics for MPLAB® Harmony Graphics Suite. Supports M
 ***
 ## Blank Library Interface
 ***
-**Blank Library Interface** - the library interface which easily allows a third-party graphics library direct access to the display framebuffer.  Blank library applications are available at various [device-family specific repositories](./apps/readme.md).
+**Blank Library Interface** - the library interface which easily allows a third-party graphics library direct access to the display framebuffer.  Blank library applications are available at various [device-family specific repositories](https://microchip-mplab-harmony.github.io/gfx/apps/readme.html).
 ## Aria Graphics
 
 ***

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Module name="gfx_le_generic_gpu" id="E716187E-7D36-48E7-9C2D-AED138E6CD3F" version="1.0.0">
+<Module name="gfx_le_virtual_gpu" id="D3AB7D48-853C-4086-AC73-56F2CA09D52F" version="1.0.0">
     <ConfigRoot path="module.py"/>
 </Module>

@@ -333,10 +333,10 @@ def instantiateComponent(comp):
 	UseGPU.setDescription("<html>Uses the GPU for buffer blits.</html>")
 
 	VblankBlit = comp.createBooleanSymbol("VblankBlit", UseGPU)
-	VblankBlit.setLabel("Blit on Vblank")
+	VblankBlit.setLabel("Blit on Layer DMA transfer complete")
 	VblankBlit.setDefaultValue(False)
 	VblankBlit.setVisible(True)
-	VblankBlit.setDescription("<html>Schedule blits during vblank.</html>")
+	VblankBlit.setDescription("<html>Schedule blits when layer transfer completes.</html>")
 	
 	if ("A5D2" in str(Variables.get("__PROCESSOR"))):
 		UseGPU.setDefaultValue(False)

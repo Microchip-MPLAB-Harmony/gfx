@@ -8,6 +8,30 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.3
+
+### New Features
+
+* MH3-51808	Add Integrated Graphics Touch Driver support
+
+### Issues Fixed
+
+* MH3-45527	add touch rotation to generic touch controller
+* MH3-51417	Evaluate GPU blit of pre-processed images
+* MH3-51419	Evaluate how GFX2D handles image blits with non-opaque pixels differently with Base Layer vs OVR1 and OVR2
+* MH3-51547	Enable Scratch Buffer padding if MZDA is selected in project wizard
+* MH3-51669	Display polarity settings not changing
+* MH3-51749	Support LCD backlight brightness control
+* MH3-51796	duplicate 'const' declaration specifier in sys_input_listener.c
+* MH3-51809	libnano compile error: 'memset' used with length equal to number of elements without multiplication by element size
+* MH3-51845	LCDC Driver Layer DMA interrupt not firing
+* MH3-52004	Add Layer IRQ Callback in LCDC driver
+* MH3-52089	Double buffering feature appears broken for LCDC (SAM 9x60/A5D2)
+ 
+* Legato Composer Linux/PC Build v1.14.4b
+* Legato Composer Mac Build v1.14.4b
+
+
 ## Graphics Release v3.9.2
 
 ### New Features
@@ -28,7 +52,7 @@ nav_order: 99
 * MH3-51106	Legato GFX - The Radio button CallbackEvent function are not generated
 * MH3-51130	Legato Composer - Image Manager Tree Drag Crash
 * MH3-51402	GFX Legato "Uses Cache" option for LCC doesn't work if is unchecked for ATSAME70Q21B
-* 
+
 * Legato Composer Linux/PC Build v1.14.4b
 * Legato Composer Mac Build v1.14.4b
 
@@ -54,6 +78,7 @@ nav_order: 99
 * Legato Composer Mac Build v1.13.5b
 
 ## Graphics Release v3.9.0
+
 ### Issues Fixed
 
 * MH3-45475 Update LCDC IOCTLS for Canvas Support
@@ -92,11 +117,13 @@ nav_order: 99
 * Legato Composer Mac Build v1.13.3
 
 ## Graphics Release v3.8.3
+
 ### Issues Fixed
 
 * MH3-45463 Fixes wrong apps/readme.md file publish in v3.8.2
 
 ## Graphics Release v3.8.2
+
 ### Issues Fixed
 
 * MH3-45434 Composer Font Import C-Friendly field
@@ -111,12 +138,14 @@ nav_order: 99
 * MH3-44692	Legato Composer - can't pan or zoom designer screen if design dimension exceeds designer screen size
 
 ## Graphics Release v3.8.1
+
 ### Issues Fixed
 
 * MH3-44910 Fixes issue with application page rendering with Jerkyll
 * MH3-44911 Fixes issue with Composer failing to launch in Windows 10
 
 ## Graphics Release v3.8.0
+
 ### New Features
 
 * MH3-44697 Remove Aria applications, middleware and tools from repo
@@ -163,7 +192,7 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 ### Dependent Components
 
 * [Core v3.9.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.9.0)
-* [Harmony 3 USB v3.7.1](https://github.com/Microchip-MPLAB-Harmony/usb/releases/tag/v3.7.1)
+* [Touch v3.9.2 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.9.2)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 
 

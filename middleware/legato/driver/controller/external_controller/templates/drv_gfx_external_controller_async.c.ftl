@@ -456,7 +456,6 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-
             DRV_${ControllerName}_NCSDeassert(intf); 
             gfxPixelBuffer_SetLocked(drv.blitParms.buf, GFX_FALSE);
             drv.state = IDLE;
@@ -635,8 +634,21 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
             
             return GFX_IOCTL_OK;
         }
+        case GFX_IOCTL_GET_STATUS:
+        {
+            val = (gfxIOCTLArg_Value*)arg;
+            
+            if (drv.state == IDLE)
+                val->value.v_uint = 0;
+            else
+                val->value.v_uint = 1;
+            
+            return GFX_IOCTL_OK;
+        }		
         default:
-        { }
+        {
+		    break;
+		}
     }
     
     return GFX_IOCTL_UNSUPPORTED;

@@ -23,8 +23,8 @@
 ##############################################################################
 
 def loadModule():
-	component = Module.CreateComponent("gfx_ptc", "Peripheral Touch Controller", "/Input/Touch", "config/ptc.py")
-	component.setDisplayType("Peripheral Touch Controller")
+	component = Module.CreateComponent("gfx_itd", "Integrated Touch Driver", "/Input/Touch", "config/itd.py")
+	component.setDisplayType("Touch Library Input Driver")
 	component.addDependency("touch_panel", "Touch Panel", False)
-	component.addDependency("PTC", "PTC", False)
+	component.addDependency("TouchData", "TouchData", False)
 	component.addDependency("sys_input", "Input System Service", True)

@@ -628,7 +628,7 @@ gfxResult DRV_2DGPU_SetTransparency(
 void DRV_2DGPU_Initialize(void)
 {
     /* initialize gpu hardware and peripheral software */
-    memset((void*)commandBuffer, 0, CMD_BUFFER_SIZE);
+    memset((void*)commandBuffer, 0, sizeof(commandBuffer));
 
     gpu_params.contiguousBase = (n2d_uint32_t)commandBuffer;
     gpu_params.registerMemBase2D = 0xBF8EB000;

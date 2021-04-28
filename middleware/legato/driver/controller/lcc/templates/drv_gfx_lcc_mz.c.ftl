@@ -48,7 +48,8 @@
 <#assign Val_VertFrontPorch = gfx_hal_le.DisplayVertFrontPorch>
 <#assign Val_VertBackPorch = gfx_hal_le.DisplayVertBackPorch>
 <#assign Val_VertPulseWidth = gfx_hal_le.DisplayVertPulseWidth>
-
+<#assign Val_VSYNCNegative = !gfx_hal_le.DisplayVSYNCNegative>
+<#assign Val_HSYNCNegative = !gfx_hal_le.DisplayHSYNCNegative>
 <#else>
 
 <#assign Val_Width = DisplayWidth>
@@ -59,7 +60,8 @@
 <#assign Val_VertFrontPorch = DisplayVertFrontPorch>
 <#assign Val_VertBackPorch = DisplayVertBackPorch>
 <#assign Val_VertPulseWidth = DisplayVertPulseWidth>
-
+<#assign Val_VSYNCNegative = !DisplayVSYNCNegative>
+<#assign Val_HSYNCNegative = !DisplayHSYNCNegative>
 </#if>
 
 #include "gfx/driver/controller/lcc/drv_gfx_lcc.h"
@@ -535,7 +537,7 @@ static void displayRefresh(void)
         {
             if (hSyncs > vsyncPulseDown)
             {
-<#if DisplayVSYNCNegative == true>
+<#if Val_VSYNCNegative == true>
                 GFX_DISP_INTF_PIN_VSYNC_Set();
 <#else>
                 GFX_DISP_INTF_PIN_VSYNC_Clear();
@@ -553,7 +555,7 @@ static void displayRefresh(void)
         {
             if (hSyncs >= vsyncPulseUp)
             {
-<#if DisplayVSYNCNegative == true>
+<#if Val_VSYNCNegative == true>
                 GFX_DISP_INTF_PIN_VSYNC_Clear();
 <#else>
                 GFX_DISP_INTF_PIN_VSYNC_Set();
@@ -601,7 +603,7 @@ static void displayRefresh(void)
         }
         case HSYNC_PULSE:
         {
-<#if DisplayHSYNCNegative == true>
+<#if Val_HSYNCNegative == true>
             GFX_DISP_INTF_PIN_HSYNC_Set();
 <#else>
             GFX_DISP_INTF_PIN_HSYNC_Clear();
@@ -623,7 +625,7 @@ static void displayRefresh(void)
         }
         case HSYNC_BACK_PORCH:
         {
-<#if DisplayHSYNCNegative == true>
+<#if Val_HSYNCNegative == true>
             GFX_DISP_INTF_PIN_HSYNC_Clear();
 <#else>
             GFX_DISP_INTF_PIN_HSYNC_Set();
