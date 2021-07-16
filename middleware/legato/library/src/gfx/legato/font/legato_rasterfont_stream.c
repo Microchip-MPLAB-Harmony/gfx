@@ -110,7 +110,7 @@ static leResult drawGlyph(const leFontGlyph* glyph,
     rasterStream.state = LE_STREAM_WAITING;
 
     return leStream_Read(&rasterStream.fontStream.stream,
-                        (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
+                        (size_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
                         rasterStream.info.dataRowWidth * rasterStream.info.height,
                         glyphCache,
                         streamDataReady);
@@ -149,7 +149,7 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
     rasterStream.fontStream.cb = cb;
 
     while(leStream_Read(&rasterStream.fontStream.stream,
-                        (uint32_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
+                        (size_t)rasterStream.font->base.header.address + rasterStream.info.dataOffset,
                         rasterStream.info.dataRowWidth * rasterStream.info.height,
                         glyphCache,
                         NULL) != LE_SUCCESS)

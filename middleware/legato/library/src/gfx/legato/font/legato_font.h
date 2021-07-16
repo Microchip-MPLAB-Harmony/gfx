@@ -317,49 +317,6 @@ leResult leFont_GetGlyphRect(const leFontGlyph* glyph,
 
 // *****************************************************************************
 /* Function:
-    void leFont_DrawUnknownGlyph(int32_t x,
-                                 int32_t y,
-                                 const leFontGlyph* glyph,
-                                 leColor clr,
-                                 uint32_t a)
-
-   Summary:
-    Draws the 'unknown glyph' symbol
-
-   Parameters:
-    int32_t x - the screen x location to draw
-    int32_t y - the screen y location to draw
-    const leFontGlyph* glyph - the glyph kerning information
-    leColor clr - the glyph render color
-    uint32_t alpha - a global alpha value to apply
-
-  Returns:
-
-  Remarks:
-*/
-/**
- * @brief Drawn unknown glyph.
- * @details Draws the 'unknown glyph' <span class="param">glyph</span>
- * to location <span class="param">x</span>, <span class="param">y</span>
- * with color <span class="param">clr</span> and alpha <span class="param">a</span>.
- * @code
- * leResult res = leFont_DrawUnknownGlyph(x, y, glyph, clr, a);
- * @endcode
- * @param x the screen x location to draw
- * @param y the screen y location to draw
- * @param glyph the glyph kerning information
- * @param clr the glyph render color
- * @param a  global alpha value to apply
- * @return void.
- */
-void leFont_DrawUnknownGlyph(int32_t x,
-                             int32_t y,
-                             const leFontGlyph* glyph,
-                             leColor clr,
-                             uint32_t a);
-
-// *****************************************************************************
-/* Function:
     leResult leFont_DrawGlyph(const leFont* fnt,
                               const leFontGlyph* glyph,
                               int32_t x,
@@ -452,56 +409,6 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
                               int32_t y,
                               leColor clr,
                               uint32_t a);
-
-// *****************************************************************************
-/* Function:
-    void leFont_DrawGlyphRow(leFontBPP bpp,
-                             const uint8_t* data,
-                             int32_t x,
-                             int32_t y,
-                             int32_t colStart,
-                             int32_t colEnd,
-                             leColor clr,
-                             uint32_t a)
-
-   Summary:
-    Draws a glyph from a raw data buffer
-
-   Parameters:
-    leFontBPP bpp - the data format of the row data
-    const uint8_t* data - the data to reference
-    int32_t x - the screen x location to draw
-    int32_t y - the screen y location to draw
-    int32_t colStart - index of the start of the data
-    int32_t colEnd - index of the end of the data
-    leColor clr - the glyph render color
-    uint32_t alpha - a global alpha value to apply
-
-  Returns:
-
-  Remarks:
-*/
-/**
- * @brief Draws a glyph from a raw data buffer.
- * @details Draws a glyph from a raw data buffer.
- * @code
- * leResult res = leFont_DrawGlyphRow(bpp, data, x, y, colStart, colEnd, clr, a);
- * @endcode
- * @param x the screen x location to draw
- * @param y the screen y location to draw
- * @param glyph the glyph kerning information
- * @param clr the glyph render color
- * @param a global alpha value to apply
- * @return void.
- */
-void leFont_DrawGlyphRow(leFontBPP bpp,
-                         const uint8_t* data,
-                         int32_t x,
-                         int32_t y,
-                         int32_t colStart,
-                         int32_t colEnd,
-                         leColor clr,
-                         uint32_t a);
 
 #if LE_STREAMING_ENABLED == 1
 // *****************************************************************************

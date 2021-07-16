@@ -41,6 +41,7 @@ static leColor gs8_rgba5551(leColor color);
 static leColor gs8_rgb888(leColor color);
 static leColor gs8_rgba8888(leColor color);
 static leColor gs8_argb8888(leColor color);
+static leColor gs8_mono(leColor color);
 
 static leColor rgb332_gs8(leColor color);
 static leColor rgb332_rgb565(leColor color);
@@ -94,17 +95,18 @@ static leColor lut_argb8888(leColor color);
 /* color conversion function matrix */
 color_convert_fn_ptr color_convert_table[LE_COLOR_MODE_COUNT][LE_COLOR_MODE_COUNT] =
 {
-//                GS8            RGB332            RGB565            RGBA_5551           RGB_888           RGBA_8888           ARGB_8888           LUT1      LUT4      LUT8
-/* GS8       */ { &no_conv,      &gs8_rgb332,      &gs8_rgb565,      &gs8_rgba5551,      &gs8_rgb888,      &gs8_rgba8888,      &gs8_argb8888,      &no_conv, &no_conv, &no_conv },
-/* RGB332    */ { &rgb332_gs8,   &no_conv,         &rgb332_rgb565,   &rgb332_rgba5551,   &rgb332_rgb888,   &rgb332_rgba8888,   &rgb332_argb8888,   &no_conv, &no_conv, &no_conv },
-/* RGB565    */ { &rgb565_gs8,   &rgb565_rgb332,   &no_conv,         &rgb565_rgba5551,   &rgb565_rgb888,   &rgb565_rgba8888,   &rgb565_argb8888,   &no_conv, &no_conv, &no_conv },
-/* RGBA_5551 */ { &rgba5551_gs8, &rgba5551_rgb332, &rgba5551_rgb565, &no_conv,           &rgba5551_rgb888, &rgba5551_rgba8888, &rgba5551_argb8888, &no_conv, &no_conv, &no_conv },
-/* RGB_888   */ { &rgb888_gs8,   &rgb888_rgb332,   &rgb888_rgb565,   &rgb888_rgba5551,   &no_conv,         &rgb888_rgba8888,   &rgb888_argb8888,   &no_conv, &no_conv, &no_conv },
-/* RGBA_8888 */ { &rgba8888_gs8, &rgba8888_rgb332, &rgba8888_rgb565, &rgba8888_rgba5551, &rgba8888_rgb888, &no_conv,           &rgba8888_argb8888, &no_conv, &no_conv, &no_conv },
-/* ARGB_8888 */ { &rgb888_gs8,   &rgb888_rgb332,   &rgb888_rgb565,   &argb8888_rgba5551, &argb8888_rgb888, &argb8888_rgba8888, &no_conv,           &no_conv, &no_conv, &no_conv },
-/* LUT1      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv },
-/* LUT4      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv },
-/* LUT8      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv },
+//                GS8            RGB332            RGB565            RGBA_5551           RGB_888           RGBA_8888           ARGB_8888           LUT1      LUT4      LUT8      MONO
+/* GS8       */ { &no_conv,      &gs8_rgb332,      &gs8_rgb565,      &gs8_rgba5551,      &gs8_rgb888,      &gs8_rgba8888,      &gs8_argb8888,      &no_conv, &no_conv, &no_conv, &gs8_mono},
+/* RGB332    */ { &rgb332_gs8,   &no_conv,         &rgb332_rgb565,   &rgb332_rgba5551,   &rgb332_rgb888,   &rgb332_rgba8888,   &rgb332_argb8888,   &no_conv, &no_conv, &no_conv, &no_conv },
+/* RGB565    */ { &rgb565_gs8,   &rgb565_rgb332,   &no_conv,         &rgb565_rgba5551,   &rgb565_rgb888,   &rgb565_rgba8888,   &rgb565_argb8888,   &no_conv, &no_conv, &no_conv, &no_conv },
+/* RGBA_5551 */ { &rgba5551_gs8, &rgba5551_rgb332, &rgba5551_rgb565, &no_conv,           &rgba5551_rgb888, &rgba5551_rgba8888, &rgba5551_argb8888, &no_conv, &no_conv, &no_conv, &no_conv },
+/* RGB_888   */ { &rgb888_gs8,   &rgb888_rgb332,   &rgb888_rgb565,   &rgb888_rgba5551,   &no_conv,         &rgb888_rgba8888,   &rgb888_argb8888,   &no_conv, &no_conv, &no_conv, &no_conv },
+/* RGBA_8888 */ { &rgba8888_gs8, &rgba8888_rgb332, &rgba8888_rgb565, &rgba8888_rgba5551, &rgba8888_rgb888, &no_conv,           &rgba8888_argb8888, &no_conv, &no_conv, &no_conv, &no_conv },
+/* ARGB_8888 */ { &rgb888_gs8,   &rgb888_rgb332,   &rgb888_rgb565,   &argb8888_rgba5551, &argb8888_rgb888, &argb8888_rgba8888, &no_conv,           &no_conv, &no_conv, &no_conv, &no_conv },
+/* LUT1      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv, &no_conv },
+/* LUT4      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv, &no_conv },
+/* LUT8      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv, &no_conv },
+/* MONO      */ { &no_conv,      &no_conv,         &no_conv,         &no_conv,           &no_conv,         &no_conv,           &no_conv,           &no_conv, &no_conv, &no_conv, &no_conv },
 };
 
 /*
@@ -242,6 +244,14 @@ static leColor gs8_argb8888(leColor color)
     res |= 0xFF000000;
     
     return res;
+}
+
+static leColor gs8_mono(leColor color)
+{
+    if(color >= 128)
+        return 1;
+
+    return 0;
 }
 
 static leColor rgb332_gs8(leColor color)

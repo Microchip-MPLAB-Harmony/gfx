@@ -86,6 +86,15 @@
 #define DRV_${ControllerName}_NCSDeassert(intf) GFX_Disp_Intf_PinControl(intf, \
                                     GFX_DISP_INTF_PIN_CS, \
                                     GFX_DISP_INTF_PIN_SET)
+									
+
+<#if BaseDriverType == "SSD1309">
+#define PIXELS_PER_BYTE 8
+#define LCD_FRAMEBUFFER_SIZE ((128 * 64) / PIXELS_PER_BYTE)
+
+static uint8_t framebuffer[LCD_FRAMEBUFFER_SIZE] = {0};
+</#if>
+									
 <#if PassiveDriver == false>
 <#if DataWriteSize == "8">
     <#if PixelDataTxSize8Bit == "2 (Little-Endian)">
@@ -219,7 +228,11 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr)
     </#if>
     GFX_Disp_Intf_WriteCommand(intf, cmd);
     <#if .vars[PARMSCOUNT] != 0>
+	<#if UseDCPinForParms == true>
     GFX_Disp_Intf_WriteData(intf, parms, ${.vars[PARMSCOUNT]});
+	<#else>
+    GFX_Disp_Intf_Write(intf, parms, ${.vars[PARMSCOUNT]});
+	</#if>
     </#if>
     <#if .vars[DELAY] != 0>
     DRV_${ControllerName}_DelayMS(${.vars[DELAY]});
@@ -276,6 +289,49 @@ void DRV_${ControllerName}_Update(void)
         drv.state = RUN;
     }
 }
+
+<#if BaseDriverType == "SSD1309">
+static inline uint8_t DRV_${ControllerName}_FB_Get_Byte(uint8_t * fb,
+                                         uint8_t page,
+                                         uint8_t column)
+{
+	return *(fb + (page * DISPLAY_WIDTH) + column);
+}
+
+static inline void DRV_${ControllerName}_FB_Set_Byte(uint8_t * fb,
+                                      uint8_t page,
+                                      uint8_t column,
+                                      uint8_t data)
+{
+	*(fb + (page * DISPLAY_WIDTH) + column) = data;
+}
+
+static void DRV_${ControllerName}_WriteFrame(void)
+{
+    GFX_Disp_Intf intf = (GFX_Disp_Intf) drv.port_priv;
+    uint8_t cmd[16];
+    
+    DRV_${ControllerName}_NCSAssert(intf);
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
+    
+    //Set Column Address
+    cmd[0] = 0x21;
+    cmd[1] = 0;
+    cmd[2] = DISPLAY_WIDTH - 1;
+    GFX_Disp_Intf_Write(intf, cmd, 3);
+    
+    //Set Page Address
+    cmd[0] = 0x22;
+    cmd[1] = 0;
+    cmd[2] = (DISPLAY_HEIGHT / 8) - 1;
+    GFX_Disp_Intf_Write(intf, cmd, 3);
+    
+    
+    GFX_Disp_Intf_WriteData(intf, framebuffer, DISPLAY_WIDTH * DISPLAY_HEIGHT / 8);
+    
+    DRV_${ControllerName}_NCSDeassert(intf);    
+}
+</#if>
 
 <#if PassiveDriver == false>
 
@@ -383,8 +439,49 @@ buf->size.height);
 </#if>
 </#if>
     DRV_${ControllerName}_NCSDeassert(intf);
+<#else>
+<#if BaseDriverType == "SSD1309">
+    uint8_t page, pixel_mask, pixel_value, lx, ly;
+	
+	if (drv.state != RUN)
+        return GFX_FAILURE;
+
+    if (buf == NULL ||
+        x > DISPLAY_WIDTH - 1 ||
+        y > DISPLAY_HEIGHT - 1)
+        return GFX_FAILURE;
+
+    for (ly = 0; ly < buf->size.height; ly++)
+    {
+        for (lx = 0; lx < buf->size.width; lx++)
+        {
+            gfxColor color = gfxPixelBufferGet(buf, lx, ly);
+
+            //determine the page and column based on pixel coordinates
+            page = (y + ly) / PIXELS_PER_BYTE;
+
+            pixel_mask = (1 << ((y + ly) - (page * 8)));
+
+            //Read the pixel data from frame buffer memory
+            pixel_value = DRV_${ControllerName}_FB_Get_Byte(framebuffer, page, x + lx);
+
+            if (color == 0)
+            {
+                pixel_value &= ~pixel_mask;
+            }
+            else
+            {
+                pixel_value |= pixel_mask;
+            }
+
+            DRV_${ControllerName}_FB_Set_Byte(framebuffer, page, x + lx, pixel_value);
+        }
+    }
+    
+    return GFX_SUCCESS;
 <#elseif StubGenerateBuildErrorDisable != true>
 #error "Blit buffer procedure is not complete. Please complete definition of blit function."
+</#if>
 </#if>
 
     return GFX_SUCCESS;
@@ -399,6 +496,14 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
     
     switch(request)
     {
+        case GFX_IOCTL_FRAME_END:
+        {
+<#if BaseDriverType == "SSD1309">
+            DRV_${ControllerName}_WriteFrame();
+			
+</#if>
+            return GFX_IOCTL_OK;
+        }	
         case GFX_IOCTL_GET_COLOR_MODE:
         {
             val = (gfxIOCTLArg_Value*)arg;

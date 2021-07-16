@@ -36,27 +36,27 @@ static leColor indexGet1bpp(const lePixelBuffer* const buffer,
     uint32_t offs;
     uint8_t byte;
     leColor color;
-    
+
     offs = (idx % 8);
-            
+
     byte = *(((uint8_t*)buffer->pixels) + (idx >> 3));
-    
+
     color = byte & (0x80 >> offs);
-    
+
     color >>= 7 - offs;
-    
+
     return color;
 }
 
 static leColor indexGet4bpp(const lePixelBuffer* const buffer,
-                              const uint32_t idx)
+                            const uint32_t idx)
 {
     uint32_t offs;
     uint8_t byte;
     leColor color;
-    
+
     byte = *(((uint8_t*)buffer->pixels) + (idx >> 1));
-    
+
     if(idx % 2 > 0)
     {
         offs = 0xF;
@@ -67,28 +67,28 @@ static leColor indexGet4bpp(const lePixelBuffer* const buffer,
         offs = 0xF0;
         color = (byte & offs) >> 0x4;
     }
-    
+
     return color;
 }
 
 static leColor indexGet(const lePixelBuffer* const buffer,
-                          const uint32_t idx)
+                        const uint32_t idx)
 {
     uint8_t* buf_ptr;
     leColor color = 0;
     uint32_t i;
 
     buf_ptr = ((uint8_t*)buffer->pixels) + (leColorInfoTable[buffer->mode].bpp >> 3) * idx;
-    
+
     for(i = 0; i < leColorInfoTable[buffer->mode].bpp >> 3; i++)
         ((uint8_t*)&color)[i] = buf_ptr[i];
-    
+
     return color;
 }
-                               
+
 typedef leColor (*PixelBufferIndexGet_FnPtr)(const lePixelBuffer* const,
-                                               const uint32_t);
-                                               
+                                             const uint32_t);
+
 PixelBufferIndexGet_FnPtr indexGet_FnTable[] =
 {
     &indexGet1bpp,
@@ -199,6 +199,7 @@ leResult lePixelBufferCreate(const int32_t width,
     switch(mode)
     {
         case LE_COLOR_MODE_INDEX_1:
+        case LE_COLOR_MODE_MONOCHROME:
         {
             buffer->buffer_length = (width * height) / 8;
             
@@ -239,7 +240,7 @@ leBuffer lePixelBufferOffsetGet(const lePixelBuffer* const buffer,
 {
     uint8_t* buf_ptr;
 
-    if(buffer == NULL)
+    if(buffer == NULL || buffer->mode == LE_COLOR_MODE_MONOCHROME)
         return NULL;
 
     buf_ptr = (uint8_t*)buffer->pixels;
@@ -257,6 +258,9 @@ leBuffer lePixelBufferOffsetGet_Unsafe(const lePixelBuffer* const buffer,
                                        uint32_t y)
 {
     uint8_t* buf_ptr;
+
+    if(buffer->mode == LE_COLOR_MODE_MONOCHROME)
+        return NULL;
 
     buf_ptr = (uint8_t*)buffer->pixels;
     
@@ -281,11 +285,30 @@ leColor lePixelBufferGet_Unsafe(const lePixelBuffer* const buffer,
 {
     uint8_t* offs_ptr;
     leColor color = 0;
-    
-    offs_ptr = (uint8_t*)lePixelBufferOffsetGet(buffer, x, y);
-    
-    color = pixelGet_FnTable[leColorInfoTable[buffer->mode].size - 1](offs_ptr);
-            
+    uint32_t offs;
+    uint32_t idx;
+    uint8_t byte;
+
+    if(buffer->mode == LE_COLOR_MODE_MONOCHROME)
+    {
+        idx = ((x + (y * buffer->size.width)));
+        offs = 1 << (7 - (idx % 8));
+
+        byte = *(((uint8_t*)buffer->pixels) + (idx / 8));
+
+        color = byte & offs;
+
+        color >>= (7 - (idx % 8));
+
+        return color;
+    }
+    else
+    {
+        offs_ptr = (uint8_t*) lePixelBufferOffsetGet(buffer, x, y);
+
+        color = pixelGet_FnTable[leColorInfoTable[buffer->mode].size - 1](offs_ptr);
+    }
+
     return color;
 }
 
@@ -318,7 +341,7 @@ leColor lePixelBufferGetIndex(const lePixelBuffer* const buffer,
 {
     if(idx >= buffer->pixel_count)
         return 0;
-        
+
     return indexGet_FnTable[leColorInfoTable[buffer->mode].bppOrdinal](buffer, idx);
 }
 
@@ -349,12 +372,28 @@ leResult lePixelBufferSet_Unsafe(const lePixelBuffer* const buffer,
                                  leColor color)
 {
     uint8_t* dest_ptr;
+    uint32_t offs;
+    uint32_t idx;
+    uint8_t* byte;
+
+    if(buffer->mode == LE_COLOR_MODE_MONOCHROME)
+    {
+        idx = ((x + (y * buffer->size.width)));
+        offs = 1 << (7 - (idx % 8));
+
+        byte = ((uint8_t*)buffer->pixels) + (idx / 8);
+
+        *byte &= ~(offs);
+        *byte |= color << (7 - (idx % 8));
+
+        return LE_SUCCESS;
+    }
     
     LE_ASSERT(x * y < buffer->pixel_count);
 
     // get address of dest pixel
     dest_ptr = (uint8_t*)lePixelBufferOffsetGet_Unsafe(buffer, x, y);
-    
+
     pixelSet_FnTable[(leColorInfoTable[buffer->mode].bpp >> 3) - 1](dest_ptr, color);
 
     return LE_SUCCESS;
@@ -406,6 +445,19 @@ leResult lePixelBufferAreaFill_Unsafe(const lePixelBuffer* const buffer,
     // calculate minimums
     row_max = h;
     col_max = w;
+
+    if(buffer->mode == LE_COLOR_MODE_MONOCHROME)
+    {
+        for(row = 0; row < row_max; row++)
+        {
+            for(col = 0; col < col_max; col++)
+            {
+                lePixelBufferSet_Unsafe(buffer, x + col, y + row, color);
+            }
+        }
+
+        return LE_SUCCESS;
+    }
 
     rowSize = col_max * leColorInfoTable[buffer->mode].size;
 

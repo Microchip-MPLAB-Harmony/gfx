@@ -203,23 +203,57 @@ gfxPixelBuffer * GFXC_GetPixelBuffer(int32_t idx)
     return &canvas[baseCanvasID + activeCanvasID].pixelBuffer;
 }
 
+static gfxResult GFXC_BufferBlit(const gfxPixelBuffer* source,
+                            const gfxRect* rectSrc,
+                            const gfxPixelBuffer* dest,
+                            const gfxRect* rectDest)
+{
+    void* srcPtr;
+    void* destPtr;
+    uint32_t row, rowSize;
+    unsigned int width, height;
+<#if GPUBlitEnabled == true>
+    gfxResult res;
+	
+    res = gfxcGPU->blitBuffer(source,
+                              rectSrc,
+                              dest,
+                              rectDest);
+    if (res != GFX_SUCCESS)
+    {
+</#if>
+    width = (rectSrc->width < rectDest->width) ? 
+                 rectSrc->width : rectDest->width;
+    height = (rectSrc->height < rectDest->height) ? 
+                 rectSrc->height : rectDest->height;
+    rowSize = width * gfxColorInfoTable[dest->mode].size;
+
+    for(row = 0; row < height; row++)
+    {
+        srcPtr = gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y + row);
+        destPtr = gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y + row);
+
+        memcpy(destPtr, srcPtr, rowSize);
+    }        
+<#if GPUBlitEnabled == true>	
+    }
+</#if>
+
+    return GFX_SUCCESS;
+}
+
 gfxResult GFXC_BlitBuffer(int32_t x,
                           int32_t y,
                           gfxPixelBuffer* buf)
 {
-<#if GPUBlitEnabled == true>
     gfxRect srcRect, destRect;   
-<#else>
-    void* srcPtr;
-    void* destPtr;
-    uint32_t row, rowSize;    
-</#if>
 
-    if (gfxcState != GFXC_RUNNING)
-        return GFX_FAILURE;
+	if (gfxcState != GFXC_RUNNING)
+	{
+		return GFX_FAILURE;
+	}
 
-<#if GPUBlitEnabled == true>
-    srcRect.x = 0;
+	srcRect.x = 0;
     srcRect.y = 0;
     srcRect.height = buf->size.height;
     srcRect.width = buf->size.width;
@@ -228,23 +262,12 @@ gfxResult GFXC_BlitBuffer(int32_t x,
     destRect.y = y;
     destRect.height = buf->size.height;
     destRect.width = buf->size.width;
+	
+	GFXC_BufferBlit(buf, 
+					&srcRect, 
+					&canvas[baseCanvasID + activeCanvasID].pixelBuffer,
+					&destRect);
 
-    gfxcGPU->blitBuffer(buf,
-                       &srcRect,
-                       &canvas[baseCanvasID + activeCanvasID].pixelBuffer,
-                       &destRect);
-<#else>
-    rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
-
-    for(row = 0; row < buf->size.height; row++)
-    {
-        srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
-        destPtr = gfxPixelBufferOffsetGet(&canvas[baseCanvasID + activeCanvasID].pixelBuffer,
-                                          x, y + row);
-
-        memcpy(destPtr, srcPtr, rowSize);
-    }
-</#if>
 
     return GFX_SUCCESS;
 }
@@ -358,12 +381,12 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
         setAlphaParm.value.v_uint = canvas[canvasID].layer.alpha;   
 
 <#if WindowClippingEnabled == true>
+		//align offsets for non-32bpp frames
+        if (gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size != 4)
+            setPositionParm.x &= ~0x3;
+			
         if (setPositionParm.x < 0)
         {
-            //align offsets for 8bpp frames
-            if (gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size == 1)
-                setPositionParm.x = -(abs(setPositionParm.x) & ~0x3);
-
             setBaseAddressParm.value.v_uint += abs(setPositionParm.x) * 
                     gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size; 
 

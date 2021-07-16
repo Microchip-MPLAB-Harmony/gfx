@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="touch_adc" id="70ED0B77-2AC6-13A0-0B77-1F60F3450C74" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

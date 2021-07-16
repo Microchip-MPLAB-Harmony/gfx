@@ -8,6 +8,26 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.4
+
+### New Features
+
+* MH3-53713	LCDC HEO Layer Support
+
+### Issues Fixed
+
+* MH3-51543	GFX Composer: Memory mapped locations ID are not set to 0
+* MH3-51576	Can't load a Aria Composer Project using Legato Composer
+* MH3-53057	Composer crashes when importing Aria project
+* MH3-53111	touch down event missing rect-to-layer space translation
+* MH3-54915	Legato Checkbox Widget Bevel Generates Exception, doesn't respond to Touch
+* MH3-54996	Legato leWidget* root variables issue
+* Fixed LCDC driver double buffer issue
+ 
+* Legato Composer Linux/PC Build v1.16.6b
+* Legato Composer Mac Build v1.16.6b
+
+
 ## Graphics Release v3.9.3
 
 ### New Features

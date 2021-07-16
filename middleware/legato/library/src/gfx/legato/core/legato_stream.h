@@ -254,7 +254,7 @@ leBool leStream_IsOpen(leStream* stream);
 // *****************************************************************************
 /* Function:
     leResult leStream_Read(leStream* stream,
-                           uint32_t addr,
+                           size_t addr,
                            uint32_t size,
                            uint8_t* buf,
                            leStream_DataReadyCallback cb)
@@ -268,7 +268,7 @@ leBool leStream_IsOpen(leStream* stream);
 
   Parameters:
     leStream* stream - the stream to read from
-    uint32_t addr - the address to read from
+    size_t addr - the address to read from
     uint32_t size - the size to read
     uint8_t* buf - the destination buffer to read to
     leStream_DataReadyCallback cb - a callback to indicate that the data is ready
@@ -281,7 +281,7 @@ leBool leStream_IsOpen(leStream* stream);
 
 */
 leResult leStream_Read(leStream* stream,
-                       uint32_t addr,
+                       size_t addr,
                        uint32_t size,
                        uint8_t* buf,
                        leStream_DataReadyCallback cb);

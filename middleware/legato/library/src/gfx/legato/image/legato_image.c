@@ -47,9 +47,13 @@ leImageDecoder* _lePNGImageDecoder_Init(void);
 leImageDecoder* _leJPEGImageDecoder_Init(void);
 #endif
 
+#if LE_ENABLE_MONO_DECODER == 1
+leImageDecoder* _leMonoImageDecoder_Init(void);
+#endif
+
 void leImage_InitDecoders()
 {
-#if LE_ENABLE_RAW_DECODER == 1 || LE_ENABLE_PNG_DECODER == 1 || LE_ENABLE_JPEG_DECODER == 1
+#if LE_ENABLE_RAW_DECODER == 1 || LE_ENABLE_PNG_DECODER == 1 || LE_ENABLE_JPEG_DECODER == 1 || LE_ENABLE_MONO_DECODER == 1
     uint32_t decIdx = 0;
 #endif
 
@@ -64,7 +68,19 @@ void leImage_InitDecoders()
 #if LE_ENABLE_JPEG_DECODER == 1
     decoders[decIdx++] = _leJPEGImageDecoder_Init();
 #endif
+
+#if LE_ENABLE_MONO_DECODER == 1
+    decoders[decIdx++] = _leMonoImageDecoder_Init();
+#endif
 }
+
+typedef struct leMonoDecodeStage
+{
+    struct leMonoDecodeState* state;
+
+    leResult (*exec)(struct leMonoDecodeStage* stage);
+    void (*cleanup)(struct leMonoDecodeStage* stage);
+} leMonoDecodeStage;
 
 leResult leImage_Create(leImage* img,
                         uint32_t width,
@@ -400,7 +416,7 @@ leResult leImage_RotateDraw(const leImage* src,
 }
 
 void leProcessImage(leImage* img,
-                    uint32_t addr,
+                    size_t addr,
                     leColorMode mode)
 {
     leImage newImage;

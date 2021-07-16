@@ -477,6 +477,8 @@ leBool _leWidget_GetAlphaEnabled(const leWidget* _this)
     
     return LE_TEST_FLAG(_this->flags, LE_WIDGET_ALPHAENABLED);
 #else
+    (void)_this; //unused;
+
     return LE_FALSE;
 #endif
 }
@@ -493,6 +495,8 @@ leBool _leWidget_GetCumulativeAlphaEnabled(const leWidget* _this)
         
         _this = _this->parent; 
     }
+#else
+    (void)_this; //unused;
 #endif
     
     return LE_FALSE;
@@ -520,6 +524,9 @@ leResult _leWidget_SetAlphaEnabled(leWidget* _this,
         
     return LE_SUCCESS;
 #else
+    (void)_this; // unused;
+    (void)enable; // unused
+
     return LE_FAILURE;
 #endif
 }
@@ -531,6 +538,8 @@ uint32_t _leWidget_GetAlphaAmount(const leWidget* _this)
     
     return _this->style.alphaAmount;
 #else
+    (void)_this; //unused;
+
     return 255;
 #endif
 }
@@ -563,6 +572,8 @@ uint32_t _leWidget_GetCumulativeAlphaAmount(const leWidget* _this)
     
     return lePercentOf(255, actualAmount);
 #else
+    (void)_this; //unused;
+
     return 255;
 #endif
 }
@@ -587,6 +598,9 @@ leResult _leWidget_SetAlphaAmount(leWidget* _this,
         
     return LE_SUCCESS;
 #else
+    (void)_this; //unused;
+    (void)alpha; //unused;
+
     return LE_FAILURE;
 #endif
 }
@@ -607,6 +621,9 @@ leBool _leWidget_IsOpaque(const leWidget* _this)
     {
        return LE_FALSE;
     }
+
+#else
+    (void)_this; //unused;
 #endif
        
     return LE_TRUE;

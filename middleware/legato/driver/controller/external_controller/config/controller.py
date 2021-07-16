@@ -39,6 +39,7 @@ def instantiateComponent(comp):
 	execfile(Module.getPath() + "/config/files.py")
 	execfile(Module.getPath() + "/config/rtos.py")
 
+
 	comp.setDependencyEnabled("Parallel Display Interface", True);
 	comp.setDependencyEnabled("SPI Display Interface", False);
 
@@ -124,6 +125,8 @@ def onBlitBufferFunctionGenerateModeChanged(source, event):
 	source.getComponent().getSymbolByID("SetYAddressCommandParm3").setVisible(event["value"] == "Use Bulk Write")
 	source.getComponent().getSymbolByID("MemoryWriteCommand").setVisible(event["value"] == "Use Bulk Write")
 	source.getComponent().getSymbolByID("StubGenerateModeComment").setVisible(event["value"] == "Stub")
+	source.getComponent().getSymbolByID("PixelDataSettingsMenu").setVisible(event["value"] == "Use Bulk Write")
+    
 
 
 def onFrameAddressSizeChanged(source, event):
@@ -138,6 +141,8 @@ def onBaseDriverTypeChanged(source, event):
 		configureBaseDriverILI9488(source.getComponent())
 	elif (event["value"] == "SSD1963"):
 		configureBaseDriverSSD1963(source.getComponent())
+	elif (event["value"] == "SSD1309"):
+		configureBaseDriverSSD1309(source.getComponent())        
 
 def onPassiveDriverChanged(source, event):
 	source.getComponent().getSymbolByID("BlitBufferFunctionSettings").setVisible(event["value"] == False)
@@ -285,7 +290,92 @@ def configureBaseDriverSSD1963(comp):
 	comp.getSymbolByID("SetXAddressCommand").setValue(0x2a)
 	comp.getSymbolByID("SetYAddressCommand").setValue(0x2b)
 	comp.getSymbolByID("MemoryWriteCommand").setValue(0x2c)
+    
+def configureBaseDriverSSD1309(comp):
+	comp.getSymbolByID("PostResetDelay").setValue(30)
+	comp.getSymbolByID("InitCommandsCount").setValue(16)
+	comp.getSymbolByID("DisplayInterfaceType").setValue("SPI 4-line")
+	comp.getSymbolByID("BlitBufferFunctionGenerateMode").setValue("Stub")
+	comp.getSymbolByID("UseDCPinForParms").setValue(False)
+    
+	comp.getSymbolByID("DisplayWidth").setValue(128)
+	comp.getSymbolByID("DisplayHeight").setValue(64)    
 
+	comp.getSymbolByID("Command0Comment").setValue("Set Command Lock")
+	comp.getSymbolByID("Command0").setValue(0xFD)
+	comp.getSymbolByID("Command0ParmsCount").setValue(1)
+	comp.getSymbolByID("Command0Parm0").setValue(0x12)
+
+	comp.getSymbolByID("Command1Comment").setValue("Set Display Off")
+	comp.getSymbolByID("Command1").setValue(0xAE)
+	comp.getSymbolByID("Command1ParmsCount").setValue(0)
+
+	comp.getSymbolByID("Command2Comment").setValue("Set Display Clock Dvide Ratio")
+	comp.getSymbolByID("Command2").setValue(0xD5)
+	comp.getSymbolByID("Command2ParmsCount").setValue(1)
+	comp.getSymbolByID("Command2Parm0").setValue(0xA1)
+
+	comp.getSymbolByID("Command3Comment").setValue("Set Multiplex Ratio")
+	comp.getSymbolByID("Command3").setValue(0xA8)
+	comp.getSymbolByID("Command3ParmsCount").setValue(1)
+	comp.getSymbolByID("Command3Parm0").setValue(0x1F)
+
+	comp.getSymbolByID("Command4Comment").setValue("Set Display Offset = 0")
+	comp.getSymbolByID("Command4").setValue(0xD3)
+	comp.getSymbolByID("Command4ParmsCount").setValue(1)
+	comp.getSymbolByID("Command4Parm0").setValue(0x0)
+
+	comp.getSymbolByID("Command5Comment").setValue("Set Display Start Line = 0")
+	comp.getSymbolByID("Command5").setValue(0x40)
+	comp.getSymbolByID("Command5ParmsCount").setValue(0)
+
+	comp.getSymbolByID("Command6Comment").setValue(" Set Segment Remap Col127")
+	comp.getSymbolByID("Command6").setValue(0xA1)
+	comp.getSymbolByID("Command6ParmsCount").setValue(0)
+
+	comp.getSymbolByID("Command7Comment").setValue("Output Scan Down")
+	comp.getSymbolByID("Command7").setValue(0xc8)
+	comp.getSymbolByID("Command7ParmsCount").setValue(0)
+    
+	comp.getSymbolByID("Command8Comment").setValue("Set Com Pins")
+	comp.getSymbolByID("Command8").setValue(0xDA)
+	comp.getSymbolByID("Command8ParmsCount").setValue(1)
+	comp.getSymbolByID("Command8Parm0").setValue(0x12)
+
+	comp.getSymbolByID("Command9Comment").setValue("Set Contrast Control Bank0")
+	comp.getSymbolByID("Command9").setValue(0x81)
+	comp.getSymbolByID("Command9ParmsCount").setValue(1)
+	comp.getSymbolByID("Command9Parm0").setValue(0xef)    
+
+	comp.getSymbolByID("Command10Comment").setValue("Set PreCharge Period")
+	comp.getSymbolByID("Command10").setValue(0xD9)
+	comp.getSymbolByID("Command10ParmsCount").setValue(1)
+	comp.getSymbolByID("Command10Parm0").setValue(0x15)
+    
+	comp.getSymbolByID("Command11Comment").setValue("Set VCOMH Deselect Level")
+	comp.getSymbolByID("Command11").setValue(0xDB)
+	comp.getSymbolByID("Command11ParmsCount").setValue(1)
+	comp.getSymbolByID("Command11Parm0").setValue(0x8)    
+
+	comp.getSymbolByID("Command12Comment").setValue("GDRAM and Display On")
+	comp.getSymbolByID("Command12").setValue(0xA4)
+	comp.getSymbolByID("Command12ParmsCount").setValue(0)
+    
+	comp.getSymbolByID("Command13Comment").setValue("Set Addressing Mode = Horizontal")
+	comp.getSymbolByID("Command13").setValue(0x20)
+	comp.getSymbolByID("Command13ParmsCount").setValue(1)
+	comp.getSymbolByID("Command13Parm0").setValue(0)      
+
+	comp.getSymbolByID("Command14Comment").setValue("Set Normal Display")
+	comp.getSymbolByID("Command14").setValue(0xA6)
+	comp.getSymbolByID("Command14ParmsCount").setValue(0)
+    
+	comp.getSymbolByID("Command15Comment").setValue("Set Display On")
+	comp.getSymbolByID("Command15").setValue(0xAF)
+	comp.getSymbolByID("Command15ParmsCount").setValue(0)
+    
+    
+    
 def updateDisplayManager(component, target):
 	if (Database.getComponentByID("gfx_hal_le") is not None):
 		if target["id"] == "gfx_display":

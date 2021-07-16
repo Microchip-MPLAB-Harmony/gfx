@@ -88,6 +88,15 @@
 #define DRV_${ControllerName}_NCSDeassert(intf) GFX_Disp_Intf_PinControl(intf, \
                                     GFX_DISP_INTF_PIN_CS, \
                                     GFX_DISP_INTF_PIN_SET)
+									
+
+<#if BaseDriverType == "SSD1309">
+#define PIXELS_PER_BYTE 8
+#define LCD_FRAMEBUFFER_SIZE ((128 * 64) / PIXELS_PER_BYTE)
+
+static uint8_t framebuffer[LCD_FRAMEBUFFER_SIZE] = {0};
+</#if>
+									
 <#if PassiveDriver == false>
 <#if DataWriteSize == "8">
     <#if PixelDataTxSize8Bit == "2 (Little-Endian)">
@@ -216,6 +225,10 @@ static inline void DRV_${ControllerName}_DelayMS(int ms)
 */
 static void DRV_${ControllerName}_Reset(void)
 {
+    <#if PreResetDelay != 0>
+    DRV_${ControllerName}_Reset_Deassert();
+    DRV_${ControllerName}_DelayMS(${PreResetDelay});
+    </#if>
     DRV_${ControllerName}_Reset_Assert();
     DRV_${ControllerName}_DelayMS(${ResetAssertDuration});
     DRV_${ControllerName}_Reset_Deassert();
@@ -250,9 +263,16 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr,
         if (initVals->parms != NULL &&
             initVals->parmCount > 0)
         {
+
+<#if UseDCPinForParms == true>
             returnValue = GFX_Disp_Intf_WriteData(intf, 
                                                  (uint8_t *) initVals->parms,
                                                  initVals->parmCount);
+<#else>
+			returnValue = GFX_Disp_Intf_Write(intf, 
+                                                 (uint8_t *) initVals->parms,
+                                                 initVals->parmCount);
+</#if>
             if (0 != returnValue)
                 break;
         
@@ -468,8 +488,76 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             break;
         }        
     }
+<#else>
+<#if BaseDriverType == "SSD1309">
+	switch (drv.state)
+    {
+		case BLIT_COLUMN_CMD:
+		{
+			uint8_t cmd[3];
+
+<#if BlitType == "Driver Asynchronous">
+            if (GFX_Disp_Intf_Ready(intf) == false)
+                break;
+</#if>		
+			DRV_${ControllerName}_NCSAssert(intf);
+			GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
+			
+			//Set Column Address
+			cmd[0] = 0x21;
+			cmd[1] = 0;
+			cmd[2] = DISPLAY_WIDTH - 1;
+			GFX_Disp_Intf_Write(intf, cmd, 3);
+	
+			drv.state = BLIT_PAGE_CMD;
+			break;
+		}
+		case BLIT_PAGE_CMD:
+		{
+			uint8_t cmd[3];
+
+<#if BlitType == "Driver Asynchronous">
+            if (GFX_Disp_Intf_Ready(intf) == false)
+                break;
+</#if>
+			//Set Page Address
+			cmd[0] = 0x22;
+			cmd[1] = 0;
+			cmd[2] = (DISPLAY_HEIGHT / 8) - 1;
+			GFX_Disp_Intf_Write(intf, cmd, 3);
+			
+			drv.state = BLIT_WRITE_DATA;
+			break;
+		}
+		case BLIT_WRITE_DATA:
+		{
+<#if BlitType == "Driver Asynchronous">
+            if (GFX_Disp_Intf_Ready(intf) == false)
+                break;
+</#if>		
+			
+			GFX_Disp_Intf_WriteData(intf, framebuffer, DISPLAY_WIDTH * DISPLAY_HEIGHT / 8);
+
+			drv.state = BLIT_DONE;
+			break;
+		}
+		case BLIT_DONE:
+		{
+<#if BlitType == "Driver Asynchronous">
+            if (GFX_Disp_Intf_Ready(intf) == false)
+                break;
+</#if>
+            DRV_${ControllerName}_NCSDeassert(intf); 		
+			drv.state = IDLE;
+			break;
+		}
+		default:
+			break;
+	}
+		
 <#elseif StubGenerateBuildErrorDisable != true>
 #error "Blit buffer procedure is not complete. Please complete definition of blit function."
+</#if>	
 </#if>
 }
 
@@ -541,11 +629,67 @@ void DRV_${ControllerName}_Update(void)
 </#if>
 }
 
+<#if BaseDriverType == "SSD1309">
+static inline uint8_t DRV_${ControllerName}_FB_Get_Byte(uint8_t * fb,
+                                         uint8_t page,
+                                         uint8_t column)
+{
+	return *(fb + (page * DISPLAY_WIDTH) + column);
+}
+
+static inline void DRV_${ControllerName}_FB_Set_Byte(uint8_t * fb,
+                                      uint8_t page,
+                                      uint8_t column,
+                                      uint8_t data)
+{
+	*(fb + (page * DISPLAY_WIDTH) + column) = data;
+}
+</#if>
+
 <#if PassiveDriver == false>
 gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
                                 int32_t y,
                                 gfxPixelBuffer* buf)
 {
+
+<#if BaseDriverType == "SSD1309">
+    uint8_t page, pixel_mask, pixel_value, lx, ly;
+	
+	if (drv.state != IDLE)
+        return GFX_FAILURE;
+
+    if (buf == NULL ||
+        x > DISPLAY_WIDTH - 1 ||
+        y > DISPLAY_HEIGHT - 1)
+        return GFX_FAILURE;
+
+    for (ly = 0; ly < buf->size.height; ly++)
+    {
+        for (lx = 0; lx < buf->size.width; lx++)
+        {
+            gfxColor color = gfxPixelBufferGet(buf, lx, ly);
+
+            //determine the page and column based on pixel coordinates
+            page = (y + ly) / PIXELS_PER_BYTE;
+
+            pixel_mask = (1 << ((y + ly) - (page * 8)));
+
+            //Read the pixel data from frame buffer memory
+            pixel_value = DRV_${ControllerName}_FB_Get_Byte(framebuffer, page, x + lx);
+
+            if (color == 0)
+            {
+                pixel_value &= ~pixel_mask;
+            }
+            else
+            {
+                pixel_value |= pixel_mask;
+            }
+
+            DRV_${ControllerName}_FB_Set_Byte(framebuffer, page, x + lx, pixel_value);
+        }
+    }
+<#else>
 
     if(drv.state != IDLE)
         return GFX_FAILURE;
@@ -560,6 +704,7 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
 <#if BlitType == "Interface Asynchronous">
     DRV_${ControllerName}_Transfer((GFX_Disp_Intf) drv.port_priv);
 </#if>
+</#if>
 
     return GFX_SUCCESS;
 }
@@ -573,6 +718,14 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
     
     switch(request)
     {
+        case GFX_IOCTL_FRAME_END:
+        {
+<#if BaseDriverType == "SSD1309">
+			drv.state = BLIT_COLUMN_CMD;
+            DRV_${ControllerName}_Transfer((GFX_Disp_Intf) drv.port_priv);
+</#if>
+            return GFX_IOCTL_OK;
+        }	
         case GFX_IOCTL_GET_COLOR_MODE:
         {
             val = (gfxIOCTLArg_Value*)arg;

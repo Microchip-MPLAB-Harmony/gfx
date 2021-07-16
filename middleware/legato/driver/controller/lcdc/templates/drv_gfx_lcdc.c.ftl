@@ -194,7 +194,11 @@ typedef struct
 LCDC_DMA_DESC __attribute__ ((section(".region_nocache"), aligned (64))) channelDesc${i};
 </#list>
 
+<#if CanvasModeOnly == true>
 static volatile DRV_STATE state[GFX_LCDC_LAYERS];
+<#else>
+static volatile DRV_STATE state;
+</#if>
 <#if UseGPU == true && le_gfx_gfx2d??>
 static gfxRect srcRect, destRect;
 <#if VblankBlit == true>
@@ -204,6 +208,9 @@ static volatile unsigned int blitLayer = 0;
 </#if>
 static unsigned int vsyncCount = 0;
 static unsigned int activeLayer = 0;
+<#if DoubleBuffer == true>
+static volatile unsigned int syncLayer = 0;
+</#if>
 
 static volatile int32_t waitForAlphaSetting[GFX_LCDC_LAYERS] = {0};
 
@@ -259,10 +266,6 @@ static LCDC_LAYER_ID lcdcLayerZOrder[GFX_LCDC_LAYERS] =
 };
 
 
-/**** Hardware Abstraction Interfaces ****/
-<#if CanvasModeOnly == false>
-static gfxResult DRV_LCDC_UpdateLayer(unsigned int layer);
-</#if>
 
 void _IntHandlerLayerReadComplete(uintptr_t context);
 
@@ -275,6 +278,7 @@ static void LCDCUpdateDMADescriptor(LCDC_DMA_DESC * desc, uint32_t addr, uint32_
 
 void DRV_LCDC_Update()
 {
+<#if CanvasModeOnly == true>
     uint32_t i;
 
     for (i = 0; i < GFX_LCDC_LAYERS; i++)
@@ -286,51 +290,83 @@ void DRV_LCDC_Update()
                 state[i] = DRAW;
                 break;
             }
-    <#if DoubleBuffer == true>
-            case SYNC:
-            {
-    <#if VblankBlit != true>
-    <#if UseGPU == true && le_gfx_gfx2d??>
-                drvLayer[i].syncRectIndex--;
-
-                gfxGPUInterface.blitBuffer(&drvLayer[i].pixelBuffer[drvLayer[i].frontBufferIdx],
-                                 &drvLayer[i].syncRect[drvLayer[i].syncRectIndex],
-                                 &drvLayer[i].pixelBuffer[drvLayer[i].backBufferIdx],
-                                 &drvLayer[i].syncRect[drvLayer[i].syncRectIndex]);
-    <#else>
-                void* srcPtr;
-                void* destPtr;
-                uint32_t row, rowSize;
-
-                drvLayer[i].syncRectIndex--;
-
-                rowSize = drvLayer[i].syncRect[drvLayer[i].syncRectIndex].width * 
-                          gfxColorInfoTable[drvLayer[i].pixelBuffer[drvLayer[i].frontBufferIdx].mode].size;
-
-                for(row = 0; row < drvLayer[i].syncRect[drvLayer[i].syncRectIndex].height; row++)
-                {
-                    srcPtr = gfxPixelBufferOffsetGet(&drvLayer[i].pixelBuffer[drvLayer[i].frontBufferIdx],
-                                        drvLayer[i].syncRect[drvLayer[i].syncRectIndex].x,
-                                        drvLayer[i].syncRect[drvLayer[i].syncRectIndex].y + row);
-                    destPtr = gfxPixelBufferOffsetGet(&drvLayer[i].pixelBuffer[drvLayer[i].backBufferIdx],
-                                        drvLayer[i].syncRect[drvLayer[i].syncRectIndex].x,
-                                        drvLayer[i].syncRect[drvLayer[i].syncRectIndex].y + row);
-
-                    memcpy(destPtr, srcPtr, rowSize);
-                }
-    </#if>               
-                state[i] = DRAW;
-    </#if>
-    
-                break;
-            }
-    </#if>
             case DRAW:
             case SWAP:
             default:
                 break;
         }
     }
+<#else>
+    switch(state)
+    {
+        case INIT:
+        {
+<#if DoubleBuffer == true>
+            syncLayer = 0;
+</#if>
+            state = DRAW;
+            break;
+        }
+<#if DoubleBuffer == true>
+        case SYNC:
+        {
+<#if VblankBlit != true>
+            if (drvLayer[syncLayer].syncRectIndex == 0)
+            {
+                syncLayer++;
+            }
+<#if UseGPU == true && le_gfx_gfx2d??>
+            else
+            {
+                drvLayer[syncLayer].syncRectIndex--;
+
+                gfxGPUInterface.blitBuffer(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
+                                 &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex],
+                                 &drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
+                                 &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex]);
+            }
+<#else>
+            else
+            {
+                void* srcPtr;
+                void* destPtr;
+                uint32_t row, rowSize;
+
+                drvLayer[syncLayer].syncRectIndex--;
+
+                rowSize = drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].width * 
+                          gfxColorInfoTable[drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx].mode].size;
+
+                for(row = 0; row < drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].height; row++)
+                {
+                    srcPtr = gfxPixelBufferOffsetGet(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
+                                        drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].x,
+                                        drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].y + row);
+                    destPtr = gfxPixelBufferOffsetGet(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
+                                        drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].x,
+                                        drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex].y + row);
+
+                    memcpy(destPtr, srcPtr, rowSize);
+                }
+            }
+</#if>
+            
+            if (syncLayer == GFX_LCDC_LAYERS)
+            {
+                syncLayer = 0;
+                state = DRAW;
+            }
+</#if>
+
+            break;
+        }
+</#if>
+        case DRAW:
+        case SWAP:
+        default:
+            break;
+    }
+</#if>
 }
 
 <#if CanvasModeOnly == true>
@@ -383,6 +419,61 @@ static LCDC_INPUT_COLOR_MODE getLCDCColorModeFromGFXColorMode(gfxColorMode mode)
         default:
             return LCDC_INPUT_COLOR_MODE_RGBA_8888;
             break;
+    }
+}
+</#if>
+
+<#if HEOLayerEnable == true>
+static void layerHEOGetScalingFactors(uint16_t xmemsize,
+                                     uint16_t ymemsize,
+                                     uint16_t xsize,
+                                     uint16_t ysize,
+                                     uint16_t* xfactor,
+                                     uint16_t* yfactor)
+{
+    uint16_t xfactor1st, yfactor1st;
+
+    xmemsize--;
+    ymemsize--;
+    xsize--;
+    ysize--;
+            
+    xfactor1st = ((2048 * xmemsize - 256 * XPHIDEF)/ xsize) + 1;
+    yfactor1st = ((2048 * ymemsize - 256 * XPHIDEF)/ ysize) + 1;
+
+    if ((xfactor1st * xsize / 2048) > xmemsize)
+        *xfactor = xfactor1st - 1;
+    else
+        *xfactor = xfactor1st;
+
+    if ((yfactor1st * ysize / 2048) > ymemsize)
+        *yfactor = yfactor1st - 1;
+    else
+        *yfactor = yfactor1st;
+}
+
+static void layerHEOSetSize(uint16_t s_width, uint16_t s_height, uint16_t w_width, uint16_t w_height)
+{
+    LCDC_SetWindowSize(LCDC_LAYER_HEO, w_width, w_height);
+    LCDC_SetHEOImageMemSize(s_width, s_height);    
+    
+    //Source and window size are not the same, use scaler
+    if (s_width != w_width || s_height != w_height)
+    {
+        uint16_t scale_w, scale_h;
+        
+        layerHEOGetScalingFactors(s_width,
+                                s_height,
+                                w_width,
+                                w_height,
+                                &scale_w,
+                                &scale_h);
+          
+        LCDC_SetHEOScaler(scale_h, scale_w, true);
+    }
+    else
+    {
+        LCDC_SetHEOScaler(0, 0, false);
     }
 }
 </#if>
@@ -549,6 +640,7 @@ gfxResult DRV_LCDC_Initialize()
         drvLayer[layerCount].alpha      = 255;
         drvLayer[layerCount].colorspace = LCDC_DEFAULT_GFX_COLOR_MODE;
         drvLayer[layerCount].frameOffset = 0;
+        drvLayer[layerCount].enabled    = true;
         LCDCUpdateDMADescriptor(drvLayer[layerCount].desc, 
                                 (uint32_t) drvLayer[layerCount].baseaddr[0],
                                 0x01,
@@ -589,6 +681,7 @@ gfxResult DRV_LCDC_Initialize()
         LCDC_UpdateAttribute(drvLayer[layerCount].hwLayerID); //Apply the attributes
 
         LCDC_SetChannelEnable(drvLayer[layerCount].hwLayerID, true);
+        LCDC_IRQ_Enable(LCDC_INTERRUPT_BASE + drvLayer[layerCount].hwLayerID);
         
         drvLayer[layerCount].frontBufferIdx = 0;
 <#if DoubleBuffer != true>
@@ -623,22 +716,118 @@ gfxResult DRV_LCDC_Initialize()
     //Register the interrupt handler
     LCDC_IRQ_CallbackRegister(_IntHandlerLayerReadComplete, (uintptr_t) NULL);
     
+<#if CanvasModeOnly == true>
     //Enable layer interrupts
     for (layerCount = 0; layerCount < GFX_LCDC_LAYERS; layerCount++)
     {
-<#if CanvasModeOnly == true>
         LCDC_LAYER_IRQ_Enable(drvLayer[layerCount].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);       
-        LCDC_IRQ_Enable(LCDC_INTERRUPT_BASE + drvLayer[layerCount].hwLayerID);        
-</#if>
     }
+</#if>
     
     return GFX_SUCCESS;
 }
 
 void _IntHandlerLayerReadComplete(uintptr_t context)
 {
-    uint32_t i, status;
+<#if CanvasModeOnly == false>
+    uint32_t i;
+<#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
 
+    if (blitBuff != NULL)
+    {
+<#if DoubleBuffer == true> 
+        gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
+                                   &srcRect,
+                                   &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].backBufferIdx],
+                                   &destRect);
+<#else>
+        gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
+                                   &srcRect,
+                                   &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].frontBufferIdx],
+                                   &destRect);
+</#if>
+
+        gfxPixelBuffer_SetLocked((gfxPixelBuffer*) blitBuff,
+                                 LE_FALSE);
+
+        blitBuff = NULL;        
+    }
+
+</#if>
+    for (i = 0; i < GFX_LCDC_LAYERS; i++)
+    {
+        LCDC_LAYER_IRQ_Disable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
+
+<#if DoubleBuffer == true>     
+        switch (state)
+        {
+            case SWAP:
+            {
+                if (drvLayer[i].swapPending == false)
+                    break;
+        
+                drvLayer[i].frontBufferIdx = drvLayer[i].backBufferIdx;
+                drvLayer[i].backBufferIdx = (drvLayer[i].backBufferIdx == 0) ? 1 : 0;
+
+                LCDCUpdateDMADescriptor(drvLayer[i].desc, 
+                                        (uint32_t) drvLayer[i].baseaddr[drvLayer[i].frontBufferIdx],
+                                        0x01,
+                                        (uint32_t) drvLayer[i].desc);
+
+                drvLayer[i].swapPending = false;
+                
+                break;
+            }
+<#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
+            case SYNC:
+            {
+                if (drvLayer[syncLayer].syncRectIndex == 0)
+                {
+                    syncLayer++;
+                }
+                else
+                {
+                    drvLayer[syncLayer].syncRectIndex--;
+
+                    gfxGPUInterface.blitBuffer(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
+                                     &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex],
+                                     &drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
+                                     &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex]);
+                }
+
+                if (syncLayer == GFX_LCDC_LAYERS)
+                {
+                    syncLayer = 0;
+                    state = DRAW;
+                }
+                
+                for (i = 0; i < GFX_LCDC_LAYERS; i++)
+                {
+                    LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
+                }
+                
+                break;
+            }
+</#if>
+            default:
+                break;
+        }
+</#if>
+    }
+<#if DoubleBuffer == true> 
+    if (state == SWAP)
+    {
+<#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
+        for (i = 0; i < GFX_LCDC_LAYERS; i++)
+        {
+            LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);       
+        }
+</#if>
+        state = SYNC;
+    }
+</#if>
+<#else>
+    uint32_t i, status;
 	//Check to see which layer this interrupt is from
     for (i = 0; i < GFX_LCDC_LAYERS; i++)
     {
@@ -651,7 +840,6 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
 </#if>
         {
 	        LCDC_LAYER_IRQ_Disable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA); 
-<#if CanvasModeOnly == true>
             if (drvLayer[i].updateLock == LAYER_LOCKED_PENDING)
             {
                 if (drvLayer[i].irqCallback != NULL)
@@ -660,25 +848,16 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
                 }
                 drvLayer[i].updateLock = LAYER_UNLOCKED;
             }
-<#else>
-            DRV_LCDC_UpdateLayer(i);
-</#if>
         }
     }
+    
 <#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
     if (blitBuff != NULL)
     {
-<#if DoubleBuffer == true>
-        gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
-                                 &srcRect,
-                                 &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].backBufferIdx],
-                                 &destRect);
-<#else>
         gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
                                  &srcRect,
                                  &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].frontBufferIdx],
                                  &destRect);
-</#if>
 
         gfxPixelBuffer_SetLocked((gfxPixelBuffer*) blitBuff,
                                  LE_FALSE);
@@ -686,46 +865,6 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
         blitBuff = NULL;        
     }
 </#if>
-<#if DoubleBuffer == true>     
-    switch (state[i])
-    {
-        case SWAP:
-        {
-            if (drvLayer[i].swapPending == false)
-                break;
-        
-            drvLayer[i].frontBufferIdx = drvLayer[i].backBufferIdx;
-            drvLayer[i].backBufferIdx = (drvLayer[i].backBufferIdx == 0) ? 1 : 0;
-
-            LCDCUpdateDMADescriptor(drvLayer[i].desc, 
-                                    (uint32_t) drvLayer[i].baseaddr[drvLayer[i].frontBufferIdx],
-                                    0x01,
-                                    (uint32_t) drvLayer[i].desc);
-
-            drvLayer[i].swapPending = false;
-                
-            break;
-        }
-<#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
-        case SYNC:
-        {
-            drvLayer[i].syncRectIndex--;
-
-            gfxGPUInterface.blitBuffer(&drvLayer[i].pixelBuffer[drvLayer[i].frontBufferIdx],
-                                &drvLayer[i].syncRect[drvLayer[i].syncRectIndex],
-                                &drvLayer[i].pixelBuffer[drvLayer[i].backBufferIdx],
-                                &drvLayer[i].syncRect[drvLayer[i].syncRectIndex]);
-
-            state[i] = DRAW;
-                
-            LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
-
-            break;
-        }
-</#if>
-        default:
-            break;
-    }
 
     if (state[i] == SWAP)
     {
@@ -737,8 +876,6 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
 </#if>
 }
 
-/**** End Hardware Abstraction Interfaces ****/
-
 gfxResult DRV_LCDC_BlitBuffer(int32_t x,
                              int32_t y,
                              gfxPixelBuffer* buf)
@@ -749,7 +886,11 @@ gfxResult DRV_LCDC_BlitBuffer(int32_t x,
     uint32_t row, rowSize;
 </#if>
 
+<#if CanvasModeOnly == true>
     if (state[activeLayer] != DRAW)
+<#else>
+    if (state != DRAW)
+</#if>
 	{
         return GFX_FAILURE;
 	}
@@ -769,9 +910,9 @@ gfxResult DRV_LCDC_BlitBuffer(int32_t x,
         drvLayer[activeLayer].syncRect[SYNC_RECT_COUNT].x = 0;
         drvLayer[activeLayer].syncRect[SYNC_RECT_COUNT].y = 0;
         drvLayer[activeLayer].syncRect[SYNC_RECT_COUNT].width = 
-                drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx].size.width;
+        drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx].size.width;
         drvLayer[activeLayer].syncRect[SYNC_RECT_COUNT].height = 
-                drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx].size.height;
+        drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx].size.height;
     }
 </#if>
 
@@ -792,8 +933,7 @@ gfxResult DRV_LCDC_BlitBuffer(int32_t x,
     blitBuff = buf;
     blitLayer = activeLayer;
     
-    LCDC_LAYER_ID layerID = lcdcLayerZOrder[blitLayer];
-    LCDC_LAYER_IRQ_Enable(layerID, LCDC_LAYER_INTERRUPT_DMA);
+    LCDC_LAYER_IRQ_Enable(drvLayer[blitLayer].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
 <#else>
 <#if DoubleBuffer == true> 
     gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
@@ -815,27 +955,6 @@ gfxResult DRV_LCDC_BlitBuffer(int32_t x,
 
     return GFX_SUCCESS;
 }
-
-<#if CanvasModeOnly == false>
-static gfxResult DRV_LCDC_UpdateLayer(unsigned int layer)
-{
-    if (drvLayer[layer].enabled == true)
-        LCDC_SetUseDMAPathEnable(drvLayer[layer].hwLayerID, true);
-    else
-        LCDC_SetUseDMAPathEnable(drvLayer[layer].hwLayerID, false);
-
-    //Update the active layer's color mode and stride
-    LCDC_SetRGBModeInput(drvLayer[layer].hwLayerID, drvLayer[layer].colorspace);
-    LCDC_SetDMAAddressRegister(drvLayer[layer].hwLayerID, drvLayer[layer].desc->addr);
-    LCDC_SetDMADescriptorNextAddress(drvLayer[layer].hwLayerID, (uint32_t) drvLayer[layer].desc);
-    LCDC_SetDMAHeadPointer(drvLayer[layer].hwLayerID, (uint32_t) drvLayer[layer].desc);
-    LCDC_SetTransferDescriptorFetchEnable(drvLayer[layer].hwLayerID, true);
-        
-    LCDC_UpdateAddToQueue(drvLayer[layer].hwLayerID);
-
-    return GFX_SUCCESS;
-}
-</#if>
 
 <#if CanvasModeOnly == true>
 static gfxDriverIOCTLResponse DRV_LCDC_layerConfig(gfxDriverIOCTLRequest request,
@@ -1016,6 +1135,9 @@ static gfxDriverIOCTLResponse DRV_LCDC_layerConfig(gfxDriverIOCTLRequest request
 gfxDriverIOCTLResponse DRV_LCDC_IOCTL(gfxDriverIOCTLRequest request,
                                       void* arg)
 {
+<#if DoubleBuffer == true>
+    unsigned int i = 0;
+</#if>
     gfxIOCTLArg_Value* val;
     gfxIOCTLArg_DisplaySize* disp;
     gfxIOCTLArg_LayerRect* rect;
@@ -1034,11 +1156,12 @@ gfxDriverIOCTLResponse DRV_LCDC_IOCTL(gfxDriverIOCTLRequest request,
         case GFX_IOCTL_FRAME_END:
         {
 <#if DoubleBuffer == true>
-            state[activeLayer] = SWAP;
-
-            LCDC_LAYER_IRQ_Enable(drvLayer[activeLayer].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
+            state = SWAP;
+            for (i = 0; i < GFX_LCDC_LAYERS; i++)
+            {
+                LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
+            }
 </#if>
-            
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_BUFFER_COUNT:
@@ -1148,7 +1271,7 @@ gfxDriverIOCTLResponse DRV_LCDC_IOCTL(gfxDriverIOCTLRequest request,
                 }
             }
 <#else>
-            if (state[activeLayer] != DRAW)
+            if (state != DRAW)
             {
                 val->value.v_uint = 1;
                 break;

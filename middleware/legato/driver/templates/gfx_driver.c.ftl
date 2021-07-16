@@ -582,6 +582,7 @@ const gfxColorModeInfo gfxColorInfoTable[] =
     {1,1,  GFX_BPP1,  {0x0,0x0,0x0,0x0},{0x0,0x0,0x0,0x0}},                        // GFX_COLOR_MODE_INDEX_1
     {1,4,  GFX_BPP4,  {0x0,0x0,0x0,0x0},{0x0,0x0,0x0,0x0}},                        // GFX_COLOR_MODE_INDEX_4
     {1,8,  GFX_BPP8,  {0x0,0x0,0x0,0x0},{0x0,0x0,0x0,0x0}},                        // GFX_COLOR_MODE_INDEX_8
+    {1,1,  GFX_BPP1,  {0x0,0x0,0x0,0x0},{0x0,0x0,0x0,0x0}},                        // GFX_COLOR_MODE_MONO
 };
 
 uint32_t gfxColorChannelRed(gfxColor clr, gfxColorMode mode)
@@ -800,6 +801,7 @@ gfxResult gfxPixelBufferCreate(const int32_t width,
     switch(mode)
     {
         case GFX_COLOR_MODE_INDEX_1:
+        case GFX_COLOR_MODE_MONOCHROME:
         {
             buffer->buffer_length = (width * height) / 8;
             
@@ -882,6 +884,23 @@ gfxColor gfxPixelBufferGet_Unsafe(const gfxPixelBuffer* const buffer,
 {
     uint8_t* offs_ptr;
     gfxColor color = 0;
+    uint32_t offs;
+    uint32_t idx;
+    uint8_t byte;
+
+    if(buffer->mode == GFX_COLOR_MODE_MONOCHROME)
+    {
+        idx = ((x + (y * buffer->size.width)));
+        offs = 1 << (7 - (idx % 8));
+
+        byte = *(((uint8_t*)buffer->pixels) + (idx / 8));
+
+        color = byte & offs;
+
+        color >>= (7 - (idx % 8));
+
+        return color;
+    }
     
     offs_ptr = (uint8_t*)gfxPixelBufferOffsetGet(buffer, x, y);
     

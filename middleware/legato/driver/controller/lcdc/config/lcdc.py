@@ -140,7 +140,6 @@ def instantiateComponent(comp):
 	HEOLayerEnable.setLabel("High-End Overlay (HEO)")
 	HEOLayerEnable.setDescription("Enables High-End Overlay")
 	HEOLayerEnable.setDefaultValue(False)
-	HEOLayerEnable.setReadOnly(True)
 	HEOLayerEnable.setDependencies(OnLayersEnabled, ["HEOLayerEnable"])
 	
 	Overlay2LayerEnable = comp.createBooleanSymbol("Overlay2LayerEnable", EnableLayersMenu)

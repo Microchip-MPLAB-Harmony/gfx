@@ -41,21 +41,21 @@
 #endif
 
 #define BLOCK_OVERHEAD_SIZE       (BLOCK_HEADER_SIZE + BLOCK_FOOTER_SIZE)
-#define BLOCK_DATA_PTR(blk)       ((uint8_t*)((uint32_t)blk + BLOCK_HEADER_SIZE))
+#define BLOCK_DATA_PTR(blk)       ((uint8_t*)((size_t)blk + BLOCK_HEADER_SIZE))
 #define BLOCK_FOOTER_PTR(blk)     ((uint8_t*)BLOCK_DATA_PTR(blk) + blk->size)
 
 #define BLOCK_MINIMUM_SIZE        (BLOCK_OVERHEAD_SIZE + LE_VARIABLEHEAP_MINALLOCSIZE)
 
 #define BLOCK_CHECKSUM            (-1)
-#define BLOCK_NEXT(blk)           (Block*)(((uint32_t)blk + BLOCK_PHYSICAL_SIZE(blk)))
-#define BLOCK_NEXT_PTR(blk)       (void*)(((uint32_t)blk + BLOCK_PHYSICAL_SIZE(blk)))
+#define BLOCK_NEXT(blk)           (Block*)(((size_t)blk + BLOCK_PHYSICAL_SIZE(blk)))
+#define BLOCK_NEXT_PTR(blk)       (void*)(((size_t)blk + BLOCK_PHYSICAL_SIZE(blk)))
 
 #define BLOCK_PHYSICAL_SIZE(blk)  (blk->size + BLOCK_OVERHEAD_SIZE)
 #define BLOCK_LOGICAL_SIZE(blk)   (blk->size)
 #define BLOCK_COMBINED_SIZE(l, r) (BLOCK_PHYSICAL_SIZE(l) + BLOCK_PHYSICAL_SIZE(r) - BLOCK_OVERHEAD_SIZE)
 
-#define BLOCK_TO_PHYSICAL(ptr)    (Block*)((uint32_t)ptr - BLOCK_HEADER_SIZE)
-#define BLOCK_TO_LOGICAL(blk)     (void*)((uint32_t)blk + BLOCK_HEADER_SIZE)
+#define BLOCK_TO_PHYSICAL(ptr)    (Block*)((size_t)ptr - BLOCK_HEADER_SIZE)
+#define BLOCK_TO_LOGICAL(blk)     (void*)((size_t)blk + BLOCK_HEADER_SIZE)
 
 #define BLOCK_ALIGNEDSIZE(size)   (size + LE_VARIABLEHEAP_ALIGNMENT - (size % LE_VARIABLEHEAP_ALIGNMENT))
 
@@ -148,7 +148,7 @@ static void _insertIntoList(Block** list, Block* blk)
         return;
     }
 
-    if((uint32_t)blk < (uint32_t)listBlock)
+    if((size_t)blk < (size_t)listBlock)
     {
         blk->next = listBlock;
         blk->prev = NULL;
@@ -161,7 +161,7 @@ static void _insertIntoList(Block** list, Block* blk)
 
     while(listBlock != NULL)
     {
-        if((uint32_t)blk < (uint32_t)listBlock)
+        if((size_t)blk < (size_t)listBlock)
             break;
 
         last = listBlock;
@@ -1311,7 +1311,7 @@ void leVariableHeap_Dump(leVariableHeap* heap,
 
         blk = heap->data;
 
-        while((uint32_t)blk < (uint32_t)heap->data + heap->size)
+        while((size_t)blk < (size_t)heap->data + heap->size)
         {
             if(blk->free == LE_TRUE)
             {

@@ -27,13 +27,14 @@ DriverInitName.setLabel("Driver Name")
 DriverInitName.setDefaultValue("ExternalController")
 DriverInitName.setVisible(False)
 
-BaseDriverType = comp.createComboSymbol("BaseDriverType", None, ["Custom", "ILI9488", "SSD1963"])
+BaseDriverType = comp.createComboSymbol("BaseDriverType", None, ["Custom", "ILI9488", "SSD1963", "SSD1309"])
 BaseDriverType.setLabel("Base Driver")
 BaseDriverType.setDefaultValue("Custom")
 BaseDriverType.setDependencies(onBaseDriverTypeChanged, ["BaseDriverType"])
 BaseDriverType.setDescription("<html>Set to customize a driver or use an ILI9488 or SSD1963 driver as base.<br>"
 							"The ILI9488 base driver targets the ILI9488 controller on the 320x480 maXTouch Curiosity Pro display.<br>"
-							"The SSD1963 base driver targets an SSD1963 driving a PDA 4.3in TM4301b WQVGA </html>")
+							"The SSD1963 base driver targets an SSD1963 driving a PDA 4.3in TM4301b WQVGA <br>"                            
+							"The SSD1309 base driver targets an SSD1309 driving a 128x32 Nano OLED display board </html>")
 
 ControllerName = comp.createStringSymbol("ControllerName", BaseDriverType)
 ControllerName.setLabel("Controller")
@@ -95,6 +96,13 @@ PostResetDelay.setDescription("<html> The delay added after the reset signal is 
 
 IntializationMenu = comp.createMenuSymbol("IntializationMenu", None)
 IntializationMenu.setLabel("Initialization Settings")
+
+UseDCPinForParms = comp.createBooleanSymbol("UseDCPinForParms", IntializationMenu)
+UseDCPinForParms.setLabel("Use D/C pin for Command Parameters")
+UseDCPinForParms.setDefaultValue(True)
+UseDCPinForParms.setDescription("<html> Configure D/C pin control during initialization. <br>"
+							"If TRUE, D/C = 0 when command is being written, and D/C = 1 when parameters are being sent. <br>"
+                            "If FALSE, D/C = 0 while initialization command and parameters are being sent. </html>")
 
 MaXNumCommands = comp.createIntegerSymbol("MaXNumCommands", IntializationMenu)
 MaXNumCommands.setLabel("Max Number of Commands")
@@ -161,13 +169,13 @@ for x in range(numCommands):
 BlitBufferFunctionSettings = comp.createMenuSymbol("BlitBufferFunctionSettings", None)
 BlitBufferFunctionSettings.setLabel("Blit Buffer Function Settings")
 
-BlitBufferFunctionGenerateMode = comp.createComboSymbol("BlitBufferFunctionGenerateMode", BlitBufferFunctionSettings, ["Use Bulk Write", "Stub"])
+BlitBufferFunctionGenerateMode = comp.createComboSymbol("BlitBufferFunctionGenerateMode", BlitBufferFunctionSettings, ["Use Bulk Write", "Stub", "Base"])
 BlitBufferFunctionGenerateMode.setLabel("Blit Buffer Function Generation Mode")
 BlitBufferFunctionGenerateMode.setDependencies(onBlitBufferFunctionGenerateModeChanged, ["BlitBufferFunctionGenerateMode"])
 BlitBufferFunctionGenerateMode.setDescription("<html> Set to generate a blit buffer function. This function is called by the library to write<br>"
 								"a subsection of the frame to the display controller.<br>"
 								"'Use Bulk Write' will generate a function that sets the UL and LR points of the subframe, then write the pixel data in burst.<br>"
-								"'Stub' will generate an empty blit function that will need to be defined based on the controller's memory write operation. </html>")
+                                "'Stub' will generate an empty blit function or a predefined blit function for the base driver, if applicable. </html>")
 								
 BlitType = comp.createComboSymbol("BlitType", BlitBufferFunctionSettings, ["Synchronous", "Driver Asynchronous", "Interface Asynchronous"])
 BlitType.setLabel("Blit Transfer Type")

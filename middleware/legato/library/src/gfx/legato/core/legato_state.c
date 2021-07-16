@@ -272,6 +272,7 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
         disp.width = 0;
         disp.height = 0;
 
+        dispDriver->ioctl(GFX_IOCTL_SET_ACTIVE_LAYER, &idx);
         dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &disp);
         
         root->rect.x = 0;

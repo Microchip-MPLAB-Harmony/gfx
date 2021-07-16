@@ -101,7 +101,7 @@ static leResult exec_nonblocking(struct StreamPaletteStage* stage)
 
     streamPaletteStage.lookupIndex = streamPaletteStage.base.state->writeColor;
 
-    addr = (uint32_t)streamPaletteStage.base.state->source->palette->header.address +
+    addr = (size_t)streamPaletteStage.base.state->source->palette->header.address +
             streamPaletteStage.lookupIndex *
             stage->paletteSize;
 
@@ -138,7 +138,7 @@ static leResult exec_blocking(struct StreamPaletteStage* stage)
 {
     uint32_t addr;
 
-    addr = (uint32_t)streamPaletteStage.base.state->source->palette->header.address +
+    addr = (size_t)streamPaletteStage.base.state->source->palette->header.address +
             streamPaletteStage.base.state->writeColor *
             stage->paletteSize;
 

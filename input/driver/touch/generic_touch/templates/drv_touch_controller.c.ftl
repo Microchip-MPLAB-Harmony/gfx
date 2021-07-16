@@ -125,6 +125,12 @@ typedef enum
 
 typedef enum
 {
+    TOUCH_RELEASED,
+    TOUCH_PRESSED,
+} DRV_TOUCH_PRESS_STATE;
+
+typedef enum
+{
     DRV_TOUCH_ERROR_NONE,    
     DRV_TOUCH_ERROR_I2C,
     DRV_TOUCH_ERROR_I2C_WRITE,
@@ -136,6 +142,7 @@ typedef struct
 {
     DRV_TOUCH_STATE state;
     DRV_TOUCH_STATE prev_state;
+    DRV_TOUCH_PRESS_STATE press_state;	
     DRV_TOUCH_STATE tx_count;
     DRV_HANDLE i2c_handle;
     DRV_I2C_TRANSFER_HANDLE i2c_tx_handle;
@@ -173,6 +180,7 @@ DRV_TOUCH_OBJ drv_touch =
 {
     .state = DRV_TOUCH_STATE_INIT,
     .prev_state = DRV_TOUCH_STATE_INIT,
+    .press_state = TOUCH_RELEASED,	
     .tx_count = 0,
 };
 
@@ -349,20 +357,35 @@ void drv_touch_process_data(void)
     pnt.x = ${Val_Height} - 1 - pos_y;
 #endif
             
-    switch(event)
+    switch (drv_touch.press_state)
     {
-        case DRV_TOUCH_DATA_EVENT_DOWN_VALUE:
-            SYS_INP_InjectTouchDown(0, pos_x, pos_y);
+        case TOUCH_RELEASED:
+        {
+            if (event == DRV_TOUCH_DATA_EVENT_DOWN_VALUE)
+            {
+                drv_touch.press_state = TOUCH_PRESSED;
+                SYS_INP_InjectTouchDown(0, pos_x, pos_y);
+            }
             break;
-        case DRV_TOUCH_DATA_EVENT_UP_VALUE:
-            SYS_INP_InjectTouchUp(0, pos_x, pos_y);
+        }
+        case TOUCH_PRESSED:
+        {
+            if (event == DRV_TOUCH_DATA_EVENT_DOWN_VALUE ||
+                event == DRV_TOUCH_DATA_EVENT_HOLD_VALUE)
+            {
+                SYS_INP_InjectTouchMove(0, pos_x, pos_y);
+            }
+            else if (event == DRV_TOUCH_DATA_EVENT_UP_VALUE)
+            {
+                drv_touch.press_state = TOUCH_RELEASED;
+                SYS_INP_InjectTouchUp(0, pos_x, pos_y);
+            }
             break;
-        case DRV_TOUCH_DATA_EVENT_HOLD_VALUE:
-            SYS_INP_InjectTouchMove(0, pos_x, pos_y);
-            break;
+        }
         default:
             break;
     }
+
 <#else>
 //Process touch data here
 //Call SYS_INP_InjectTouchUp() or SYS_INP_InjectTouchDown() to 

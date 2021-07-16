@@ -197,15 +197,13 @@ FRAMEBUFFER_PIXEL_TYPE  __attribute__ ((coherent, aligned (32))) framebuffer1_${
 </#if>
 
 static volatile DRV_STATE state;
-<#if UseGPU == true && le_gfx_driver_2dgpu??>
 static gfxRect srcRect, destRect;
-<#if VblankBlit == true>
+static unsigned int vsyncCount = 0;
+static unsigned int activeLayer = 0;
+<#if UseGPU == true && le_gfx_driver_2dgpu?? && VblankBlit == true>
 volatile gfxPixelBuffer* blitBuff = NULL;
 static unsigned int blitLayer = 0;
 </#if>
-</#if>
-static unsigned int vsyncCount = 0;
-static unsigned int activeLayer = 0;
 <#if VblankUpdate == true>
 static bool vblankSync = true;
 <#else>
@@ -252,6 +250,45 @@ static DISPLAY_LAYER drvLayer[GFX_GLCD_LAYERS];
 
 static gfxResult DRV_GLCD_UpdateLayer(unsigned int layer);
 
+static gfxResult DRV_GLCD_BufferBlit(const gfxPixelBuffer* source,
+                            const gfxRect* rectSrc,
+                            const gfxPixelBuffer* dest,
+                            const gfxRect* rectDest)
+{
+    void* srcPtr;
+    void* destPtr;
+    uint32_t row, rowSize;
+    unsigned int width, height;
+<#if UseGPU == true && le_gfx_driver_2dgpu??>
+    gfxResult res;
+	
+	res = gfxGPUInterface.blitBuffer(source,
+                                     rectSrc,
+                                     dest,
+                                     rectDest);
+    if (res != GFX_SUCCESS)
+    {
+</#if>
+        width = (rectSrc->width < rectDest->width) ? 
+                 rectSrc->width : rectDest->width;
+        height = (rectSrc->height < rectDest->height) ? 
+                 rectSrc->height : rectDest->height;
+        rowSize = width * gfxColorInfoTable[dest->mode].size;
+
+        for(row = 0; row < height; row++)
+        {
+            srcPtr = gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y + row);
+            destPtr = gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y + row);
+
+            memcpy(destPtr, srcPtr, rowSize);
+        }        
+<#if UseGPU == true && le_gfx_driver_2dgpu??>		
+    }
+</#if>
+
+    return GFX_SUCCESS;
+}
+
 void DRV_GLCD_Update()
 {
     switch(state)
@@ -277,7 +314,7 @@ void DRV_GLCD_Update()
             {
                 drvLayer[syncLayer].syncRectIndex--;
 
-                gfxGPUInterface.blitBuffer(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
+                DRV_GLCD_BufferBlit(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
                                  &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex],
                                  &drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
                                  &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex]);
@@ -587,15 +624,15 @@ void GLCD_Interrupt_Handler(void)
     if (blitBuff != NULL)
     {
 <#if DoubleBuffer == true> 
-    gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
-                                   &srcRect,
-                                   &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].backBufferIdx],
-                                   &destRect);
+		DRV_GLCD_BufferBlit((const gfxPixelBuffer*) blitBuff,
+							&srcRect,
+							&drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].backBufferIdx],
+							&destRect);
 <#else>
-    gfxGPUInterface.blitBuffer((const gfxPixelBuffer*) blitBuff,
-                                   &srcRect,
-                                   &drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].frontBufferIdx],
-                                   &destRect);
+		DRV_GLCD_BufferBlit((const gfxPixelBuffer*) blitBuff,
+							&srcRect,
+							&drvLayer[blitLayer].pixelBuffer[drvLayer[blitLayer].frontBufferIdx],
+							&destRect);
 </#if>
 
         gfxPixelBuffer_SetLocked((gfxPixelBuffer*) blitBuff,
@@ -637,10 +674,10 @@ void GLCD_Interrupt_Handler(void)
                 {
                     drvLayer[syncLayer].syncRectIndex--;
 
-                    gfxGPUInterface.blitBuffer(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
-                                     &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex],
-                                     &drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
-                                     &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex]);
+                    DRV_GLCD_BufferBlit(&drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].frontBufferIdx],
+                                       &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex],
+                                       &drvLayer[syncLayer].pixelBuffer[drvLayer[syncLayer].backBufferIdx],
+                                       &drvLayer[syncLayer].syncRect[drvLayer[syncLayer].syncRectIndex]);
                 }
 
                 if (syncLayer == GFX_GLCD_LAYERS)
@@ -683,14 +720,10 @@ gfxResult DRV_GLCD_BlitBuffer(int32_t x,
                              int32_t y,
                              gfxPixelBuffer* buf)
 {
-<#if UseGPU == false || !le_gfx_driver_2dgpu??>
-    void* srcPtr;
-    void* destPtr;
-    uint32_t row, rowSize;
-</#if>
-
     if (state != DRAW)
         return GFX_FAILURE;
+		
+    gfxPixelBuffer_SetLocked(buf, LE_TRUE);		
 
 <#if DoubleBuffer == true>
     if (drvLayer[activeLayer].syncRectIndex < SYNC_RECT_COUNT)
@@ -713,7 +746,6 @@ gfxResult DRV_GLCD_BlitBuffer(int32_t x,
     }
 </#if>
 
-<#if UseGPU == true && le_gfx_driver_2dgpu??>
     srcRect.x = 0;
     srcRect.y = 0;
     srcRect.height = buf->size.height;
@@ -724,30 +756,16 @@ gfxResult DRV_GLCD_BlitBuffer(int32_t x,
     destRect.height = buf->size.height;
     destRect.width = buf->size.width;
 
-<#if VblankBlit == true>
-    gfxPixelBuffer_SetLocked(buf, LE_TRUE);
-    
+<#if UseGPU == true && le_gfx_driver_2dgpu?? && VblankBlit == true>
     blitBuff = buf;
-    blitLayer = activeLayer;
-    
-    PLIB_GLCD_VSyncInterruptEnable();
-<#else>
-<#if DoubleBuffer == true> 
-    gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
-<#else>
-    gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx], &destRect);
-</#if>
-</#if>
-<#else>
-    rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
+	blitLayer = activeLayer;
 
-    for(row = 0; row < buf->size.height; row++)
-    {
-        srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
-        destPtr = gfxPixelBufferOffsetGet(&drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], x, y + row);
-
-        memcpy(destPtr, srcPtr, rowSize);
-    }
+	//Enable interrupt to schedule blit
+	PLIB_GLCD_VSyncInterruptEnable();
+<#else>
+   	DRV_GLCD_BufferBlit(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
+	
+	gfxPixelBuffer_SetLocked(buf, LE_FALSE);
 </#if>
 
     return GFX_SUCCESS;

@@ -138,7 +138,7 @@ static leResult exec_nonblocking(struct StreamReadStage* stage)
     return LE_FAILURE;
 }
 
-leResult exec_blocking(struct StreamReadStage* stage)
+static leResult exec_blocking(struct StreamReadStage* stage)
 {
     uint32_t addr;
     leRawSourceReadOperation* op;

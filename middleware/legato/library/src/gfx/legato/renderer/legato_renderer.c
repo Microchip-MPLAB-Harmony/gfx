@@ -44,6 +44,12 @@ leRenderState _rendererState;
 #define LE_NO_CACHE_ATTR
 #endif
 
+#ifndef __ALIGNED
+#define __ALIGNED(val)
+#endif
+
+void _leRenderer_InitDrawForMode(leColorMode mode);
+
 static uint8_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _dataBuffers[SCRATCH_BUFFER_SZ];
 
 struct leScratchBuffer
@@ -72,6 +78,7 @@ static gfxColorMode _convertColorMode(leColorMode mode)
         case LE_COLOR_MODE_RGB_888:   return GFX_COLOR_MODE_RGB_888;
         case LE_COLOR_MODE_RGBA_8888: return GFX_COLOR_MODE_RGBA_8888;
         case LE_COLOR_MODE_ARGB_8888: return GFX_COLOR_MODE_ARGB_8888;
+        case LE_COLOR_MODE_MONOCHROME: return GFX_COLOR_MODE_MONOCHROME;
     }
 
     return 0;
@@ -189,10 +196,6 @@ leResult leRenderer_Initialize(const gfxDisplayDriver* dispDriver,
     }
 
     _rendererState.frameState = LE_FRAME_READY;
-    
-    //maxScratchPixels = SCRACH_BUFFER_SZ / leColorInfoTable[LE_GLOBAL_COLOR_MODE].size;
-    
-    //leRenderer_DamageArea(&lyr->widget.rect, LE_FALSE);
     
     return LE_SUCCESS;
 }
@@ -423,6 +426,8 @@ static void preLayer(void)
     }
     else
     {
+        _leRenderer_InitDrawForMode(leGetLayerColorMode(_rendererState.layerIdx));
+
         _rendererState.frameState = LE_FRAME_PRERECT;
     }
 }
@@ -465,6 +470,7 @@ static void invalidateWidget(leWidget* wgt, leRect* rect)
 static void preRect(void)
 {
     int32_t idx;
+    uint32_t width, height;
     struct leScratchBuffer* buf = NULL;
 
     if(_rendererState.frameRectIdx == _rendererState.layerStates[_rendererState.layerIdx].frameRectList.size)
@@ -482,7 +488,6 @@ static void preRect(void)
         {
             _rendererState.currentScratchBuffer = idx;
             buf = &_scratchBuffers[idx];
-            buf->renderBuffer.pixels = &_dataBuffers[idx];
 
             break;
         }
@@ -496,16 +501,18 @@ static void preRect(void)
 
     // set up render buffer to match damaged rectangle size
 #if LE_RENDER_ORIENTATION == 0 || LE_RENDER_ORIENTATION == 180
-    buf->renderBuffer.size.width = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].width;
-    buf->renderBuffer.size.height = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].height;
+    width = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].width;
+    height = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].height;
 #else
-    buf->renderBuffer.size.width = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].height;
-    buf->renderBuffer.size.height = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].width;
+    width = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].height;
+    height = _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].width;
 #endif
 
-    buf->renderBuffer.pixel_count = buf->renderBuffer.size.width * buf->renderBuffer.size.height;
-    buf->renderBuffer.mode = leGetLayerColorMode(_rendererState.layerIdx);
-    buf->renderBuffer.buffer_length = buf->renderBuffer.pixel_count * leColorInfoTable[buf->renderBuffer.mode].size;
+    lePixelBufferCreate(width,
+                        height,
+                        leGetLayerColorMode(_rendererState.layerIdx),
+                        &_dataBuffers[idx],
+                        &buf->renderBuffer);
 
     _rendererState.frameState = LE_FRAME_PREWIDGET;
 }

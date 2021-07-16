@@ -70,7 +70,8 @@ typedef enum leImageFormat
     LE_IMAGE_FORMAT_RAW = 0,
     LE_IMAGE_FORMAT_RLE,
     LE_IMAGE_FORMAT_JPEG,
-    LE_IMAGE_FORMAT_PNG
+    LE_IMAGE_FORMAT_PNG,
+    LE_IMAGE_FORMAT_MONO
 } leImageFormat;
 
 #define LE_IMAGE_FORMAT_COUNT (LE_IMAGE_FORMAT_RLE + 1)
@@ -726,7 +727,7 @@ leResult leImage_RotateDraw(const leImage* src,
  * @param mode the new color mode of the image
  */
 void leProcessImage(leImage* img,
-                    uint32_t addr,
+                    size_t addr,
                     leColorMode mode);
 
 #endif /* LE_IMAGE_H */

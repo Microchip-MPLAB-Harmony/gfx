@@ -75,7 +75,7 @@ def instantiateComponent(comp):
 	DefaultNumLayers.setLabel("Default Number of Layers")
 	DefaultNumLayers.setDescription("<html>The default number of layeres. <br>"
 		"This value will be overridden by the actual layers in the display controller, if used.</html>")
-	DefaultNumLayers.setDefaultValue(3)
+	DefaultNumLayers.setReadOnly(True)
 
 	MaXCanvasObjects = comp.createIntegerSymbol("MaXCanvasObjects", CanvasSettings)
 	MaXCanvasObjects.setLabel("Max Number of Parameters")
@@ -184,7 +184,9 @@ def onAttachmentConnected(source, target):
 	print("dependency Connected = " + str(target['id']))
 	if source["id"] == "gfx_display_driver":
 		driverName = target["component"].getSymbolValue("DriverInitName")
-		source["component"].setSymbolValue("DisplayDriverName", driverName)
+		numLayers = target["component"].getSymbolValue("TotalNumLayers")
+		source["component"].setSymbolValue("DisplayDriverName", driverName)		
+		source["component"].setSymbolValue("DefaultNumLayers", numLayers)		       
 
 def showRTOSMenu(symbol, event):
 	symbol.setVisible(event["value"] != "BareMetal")

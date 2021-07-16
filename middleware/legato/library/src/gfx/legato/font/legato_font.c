@@ -30,46 +30,21 @@
 #include "gfx/legato/common/legato_rect.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 
-int32_t getGlyphRowDataSize1bpp(int32_t width)
-{
-    int32_t offset;
-    
-    offset = width >> 3;
-    offset += (width % 8) > 0 ? 1 : 0;
-    
-    return offset;
-}
-                            
-int32_t getGlyphRowDataSize8bpp(int32_t width)
-{
-    return width;
-} 
-
-typedef int32_t (*getGlyphRowDataSize_FnPtr)(int32_t);
-                                         
-getGlyphRowDataSize_FnPtr glyphRowDataSizeFn[] =
-{
-    &getGlyphRowDataSize1bpp,
-    &getGlyphRowDataSize8bpp
-};
-
 typedef void (*drawGlyphRow_FnPtr)(const uint8_t*,
-                                   //int32_t,
                                    int32_t,
                                    int32_t,
                                    int32_t,
                                    int32_t,
                                    leColor,
-                                   uint32_t a);
+                                   uint32_t);
 
-void drawGlyphRow1bpp(const uint8_t* data,
-                      //int32_t width,
-                      int32_t x,
-                      int32_t y,
-                      int32_t colStart,
-                      int32_t colEnd,
-                      leColor clr,
-                      uint32_t a)
+static void drawGlyphRow1bpp(const uint8_t* data,
+                             int32_t x,
+                             int32_t y,
+                             int32_t colStart,
+                             int32_t colEnd,
+                             leColor clr,
+                             uint32_t a)
 {
     int32_t i;
     uint32_t offs;
@@ -107,21 +82,20 @@ void drawGlyphRow1bpp(const uint8_t* data,
     }
 }
                             
-void drawGlyphRow8bpp(const uint8_t* data,
-                      //int32_t width,
-                      int32_t x,
-                      int32_t y,
-                      int32_t colStart,
-                      int32_t colEnd,
-                      leColor clr,
-                      uint32_t a)
+static void drawGlyphRow8bpp(const uint8_t* data,
+                             int32_t x,
+                             int32_t y,
+                             int32_t colStart,
+                             int32_t colEnd,
+                             leColor clr,
+                             uint32_t a)
 {
     int32_t i;
     uint32_t valPercent;
     uint32_t aPercent;
     
     a = leClampi(0, 255, a);
-    
+
     if(a < 255)
     {
         aPercent = lePercentWholeRounded(a, 255);
@@ -148,24 +122,52 @@ void drawGlyphRow8bpp(const uint8_t* data,
             }
         }
     }
-} 
-                                         
-drawGlyphRow_FnPtr drawGlyphRowFn[] =
-{
-    &drawGlyphRow1bpp,
-    &drawGlyphRow8bpp
-};
+}
 
-void leFont_DrawGlyphRow(leFontBPP bpp,
-                         const uint8_t* data,
-                         int32_t x,
-                         int32_t y,
-                         int32_t colStart,
-                         int32_t colEnd,
-                         leColor clr,
-                         uint32_t a)
+static void drawGlyphRow1bppMono(const uint8_t* data,
+                                 int32_t x,
+                                 int32_t y,
+                                 int32_t colStart,
+                                 int32_t colEnd,
+                                 leColor clr,
+                                 uint32_t a)
 {
-    drawGlyphRowFn[bpp](data, x, y, colStart, colEnd, clr, a);
+    int32_t i;
+    uint32_t offs;
+    uint8_t val;
+    (void)a; // unused
+
+    for(i = colStart; i < colEnd; i++)
+    {
+        offs = (i % 8);
+
+        val = data[i >> 3] & (0x80 >> offs);
+
+        if(val > 0)
+        {
+            leRenderer_PutPixel(x + i, y, clr);
+        }
+    }
+}
+
+static void drawGlyphRow8bppMono(const uint8_t* data,
+                                 int32_t x,
+                                 int32_t y,
+                                 int32_t colStart,
+                                 int32_t colEnd,
+                                 leColor clr,
+                                 uint32_t a)
+{
+    int32_t i;
+    (void)a; // unused
+
+    for(i = colStart; i < colEnd; i++)
+    {
+        if(data[i] > 127) // alpha half
+        {
+            leRenderer_PutPixel(x + i, y, clr);
+        }
+    }
 }
 
 leResult leFont_GetGlyphInfo(const leFont* fnt,
@@ -238,11 +240,11 @@ leResult leFont_GetGlyphRect(const leFontGlyph* glyph,
     return LE_SUCCESS;
 }
 
-void leFont_DrawUnknownGlyph(int32_t x,
-                             int32_t y,
-                             const leFontGlyph* glyph,
-                             leColor clr,
-                             uint32_t a)
+static void _drawUnknownGlyph(int32_t x,
+                              int32_t y,
+                              const leFontGlyph* glyph,
+                              leColor clr,
+                              uint32_t a)
 {
     leRect glyphRect;
     
@@ -257,7 +259,15 @@ void leFont_DrawUnknownGlyph(int32_t x,
     
     if(leRenderer_CullDrawRect(&glyphRect) == LE_TRUE)
         return;
-    
+
+    if(leRenderer_CurrentColorMode() == LE_COLOR_MODE_MONOCHROME)
+    {
+        if(clr > 0)
+        {
+            clr = LE_MONOCHROME_ON;
+        }
+    }
+
     // left line
     leRenderer_VertLine(x,
                         y,
@@ -300,6 +310,7 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
     leRect clippedGlyph;
     int32_t colStart, colEnd;
     leRasterFont* rasFnt = (leRasterFont*)fnt;
+    drawGlyphRow_FnPtr drawFn;
     
     //x += glyph->bearingX;
     //y += (fnt->baseline - glyph->bearingY);
@@ -311,7 +322,30 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
     
     if(leRenderer_CullDrawRect(&glyphRect) == LE_TRUE)
         return LE_SUCCESS;
-    
+
+    if(leRenderer_CurrentColorMode() == LE_COLOR_MODE_MONOCHROME)
+    {
+        if(rasFnt->bpp == LE_FONT_BPP_1)
+        {
+            drawFn = drawGlyphRow1bppMono;
+        }
+        else
+        {
+            drawFn = drawGlyphRow8bppMono;
+        }
+    }
+    else
+    {
+        if(rasFnt->bpp == LE_FONT_BPP_1)
+        {
+            drawFn = drawGlyphRow1bpp;
+        }
+        else
+        {
+            drawFn = drawGlyphRow8bpp;
+        }
+    }
+
     leRenderer_ClipDrawRect(&glyphRect, &clippedGlyph);
     
     if(x >= clippedGlyph.x)
@@ -334,13 +368,13 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
     
     for(row = clippedGlyph.y - glyphRect.y; row < (clippedGlyph.y - glyphRect.y) + (clippedGlyph.height); row++)
     {
-        drawGlyphRowFn[rasFnt->bpp](data + (row * glyph->dataRowWidth),
-                                    x,
-                                    y + row,
-                                    colStart,
-                                    colEnd,
-                                    clr,
-                                    a);
+        drawFn(data + (row * glyph->dataRowWidth),
+               x,
+               y + row,
+               colStart,
+               colEnd,
+               clr,
+               a);
     }
 
     return LE_SUCCESS;
@@ -362,7 +396,7 @@ leResult leFont_DrawGlyph(const leFont* fnt,
     // if no data found then draw empty rectangle
     if(glyph->codePoint == LE_UNKNOWN_GLYPH)
     {
-        leFont_DrawUnknownGlyph(x, y, glyph, clr, a);
+        _drawUnknownGlyph(x, y, glyph, clr, a);
 
         return LE_SUCCESS;
     }

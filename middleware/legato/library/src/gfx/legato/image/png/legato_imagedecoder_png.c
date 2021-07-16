@@ -105,7 +105,7 @@ static leResult _draw(const leImage* img,
         stream.flags |= SF_BLOCKING;
 
         if(leStream_Read(&stream,
-                         (uint32_t)img->header.address,
+                         (size_t)img->header.address,
                          img->header.size,
                          encodedData,
                          NULL) == LE_FAILURE)
@@ -235,7 +235,7 @@ static leResult _render(const leImage* src,
         stream.flags |= SF_BLOCKING;
 
         if(leStream_Read(&stream,
-                         (uint32_t)src->header.address,
+                         (size_t)src->header.address,
                          src->header.size,
                          encodedData,
                          NULL) == LE_FAILURE)

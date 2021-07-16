@@ -195,20 +195,20 @@ TouchPointEventShift.setLabel("Event Shift")
 TouchPointEventShift.setDescription("The offset of the event value in the event byte")
 TouchPointEventShift.setMin(0)
 
-TouchPointEventDownValue = comp.createHexSymbol("TouchPointEventDownValue", TouchPointEventMenu)
-TouchPointEventDownValue.setLabel("Down Event Value")
-TouchPointEventDownValue.setDescription("The value of a touch down event.")
-TouchPointEventDownValue.setMin(0x0)
-
 TouchPointEventUpValue = comp.createHexSymbol("TouchPointEventUpValue", TouchPointEventMenu)
 TouchPointEventUpValue.setLabel("Up Event Value")
 TouchPointEventUpValue.setDescription("The value of a touch up event.")
-TouchPointEventUpValue.setMin(0x1)
+TouchPointEventUpValue.setDefaultValue(0x0)
+
+TouchPointEventDownValue = comp.createHexSymbol("TouchPointEventDownValue", TouchPointEventMenu)
+TouchPointEventDownValue.setLabel("Down Event Value")
+TouchPointEventDownValue.setDescription("The value of a touch down event.")
+TouchPointEventDownValue.setDefaultValue(0x1)
 
 TouchPointEventHoldValue = comp.createHexSymbol("TouchPointEventHoldValue", TouchPointEventMenu)
 TouchPointEventHoldValue.setLabel("Hold Event Value")
 TouchPointEventHoldValue.setDescription("<html>The value of a touch hold event. <br>On some controllers, this can be the contact or move event.</html>")
-TouchPointEventHoldValue.setMin(0x2)
+TouchPointEventHoldValue.setDefaultValue(0x2)
 
 TouchPointPositionMenu = comp.createMenuSymbol("TouchPointPositionMenu", TouchDataMenu)
 TouchPointPositionMenu.setLabel("Touch Position")

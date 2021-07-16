@@ -79,7 +79,7 @@ leBool leStream_IsOpen(leStream* stream)
 }
 
 leResult leStream_Read(leStream* stream,
-                       uint32_t addr,
+                       size_t addr,
                        uint32_t size,
                        uint8_t* buf,
                        leStream_DataReadyCallback cb)
@@ -128,12 +128,12 @@ leResult leStream_Read(leStream* stream,
             {
                 remaining = stream->cache.physicalSize;
 
-                if(stream->desc->size - ((uint32_t)addr - (uint32_t)stream->desc->address) < remaining)
+                if(stream->desc->size - (addr - (size_t)stream->desc->address) < remaining)
                 {
-                    remaining = stream->desc->size - ((uint32_t)addr - (uint32_t)stream->desc->address);
+                    remaining = stream->desc->size - (addr - (size_t)stream->desc->address);
                 }
 
-                stream->cache.baseAddress = (uint32_t)addr;
+                stream->cache.baseAddress = (size_t)addr;
                 stream->cache.logicalSize = remaining;
 
                 stream->state = LE_STREAM_WAITING;

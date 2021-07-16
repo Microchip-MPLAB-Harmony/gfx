@@ -412,6 +412,7 @@ void _leCheckBoxWidget_GenerateVTable()
     checkBoxWidgetVTable.languageChangeEvent = handleLanguageChangeEvent;
     checkBoxWidgetVTable._paint = _leCheckBoxWidget_Paint;
     checkBoxWidgetVTable.invalidateContents = invalidateContents;
+    checkBoxWidgetVTable._invalidateBorderAreas = invalidateContents;
     checkBoxWidgetVTable.touchDownEvent = handleTouchDownEvent;
     checkBoxWidgetVTable.touchUpEvent = handleTouchUpEvent;
     checkBoxWidgetVTable.touchMoveEvent = handleTouchMovedEvent;
@@ -518,6 +519,7 @@ static const leCheckBoxWidgetVTable checkBoxWidgetVTable =
     .languageChangeEvent = handleLanguageChangeEvent,
     ._paint = _leCheckBoxWidget_Paint,
     .invalidateContents = invalidateContents,
+    ._invalidateBorderAreas = invalidateContents,
     .touchDownEvent = handleTouchDownEvent,
     .touchUpEvent = handleTouchUpEvent,
     .touchMoveEvent = handleTouchMovedEvent,

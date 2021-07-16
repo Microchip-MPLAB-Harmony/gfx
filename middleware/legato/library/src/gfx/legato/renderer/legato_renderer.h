@@ -565,39 +565,6 @@ leResult leRenderer_FillArea(int32_t x,
 
 // *****************************************************************************
 /* Function:
-    leResult leRenderer_FillArea_Safe(int32_t x,
-                                      int32_t y,
-                                      uint32_t width,
-                                      uint32_t height,
-                                      leColor clr,
-                                      uint32_t a)
-
-  Summary:
-    Fills an area of the buffer with a single color.
-
-  Description:
-    Fills an area of the buffer with a single color.
-
-  Parameters:
-    int32_t x - the x component of the area to fill (screen space)
-    int32_t y - the y component of the area to fill (screen space)
-    uint32_t width - the width of the area
-    uint32_t height - the height of the area
-    leColor clr - the color to write
-    uint32_t a - the global alpha blending value to use
-
-  Returns:
-    leResult
-*/
-leResult leRenderer_FillArea_Safe(int32_t x,
-                                  int32_t y,
-                                  uint32_t width,
-                                  uint32_t height,
-                                  leColor clr,
-                                  uint32_t a);
-
-// *****************************************************************************
-/* Function:
     leResult leRenderer_HorzLine(int32_t x,
                                  int32_t y,
                                  int32_t w,

@@ -19,16 +19,17 @@ static gfxColorMode _convertColorMode(leColorMode mode)
 {
     switch(mode)
     {
-        case LE_COLOR_MODE_INDEX_1:   return GFX_COLOR_MODE_INDEX_1;
-        case LE_COLOR_MODE_INDEX_4:   return GFX_COLOR_MODE_INDEX_4;
-        case LE_COLOR_MODE_INDEX_8:   return GFX_COLOR_MODE_INDEX_8;
-        case LE_COLOR_MODE_GS_8:      return GFX_COLOR_MODE_GS_8;
-        case LE_COLOR_MODE_RGB_332:   return GFX_COLOR_MODE_RGB_332;
-        case LE_COLOR_MODE_RGB_565:   return GFX_COLOR_MODE_RGB_565;
-        case LE_COLOR_MODE_RGBA_5551: return GFX_COLOR_MODE_RGBA_5551;
-        case LE_COLOR_MODE_RGB_888:   return GFX_COLOR_MODE_RGB_888;
-        case LE_COLOR_MODE_RGBA_8888: return GFX_COLOR_MODE_RGBA_8888;
-        case LE_COLOR_MODE_ARGB_8888: return GFX_COLOR_MODE_ARGB_8888;
+        case LE_COLOR_MODE_INDEX_1:    return GFX_COLOR_MODE_INDEX_1;
+        case LE_COLOR_MODE_INDEX_4:    return GFX_COLOR_MODE_INDEX_4;
+        case LE_COLOR_MODE_INDEX_8:    return GFX_COLOR_MODE_INDEX_8;
+        case LE_COLOR_MODE_GS_8:       return GFX_COLOR_MODE_GS_8;
+        case LE_COLOR_MODE_RGB_332:    return GFX_COLOR_MODE_RGB_332;
+        case LE_COLOR_MODE_RGB_565:    return GFX_COLOR_MODE_RGB_565;
+        case LE_COLOR_MODE_RGBA_5551:  return GFX_COLOR_MODE_RGBA_5551;
+        case LE_COLOR_MODE_RGB_888:    return GFX_COLOR_MODE_RGB_888;
+        case LE_COLOR_MODE_RGBA_8888:  return GFX_COLOR_MODE_RGBA_8888;
+        case LE_COLOR_MODE_ARGB_8888:  return GFX_COLOR_MODE_ARGB_8888;
+        case LE_COLOR_MODE_MONOCHROME: return GFX_COLOR_MODE_MONOCHROME;
     }
 
     return 0;
@@ -102,6 +103,8 @@ leResult leGPU_DrawLine(int32_t x0,
                                                  a,
                                                  255);
     }
+#else
+    (void)a; // unused
 #endif
 
     res = _rendererState.gpuDriver->drawLine(&buf,
@@ -175,6 +178,8 @@ leResult leGPU_FillRect(const leRect* rect,
                                                  a,
                                                  255);
     }
+#else
+    (void)a; // unused
 #endif
 
     res = _rendererState.gpuDriver->fillRect(&buf,
@@ -245,6 +250,8 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
 
         _rendererState.gpuDriver->setBlend(GFX_BLEND_SRC_OVER);
     }
+#else
+    (void)a; // unused
 #endif
 
     res = _rendererState.gpuDriver->blitBuffer(&sourceBuf,
@@ -316,6 +323,8 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
                                                  a,
                                                  255);
     }
+#else
+    (void)a; // unused
 #endif
 
     res = _rendererState.gpuDriver->blitBuffer(&sourceBuf,
