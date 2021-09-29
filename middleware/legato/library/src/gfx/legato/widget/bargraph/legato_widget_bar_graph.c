@@ -195,6 +195,9 @@ static void getValueLabelMaxDrawRect(const leBarGraphWidget* _this,
             leStringUtils_GetRectCStr(strbuff,
                                       _this->ticksLabelFont,
                                       &minLabelRect);
+
+            leStringUtils_KerningRect((leRasterFont*)_this->ticksLabelFont,
+                                      &minLabelRect);
         }
 
         //Protect from overflow
@@ -211,11 +214,14 @@ static void getValueLabelMaxDrawRect(const leBarGraphWidget* _this,
                                   _this->ticksLabelFont,
                                   &maxLabelRect);
 
+        leStringUtils_KerningRect((leRasterFont*)_this->ticksLabelFont,
+                                  &maxLabelRect);
+
         rect->width = (maxLabelRect.width > minLabelRect.width) ?
                       (maxLabelRect.width) :
                       (minLabelRect.width);
 
-        rect->height = (maxLabelRect.height > minLabelRect.height) ? 
+        rect->height = (maxLabelRect.height > minLabelRect.height) ?
                        (maxLabelRect.height) :
                        (minLabelRect.height);
     }

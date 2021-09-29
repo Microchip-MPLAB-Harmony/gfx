@@ -250,6 +250,9 @@ static void _paintLabelValueAtAngle(int32_t angle,
 
     paintState.labelStr.fn->getRect(&paintState.labelStr, &stringRect);
 
+    leStringUtils_KerningRect((leRasterFont*)fnt,
+                              &stringRect);
+
     stringRect.x = paintState.gaugeOrigin.x + lblPoint.x - stringRect.width / 2;
     stringRect.y = paintState.gaugeOrigin.y + (-lblPoint.y) - stringRect.height / 2;
 

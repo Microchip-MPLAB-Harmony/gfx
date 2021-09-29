@@ -58,6 +58,9 @@ static leResult drawString(leStringRenderRequest* req)
 
     req->str->fn->getRect(req->str, &stringRect);
 
+    leStringUtils_KerningRect(font,
+                              &stringRect);
+
     //drawRect = stringRect;
     //drawRect.x += x;
     //drawRect.y += y;
@@ -158,6 +161,8 @@ static leResult drawUString(leUStringRenderRequest* req)
 
     leStringUtils_GetRect(req->str, req->length, req->font, &stringRect);
 
+    leStringUtils_KerningRect((leRasterFont*)req->font, &stringRect);
+
     for(lineItr = 0; lineItr < lines; lineItr++)
     {
         leStringUtils_GetLineIndices(req->str, req->length, lineItr, &startIdx, &endIdx);
@@ -248,6 +253,8 @@ static leResult drawCString(leCStringRenderRequest* req)
     lines = leStringUtils_GetLineCountCStr(req->str);
 
     leStringUtils_GetRectCStr(req->str, req->font, &stringRect);
+
+    leStringUtils_KerningRect((leRasterFont*)req->font, &stringRect);
 
     for(lineItr = 0; lineItr < lines; lineItr++)
     {

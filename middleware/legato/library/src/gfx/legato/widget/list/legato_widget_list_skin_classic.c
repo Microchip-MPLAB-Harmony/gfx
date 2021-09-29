@@ -32,6 +32,7 @@
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -163,10 +164,10 @@ void _leListWidget_GetRowRect(const leListWidget* lst,
     leUtils_RectToScreenSpace((leWidget*)lst, rect);
 }
 
-void _leListWidget_GetTextRect(const leListWidget* lst,
-                               uint32_t idx,
-                               leRect* textRect,
-                               leRect* drawRect)
+void _leListWidget_GetTextRects(const leListWidget* lst,
+                                uint32_t idx,
+                                leRect* boundingRect,
+                                leRect* kerningRect)
 {
     leRect rowRect, imageRect;
     int32_t y;
@@ -179,13 +180,19 @@ void _leListWidget_GetTextRect(const leListWidget* lst,
     // get text rectangle
     if(item->string != NULL)
     {
-        item->string->fn->getRect(item->string, textRect);
+        item->string->fn->getRect(item->string, boundingRect);
+
+        *kerningRect = *boundingRect;
+
+        leStringUtils_KerningRect((leRasterFont*)item->string->fn->getFont(item->string),
+                                  kerningRect);
     }
     else
     {
-        *textRect = leRect_Zero;
+        *boundingRect = leRect_Zero;
+        *kerningRect = *boundingRect;
     }
-    
+
     // craft item entry rectangle
     rowRect.x = 0;
     rowRect.width = lst->widget.rect.width;
@@ -207,7 +214,7 @@ void _leListWidget_GetTextRect(const leListWidget* lst,
     }
     
     // arrange relative to image rect
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      imageRect,
                                      rowRect,
                                      lst->widget.style.halign,
@@ -219,15 +226,17 @@ void _leListWidget_GetTextRect(const leListWidget* lst,
                                      lst->widget.margin.bottom,
                                      lst->iconMargin);
 
-    leRectClip(textRect, &rowRect, drawRect);                                     
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
+
+    leRectClip(kerningRect, &rowRect, kerningRect);
                                      
-    leUtils_RectToScreenSpace((leWidget*)lst, textRect);
-    leUtils_RectToScreenSpace((leWidget*)lst, drawRect);
+    leUtils_RectToScreenSpace((leWidget*)lst, kerningRect);
     
     y = _leListWidget_GetRowY(lst, idx);
-    
-    textRect->y += y;
-    drawRect->y += y;
+
+    boundingRect->y += y;
+    kerningRect->y += y;
 }
 
 void _leListWidget_GetIconRect(const leListWidget* lst,
@@ -489,7 +498,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leListWidget* lst)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     leColor clr;
     
     if(paintState.nextItem == (int32_t)lst->items.size)
@@ -506,10 +515,10 @@ static void drawString(leListWidget* lst)
         // get rectangles
         paintState.item = lst->items.values[paintState.nextItem];
 
-        _leListWidget_GetTextRect(lst,
-                                  paintState.nextItem,
-                                  &textRect,
-                                  &drawRect);
+        _leListWidget_GetTextRects(lst,
+                                   paintState.nextItem,
+                                   &boundingRect,
+                                   &kerningRect);
 
         if(paintState.nextItem == lst->itemDown || paintState.item->selected == LE_FALSE)
         {
@@ -528,8 +537,8 @@ static void drawString(leListWidget* lst)
         }
 
         paintState.item->string->fn->_draw(paintState.item->string,
-                                           textRect.x,
-                                           textRect.y,
+                                           kerningRect.x,
+                                           kerningRect.y,
                                            LE_HALIGN_CENTER,
                                            clr,
                                            paintState.alpha);

@@ -99,8 +99,10 @@ uint32_t leStringUtils_ToCStr(const leChar* str,
  * @code
  * leResult res = leStringUtils_GetRect(str, size, font, rect);
  * @endcode
- * @param str is an integer.
- * @param buf is an integer.
+ * @param str is a string pointer.
+ * @param size is the length of the string.
+ * @param font is the font object that provides the glyph metrics
+ * @param rect is the resulting bounding area
  * @return LE_SUCCESS if set, otherwise LE_FAILURE.
  */
 leResult leStringUtils_GetRect(const leChar* str,
@@ -119,8 +121,9 @@ leResult leStringUtils_GetRect(const leChar* str,
  * leRect* rect;
  * leResult res = leStringUtils_GetRectCStr(str, font, rect);
  * @endcode
- * @param str is an integer.
- * @param buf is an integer.
+ * @param str is a C string pointer.
+ * @param font is the font object that provides the glyph metrics
+ * @param rect is the resulting bounding area
  * @return LE_SUCCESS if set, otherwise LE_FAILURE.
  */
 leResult leStringUtils_GetRectCStr(const char* str,
@@ -181,30 +184,6 @@ leResult leStringUtils_GetLineIndices(const leChar* str,
                                       uint32_t* start,
                                       uint32_t* end);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetLineIndicesCStr(const char* str,
-                                              uint32_t line,
-                                              uint32_t* start,
-                                              uint32_t* end)
-
-  Summary:
-
-
-  Description:
-     Gets the line indices for a C-style string
-
-  Parameters:
-    const char* str - the source C-string to aGets the line indices for a C-style stringnalyze
-    uint32_t line - the line index to query
-    uint32_t* start - will contain the start index of the line
-    uint32_t* end - will contain the end index of the line
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets the line indices for a C-style string.
  * @details Gets the line indices for a C-style string.
@@ -219,41 +198,17 @@ leResult leStringUtils_GetLineIndicesCStr(const char* str,
                                           uint32_t line,
                                           uint32_t* start,
                                           uint32_t* end);
-
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetLineRect(const leChar* str,
-                                       uint32_t size,
-                                       const leFont* font,
-                                       uint32_t line,
-                                       leRect* rect)
-
-  Summary:
-     Gets the line bounding rectangle for a leChar style string
-
-  Description:
-     Gets the line bounding rectangle for a leChar style string
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the input buffer in code points
-    const leFont* font - the font to reference
-    uint32_t line - the line index to reference
-    leRect* rect - will contain the line bounding rectangle
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets the line bounding rectangle for a leChar style string.
  * @details Gets the line bounding rectangle for a leChar style string.
  * @code
- * leResult res = leStringUtils_GetLineRect(str);
+ * leResult res = leStringUtils_GetLineRect(str, size, font, line, &rect);
  * @endcode
- * @param str is an integer.
- * @param buf is an integer.
+ * @param str is a string pointer.
+ * @param size is the length of the string.
+ * @param font is the font object that provides the glyph metrics
+ * @param line is the line number to query
+ * @param rect is the resulting bounding rect
  * @return LE_SUCCESS if set, otherwise LE_FAILURE.
  */
 leResult leStringUtils_GetLineRect(const leChar* str,
@@ -262,38 +217,16 @@ leResult leStringUtils_GetLineRect(const leChar* str,
                                    uint32_t line,
                                    leRect* rect);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetLineRectCStr(const char* str,
-                                           const leFont* font,
-                                           uint32_t line,
-                                           leRect* rect)
-
-  Summary:
-     Gets the line bounding rectangle for a C-style string
-
-  Description:
-     Gets the line bounding rectangle for a C-style string
-
-  Parameters:
-    const char* str - the source C string
-    const leFont* font - the font to reference
-    uint32_t line - the line index to reference
-    leRect* rect - will contain the line bounding rectangle
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets the line bounding rectangle for a C-style string.
  * @details Gets the line bounding rectangle for a C-style string.
  * @code
  * leResult res = leStringUtils_GetLineRectCStr(str);
  * @endcode
- * @param str is an integer.
- * @param buf is an integer.
+ * @param str is a C string pointer.
+ * @param font is the font object that provides the glyph metrics
+ * @param line is the line number to query
+ * @param rect is the resulting bounding rect
  * @return LE_SUCCESS if set, otherwise LE_FAILURE.
  */
 
@@ -302,32 +235,6 @@ leResult leStringUtils_GetLineRectCStr(const char* str,
                                        uint32_t line,
                                        leRect* rect);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetCharRect(const leChar* str,
-                                       uint32_t size,
-                                       const leFont* font,
-                                       uint32_t charIdx,
-                                       leRect* rect)
-
-  Summary:
-     Gets a glyph bounding rectangle for a leChar style string
-
-  Description:
-     Gets a glyph bounding rectangle for a leChar style string
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the input buffer in code points
-    const leFont* font - the font to reference
-    uint32_t charIdx - the char index to reference
-    leRect* rect - will contain the glyph bounding rectangle
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets a glyph bounding rectangle for a leChar style string.
  * @details Gets a glyph bounding rectangle for a leChar style string.
@@ -344,30 +251,6 @@ leResult leStringUtils_GetCharRect(const leChar* str,
                                    uint32_t charIdx,
                                    leRect* rect);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetCharRectCStr(const char* str,
-                                           const leFont* font,
-                                           uint32_t charIdx,
-                                           leRect* rect)
-
-  Summary:
-     Gets a glyph bounding rectangle for a C-style string
-
-  Description:
-     Gets a glyph bounding rectangle for a C-style string
-
-  Parameters:
-    const char* str - the source C string
-    const leFont* font - the font to reference
-    uint32_t charIdx - the char index to reference
-    leRect* rect - will contain the glyph bounding rectangle
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets a glyph bounding rectangle for a C-style string.
  * @details Gets a glyph bounding rectangle for a C-style string.
@@ -383,32 +266,6 @@ leResult leStringUtils_GetCharRectCStr(const char* str,
                                        uint32_t charIdx,
                                        leRect* rect);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetCharIndexAtPoint(const leChar* str,
-                                               uint32_t size,
-                                               const leFont* font,
-                                               const lePoint pt,
-                                               uint32_t* charIdx)
-
-  Summary:
-     Gets the glyph at a point inside a leChar string bounding rectangle
-
-  Description:
-     Gets the glyph at a point inside a leChar string bounding rectangle
-
-  Parameters:
-    const leChar* str - the source leChar string
-    uint32_t size - the size of the input buffer in code points
-    const leFont* font - the font to reference
-    const lePoint pt - the point to query with
-    uint32_t* charIdx - will contain the index of the char at pt
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets the glyph at a point inside a leChar string bounding rectangle.
  * @details Gets the glyph at a point inside a leChar string bounding rectangle.
@@ -425,30 +282,6 @@ leResult leStringUtils_GetCharIndexAtPoint(const leChar* str,
                                            const lePoint pt,
                                            uint32_t* charIdx);
 
-// *****************************************************************************
-/* Function:
-    leResult leStringUtils_GetCharIndexAtPointCStr(const char* str,
-                                                   const leFont* font,
-                                                   const lePoint pt,
-                                                   uint32_t* charIdx)
-
-  Summary:
-     Gets the glyph at a point inside a C-style string bounding rectangle
-
-  Description:
-     Gets the glyph at a point inside a C-style string bounding rectangle
-
-  Parameters:
-    const char* str - the source C string
-    const leFont* font - the font to reference
-    const lePoint pt - the point to query with
-    uint32_t* charIdx - will contain the index of the char at pt
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Gets the glyph at a point inside a C-style string bounding rectangle.
  * @details Gets the glyph at a point inside a C-style string bounding rectangle.
@@ -463,35 +296,6 @@ leResult leStringUtils_GetCharIndexAtPointCStr(const char* str,
                                                const lePoint pt,
                                                uint32_t* charIdx);
 
-// *****************************************************************************
-/* Function:
-    leResult leDecodeCodePoint(uint32_t encoding,
-                               uint8_t* data,
-                               uint32_t max,
-                               uint32_t* codePoint,
-                               uint32_t* offset)
-
-  Summary:
-     Given an encoded codepoint (ASCII, UTF-8, or UTF-16) returns the actual
-     codepoint
-
-  Description:
-     Given an encoded codepoint (ASCII, UTF-8, or UTF-16) returns the actual
-     codepoint
-
-  Parameters:
-    uint32_t encoding - the encoding of the value
-    uint8_t* data - the data to decode
-    uint32_t max - the size of the data buffer
-    uint32_t* codePoint - will contain the decoded code point
-    uint32_t* offset - will contain the offset in the buffer after the decode
-                       point
-
-  Remarks:
-
-  Returns:
-    leResult - the result of the operation
-*/
 /**
  * @brief Given an encoded codepoint (ASCII, UTF-8, or UTF-16) returns the
  * actual codepoint.
@@ -508,5 +312,19 @@ leResult leDecodeCodePoint(uint32_t encoding,
                            uint32_t max,
                            uint32_t* codePoint,
                            uint32_t* offset);
+
+/**
+ * @brief Converts a string bounding rectangle to a string kerning rectangle
+ * @details Lines of text are typically arranged using a reduced size rectangle compared
+ * to their bounding rectangles.  This allows for more even vertical centering for strings
+ * that have glyphs that descend below the baseline
+ * @code
+ * leResult res = leStringUtils_KerningRect(font, &rect);
+ * @param fnt is the font that produced the bounding rectangle.
+ * @param rect an address to the bounding rectangle that will be reduced
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+leResult leStringUtils_KerningRect(const leRasterFont* fnt,
+                                   leRect* rect);
 
 #endif /* LE_STRINGUTILS_H */

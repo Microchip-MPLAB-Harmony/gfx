@@ -33,6 +33,7 @@
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -126,23 +127,26 @@ void _leCheckBoxWidget_GetImageRect(const leCheckBoxWidget* cbox,
 	leUtils_RectToScreenSpace((leWidget*)cbox, imgRect);
 }
 
-void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
-								   leRect* textRect,
-								   leRect* drawRect)
+void _leCheckBoxWidget_GetTextRects(const leCheckBoxWidget* cbox,
+								    leRect* boundingRect,
+								    leRect* kerningRect)
 {
     leRect bounds;
     
     leRect imgRect = {0};
     
-    *textRect = leRect_Zero;
-    
     if(cbox->string == NULL)
         return;
     
-    cbox->string->fn->getRect(cbox->string, textRect);
+    cbox->string->fn->getRect(cbox->string, boundingRect);
+
+    *kerningRect = *boundingRect;
+
+    leStringUtils_KerningRect((leRasterFont*)cbox->string->fn->getFont(cbox->string),
+                              kerningRect);
 
     cbox->fn->localRect(cbox, &bounds);
-    
+
     // calculate image dimensions
     if(cbox->checked == LE_TRUE)
     {
@@ -172,7 +176,7 @@ void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
     }
     
     // arrange relative to image rect
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      imgRect,
                                      bounds,
                                      cbox->widget.style.halign,
@@ -184,11 +188,13 @@ void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
                                      cbox->widget.margin.bottom,
                                      cbox->imageMargin);
 
-	leRectClip(textRect, &bounds, drawRect);
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
 
-	// move the rects to layer space
-	leUtils_RectToScreenSpace((leWidget*)cbox, textRect);
-    leUtils_RectToScreenSpace((leWidget*)cbox, drawRect);
+	leRectClip(kerningRect, &bounds, kerningRect);
+
+	// move the rect to layer space
+    leUtils_RectToScreenSpace((leWidget*)cbox, kerningRect);
 }
 
 static void drawBackground(leCheckBoxWidget* cbox);
@@ -403,17 +409,17 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leCheckBoxWidget* cbox)
 {
-	leRect textRect, drawRect;
+	leRect boundingRect, kerningRect;
 
-	_leCheckBoxWidget_GetTextRect(cbox, &textRect, &drawRect);
+	_leCheckBoxWidget_GetTextRects(cbox, &boundingRect, &kerningRect);
 
-    /*leRenderer_RectLine(&textRect,
+    /*leRenderer_RectLine(&kerningRect,
                         leColorValue(LE_COLOR_MODE_RGB_565, LE_COLOR_RED),
                         255);*/
 
     cbox->string->fn->_draw(cbox->string,
-                            textRect.x,
-                            textRect.y,
+                            kerningRect.x,
+                            kerningRect.y,
                             cbox->widget.style.halign,
                             leScheme_GetRenderColor(cbox->widget.scheme, LE_SCHM_TEXT),
                             paintState.alpha);

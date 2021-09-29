@@ -31,6 +31,7 @@
 
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -52,27 +53,42 @@ static struct
     uint32_t alpha;
 } paintState;
 
-void _leTextFieldWidget_GetTextRect(leTextFieldWidget* txt,
-                                    leRect* textRect,
-                                    leRect* drawRect)
+void _leTextFieldWidget_GetTextRects(leTextFieldWidget* txt,
+                                     leRect* boundingRect,
+                                     leRect* kerningRect)
 {
     leRect bounds;
+    leFont* fnt;
 
     txt->fn->localRect(txt, &bounds);
 
-    *textRect = leRect_Zero;
-    *drawRect = leRect_Zero;
+    *boundingRect = leRect_Zero;
+    *kerningRect = leRect_Zero;
 
     if(txt->text.fn->length(&txt->text) > 0)
     {
-        txt->text.fn->getRect(&txt->text, textRect);
+        txt->text.fn->getRect(&txt->text, boundingRect);
+
+        fnt = txt->text.fn->getFont(&txt->text);
+
+        *kerningRect = *boundingRect;
+
+        leStringUtils_KerningRect((leRasterFont*)fnt,
+                                  kerningRect);
     }
     else if(txt->hintText != NULL && leGetEditWidget() != (void*)txt)
     {
-        txt->hintText->fn->getRect(txt->hintText, textRect);
+        txt->hintText->fn->getRect(txt->hintText, boundingRect);
+
+        fnt = txt->hintText->fn->getFont(txt->hintText);
+
+        *kerningRect = *boundingRect;
+
+        leStringUtils_KerningRect((leRasterFont*)fnt,
+                                  kerningRect);
     }
 
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      leRect_Zero,
                                      bounds,
                                      txt->editWidget.widget.style.halign,
@@ -83,11 +99,13 @@ void _leTextFieldWidget_GetTextRect(leTextFieldWidget* txt,
                                      txt->editWidget.widget.margin.right,
                                      txt->editWidget.widget.margin.bottom,
                                      0);
-                                     
-    leRectClip(textRect, &bounds, drawRect);
+
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
+
+    leRectClip(kerningRect, &bounds, kerningRect);
     
-    leUtils_RectToScreenSpace((leWidget*)txt, textRect);
-    leUtils_RectToScreenSpace((leWidget*)txt, drawRect);
+    leUtils_RectToScreenSpace((leWidget*)txt, kerningRect);
 }
 
 void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* txt,
@@ -255,15 +273,15 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leTextFieldWidget* txt)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
 
-    _leTextFieldWidget_GetTextRect(txt, &textRect, &drawRect);
+    _leTextFieldWidget_GetTextRects(txt, &boundingRect, &kerningRect);
 
     if(txt->text.fn->length(&txt->text) > 0)
     {
         txt->text.fn->_draw(&txt->text,
-                            textRect.x,
-                            textRect.y,
+                            kerningRect.x,
+                            kerningRect.y,
                             txt->editWidget.widget.style.halign,
                             leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_TEXT),
                             paintState.alpha);
@@ -271,8 +289,8 @@ static void drawString(leTextFieldWidget* txt)
     else if(txt->hintText != NULL && leGetEditWidget() != (void*)txt)
     {
         txt->hintText->fn->_draw(txt->hintText,
-                                 textRect.x,
-                                 textRect.y,
+                                 kerningRect.x,
+                                 kerningRect.y,
                                  txt->editWidget.widget.style.halign,
                                  leScheme_GetRenderColor(txt->editWidget.widget.scheme, LE_SCHM_TEXT_DISABLED),
                                  paintState.alpha);

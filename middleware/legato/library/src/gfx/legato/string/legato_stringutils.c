@@ -748,4 +748,15 @@ leResult leDecodeCodePoint(uint32_t encoding,
     return decodeGlyph[encoding](data, max, codePoint, offset);
 }
 
+leResult leStringUtils_KerningRect(const leRasterFont* fnt,
+                                   leRect* rect)
+{
+    if(fnt == NULL || rect == NULL)
+        return LE_FAILURE;
+
+    rect->height -= fnt->height;
+    rect->height += fnt->baseline;
+
+    return LE_SUCCESS;
+}
 

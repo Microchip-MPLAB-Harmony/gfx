@@ -47,20 +47,20 @@ const
 #endif
 leTextFieldWidgetVTable textFieldWidgetVTable;
 
-void _leTextFieldWidget_GetTextRect(const leTextFieldWidget* _this,
-                                    leRect* textRect,
-                                    leRect* drawRect);
+void _leTextFieldWidget_GetTextRects(const leTextFieldWidget* _this,
+                                     leRect* boundingRect,
+                                     leRect* kerningRect);
                                     
 void _leTextFieldWidget_GetCursorRect(const leTextFieldWidget* _this,
                                       leRect* cursorRect);
 
 static void _invalidateText(const leTextFieldWidget* _this)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     
-    _leTextFieldWidget_GetTextRect(_this, &textRect, &drawRect);
+    _leTextFieldWidget_GetTextRects(_this, &boundingRect, &kerningRect);
     
-    _this->fn->_damageArea(_this, &drawRect);
+    _this->fn->_damageArea(_this, &kerningRect);
 }
 
 static void stringPreinvalidate(const leString* str,

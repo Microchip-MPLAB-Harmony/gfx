@@ -32,6 +32,7 @@
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -54,24 +55,29 @@ static struct
     uint32_t alpha;
 } paintState;
 
-void _leLabelWidget_GetTextRect(leLabelWidget* lbl,
-                                leRect* textRect,
-								leRect* drawRect)
+void _leLabelWidget_GetTextRects(const leLabelWidget* lbl,
+                                 leRect* boundingRect,
+                                 leRect* kerningRect)
 {
     leRect bounds;
     
-    *textRect = leRect_Zero;
+    *boundingRect = leRect_Zero;
     
     if(lbl->string == NULL)
         return;
     
     lbl->string->fn->getRect(lbl->string,
-                             textRect);
+                             boundingRect);
+
+    *kerningRect = *boundingRect;
+
+    leStringUtils_KerningRect((leRasterFont*)lbl->string->fn->getFont(lbl->string),
+                              kerningRect);
     
     lbl->fn->localRect(lbl, &bounds);
     
     // arrange relative to image rect
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      leRect_Zero,
                                      bounds,
                                      lbl->widget.style.halign,
@@ -83,11 +89,13 @@ void _leLabelWidget_GetTextRect(leLabelWidget* lbl,
                                      lbl->widget.margin.bottom,
                                      0);
 
-    leRectClip(textRect, &bounds, drawRect);
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
 
-	// move the rects to screen space
-	leUtils_RectToScreenSpace((leWidget*)lbl, textRect);
-    leUtils_RectToScreenSpace((leWidget*)lbl, drawRect);
+    leRectClip(kerningRect, &bounds, kerningRect);
+
+	// move the draw rect to screen space
+    leUtils_RectToScreenSpace((leWidget*)lbl, kerningRect);
 }
 
 static void drawBackground(leLabelWidget* lbl);
@@ -172,18 +180,18 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leLabelWidget* lbl)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
 
-    _leLabelWidget_GetTextRect(lbl, &textRect, &drawRect);
+    _leLabelWidget_GetTextRects(lbl, &boundingRect, &kerningRect);
 
     //leRenderer_RectFill(&textRect, leColorConvert(LE_COLOR_MODE_RGB_888, LE_COLOR_MODE_RGB_565, 0xFF0000), 255);
     
     lbl->string->fn->_draw(lbl->string,
-                          textRect.x,
-                          textRect.y,
-                          lbl->widget.style.halign,
-                          leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_TEXT),
-                          paintState.alpha);
+                           kerningRect.x,
+                           kerningRect.y,
+                           lbl->widget.style.halign,
+                           leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_TEXT),
+                           paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
     if(leGetActiveStream() != NULL)

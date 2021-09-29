@@ -25,8 +25,8 @@
 <#if HarmonyCore.SELECT_RTOS == "BareMetal">
     <#lt>    drv_touch_itd_task();
 <#elseif HarmonyCore.SELECT_RTOS == "FreeRTOS">
-    <#lt>    xTaskCreate( _drv_touch_itc_task,
-    <#lt>        "drv_touch_itc_task",
+    <#lt>    xTaskCreate( _drv_touch_itd_task,
+    <#lt>        "drv_touch_itd_task",
     <#lt>        ${RTOSStackSize},
     <#lt>        (void*)NULL,
     <#lt>        ${RTOSTaskPriority},

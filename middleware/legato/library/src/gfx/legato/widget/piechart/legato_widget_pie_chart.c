@@ -129,15 +129,19 @@ static void _recalculateSliceAngles(const lePieChartWidget* _this)
         pie = (lePieChartPie*)_this->pieArray.values[itr];
 
         pie->percentOffset = lastPercent;
-        pie->percentValue = lePercentWholeRounded(pie->value, totalValue);
 
-        lastPercent = pie->percentOffset + pie->percentValue;
-
-        if(itr == _this->pieArray.size - 1)
+        if(pie->value > 0)
         {
-            if(pie->percentOffset + pie->percentValue != 100)
+            pie->percentValue = lePercentWholeRounded(pie->value, totalValue);
+
+            lastPercent = pie->percentOffset + pie->percentValue;
+
+            if(itr == _this->pieArray.size - 1)
             {
-                pie->percentValue = 100 - pie->percentOffset;
+                if(pie->percentOffset + pie->percentValue != 100)
+                {
+                    pie->percentValue = 100 - pie->percentOffset;
+                }
             }
         }
     }

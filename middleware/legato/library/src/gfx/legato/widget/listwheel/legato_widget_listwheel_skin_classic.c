@@ -33,6 +33,7 @@
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -67,48 +68,54 @@ static int32_t getItemY(const leListWheelWidget* whl,
     return (y - (itemHeight / 2)) + whl->rotation;
 }
 
-void _leListWheelWidget_GetItemTextRect(const leListWheelWidget* whl,
-                                        uint32_t idx,
-                                        uint32_t pos,
-                                        leRect* textRect,
-                                        leRect* drawRect)
+void _leListWheelWidget_GetItemTextRects(const leListWheelWidget* whl,
+                                         uint32_t idx,
+                                         uint32_t pos,
+                                         leRect* boundingRect,
+                                         leRect* kerningRect)
 {
     leRect bounds, imageRect;
     leListWheelItem* item;
     int32_t y;
-        
+
     // get rectangles
     item = whl->items.values[idx];
-    
+
     if(item->string != NULL)
     {
-        item->string->fn->getRect(item->string, textRect);
+        item->string->fn->getRect(item->string, boundingRect);
+
+        *kerningRect = *boundingRect;
+
+        leStringUtils_KerningRect((leRasterFont*)item->string->fn->getFont(item->string),
+                                  kerningRect);
     }
     else
     {
-        *textRect = leRect_Zero;
+        *boundingRect = leRect_Zero;
+        *kerningRect = *boundingRect;
     }
-    
+
     bounds.x = 0;
     bounds.y = 0;
     bounds.width = whl->widget.rect.width;
-    bounds.height = textRect->height;
-    
+    bounds.height = boundingRect->height;
+
     imageRect = leRect_Zero;
-    
+
     if(item->icon != NULL)
     {
         if(bounds.height < (int32_t)item->icon->buffer.size.height)
         {
             bounds.height = (int32_t)item->icon->buffer.size.height;
         }
-            
+
         imageRect.width = item->icon->buffer.size.width;
         imageRect.height = item->icon->buffer.size.height;
     }
-    
+
     // arrange relative to image rect
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      imageRect,
                                      bounds,
                                      whl->widget.style.halign,
@@ -119,17 +126,19 @@ void _leListWheelWidget_GetItemTextRect(const leListWheelWidget* whl,
                                      whl->widget.margin.right,
                                      whl->widget.margin.bottom,
                                      whl->iconMargin);
-                                     
-    leRectClip(textRect, &bounds, drawRect);
 
-	// move the rects to layer space
-	leUtils_RectToScreenSpace((leWidget*)whl, textRect);
-    leUtils_RectToScreenSpace((leWidget*)whl, drawRect);   
-    
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
+
+    leRectClip(kerningRect, &bounds, kerningRect);
+
+    // move the draw rect to layer space
+    leUtils_RectToScreenSpace((leWidget*)whl, kerningRect);
+
     y = getItemY(whl, pos, bounds.height);
-    
-    textRect->y += y;
-    drawRect->y += y;  
+
+    boundingRect->y += y;
+    kerningRect->y += y;
 }
 
 void _leListWheelWidget_GetIndicatorRect(leListWheelWidget* whl,
@@ -480,7 +489,7 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leListWheelWidget* whl)
 {
-    leRect textRect, drawRect, widgetRect;
+    leRect boundingRect, kerningRect, widgetRect;
     leListWheelItem* item;
     leRect midLineRect;
     leRect itemRect;
@@ -506,15 +515,15 @@ static void drawString(leListWheelWidget* whl)
         return;
     }
     
-    _leListWheelWidget_GetItemTextRect(whl,
-                                       whl->paintState.nextItem,
-                                       whl->paintState.y,
-                                       &textRect,
-                                       &drawRect);
+    _leListWheelWidget_GetItemTextRects(whl,
+                                        whl->paintState.nextItem,
+                                        whl->paintState.y,
+                                        &boundingRect,
+                                        &kerningRect);
 
     whl->fn->rectToScreen(whl, &widgetRect);
     
-    if(leRectIntersects(&drawRect, &widgetRect) == LE_FALSE)
+    if(leRectIntersects(&kerningRect, &widgetRect) == LE_FALSE)
     {
         nextItem(whl);
         
@@ -536,8 +545,8 @@ static void drawString(leListWheelWidget* whl)
     if (leRectIntersects(&itemRect, &midLineRect) == LE_TRUE)
     {
         item->string->fn->_draw(item->string,
-                                textRect.x,
-                                textRect.y,
+                                kerningRect.x,
+                                kerningRect.y,
                                 whl->widget.style.halign,
                                 leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT_HIGHLIGHTTEXT),
                                 paintState.alpha);
@@ -559,11 +568,11 @@ static void drawString(leListWheelWidget* whl)
         if (whl->zoomEffects == LE_LISTWHEEL_ZOOM_EFFECT_NONE)
         {
             item->string->fn->_draw(item->string,
-                                textRect.x,
-                                textRect.y,
-                                whl->widget.style.halign,
-                                leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT),
-                                paintState.alpha);
+                                    kerningRect.x,
+                                    kerningRect.y,
+                                    whl->widget.style.halign,
+                                    leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT),
+                                    paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
             if(leGetActiveStream() != NULL)

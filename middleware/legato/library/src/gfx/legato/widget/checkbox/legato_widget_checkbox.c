@@ -51,9 +51,9 @@ void _leCheckBoxWidget_GetImageRect(const leCheckBoxWidget* cbox,
 									leRect* imgRect,
 									leRect* imgSrcRect);
 									
-void _leCheckBoxWidget_GetTextRect(const leCheckBoxWidget* cbox,
-								   leRect* textRect,
-								   leRect* drawRect);									
+void _leCheckBoxWidget_GetTextRects(const leCheckBoxWidget* cbox,
+								    leRect* boundingRect,
+								    leRect* kerningRect);
 
 static void invalidateImageRect(const leCheckBoxWidget* _this)
 {
@@ -66,11 +66,11 @@ static void invalidateImageRect(const leCheckBoxWidget* _this)
 
 static void invalidateTextRect(const leCheckBoxWidget* _this)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     
-    _leCheckBoxWidget_GetTextRect(_this, &textRect, &drawRect);
+    _leCheckBoxWidget_GetTextRects(_this, &boundingRect, &kerningRect);
     
-    _this->fn->_damageArea(_this, &drawRect);
+    _this->fn->_damageArea(_this, &boundingRect);
 }
 
 static void invalidateContents(const leCheckBoxWidget* _this)

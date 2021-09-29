@@ -33,6 +33,7 @@
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -130,9 +131,9 @@ void _leRadioButtonWidget_GetImageRect(const leRadioButtonWidget* btn,
 	leUtils_RectToScreenSpace((leWidget*)btn, imgRect);
 }
 
-void _leRadioButtonWidget_GetTextRect(leRadioButtonWidget* btn,
-								      leRect* textRect,
-								      leRect* drawRect)
+void _leRadioButtonWidget_GetTextRects(leRadioButtonWidget* btn,
+								       leRect* boundingRect,
+								       leRect* kerningRect)
 {
     leRect bounds;
     
@@ -142,11 +143,17 @@ void _leRadioButtonWidget_GetTextRect(leRadioButtonWidget* btn,
     
     if(btn->string != NULL)
     {
-        btn->string->fn->getRect(btn->string, textRect);
+        btn->string->fn->getRect(btn->string, boundingRect);
+
+        *kerningRect = *boundingRect;
+
+        leStringUtils_KerningRect((leRasterFont*)btn->string->fn->getFont(btn->string),
+                                  kerningRect);
     }
     else
     {
-        *textRect = leRect_Zero;
+        *boundingRect = leRect_Zero;
+        *kerningRect = *boundingRect;
     }
     
     // calculate image dimensions
@@ -178,7 +185,7 @@ void _leRadioButtonWidget_GetTextRect(leRadioButtonWidget* btn,
     }
     
     // arrange relative to image rect
-    leUtils_ArrangeRectangleRelative(textRect,
+    leUtils_ArrangeRectangleRelative(kerningRect,
                                      imgRect,
                                      bounds,
                                      btn->widget.style.halign,
@@ -190,11 +197,13 @@ void _leRadioButtonWidget_GetTextRect(leRadioButtonWidget* btn,
                                      btn->widget.margin.bottom,
                                      btn->imageMargin);
 
-	leRectClip(textRect, &bounds, drawRect);
+    boundingRect->x = kerningRect->x;
+    boundingRect->y = kerningRect->y;
 
-	// move the rects to layer space
-	leUtils_RectToScreenSpace((leWidget*)btn, textRect);
-    leUtils_RectToScreenSpace((leWidget*)btn, drawRect);
+	leRectClip(kerningRect, &bounds, kerningRect);
+
+	// move the draw rect to layer space
+    leUtils_RectToScreenSpace((leWidget*)btn, kerningRect);
 }
 
 static void drawBackground(leRadioButtonWidget* btn);
@@ -494,16 +503,18 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leRadioButtonWidget* btn)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     
-    _leRadioButtonWidget_GetTextRect(btn, &textRect, &drawRect);
+    _leRadioButtonWidget_GetTextRects(btn,
+                                      &boundingRect,
+                                      &kerningRect);
         
     btn->string->fn->_draw(btn->string,
-                         textRect.x,
-                         textRect.y,
-                         LE_HALIGN_CENTER,
-                         leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_TEXT),
-                         paintState.alpha);
+                           kerningRect.x,
+                           kerningRect.y,
+                           LE_HALIGN_CENTER,
+                           leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_TEXT),
+                           paintState.alpha);
 
 #if LE_STREAMING_ENABLED == 1
     if(leGetActiveStream() != NULL)

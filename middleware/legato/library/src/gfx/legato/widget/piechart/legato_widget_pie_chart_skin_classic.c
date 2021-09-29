@@ -34,6 +34,7 @@
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_fixedstring.h"
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -144,7 +145,7 @@ static void drawSliceLabel(lePieChartWidget* chart,
     leRectClip(&textRect, &bounds, &drawRect);
 
     //Find center angle of pie
-    midAngle = pie->startAngle + (pie->spanAngle / 2);
+    midAngle = pie->startAngle + (pie->value / 2);
 
     lePolarToXY(pie->radius + pie->offset + chart->labelsOffset, midAngle , &centerPoint);
     centerPoint.y *= -1;
@@ -156,6 +157,9 @@ static void drawSliceLabel(lePieChartWidget* chart,
     drawRect.y = centerPoint.y - (textRect.height / 2);
     drawRect.width = textRect.width;
     drawRect.height = textRect.height;
+
+    leStringUtils_KerningRect((leRasterFont*)str.fn->getFont(&str),
+                              &drawRect);
 
     str.fn->_draw(&str,
                   drawRect.x,

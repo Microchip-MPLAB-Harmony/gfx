@@ -44,17 +44,19 @@ const
 #endif
 leLabelWidgetVTable labelWidgetVTable;
 
-void _leLabelWidget_GetTextRect(const leLabelWidget* lbl,
-                                leRect* textRect,
-								leRect* drawRect);
+void _leLabelWidget_GetTextRects(const leLabelWidget* lbl,
+                                 leRect* boundingRect,
+                                 leRect* kerningRect);
 
 static void invalidateContents(const leLabelWidget* lbl)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     
-    _leLabelWidget_GetTextRect(lbl, &textRect, &drawRect);
-    
-    lbl->fn->_damageArea(lbl, &drawRect);
+    _leLabelWidget_GetTextRects(lbl, &boundingRect, &kerningRect);
+
+    leUtils_RectToScreenSpace((leWidget*)lbl, &boundingRect);
+
+    lbl->fn->_damageArea(lbl, &boundingRect);
 }
 
 static void stringPreinvalidate(const leString* str,

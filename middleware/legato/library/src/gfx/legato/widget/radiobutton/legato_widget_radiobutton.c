@@ -55,9 +55,9 @@ void _leRadioButtonWidget_GetImageRect(const leRadioButtonWidget* btn,
 									   leRect* imgRect,
 									   leRect* imgSrcRect);
 
-void _leRadioButtonWidget_GetTextRect(const leRadioButtonWidget* btn,
-								      leRect* textRect,
-								      leRect* drawRect);
+void _leRadioButtonWidget_GetTextRects(const leRadioButtonWidget* btn,
+								       leRect* boundingRect,
+								       leRect* kerningRect);
 
 static void _invalidateImageRect(const leRadioButtonWidget* _this)
 {
@@ -70,11 +70,11 @@ static void _invalidateImageRect(const leRadioButtonWidget* _this)
 
 static void _invalidateTextRect(const leRadioButtonWidget* _this)
 {
-    leRect textRect, drawRect;
+    leRect boundingRect, kerningRect;
     
-    _leRadioButtonWidget_GetTextRect(_this, &textRect, &drawRect);
+    _leRadioButtonWidget_GetTextRects(_this, &boundingRect, &kerningRect);
     
-    _this->fn->_damageArea(_this, &drawRect);
+    _this->fn->_damageArea(_this, &boundingRect);
 }
 
 static void _invalidateContents(const leRadioButtonWidget* _this)

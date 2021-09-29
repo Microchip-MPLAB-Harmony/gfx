@@ -264,11 +264,19 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
 
     sprintf(paintState.strbuff, "%ld", graph->minValue);
 
-    leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &minRect);
+    leStringUtils_GetRectCStr(paintState.strbuff,
+                              graph->ticksLabelFont,
+                              &minRect);
+
+    leStringUtils_KerningRect((leRasterFont*)graph->ticksLabelFont,
+                              &minRect);
 
     sprintf(paintState.strbuff, "%ld", graph->maxValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxRect);
+
+    leStringUtils_KerningRect((leRasterFont*)graph->ticksLabelFont,
+                              &maxRect);
 
     if(maxRect.width > minRect.width)
     {
@@ -307,6 +315,9 @@ static void drawTickLabelWithValue(const leLineGraphWidget* graph,
     // get the string rectangle
     leStringUtils_GetRectCStr(paintState.strbuff,
                               graph->ticksLabelFont,
+                              &textRect);
+
+    leStringUtils_KerningRect((leRasterFont*)graph->ticksLabelFont,
                               &textRect);
 
     if (position == LE_RELATIVE_POSITION_LEFTOF)
@@ -1399,10 +1410,10 @@ static void drawLineGraph(leLineGraphWidget* graph)
         paintState.originPoint.y = paintState.graphRect.y + paintState.graphRect.height;
         paintState.originValue = graph->minValue;
     }
-    else if(graph->minValue <= 0)
+    else if(graph->maxValue <= 0)
     {
         paintState.originPoint.y = paintState.graphRect.y;
-        paintState.originValue = graph->minValue;
+        paintState.originValue = graph->maxValue;
     }
 
     _calculateCategoryPoints(graph);

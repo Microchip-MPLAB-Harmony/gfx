@@ -387,8 +387,7 @@ static leResult stepBackward(leScrollBarWidget* _this)
         
     _invalidateHandleRect(_this);
         
-    if(((int32_t)_this->value - (int32_t)_this->step) < DEFAULT_MIN ||
-       ((int32_t)_this->value - (int32_t)_this->step) > (int32_t)_this->max)
+    if(((int32_t)_this->value - (int32_t)_this->step) < DEFAULT_MIN)
     {
         _this->value = DEFAULT_MIN;
     }
@@ -416,8 +415,7 @@ static leResult stepForward(leScrollBarWidget* _this)
         
     _invalidateHandleRect(_this);
 
-    if(((int32_t)_this->value - (int32_t)_this->step) < DEFAULT_MIN ||
-        ((int32_t)_this->value - (int32_t)_this->step) > (int32_t)_this->max)
+    if(((int32_t)_this->value + (int32_t)_this->step) > (int32_t)_this->max)
     {
         _this->value = _this->max;
     }

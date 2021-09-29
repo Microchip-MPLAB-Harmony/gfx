@@ -342,6 +342,10 @@ static void preLayer(void)
     uint32_t i;
     leRect rect;
 
+#if LE_SCRATCH_BUFFER_PADDING == 1
+    uint32_t padSize = 0;
+#endif
+
     //printf("dump: %i\n", dump++);
 
     leRectArray_Clear(&_rendererState.layerStates[_rendererState.layerIdx].scratchRectList);
@@ -394,7 +398,20 @@ static void preLayer(void)
     }
 
 #if LE_SCRATCH_BUFFER_PADDING == 1
-    leRectArray_PadRectangles(&_rendererState.layerStates[_rendererState.layerIdx].scratchRectList);
+    padSize = 4;
+
+    if(leGetLayerColorMode(_rendererState.layerIdx) == LE_COLOR_MODE_RGB_565)
+    {
+        padSize = 8;
+    }
+
+#if LE_RENDER_ORIENTATION == 90 || LE_RENDER_ORIENTATION == 270
+    leRectArray_PadRectangleHeight(&_rendererState.layerStates[_rendererState.layerIdx].scratchRectList,
+                                   padSize);
+#else
+    leRectArray_PadRectangleWidth(&_rendererState.layerStates[_rendererState.layerIdx].scratchRectList,
+                                  padSize);
+#endif
 #endif
 
     while(_rendererState.layerStates[_rendererState.layerIdx].scratchRectList.size != 0)

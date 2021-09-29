@@ -122,13 +122,12 @@ def instantiateComponent(comp):
 	MasterClockSource.setDescription("The source master clock")
 	MasterClockSource.setDefaultValue("REFCLK5")
 	
-	MasterClockValue = 200000000
 	try:
-		MasterClockValue = Database.getSymbolValue("core", GLCDRefClkSource + "_FREQ")
+		MasterClockValue = Database.getSymbolValue("core", "CONFIG_SYS_CLK_REFCLK5_FREQ")
 	except:
 		print(MasterClockSource.getValue() + " symbol not found")
 
-	print("MasterClockValue = " + str(MasterClockValue))
+	#### print("MasterClockValue = " + str(MasterClockValue))
 	MasterClockSourceValue = comp.createIntegerSymbol("MasterClockSourceValue", ClockSettingsMenu)
 	MasterClockSourceValue.setLabel("Master Clock (Hz)")
 	MasterClockSourceValue.setReadOnly(True)
@@ -144,6 +143,7 @@ def instantiateComponent(comp):
 	PixelClockDivider.setMax(32)
 	PixelClockDivider.setMin(1)
 	PixelClockDivider.setDependencies(onPixelDividerSet, ["PixelClockDivider"])
+	PixelClockDivider.setDependencies(onPixelDividerSet, ["core:CONFIG_SYS_CLK_REFCLK5_FREQ"])
 
 	clockValue = MasterClockSourceValue.getValue() / PixelClockDivider.getValue()
 
@@ -467,6 +467,12 @@ def onPixelClockSet(pixelClockSet, event):
 		Database.setSymbolValue("gfx_hal_le", "PixelClock", event["value"], 1)
 
 def onPixelDividerSet(pixelDividerSet, event):
+	try:
+		MasterClockValue = Database.getSymbolValue("core", "CONFIG_SYS_CLK_REFCLK5_FREQ")
+	except:
+		print(MasterClockSource.getValue() + " symbol not found")
+	Database.setSymbolValue("le_gfx_driver_glcd", "MasterClockSourceValue", int(MasterClockValue))
+	#### print("MasterClockValue = " + str(MasterClockValue))
 	clockValue = int(pixelDividerSet.getComponent().getSymbolValue("MasterClockSourceValue")) / int(pixelDividerSet.getComponent().getSymbolValue("PixelClockDivider"))
 	pixelDividerSet.getComponent().setSymbolValue("PixelClock", clockValue, 1)
 	

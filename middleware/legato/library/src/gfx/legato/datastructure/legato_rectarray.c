@@ -417,12 +417,20 @@ leResult leRectArray_RemoveOverlapping(leRectArray* arr)
 #if LE_SCRATCH_BUFFER_PADDING == 1
 leResult leRectArray_PadRectangles(leRectArray* arr)
 {
+    leRectArray_PadRectangleWidth(arr, 4);
+
+    return LE_SUCCESS;
+}
+
+leResult leRectArray_PadRectangleWidth(leRectArray* arr,
+                                       uint32_t size)
+{
     uint32_t rectItr, mod, oldWidth;
     leRect splitRect;
 
     for(rectItr = 0; rectItr < arr->size; rectItr++)
     {
-        mod = arr->rects[rectItr].width % 4;
+        mod = arr->rects[rectItr].width % size;
 
         if(mod != 0)
         {
@@ -431,18 +439,55 @@ leResult leRectArray_PadRectangles(leRectArray* arr)
 
             arr->rects[rectItr].width >>= 1;
 
-            mod = arr->rects[rectItr].width % 4;
+            mod = arr->rects[rectItr].width % size;
 
-            arr->rects[rectItr].width += 4 - mod;
+            arr->rects[rectItr].width += size - mod;
 
             splitRect.width = oldWidth >> 1;
             splitRect.x += splitRect.width;
 
-            mod = splitRect.width % 4;
-            splitRect.x -= 4 - mod;
-            splitRect.width += 4 - mod;
+            mod = splitRect.width % size;
+            splitRect.x -= size - mod;
+            splitRect.width += size - mod;
 
             splitRect.x = arr->rects[rectItr].x + oldWidth - splitRect.width;
+
+            leRectArray_PushBack(arr, &splitRect);
+        }
+    }
+
+    return LE_SUCCESS;
+}
+
+leResult leRectArray_PadRectangleHeight(leRectArray* arr,
+                                        uint32_t size)
+{
+    uint32_t rectItr, mod, oldHeight;
+    leRect splitRect;
+
+    for(rectItr = 0; rectItr < arr->size; rectItr++)
+    {
+        mod = arr->rects[rectItr].height % size;
+
+        if(mod != 0)
+        {
+            oldHeight = arr->rects[rectItr].height;
+            splitRect = arr->rects[rectItr];
+
+            arr->rects[rectItr].height >>= 1;
+
+            mod = arr->rects[rectItr].height % size;
+
+            arr->rects[rectItr].height += size - mod;
+
+            splitRect.height = oldHeight >> 1;
+            splitRect.y += splitRect.height;
+
+            mod = splitRect.height % size;
+            splitRect.y -= size - mod;
+            splitRect.height += size - mod;
+
+            splitRect.y = arr->rects[rectItr].x + oldHeight - splitRect.height;
 
             leRectArray_PushBack(arr, &splitRect);
         }

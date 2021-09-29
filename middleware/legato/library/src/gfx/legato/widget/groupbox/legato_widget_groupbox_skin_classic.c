@@ -28,6 +28,7 @@
 
 #if LE_GROUPBOX_WIDGET_ENABLED
 
+#include "gfx/legato/string/legato_stringutils.h"
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
@@ -344,6 +345,9 @@ static void drawString(leGroupBoxWidget* box)
     leRect textRect, drawRect;
     
     _leGroupBoxWidget_GetTextRect(box, &textRect, &drawRect);
+
+    leStringUtils_KerningRect((leRasterFont*)box->string->fn->getFont(box->string),
+                              &textRect);
         
     box->string->fn->_draw(box->string,
                            textRect.x,

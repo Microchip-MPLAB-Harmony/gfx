@@ -8,6 +8,36 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.9.5
+
+### New Features
+
+* Displays and Template support for PIC32MZ DA Radial Development Board
+* Duplicate Screen Button in Graphics Composer
+
+### Issues Fixed
+
+* MH3-59974 MZ DA GPU incorrect in blit-ing images with semi-transparent pixels
+* MH3-50911	MZ DA GPU blit preprocessed images has artifacts with width not multiple of 4
+* MH3-51057	Composer Project Wizard: Automatically enable scratch buffer padding when MZ DA profile is selected
+* MH3-51060	MZDA image pre-processing with GPU blit does not work for non x4 wide images 
+* MH3-51454	Add an option to byte-swap generated assets to support external controller with opposite endianness
+* MH3-51464	Unable to set pre-process for multiple image assets
+* MH3-51546	GFX: Legato: Buttons may not paint when orientation is set at 90 and 270
+* MH3-51677	Add option to not store rasterized glyph data in Composer save data (glyphs.json)
+* MH3-52808	Legato paints only to visible area of a layer that have areas clip from view
+* MH3-55278	Legato Line Graph is not drawn if the axis is entirely below origin
+* MH3-55403	button text not vertically centered
+* MH3-59264	RGB565 GPU support for both PIC32MZ DA and SAM9x60 needs word aligned addressing
+* MH3-59468	Latest Gfx release breaks existing 8-bit applications
+* MH3-53723	Display Manager / GFX Core LE does not save resolution and timing values for custom display
+* MH3-51215	Master clock value in GLCD component does not match out value from REFCLK5
+* MH3-59484	GFX: PIC32MZDA - Clock Setting in LE GLCD Configuration Options window does not get updated
+
+* Legato Composer Linux/PC Build v1.20.2b
+* Legato Composer Mac Build v1.20.2b
+
+
 ## Graphics Release v3.9.4
 
 ### New Features
@@ -196,23 +226,21 @@ nav_order: 99
 ### Known Issues
 
 * Applications running on SAM E70 in combination with LCC will observe visual rendering artifacts on display during SD card R/W access. There is no loss in SD Card data.
-* legato_flash SAM E54 configuration support for USB is non-functional. SDCARD is functional.
-* Legato Composer is not supported in this release for OSX operating systems.
 * For applications on SAM E54 + CPRO with the 24-bit passthrough board, Pin 7 of the EXT1 connector should drive the backlight. However, on rev1.0 of the board, it is not connected to any pin on the MCU. As a workaround, it needs to be connected to a v3.3 pin.
 
 For a list of post release issues that affect this release, refer to MPLAB Harmony [GFX Issues and Errata](https://github.com/Microchip-MPLAB-Harmony/gfx/wiki/Issues-and-Errata).
 
 ### Development Tools
 
-* [MPLAB® X IDE v5.45 or above](https://www.microchip.com/mplab/mplab-x-ide)
-* [MPLAB® XC32 C/C++ Compiler v2.50](https://www.microchip.com/mplab/compilers)
+* [MPLAB® X IDE v5.50 or above](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v2.50 or above](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * [MPLAB® Harmony Configurator (MHC) v3.6.3 and above](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    * [MPLAB® Harmony Configurator (MHC) v3.8.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
 
 ### Dependent Components
 
-* [Core v3.9.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.9.0)
-* [Touch v3.9.2 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.9.2)
+* [Core v3.10.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.10.0)
+* [Touch v3.10.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.10.1)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 
 

@@ -27,6 +27,7 @@
 
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/string/legato_stringtable.h"
+#include "gfx/legato/string/legato_stringutils.h"
 
 #if LE_STREAMING_ENABLED == 1
 
@@ -370,6 +371,9 @@ leResult _leStringStreamRenderer_Draw(leStringRenderRequest* req)
 
     req->str->fn->getRect(req->str, &renderState.stringRect);
 
+    leStringUtils_KerningRect(renderState.font,
+                              &renderState.stringRect);
+
     getLineMetrics();
 
     renderState.stream = leFont_GetStream((leFont*)renderState.font);
@@ -384,7 +388,6 @@ leResult _leStringStreamRenderer_Draw(leStringRenderRequest* req)
     codepoint = renderState.string->fn->charAt(renderState.string, renderState.charItr);
 
     leFont_GetGlyphInfo((leFont*)renderState.font, codepoint, &renderState.glyphInfo);
-
 
     renderState.manager.isDone = isDone;
     renderState.manager.abort = abortDraw;

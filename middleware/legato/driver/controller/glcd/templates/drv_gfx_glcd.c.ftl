@@ -470,11 +470,6 @@ void DRV_GLCD_Initialize()
     uint32_t      bufferCount;
 </#if>
 
-    // general default initialization
-    //if(defInitialize(context) == LE_FAILURE)
-    //        return LE_FAILURE;
-
-
     /* set temporary information */
     xResolution     = ${Val_Width};
     yResolution     = ${Val_Height};
@@ -636,7 +631,7 @@ void GLCD_Interrupt_Handler(void)
 </#if>
 
         gfxPixelBuffer_SetLocked((gfxPixelBuffer*) blitBuff,
-                                 LE_FALSE);
+                                 GFX_FALSE);
 
         blitBuff = NULL;        
     }
@@ -723,7 +718,7 @@ gfxResult DRV_GLCD_BlitBuffer(int32_t x,
     if (state != DRAW)
         return GFX_FAILURE;
 		
-    gfxPixelBuffer_SetLocked(buf, LE_TRUE);		
+    gfxPixelBuffer_SetLocked(buf, GFX_TRUE);		
 
 <#if DoubleBuffer == true>
     if (drvLayer[activeLayer].syncRectIndex < SYNC_RECT_COUNT)
@@ -765,7 +760,7 @@ gfxResult DRV_GLCD_BlitBuffer(int32_t x,
 <#else>
    	DRV_GLCD_BufferBlit(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
 	
-	gfxPixelBuffer_SetLocked(buf, LE_FALSE);
+	gfxPixelBuffer_SetLocked(buf, GFX_FALSE);
 </#if>
 
     return GFX_SUCCESS;

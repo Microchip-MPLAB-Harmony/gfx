@@ -388,6 +388,9 @@ void _leRenderer_InitDrawForMode(leColorMode mode)
     switch(mode)
     {
         case LE_COLOR_MODE_GS_8:
+        case LE_COLOR_MODE_INDEX_1:
+        case LE_COLOR_MODE_INDEX_4:
+        case LE_COLOR_MODE_INDEX_8:
         case LE_COLOR_MODE_RGB_332:
         case LE_COLOR_MODE_RGB_565:
         case LE_COLOR_MODE_RGB_888:
