@@ -42,6 +42,8 @@ const leScheme leDefaultScheme =
         { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // index 8
         { { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, // monochrome
     },
+    0,
+    NULL
 };
 
 void leScheme_Initialize(leScheme* scheme)

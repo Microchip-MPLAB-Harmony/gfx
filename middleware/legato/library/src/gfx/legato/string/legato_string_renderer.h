@@ -63,6 +63,7 @@ typedef struct leStringRenderRequest
     leHAlignment align;
     leColor color;
     uint32_t alpha;
+    const leBlendLookupTable* lookupTable;
 } leStringRenderRequest;
 
 // *****************************************************************************
@@ -99,6 +100,7 @@ typedef struct leUStringRenderRequest
     leHAlignment align;
     leColor color;
     uint32_t alpha;
+    const leBlendLookupTable* lookupTable;
 } leUStringRenderRequest;
 
 // *****************************************************************************
@@ -133,6 +135,7 @@ typedef struct leCStringRenderRequest
     leHAlignment align;
     leColor color;
     uint32_t alpha;
+    const leBlendLookupTable* lookupTable;
 } leCStringRenderRequest;
 
 // *****************************************************************************

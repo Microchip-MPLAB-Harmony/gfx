@@ -448,10 +448,14 @@ gfxResult DRV_SSD1963_BlitBuffer(int32_t x,
     return GFX_SUCCESS;
 }
 
-gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req,
-                                         void* arg)
+gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req, void* arg)
 {
-	switch(request)
+    
+    gfxIOCTLArg_Value* val;
+    gfxIOCTLArg_DisplaySize* disp;
+    gfxIOCTLArg_LayerRect* rect;
+    
+	switch(req)
 	{
 		case GFX_IOCTL_GET_COLOR_MODE:
 		{
@@ -526,4 +530,3 @@ gfxDriverIOCTLResponse DRV_SSD1963_IOCTL(gfxDriverIOCTLRequest req,
 	
 	return GFX_IOCTL_UNSUPPORTED;
 }
-

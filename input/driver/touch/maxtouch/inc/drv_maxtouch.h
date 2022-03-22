@@ -119,6 +119,9 @@ typedef struct
     /* open function for I2C driver */
     DRV_HANDLE              (*drvOpen) ( const SYS_MODULE_INDEX index, const DRV_IO_INTENT intent );
     
+    /* open function for I2C driver */
+    void                    (*drvClose) ( const DRV_HANDLE handle );
+
     /* interrupt source for driver instance */
     INT_SOURCE              interruptSource;
     
@@ -304,6 +307,7 @@ SYS_MODULE_OBJ DRV_MAXTOUCH_Initialize(const SYS_MODULE_INDEX index,
 
 void DRV_MAXTOUCH_Deinitialize(SYS_MODULE_OBJ object);
 
+void DRV_MAXTOUCH_Reinitialize(SYS_MODULE_OBJ object);
 
 /**************************************************************************
   Function:
@@ -367,6 +371,8 @@ void DRV_MAXTOUCH_Deinitialize(SYS_MODULE_OBJ object);
 */
 
 SYS_STATUS DRV_MAXTOUCH_Status(SYS_MODULE_OBJ object);
+
+void DRV_MAXTOUCH_SoftReset ( SYS_MODULE_OBJ object );
 
 // *****************************************************************************
 /* Function:

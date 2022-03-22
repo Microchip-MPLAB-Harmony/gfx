@@ -175,7 +175,9 @@ static leResult _draw(const leImage* img,
                  y,
                  a);
 
+#if defined LE_PNG_USE_SCRATCH && LE_PNG_USE_SCRATCH == 0
     LE_FREE(decodedData);
+#endif
 
     return LE_SUCCESS;
 }
@@ -267,7 +269,9 @@ static leResult _render(const leImage* src,
 
     lePixelBufferCopy(&dst->buffer, x, y, &src->buffer, srcRect);
 
+#if defined LE_PNG_USE_SCRATCH && LE_PNG_USE_SCRATCH == 0
     LE_FREE(decodedData);
+#endif
 
     return LE_SUCCESS;
 }

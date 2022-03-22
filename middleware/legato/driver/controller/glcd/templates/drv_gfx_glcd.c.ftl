@@ -568,7 +568,9 @@ void DRV_GLCD_Initialize()
         PLIB_GLCD_LayerSrcBlendFuncSet(layerCount, drvLayer[layerCount].sblend );
         PLIB_GLCD_LayerColorModeSet(layerCount, drvLayer[layerCount].colorspace );
 
+<#if CanvasModeOnly == false>
         PLIB_GLCD_LayerEnable(layerCount);
+</#if>
 
         drvLayer[layerCount].frontBufferIdx = 0;
 <#if DoubleBuffer != true>

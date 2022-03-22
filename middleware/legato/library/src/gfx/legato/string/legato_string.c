@@ -345,6 +345,7 @@ leResult _leString_Draw(const leString* _this,
     req.align = align;
     req.color = clr;
     req.alpha = a;
+    req.lookupTable = NULL;
 
     return leStringRenderer_DrawString(&req);
 }

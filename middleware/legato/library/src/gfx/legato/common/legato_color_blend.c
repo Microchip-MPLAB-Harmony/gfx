@@ -25,91 +25,90 @@
 
 
 #include "gfx/legato/common/legato_color.h"
-#include "gfx/legato/common/legato_math.h"
 
-static uint8_t calculateBlendColor(uint8_t ca,
-                                   uint32_t aa,
-                                   uint8_t cb,
-                                   uint32_t ab,
-                                   uint32_t ar)
+
+#define RGBA8888_to_RxB8x8(color)   ((color & (RGBA_8888_RED_MASK | RGBA_8888_BLUE_MASK)) >> 8)
+#define RGBA8888_to_xGxx8x(color)   ((color & RGBA_8888_GREEN_MASK) >> 8)
+
+#define ARGB8888_to_RxB8x8(color)   (color & (ARGB_8888_RED_MASK | ARGB_8888_BLUE_MASK))
+#define ARGB8888_to_xGxx8x(color)   (color & ARGB_8888_GREEN_MASK)
+
+
+static uint32_t calculateBlendColor(uint32_t ca,
+                                    uint32_t aa,
+                                    uint32_t cb,
+                                    uint32_t ab,
+                                    uint32_t ar)
 {
-    uint32_t caaa = lePercentOf(ca, aa);
-    uint32_t cbab = lePercentOf(cb, ab);
     uint32_t cr;
 
-    cbab = lePercentOf(cbab, 100 - aa);
-    caaa += cbab;
-
-    cr = caaa * 100;
+    // color_result = ((color_top*alpha_top) +
+    //                 (color_bottom*alpha_bottom*(1 - alpha_top))) /
+    //                alpha_result
+    
+    cr = ca * aa;
+    cr += ((cb * ab * (255-aa)) + 127) / 255;
     cr /= ar;
 
-    if(cr > 255)
-        return 255;
-
-    return (uint8_t)cr;
-
-    /*float lclr, rclr, lalpha, ralpha, calpha;
-
-    lclr = (float)ca / 255.0f;
-    lalpha = (float)aa / 100.0f;
-    rclr = (float)cb / 255.0f;
-    ralpha = (float)ab / 100.0f;
-    calpha = ar / 100.0f;
-
-    float caaa = lclr * lalpha; // Ca αa
-    float cbab = (rclr * ralpha) * (1.0f - lalpha); // Cb αb
-    float cr;
-
-    caaa += cbab; // Ca αa + (Cb αb (1 - αa))
-    cr = caaa / calpha;
-
-    cr *= 255.0f;
-
-    return (uint8_t)cr;*/
+    return cr;
 }
 
-// αr = αa + αb (1 - αa)
-// Cr = (Ca αa + Cb αb (1 - αa)) / αr
 leColor leColorBlend_RGBA_8888(leColor c1, leColor c2)
 {
-    uint32_t result = 0;
-    uint32_t c1a, c2a;
-    uint32_t calpha;
+    leColor result;
 
-    c1a = c1 & RGBA_8888_ALPHA_MASK;
-    c2a = c2 & RGBA_8888_ALPHA_MASK;
+    uint32_t c1a = c1 & RGBA_8888_ALPHA_MASK;
+    uint32_t c2a = c2 & RGBA_8888_ALPHA_MASK;
 
-    c1a = lePercentWholeRounded(c1a, 255);
-    c2a = lePercentWholeRounded(c2a, 255);
+    if(c1a == 0)
+    {
+        // transparent foreground
+        result = c2;
+    }
+    else if((c1a == 255) || (c2a == 0))
+    {
+        // opaque foreground or transparent background
+        result = c1;
+    }
+    else if(c2a == 255)
+    {
+        // opaque background - optimized blend
+        result =  ((RGBA8888_to_RxB8x8(c1) * c1a) +
+                   (RGBA8888_to_RxB8x8(c2) * (255-c1a))) &
+                  (RGBA_8888_RED_MASK | RGBA_8888_BLUE_MASK);
 
-    calpha = c1a + (lePercentOf(c2a, (100 - c1a)));
+        result |= ((RGBA8888_to_xGxx8x(c1) * c1a) +
+                   (RGBA8888_to_xGxx8x(c2) * (255-c1a))) &
+                  RGBA_8888_GREEN_MASK;
 
-    if(calpha == 0)
-        return c2;
+        result |= RGBA_8888_ALPHA_MASK;
+    }
+    else
+    {
+        // alpha_result = alpha_top + alpha_bottom*(1 - alpha_top)
+        uint32_t calpha = ((c1a * 255) + (c2a * (255-c1a)) + 127) / 255;
 
-    // red channel
-    result |= calculateBlendColor((c1 & RGBA_8888_RED_MASK) >> 24,
-                                  c1a,
-                                  (c2 & RGBA_8888_RED_MASK) >> 24,
-                                  c2a,
-                                  calpha) << 24;
+        if(calpha == 0)
+            return c2;
 
-    // green channel
-    result |= calculateBlendColor((c1 & RGBA_8888_GREEN_MASK) >> 16,
-                                  c1a,
-                                  (c2 & RGBA_8888_GREEN_MASK) >> 16,
-                                  c2a,
-                                  calpha) << 16;
+        // red channel
+        result = calculateBlendColor((c1 & RGBA_8888_RED_MASK) >> 24, c1a,
+                                     (c2 & RGBA_8888_RED_MASK) >> 24, c2a,
+                                     calpha) << 24;
 
-    // blue channel
-    result |= calculateBlendColor((c1 & RGBA_8888_BLUE_MASK) >> 8,
-                                  c1a,
-                                  (c2 & RGBA_8888_BLUE_MASK) >> 8,
-                                  c2a,
-                                  calpha) << 8;
+        // green channel
+        result |= calculateBlendColor((c1 & RGBA_8888_GREEN_MASK) >> 16, c1a,
+                                      (c2 & RGBA_8888_GREEN_MASK) >> 16, c2a,
+                                      calpha) << 16;
 
-    result &= ~(RGBA_8888_ALPHA_MASK);
-    result |= (uint8_t)(lePercentOf(255, calpha));
+        // blue channel
+        result |= calculateBlendColor((c1 & RGBA_8888_BLUE_MASK) >> 8, c1a,
+                                      (c2 & RGBA_8888_BLUE_MASK) >> 8, c2a,
+                                      calpha) << 8;
+
+        // alpha channel
+        result |= calpha;
+    }
 
     return result;
 }
@@ -117,49 +116,59 @@ leColor leColorBlend_RGBA_8888(leColor c1, leColor c2)
 leColor leColorBlend_ARGB_8888(leColor c1, leColor c2)
 {
     leColor result;
-    uint32_t c1a, c2a;
-    uint32_t calpha;
 
-    result = 0;
+    uint32_t c1a = (c1 & ARGB_8888_ALPHA_MASK) >> 24;
+    uint32_t c2a = (c2 & ARGB_8888_ALPHA_MASK) >> 24;
 
-    c1a = (c1 & ARGB_8888_ALPHA_MASK);
-    c1a >>= 24;
+    if(c1a == 0)
+    {
+        // transparent foreground
+        result = c2;
+    }
+    else if((c1a == 255) || (c2a == 0))
+    {
+        // opaque foreground or transparent background
+        result = c1;
+    }
+    else if(c2a == 255)
+    {
+        // opaque background - optimized blend
+        result =  (((ARGB8888_to_RxB8x8(c1) * c1a) +
+                    (ARGB8888_to_RxB8x8(c2) * (255-c1a))) >> 8)  &
+                  (ARGB_8888_RED_MASK | ARGB_8888_BLUE_MASK);
 
-    c2a = (c2 & ARGB_8888_ALPHA_MASK);
-    c2a >>= 24;
+        result |= (((ARGB8888_to_xGxx8x(c1) * c1a) +
+                    (ARGB8888_to_xGxx8x(c2) * (255-c1a))) >> 8) &
+                  ARGB_8888_GREEN_MASK;
 
-    c1a = lePercentWholeRounded(c1a, 255);
-    c2a = lePercentWholeRounded(c2a, 255);
+        result |= ARGB_8888_ALPHA_MASK;        
+    }
+    else
+    {
+        // alpha_result = alpha_top + alpha_bottom*(1 - alpha_top)
+        uint32_t calpha = ((c1a * 255) + (c2a * (255-c1a)) + 127) / 255;
 
-    calpha = c1a + (lePercentOf(c2a, (100 - c1a)));
+        if(calpha == 0)
+            return c2;
 
-    // alpha channel
-    result |= calculateBlendColor((c1 & ARGB_8888_ALPHA_MASK) >> 24,
-                                  c1a,
-                                  (c2 & ARGB_8888_ALPHA_MASK) >> 24,
-                                  c2a,
-                                  calpha) << 24;
+        // alpha channel
+        result = calpha << 24;
 
-    // red channel
-    result |= calculateBlendColor((c1 & ARGB_8888_RED_MASK) >> 16,
-                                  c1a,
-                                  (c2 & ARGB_8888_RED_MASK) >> 16,
-                                  c2a,
-                                  calpha) << 16;
+        // red channel
+        result |= calculateBlendColor((c1 & ARGB_8888_RED_MASK) >> 16, c1a,
+                                      (c2 & ARGB_8888_RED_MASK) >> 16, c2a,
+                                      calpha) << 16;
 
-    // green channel
-    result |= calculateBlendColor((c1 & ARGB_8888_GREEN_MASK) >> 8,
-                                  c1a,
-                                  (c2 & ARGB_8888_GREEN_MASK) >> 8,
-                                  c2a,
-                                  calpha) << 8;
+        // green channel
+        result |= calculateBlendColor((c1 & ARGB_8888_GREEN_MASK) >> 8, c1a,
+                                      (c2 & ARGB_8888_GREEN_MASK) >> 8, c2a,
+                                      calpha) << 8;
 
-    // blue channel
-    result |= calculateBlendColor((c1 & ARGB_8888_BLUE_MASK),
-                                  c1a,
-                                  (c2 & ARGB_8888_BLUE_MASK),
-                                  c2a,
-                                  calpha);
-
+        // blue channel
+        result |= calculateBlendColor((c1 & ARGB_8888_BLUE_MASK), c1a,
+                                      (c2 & ARGB_8888_BLUE_MASK), c2a,
+                                      calpha);
+    }
+    
     return result;
 }

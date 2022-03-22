@@ -605,3 +605,24 @@ void leUtils_RectLogicalToScratch(leRect* rect)
     rect->x = rotX;
     rect->y = rotY;
 }
+
+const leBlendLookupTable* leUtils_GetSchemeLookupTable(const leScheme* schm,
+                                                       leColor foreground,
+                                                       leColor background)
+{
+    uint32_t itr;
+
+    if(schm == NULL)
+        return NULL;
+
+    for(itr = 0; itr < schm->blendTableCount; ++itr)
+    {
+        if(schm->blendTables[itr]->foreground == foreground &&
+           schm->blendTables[itr]->background == background)
+        {
+            return schm->blendTables[itr];
+        }
+    }
+
+    return NULL;
+}

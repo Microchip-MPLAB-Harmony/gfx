@@ -207,6 +207,33 @@ static leResult _initBlendStage(leRawDecodeState* state)
     return LE_SUCCESS;
 }
 
+static void _directBlit(const lePixelBuffer* src,
+                        const leRect* srcRect,
+                        const leRect* destRect)
+{
+    void* srcPtr;
+    void* destPtr;
+    lePixelBuffer dest;
+    uint32_t row, rowSize;
+
+    dest.pixel_count = leGetRenderBuffer()->pixel_count;
+    dest.size.width = leGetRenderBuffer()->size.width;
+    dest.size.height = leGetRenderBuffer()->size.height;
+    dest.mode = leGetRenderBuffer()->mode;
+    dest.buffer_length = leGetRenderBuffer()->buffer_length;
+    dest.pixels = (gfxBuffer)leGetRenderBuffer()->pixels;
+
+    rowSize = srcRect->width * gfxColorInfoTable[src->mode].size;
+
+    for(row = 0; row < srcRect->height; row++)
+    {
+        srcPtr = lePixelBufferOffsetGet(src, srcRect->x, srcRect->y + row);
+        destPtr = lePixelBufferOffsetGet(&dest, destRect->x, destRect->y + row);
+
+        memcpy(destPtr, srcPtr, rowSize);
+    }
+}
+
 static leResult _draw(const leImage* img,
                       const leRect* srcRect,
                       int32_t x,
@@ -268,6 +295,18 @@ static leResult _draw(const leImage* img,
     if(img->header.location == LE_STREAM_LOCATION_ID_INTERNAL &&
        img->format == LE_IMAGE_FORMAT_RAW)
     {
+        if((img->flags & LE_IMAGE_DIRECT_BLIT) > 0 &&
+           img->buffer.mode == _state.targetMode)
+        {
+            _directBlit(&_state.source->buffer,
+                        &_state.sourceRect,
+                        &_state.destRect);
+
+            // the op has already completed
+            // failure indicates to the exe loop that there are no stages to run
+            return LE_FAILURE;
+        }
+
         if(leGPU_BlitBuffer(&_state.source->buffer,
                             &_state.sourceRect,
                             &_state.destRect,

@@ -8,6 +8,43 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.10.0
+
+### New Features
+
+* SAM9X60: Added support for Image Sensor Interface (ISI)
+* Anti-alias Font Fast-Rendering System
+
+### Issues Fixed
+
+* MH3-44161	Legato button toggle-able behavior
+* MH3-44200	Legato generic controller driver interrupt mode is needed
+* MH3-44862	PNG images are not rendered correctly
+* MH3-45241	Better user experience with adding layers in Legato Composer
+* MH3-45248	wrong register in LCDC_SetHorizontalBackPorchWidth
+* MH3-45460	Legato Composer - remember last location for importing assets
+* MH3-45526	MHC generate wrong code for HVsync polarity in legato display manager
+* MH3-51678	Optimized legato_color_blend.c
+* MH3-53112	LCDC peripheral missing APIs for DBLO and BLEN bits for the Layer Config
+* MH3-53113	LCDC Driver: Layer System Bus Burst Support
+* MH3-54591	GFX2D implementation has a bug causing the images to be displayed very glitchy
+* MH3-59698	old legato project build error with GFX 3.9.4 and text display incorrectly in legato
+* MH3-60482	legato displays garbage data during system initialization in PIC32MZDA with canvas mode
+* MH3-61252	Missing declaration in drv_gfx_ssd1963.c
+* MH3-61255	maXTouch Driver lacking runtime re-initialization capability
+* MH3-61362	Legato GFX Composer crashes in certain situations
+* MH3-62205	In “legato_tablestring.h” the keyword "this" causes compiler error
+* MH3-62206	le_gen_harmony.h is missing C++ guard for C++ compilation
+* MH3-62776	Widget Drag and Drop not working on Mac
+* MH3-62918	SAM 9x60 LCDC Driver Swap Interrupt not aligned with V-sync
+* MH3-63144	clean cache before doing a DMA transfer instead of assigning frame buffer in no cache region
+* MH3-63194	Legato - The text on the button widget won't update when the user use setString
+
+
+* Legato Composer Linux/PC Build v1.25.2b
+* Legato Composer Mac Build v1.25.2b
+
+
 ## Graphics Release v3.9.5
 
 ### New Features
@@ -232,15 +269,15 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 
 ### Development Tools
 
-* [MPLAB® X IDE v5.50 or above](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® X IDE v6.00 or above](https://www.microchip.com/mplab/mplab-x-ide)
 * [MPLAB® XC32 C/C++ Compiler v2.50 or above](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * [MPLAB® Harmony Configurator (MHC) v3.8.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
 
 ### Dependent Components
 
-* [Core v3.10.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.10.0)
-* [Touch v3.10.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.10.1)
+* [Core v3.11.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.0)
+* [Touch v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.11.1)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 
 

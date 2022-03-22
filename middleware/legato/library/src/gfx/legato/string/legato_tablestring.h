@@ -44,9 +44,9 @@ struct leTableString;
 #define LE_TABLESTRING_VTABLE(THIS_TYPE) \
     LE_STRING_VTABLE(THIS_TYPE) \
     \
-    uint32_t (*getID)(const THIS_TYPE* this); \
-    leResult (*setID)(THIS_TYPE* this, uint32_t id); \
-    uint32_t (*sizeInBytes)(const THIS_TYPE* this); \
+    uint32_t (*getID)(const THIS_TYPE* _this); \
+    leResult (*setID)(THIS_TYPE* _this, uint32_t id); \
+    uint32_t (*sizeInBytes)(const THIS_TYPE* _this); \
 
 typedef struct leTableStringVTable
 {

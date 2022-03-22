@@ -483,6 +483,9 @@ struct DEVICE_OBJECT
     DRV_HANDLE (*drvOpen)(const SYS_MODULE_INDEX index,
                           const DRV_IO_INTENT intent);
 
+    /* Callback for I2C Driver Close call */
+    void (*drvClose)(const DRV_HANDLE handle);
+
     /* Touch input interrupt source */
     INT_SOURCE interruptSource;
     
@@ -790,18 +793,12 @@ SYS_MODULE_OBJ DRV_MAXTOUCH_Initialize(const SYS_MODULE_INDEX index,
     struct DEVICE_OBJECT * pDrvInstance =
                 ( struct DEVICE_OBJECT *)&sMAXTOUCHDriverInstances[index];
 
-    if ( pDrvInstance->inUse == true )
-    {
-        SYS_ASSERT(false, "MAXTOUCH Driver: Attempting to reinitialize a driver instance that is already in use");
-        return SYS_MODULE_OBJ_INVALID;
-    }
-
-    pDrvInstance->inUse = true;
-
     pInit = (const DRV_MAXTOUCH_INIT* const)init;
 
     /* */
     pDrvInstance->drvOpen         = pInit->drvOpen;
+    pDrvInstance->drvClose        = pInit->drvClose;
+    pDrvInstance->inUse           = false;
     pDrvInstance->drvI2CHandle    = DRV_HANDLE_INVALID;
 //    infoBlockData = NULL;
     
@@ -850,10 +847,25 @@ void DRV_MAXTOUCH_Deinitialize ( SYS_MODULE_OBJ object )
         return;
     }
 
+    DRV_MAXTOUCH_Close (pDrvInstance->drvI2CHandle);
+
     SYS_INT_SourceDisable(pDrvInstance->interruptSource);
 
     pDrvInstance->inUse                 = false;
     pDrvInstance->status                = SYS_STATUS_UNINITIALIZED;
+
+    return;
+}
+
+void DRV_MAXTOUCH_Reinitialize ( SYS_MODULE_OBJ object )
+{
+    struct DEVICE_OBJECT * pDrvInstance =
+                                    (struct DEVICE_OBJECT *)object;
+
+    DRV_MAXTOUCH_Deinitialize (object);
+    pDrvInstance->deviceState = DEVICE_STATE_OPEN;
+    pDrvInstance->data.progress = 0;
+    pDrvInstance->apiEvent = APP_DRV_MAXTOUCH_None;
 
     return;
 }
@@ -893,6 +905,12 @@ DRV_HANDLE DRV_MAXTOUCH_Open(const SYS_MODULE_INDEX index,
         SYS_ASSERT(false, "MAXTOUCH Driver: Bus driver init parameter missing");
         return DRV_HANDLE_INVALID;
     }
+
+    if(pDrvInstance->drvClose == NULL)
+    {
+        SYS_ASSERT(false, "MAXTOUCH Driver: Bus driver init close parameter missing");
+        return DRV_HANDLE_INVALID;
+    }
     
     if(pDrvInstance->drvI2CHandle == DRV_HANDLE_INVALID)
     {
@@ -918,22 +936,64 @@ DRV_HANDLE DRV_MAXTOUCH_Open(const SYS_MODULE_INDEX index,
           
     pDrvInstance->status = SYS_STATUS_BUSY;
         
+    if ( pDrvInstance->inUse == true )
+    {
+        SYS_ASSERT(false, "MAXTOUCH Driver: Attempting to open a driver instance that is already in use");
+        return SYS_MODULE_OBJ_INVALID;
+    }
+
+    pDrvInstance->inUse = true;
+
     return (DRV_HANDLE)pDrvInstance;
 }
 
 void DRV_MAXTOUCH_Close (DRV_HANDLE handle)
 {
-    struct DEVICE_OBJECT* pDrvObject = (struct DEVICE_OBJECT*)handle;
+    struct DEVICE_OBJECT * pDrvInstance = (struct DEVICE_OBJECT*)&sMAXTOUCHDriverInstances[0];
 
-    if(pDrvObject == NULL)
+    if(pDrvInstance == NULL)
     {
         SYS_ASSERT(false, "MAXTOUCH Driver: Trying to close a client with invalid driver object");
-        
+
         return;
     }
-    
+
+    /* Open the bus driver */
+    if(pDrvInstance->drvClose == NULL)
+    {
+        SYS_ASSERT(false, "MAXTOUCH Driver: Bus driver init parameter missing");
+        return ;
+    }
+
+    if(pDrvInstance->drvI2CHandle != DRV_HANDLE_INVALID)
+    {
+        pDrvInstance->drvClose(pDrvInstance->drvI2CHandle);
+        pDrvInstance->drvI2CHandle = DRV_HANDLE_INVALID;
+    }
+
     /* move driver to the idle state to stop any processes */
-    pDrvObject->deviceState = DEVICE_STATE_REQUEST_ID_BLOCK;
+    pDrvInstance->deviceState = DEVICE_STATE_WAIT;
+}
+
+void DRV_MAXTOUCH_SoftReset ( SYS_MODULE_OBJ object )
+{
+    struct DEVICE_OBJECT * pDrvInstance = (struct DEVICE_OBJECT*)&sMAXTOUCHDriverInstances[0];
+
+        uint16_t pReg;
+
+        /* write the address of the object register to the device */
+        pReg = pDrvInstance->data.T6_address + MXT_COMMAND_RESET;
+
+        buf[0] = pReg & 0xFF;
+        buf[1] = pReg >> 8;
+        buf[2] = MXT_RESET_VALUE;
+
+        DRV_I2C_WriteTransferAdd(pDrvInstance->drvI2CHandle,
+                                    I2C_MASTER_WRITE_ID,
+                                    &buf[0],
+                                    3,
+                                    &pDrvInstance->hResetWrite);
+
 }
 
 void DRV_MAXTOUCH_ConfigParse ( SYS_MODULE_OBJ object, DRV_MAXTOUCH_Firmware * firmware )

@@ -33,6 +33,7 @@
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/string/legato_stringutils.h"
+#include "gfx/legato/string/legato_string_renderer.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -181,17 +182,21 @@ static void onStringStreamFinished(leStreamManager* strm)
 static void drawString(leLabelWidget* lbl)
 {
     leRect boundingRect, kerningRect;
+    leStringRenderRequest req;
 
     _leLabelWidget_GetTextRects(lbl, &boundingRect, &kerningRect);
 
-    //leRenderer_RectFill(&textRect, leColorConvert(LE_COLOR_MODE_RGB_888, LE_COLOR_MODE_RGB_565, 0xFF0000), 255);
-    
-    lbl->string->fn->_draw(lbl->string,
-                           kerningRect.x,
-                           kerningRect.y,
-                           lbl->widget.style.halign,
-                           leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_TEXT),
-                           paintState.alpha);
+    req.str = lbl->string;
+    req.x = kerningRect.x;
+    req.y = kerningRect.y;
+    req.align = lbl->widget.style.halign;
+    req.color = leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_TEXT);
+    req.alpha = paintState.alpha;
+    req.lookupTable = leUtils_GetSchemeLookupTable(lbl->widget.scheme,
+                                                   req.color,
+                                                   leScheme_GetRenderColor(lbl->widget.scheme, LE_SCHM_BASE));
+
+    leStringRenderer_DrawString(&req);
 
 #if LE_STREAMING_ENABLED == 1
     if(leGetActiveStream() != NULL)

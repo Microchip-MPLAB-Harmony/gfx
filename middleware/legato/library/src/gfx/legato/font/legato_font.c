@@ -380,6 +380,99 @@ leResult leFont_DrawGlyphData(const leFont* fnt,
     return LE_SUCCESS;
 }
 
+leResult leFont_DrawGlyphData_Lookup(const leFont* fnt,
+                                     const leFontGlyph* glyph,
+                                     const uint8_t* data,
+                                     int32_t x,
+                                     int32_t y,
+                                     const leBlendLookupTable* tbl)
+{
+    int32_t row, col;
+    leRect glyphRect;
+    leRect clippedGlyph;
+    int32_t colStart, colEnd;
+    uint32_t* colorData32;
+    uint16_t* colorData16;
+    uint8_t* colorData8;
+    const uint8_t* dataPtr;
+
+    glyphRect.x = x;
+    glyphRect.y = y;
+    glyphRect.width = glyph->width;
+    glyphRect.height = glyph->height;
+
+    if(fnt == NULL || glyph == NULL || data == NULL || tbl == NULL)
+        return LE_FAILURE;
+
+    if(leRenderer_CullDrawRect(&glyphRect) == LE_TRUE)
+        return LE_SUCCESS;
+
+    leRenderer_ClipDrawRect(&glyphRect, &clippedGlyph);
+
+    if(x >= clippedGlyph.x)
+    {
+        colStart = 0;
+    }
+    else
+    {
+        colStart = clippedGlyph.x - x;
+    }
+
+    if(x + (int32_t)glyph->width <= clippedGlyph.x + clippedGlyph.width)
+    {
+        colEnd = glyph->width;
+    }
+    else
+    {
+        colEnd = glyph->width + ((clippedGlyph.x + clippedGlyph.width) - (x + (int32_t)glyph->width));
+    }
+
+    if(leColorInfoTable[tbl->mode].bpp == 32)
+    {
+        colorData32 = (uint32_t*)tbl->data;
+
+        for(row = clippedGlyph.y - glyphRect.y; row < (clippedGlyph.y - glyphRect.y) + (clippedGlyph.height); row++)
+        {
+            dataPtr = data + (row * glyph->dataRowWidth);
+
+            for(col = colStart; col < colEnd; col++)
+            {
+                leRenderer_PutPixel(x + col, y + row, colorData32[dataPtr[col]]);
+            }
+        }
+    }
+    else if(leColorInfoTable[tbl->mode].bpp == 16)
+    {
+        colorData16 = (uint16_t*)tbl->data;
+
+        for(row = clippedGlyph.y - glyphRect.y; row < (clippedGlyph.y - glyphRect.y) + (clippedGlyph.height); row++)
+        {
+            dataPtr = data + (row * glyph->dataRowWidth);
+
+            for(col = colStart; col < colEnd; col++)
+            {
+                leRenderer_PutPixel(x + col, y + row, colorData16[dataPtr[col]]);
+            }
+        }
+    }
+    else
+    {
+        colorData8 = (uint8_t*)tbl->data;
+
+        for(row = clippedGlyph.y - glyphRect.y; row < (clippedGlyph.y - glyphRect.y) + (clippedGlyph.height); row++)
+        {
+            dataPtr = data + (row * glyph->dataRowWidth);
+
+            for(col = colStart; col < colEnd; col++)
+            {
+                leRenderer_PutPixel(x + col, y + row, colorData8[dataPtr[col]]);
+            }
+        }
+    }
+
+    return LE_SUCCESS;
+}
+
 leResult leFont_DrawGlyph(const leFont* fnt,
                           const leFontGlyph* glyph,
                           int32_t x,
@@ -408,6 +501,39 @@ leResult leFont_DrawGlyph(const leFont* fnt,
             addr += glyph->dataOffset;
 
             return leFont_DrawGlyphData(fnt, glyph, addr, x, y, clr, a);
+        }
+    }
+
+    return LE_FAILURE;
+}
+
+leResult leFont_DrawGlyph_Lookup(const leFont* fnt,
+                                 const leFontGlyph* glyph,
+                                 int32_t x,
+                                 int32_t y,
+                                 const leBlendLookupTable* tbl)
+{
+    uint8_t* addr;
+
+    if(fnt == NULL || glyph == NULL || tbl == NULL)
+        return LE_FAILURE;
+
+    // attempt to find the glyph raster data
+    // if no data found then draw empty rectangle
+    if(glyph->codePoint == LE_UNKNOWN_GLYPH)
+    {
+        _drawUnknownGlyph(x, y, glyph, tbl->foreground, 255);
+
+        return LE_SUCCESS;
+    }
+    else
+    {
+        if(fnt->header.location == LE_STREAM_LOCATION_ID_INTERNAL)
+        {
+            addr = ((uint8_t*)fnt->header.address);
+            addr += glyph->dataOffset;
+
+            return leFont_DrawGlyphData_Lookup(fnt, glyph, addr, x, y, tbl);
         }
     }
 
