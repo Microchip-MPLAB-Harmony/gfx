@@ -320,6 +320,8 @@ static leResult setKeyValue(leKeyPadWidget* _this,
 
     _this->cells[row * _this->cols + col].value = val;
 
+    _this->fn->invalidate(_this);
+
     return LE_SUCCESS;
 }
                                                

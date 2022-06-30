@@ -4754,7 +4754,12 @@ unsigned lodepng_decode(unsigned char** out, unsigned* w, unsigned* h,
     }
 
     outsize = lodepng_get_raw_size(*w, *h, &state->info_raw);
+
+#if defined LE_PNG_USE_SCRATCH && LE_PNG_USE_SCRATCH == 1
+    *out = (void*)LE_PNG_SCRATCH_ADDRESS;
+#else
     *out = (unsigned char*)lodepng_malloc(outsize);
+#endif
     if(!(*out))
     {
       state->error = 83; /*alloc fail*/

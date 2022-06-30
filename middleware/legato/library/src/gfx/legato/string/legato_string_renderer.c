@@ -97,12 +97,23 @@ static leResult drawString(leStringRenderRequest* req)
             }
             else
             {
-                leFont_DrawGlyph((leFont*)font,
-                                 &glyphInfo,
-                                 req->x + lineX + glyphInfo.bearingX,
-                                 stringY + (font->baseline - glyphInfo.bearingY),
-                                 req->color,
-                                 req->alpha);
+                if(req->lookupTable != NULL)
+                {
+                    leFont_DrawGlyph_Lookup((leFont*)font,
+                                            &glyphInfo,
+                                            req->x + lineX + glyphInfo.bearingX,
+                                            stringY + (font->baseline - glyphInfo.bearingY),
+                                            req->lookupTable);
+                }
+                else
+                {
+                    leFont_DrawGlyph((leFont*)font,
+                                     &glyphInfo,
+                                     req->x + lineX + glyphInfo.bearingX,
+                                     stringY + (font->baseline - glyphInfo.bearingY),
+                                     req->color,
+                                     req->alpha);
+                }
             }
 
             lineX += glyphInfo.advance;

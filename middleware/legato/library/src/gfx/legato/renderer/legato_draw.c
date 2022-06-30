@@ -210,11 +210,11 @@ static leResult _RGBBlendFill(int32_t x,
     lePoint pnt;
     leRect fillRect;
 
-    if(a == 0)
-        return LE_SUCCESS;
+    //if(a == 0)
+    //    return LE_SUCCESS;
 
-    if(a == 255)
-        return _RGBFill(x, y, width, height, clr, 0);
+    //if(a == 255)
+    //    return _RGBFill(x, y, width, height, clr, 0);
 
     // adjust for rectangle position
     pnt.x = x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
@@ -380,7 +380,7 @@ leResult leRenderer_FillArea(int32_t x,
                              leColor clr,
                              uint32_t a)
 {
-    return _drawFunction.fill(x, y, width, height, clr, a);
+    return _drawFunction.blendFill(x, y, width, height, clr, a);
 }
 
 void _leRenderer_InitDrawForMode(leColorMode mode)

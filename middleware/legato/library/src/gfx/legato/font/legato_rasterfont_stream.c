@@ -47,6 +47,7 @@ struct FontStream
     int32_t y;
     leColor clr;
     uint32_t a;
+    const leBlendLookupTable* lookupTable;
 };
 
 static LE_COHERENT_ATTR struct FontStream rasterStream;
@@ -55,13 +56,25 @@ static void streamDataReady(leStream* stream)
 {
     (void)stream; // unused
 
-    leFont_DrawGlyphData((leFont*)rasterStream.font,
-                         &rasterStream.info,
-                         glyphCache,
-                         rasterStream.x,
-                         rasterStream.y,
-                         rasterStream.clr,
-                         rasterStream.a);
+    if(rasterStream.lookupTable != NULL)
+    {
+        leFont_DrawGlyphData_Lookup((leFont*) rasterStream.font,
+                             &rasterStream.info,
+                             glyphCache,
+                             rasterStream.x,
+                             rasterStream.y,
+                             rasterStream.lookupTable);
+    }
+    else
+    {
+        leFont_DrawGlyphData((leFont*) rasterStream.font,
+                             &rasterStream.info,
+                             glyphCache,
+                             rasterStream.x,
+                             rasterStream.y,
+                             rasterStream.clr,
+                             rasterStream.a);
+    }
 
     rasterStream.state = LE_STREAM_READY;
 
@@ -76,6 +89,7 @@ static leResult drawGlyph(const leFontGlyph* glyph,
                           int32_t y,
                           leColor clr,
                           uint32_t a,
+                          const leBlendLookupTable* lookupTable,
                           leFontStream_DrawCompleteFn cb)
 {
     leRect glyphRect;
@@ -105,6 +119,7 @@ static leResult drawGlyph(const leFontGlyph* glyph,
     rasterStream.y = y;
     rasterStream.clr = clr;
     rasterStream.a = a;
+    rasterStream.lookupTable = lookupTable;
     rasterStream.fontStream.cb = cb;
 
     rasterStream.state = LE_STREAM_WAITING;
@@ -121,6 +136,7 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
                                    int32_t y,
                                    leColor clr,
                                    uint32_t a,
+                                   const leBlendLookupTable* lookupTable,
                                    leFontStream_DrawCompleteFn cb)
 {
     leRect glyphRect;
@@ -146,6 +162,7 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
     rasterStream.y = y;
     rasterStream.clr = clr;
     rasterStream.a = a;
+    rasterStream.lookupTable = lookupTable;
     rasterStream.fontStream.cb = cb;
 
     while(leStream_Read(&rasterStream.fontStream.stream,
@@ -155,13 +172,25 @@ static leResult drawGlyph_blocking(const leFontGlyph* glyph,
                         NULL) != LE_SUCCESS)
     { }
 
-    leFont_DrawGlyphData((leFont*)rasterStream.font,
-                         &rasterStream.info,
-                         glyphCache,
-                         rasterStream.x,
-                         rasterStream.y,
-                         rasterStream.clr,
-                         rasterStream.a);
+    if(rasterStream.lookupTable != NULL)
+    {
+        leFont_DrawGlyphData_Lookup((leFont*) rasterStream.font,
+                                    &rasterStream.info,
+                                    glyphCache,
+                                    rasterStream.x,
+                                    rasterStream.y,
+                                    rasterStream.lookupTable);
+    }
+    else
+    {
+        leFont_DrawGlyphData((leFont*) rasterStream.font,
+                             &rasterStream.info,
+                             glyphCache,
+                             rasterStream.x,
+                             rasterStream.y,
+                             rasterStream.clr,
+                             rasterStream.a);
+    }
 
     if(rasterStream.fontStream.cb != NULL)
     {

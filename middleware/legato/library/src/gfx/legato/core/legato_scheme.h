@@ -154,6 +154,8 @@ typedef union leSchemeColorTable
 typedef struct leScheme
 {
     leSchemeColorTable tables[LE_SCHEME_COLOR_MODE_COUNT];
+    uint32_t blendTableCount;
+    const leBlendLookupTable** blendTables;
 } leScheme;
 
 extern const struct leScheme leDefaultScheme;

@@ -281,6 +281,21 @@ typedef enum leColorName
     LE_COLOR_LAST
 } leColorName;
 
+/**
+ * @brief This struct represents a blend color lookup table.
+ * @details A blend color lookup table is allows for a fast blending
+ * result based on a lookup table versus having to perform the calculation
+ * mathematically.
+ */
+typedef struct leBlendLookupTable
+{
+    leColor foreground;   /**< The table foreground color */
+    leColor background;   /**< The table background color */
+    leColorMode mode;     /**< The table color mode. */
+
+    const void* data;     /**< Pointer to a buffer which holds the lookup values. */
+} leBlendLookupTable;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Routines
@@ -673,7 +688,18 @@ leColor leColorBilerp(leColor c00,
                       uint32_t yper,
                       leColorMode mode);
 
+/**
+ * @brief Swaps the red and blue channels for a given color value.
+ * @details Swaps the red and blue channels for a given color value.
+ *  This can change an RGB color to BGR and vice versa.
+ * @code
+ * @endcode
+ * @param clr is the color value.
+ * @param mode is the color value mode.
+ * @return the result color.
+ */
 leColor leColorSwap(leColor clr,
                     leColorMode mode);
+
 
 #endif /* LE_COLOR_H */

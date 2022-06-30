@@ -173,13 +173,19 @@ gfxResult DRV_GFX2D_Blit(const gfxPixelBuffer* source,
     src_rect.width = (uint32_t)srcRect->width;
     src_rect.height = (uint32_t)srcRect->height;
 
+	dcache_CleanByAddr(source->pixels, source->buffer_length);
+	dcache_CleanByAddr(dest->pixels, dest->buffer_length);
+
     if ( blendState == GFX_BLEND_NONE )
     {
         PLIB_GFX2D_Copy(&dest_buffer, &dest_rect, &src_buffer, &src_rect);
     }
     else
     {
-        GFX2D_BLEND blend;
+		// blend pipeline is broken, fall back to software (MH3-54591)
+		return GFX_FAILURE;
+		
+        /*GFX2D_BLEND blend;
 
         blend.spe=GFX2D_SPE_MULTIPLY;
         blend.func= GFX2D_FUNCTION_SPE;
@@ -188,7 +194,7 @@ gfxResult DRV_GFX2D_Blit(const gfxPixelBuffer* source,
 
         DRV_GFX2D_Blend(&dest_buffer, (GFX2D_RECTANGLE*)&dest_rect, &dest_buffer,
             (GFX2D_RECTANGLE*)&dest_rect, &src_buffer, (GFX2D_RECTANGLE*)&src_rect,
-            blend);
+            blend);*/
     }
 
     /* Wait for instruction to complete */

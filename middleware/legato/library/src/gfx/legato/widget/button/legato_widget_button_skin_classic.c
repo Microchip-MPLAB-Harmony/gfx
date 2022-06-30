@@ -34,6 +34,7 @@
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/string/legato_stringutils.h"
+#include "gfx/legato/string/legato_string_renderer.h"
 #include "gfx/legato/widget/legato_widget.h"
 
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
@@ -430,19 +431,35 @@ static void onStringStreamFinished(leStreamManager* strm)
 static void drawString(leButtonWidget* btn)
 {
     leRect boundingRect, kerningRect;
+    leStringRenderRequest req;
+    leColor background;
 
     _leButtonWidget_GetTextRects(btn, &boundingRect, &kerningRect);
     
     /*leRenderer_RectLine(&textRect,
                         leColorValue(LE_COLOR_MODE_RGB_565, LE_COLOR_RED),
                         255);*/
-    
-    btn->string->fn->_draw(btn->string,
-                           kerningRect.x,
-                           kerningRect.y,
-                           btn->widget.style.halign,
-                           leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_TEXT),
-                           paintState.alpha);
+
+    if(btn->state != LE_BUTTON_STATE_UP)
+    {
+        background = leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_BACKGROUND);
+    }
+    else
+    {
+        background = leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_BASE);
+    }
+
+    req.str = btn->string;
+    req.x = kerningRect.x;
+    req.y = kerningRect.y;
+    req.align = btn->widget.style.halign;
+    req.color = leScheme_GetRenderColor(btn->widget.scheme, LE_SCHM_TEXT);
+    req.alpha = paintState.alpha;
+    req.lookupTable = leUtils_GetSchemeLookupTable(btn->widget.scheme,
+                                                   req.color,
+                                                   background);
+
+    leStringRenderer_DrawString(&req);
 
 #if LE_STREAMING_ENABLED == 1
     if(leGetActiveStream() != NULL)

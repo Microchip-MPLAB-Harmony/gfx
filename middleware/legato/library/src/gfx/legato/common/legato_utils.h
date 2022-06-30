@@ -45,6 +45,8 @@
 #define LEGATO_UTILS_H
 
 #include "gfx/legato/common/legato_common.h"
+#include "gfx/legato/common/legato_color.h"
+#include "gfx/legato/core/legato_scheme.h"
 
 typedef struct leWidget leWidget;
 typedef struct leList leList;
@@ -357,4 +359,7 @@ void leUtils_PointLogicalToScratch(int16_t* x,
 
 void leUtils_RectLogicalToScratch(leRect* rect);
 
+const leBlendLookupTable* leUtils_GetSchemeLookupTable(const leScheme* schm,
+                                                       leColor foreground,
+                                                       leColor background);
 #endif // LEGATO_UTILS_H

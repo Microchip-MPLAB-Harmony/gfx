@@ -116,15 +116,15 @@
 </#if>
 
 <#if DisplayVSYNCNegative == true>
-#define LCDC_VSYNC_POLARITY LCDC_POLARITY_NEGATIVE
-<#else>
 #define LCDC_VSYNC_POLARITY LCDC_POLARITY_POSITIVE
+<#else>
+#define LCDC_VSYNC_POLARITY LCDC_POLARITY_NEGATIVE
 </#if>
 
 <#if DisplayHSYNCNegative == true>
-#define LCDC_HSYNC_POLARITY LCDC_POLARITY_NEGATIVE
-<#else>
 #define LCDC_HSYNC_POLARITY LCDC_POLARITY_POSITIVE
+<#else>
+#define LCDC_HSYNC_POLARITY LCDC_POLARITY_NEGATIVE
 </#if>
 
 <#if GlobalAlphaEnable == true>
@@ -679,7 +679,10 @@ gfxResult DRV_LCDC_Initialize()
         LCDC_SetBlenderUseIteratedColor(drvLayer[layerCount].hwLayerID, true); //Use iterated color        
         LCDC_UpdateOverlayAttributesEnable(drvLayer[layerCount].hwLayerID);
         LCDC_UpdateAttribute(drvLayer[layerCount].hwLayerID); //Apply the attributes
-
+        
+        LCDC_SetSytemBusDMABurstEnable(drvLayer[layerCount].hwLayerID, true); // Set DLBO in configuration reg 0
+        LCDC_SetSytemBusDMABurstLength(drvLayer[layerCount].hwLayerID, LCDC_BASECFG0_BLEN_AHB_INCR16_Val); // Set burst length
+       
         LCDC_SetChannelEnable(drvLayer[layerCount].hwLayerID, true);
         LCDC_IRQ_Enable(LCDC_INTERRUPT_BASE + drvLayer[layerCount].hwLayerID);
         
@@ -803,6 +806,7 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
                 
                 for (i = 0; i < GFX_LCDC_LAYERS; i++)
                 {
+                    LCDC_LAYER_IRQ_Status(i);
                     LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
                 }
                 
@@ -820,6 +824,7 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
 <#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
         for (i = 0; i < GFX_LCDC_LAYERS; i++)
         {
+            LCDC_LAYER_IRQ_Status(i);
             LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);       
         }
 </#if>
@@ -932,7 +937,7 @@ gfxResult DRV_LCDC_BlitBuffer(int32_t x,
     
     blitBuff = buf;
     blitLayer = activeLayer;
-    
+    LCDC_LAYER_IRQ_Status(blitLayer); 
     LCDC_LAYER_IRQ_Enable(drvLayer[blitLayer].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
 <#else>
 <#if DoubleBuffer == true> 
@@ -1159,6 +1164,7 @@ gfxDriverIOCTLResponse DRV_LCDC_IOCTL(gfxDriverIOCTLRequest request,
             state = SWAP;
             for (i = 0; i < GFX_LCDC_LAYERS; i++)
             {
+                LCDC_LAYER_IRQ_Status(i);           
                 LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);
             }
 </#if>

@@ -96,7 +96,7 @@ leResult leGPU_DrawLine(int32_t x0,
     drawClr = clr;
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA((leColorMode)buf.mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_ON,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -114,7 +114,7 @@ leResult leGPU_DrawLine(int32_t x0,
                                              drawClr);
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA((leColorMode)buf.mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_OFF,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -171,7 +171,7 @@ leResult leGPU_FillRect(const leRect* rect,
     drawClr = clr;
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA((leColorMode)buf.mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_ON,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -187,7 +187,7 @@ leResult leGPU_FillRect(const leRect* rect,
                                              drawClr);
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA((leColorMode)buf.mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_OFF,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -241,7 +241,7 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
     gfxDestRect.height = destRect->height;
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA(sourceBuffer->mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_SCALE,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -260,7 +260,7 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
                                                &gfxDestRect);
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA(sourceBuffer->mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_OFF,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -316,7 +316,7 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
     gfxDestRect.height = destRect->height;
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA(sourceBuffer->mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_ON,
                                                  GFX_GLOBAL_ALPHA_OFF,
@@ -333,7 +333,7 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
                                                &gfxDestRect);
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(a <= 255)
+    if(a < 255 || LE_COLOR_MODE_IS_ALPHA(sourceBuffer->mode) == 1)
     {
         _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_OFF,
                                                  GFX_GLOBAL_ALPHA_OFF,
