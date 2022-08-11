@@ -36,6 +36,9 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
 
 #define DEFAULT_WIDTH             100
 #define DEFAULT_HEIGHT            100
@@ -584,7 +587,11 @@ static leResult setVisibleItemCount(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -614,8 +621,11 @@ static leResult setIconPosition(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -641,7 +651,11 @@ static leResult setIconMargin(leListWheelWidget* _this,
    // invalidateContents(_this);
    
    _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -667,7 +681,11 @@ static leResult setShowIndicators(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -694,7 +712,11 @@ static leResult setIndicatorArea(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -716,7 +738,11 @@ static leResult setShaded(leListWheelWidget* _this,
     _this->shaded = b;
 
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -733,7 +759,11 @@ static leResult setFlickInitSpeed(leListWheelWidget* _this,
     LE_ASSERT_THIS();
         
     _this->minFlickDelta = speed;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -750,7 +780,11 @@ static leResult setMaxMomentum(leListWheelWidget* _this,
     LE_ASSERT_THIS();
         
     _this->maxMomentum = max;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -767,7 +801,11 @@ static leResult setMomentumFalloffRate(leListWheelWidget* _this,
     LE_ASSERT_THIS();
         
     _this->momentumFalloff = percent;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -784,7 +822,11 @@ static leResult setRotationUpdateRate(leListWheelWidget* _this,
     LE_ASSERT_THIS();
         
     _this->rotationTick = ms;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                         
@@ -823,7 +865,11 @@ static int32_t appendItem(leListWheelWidget* _this)
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return (int32_t)_this->items.size - 1;
 }
 
@@ -859,7 +905,11 @@ static int32_t insertItem(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return idx;
 }
 
@@ -897,7 +947,11 @@ static leResult removeItem(leListWheelWidget* _this,
     //    invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -926,7 +980,11 @@ static leResult removeAllItems(leListWheelWidget* _this)
     calculateTopItem(_this);
         
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -962,7 +1020,11 @@ static leResult setSelectedItem(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1003,7 +1065,11 @@ static leResult selectPreviousItem(leListWheelWidget* _this)
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1044,7 +1110,11 @@ static leResult selectNextItem(leListWheelWidget* _this)
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                  
@@ -1100,7 +1170,11 @@ static leResult setItemString(leListWheelWidget* _this,
                                             _this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                
@@ -1139,7 +1213,11 @@ static leResult setItemIcon(leListWheelWidget* _this,
     //invalidateContents(_this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1184,7 +1262,11 @@ static leResult setIndicatorFill(leListWheelWidget* _this,
     _this->indicatorFill = fill;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1209,7 +1291,11 @@ static leResult setZoomEffects(leListWheelWidget* _this,
     _this->zoomEffects = zoomEffects;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1232,17 +1318,26 @@ static leResult setAutoHideWheel(leListWheelWidget* _this,
     
     _this->hideWheel = autoHide;
     
-    _this->borderTypeCache = _this->fn->getBorderType(_this);
-    _this->backgroundTypeCache = _this->fn->getBackgroundType(_this);
-    
     if (_this->autoHideWheel == LE_TRUE)
     {
+        _this->borderTypeCache = _this->fn->getBorderType(_this);
+        _this->backgroundTypeCache = _this->fn->getBackgroundType(_this);
+
         _this->fn->setBorderType(_this, LE_WIDGET_BORDER_NONE);
         _this->fn->setBackgroundType(_this, LE_WIDGET_BACKGROUND_NONE);   
     }
+    else
+    {
+        _this->fn->setBorderType(_this, _this->borderTypeCache);
+        _this->fn->setBackgroundType(_this, _this->backgroundTypeCache);
+    }
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

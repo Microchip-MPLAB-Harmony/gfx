@@ -48,6 +48,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types and Constants
@@ -186,6 +190,10 @@ void leSetErrorMessage(const char* msg);
  */
 void leSprintfErrorMessage(const char* fmt, ...) __attribute__ ((noreturn));;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* LE_ERROR_H */

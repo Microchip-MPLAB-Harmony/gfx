@@ -293,8 +293,8 @@ leResult leFixedHeap_Validate(struct leFixedHeap* heap)
 void leFixedHeap_Dump(leFixedHeap* heap,
                       leBool dumpRecords)
 {
-    leFixedHeapBlock* blk;
-    uint32_t i;
+    leFixedHeapBlock* blk = NULL;
+    uint32_t i = 0;
 
     blk = heap->data;
     

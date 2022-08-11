@@ -49,6 +49,10 @@
 
 #if LE_RECTANGLE_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 // *****************************************************************************
@@ -64,11 +68,11 @@ typedef struct leRectangleWidget leRectangleWidget;
     \
     int32_t   (*getThickness)(const THIS_TYPE* _this); \
     leResult  (*setThickness)(THIS_TYPE* _this, int32_t thk); \
-    
+
 typedef struct leRectangleWidgetVTable
 {
-	LE_RECTANGLEWIDGET_VTABLE(leRectangleWidget)
-} leRectangleWidgetVTable; 
+    LE_RECTANGLEWIDGET_VTABLE(leRectangleWidget)
+} leRectangleWidgetVTable;
 
 // *****************************************************************************
 /**
@@ -115,7 +119,6 @@ leRectangleWidget* leRectangleWidget_New(void);
  * @return void.
  */
 void leRectangleWidget_Constructor(leRectangleWidget* wgt);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -189,6 +192,10 @@ virtual leResult setThickness(leRectangleWidget* _this,
                               int32_t thk);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_RECTANGLE_WIDGET_ENABLED

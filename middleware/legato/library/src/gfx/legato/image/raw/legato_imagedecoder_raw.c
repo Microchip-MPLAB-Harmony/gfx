@@ -214,7 +214,10 @@ static void _directBlit(const lePixelBuffer* src,
     void* srcPtr;
     void* destPtr;
     lePixelBuffer dest;
-    uint32_t row, rowSize;
+    int32_t row, rowSize;
+    leRect frameRect;
+
+    leRenderer_GetFrameRect(&frameRect);
 
     dest.pixel_count = leGetRenderBuffer()->pixel_count;
     dest.size.width = leGetRenderBuffer()->size.width;
@@ -228,7 +231,7 @@ static void _directBlit(const lePixelBuffer* src,
     for(row = 0; row < srcRect->height; row++)
     {
         srcPtr = lePixelBufferOffsetGet(src, srcRect->x, srcRect->y + row);
-        destPtr = lePixelBufferOffsetGet(&dest, destRect->x, destRect->y + row);
+        destPtr = lePixelBufferOffsetGet(&dest, destRect->x - frameRect.x, destRect->y - frameRect.y + row);
 
         memcpy(destPtr, srcPtr, rowSize);
     }
@@ -243,7 +246,7 @@ static leResult _draw(const leImage* img,
     leRect imgRect, sourceClipRect, drawRect, clipRect;
     leRect dmgRect;
 
-    leRenderer_GetDrawRect(&dmgRect);
+    leRenderer_GetClipRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
     if(_state.mode != LE_RAW_MODE_NONE)
@@ -397,6 +400,7 @@ static leResult _resize(const leImage* src,
 #endif
 
     _state.mode = LE_RAW_MODE_RESIZE;
+    _state.randomRLE = LE_TRUE;
 
     _state.source = src;
     _state.sourceRect = sourceClipRect;
@@ -467,7 +471,7 @@ static leResult _resizeDraw(const leImage* src,
     leRect imgRect, sourceClipRect, drawRect, drawClipRect, clipRect;
     leRect dmgRect;
 
-    leRenderer_GetDrawRect(&dmgRect);
+    leRenderer_GetClipRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
     if(_state.mode != LE_RAW_MODE_NONE)
@@ -520,6 +524,7 @@ static leResult _resizeDraw(const leImage* src,
 #endif
 
     _state.mode = LE_RAW_MODE_RESIZEDRAW;
+    _state.randomRLE = LE_TRUE;
 
     _state.source = src;
     _state.sourceRect = drawClipRect;
@@ -905,6 +910,7 @@ static leResult _rotate(const leImage* src,
 #endif
 
     _state.mode = LE_RAW_MODE_ROTATE;
+    _state.randomRLE = LE_TRUE;
 
     _state.source = src;
     _state.sourceRect = sourceClipRect;
@@ -973,7 +979,7 @@ static leResult _rotateDraw(const leImage* src,
     leRect imgRect, sourceClipRect, drawRect, clipRect;
     leRect dmgRect;
 
-    leRenderer_GetDrawRect(&dmgRect);
+    leRenderer_GetClipRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
     if(_state.mode != LE_RAW_MODE_NONE)

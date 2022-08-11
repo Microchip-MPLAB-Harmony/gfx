@@ -128,7 +128,7 @@ static leResult _draw(const leImage* img,
                                      img->buffer.mode == LE_COLOR_MODE_RGBA_8888 ? LCT_RGBA : LCT_RGB,
                                      8);
 
-    LE_ASSERT(pngError == 0);
+    //LE_ASSERT(pngError == 0);
 
     if(pngError != 0)
         return LE_FAILURE;

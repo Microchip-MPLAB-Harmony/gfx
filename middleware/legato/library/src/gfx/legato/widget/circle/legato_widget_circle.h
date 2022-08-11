@@ -50,6 +50,10 @@
 
 #if LE_CIRCLE_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 // *****************************************************************************
@@ -79,11 +83,11 @@
     leResult         (*setThickness)(THIS_TYPE* _this, uint32_t thk); \
     leBool           (*getFilled)(const THIS_TYPE* _this); \
     leResult         (*setFilled)(THIS_TYPE* _this, leBool fill); \
-    
+
 typedef struct leCircleWidgetVTable
 {
-	LE_CIRCLEWIDGET_VTABLE(leCircleWidget)
-} leCircleWidgetVTable; 
+    LE_CIRCLEWIDGET_VTABLE(leCircleWidget)
+} leCircleWidgetVTable;
 
 /**
   * @endcond
@@ -150,7 +154,6 @@ leCircleWidget* leCircleWidget_New(void);
  * @return void.
  */
 void leCircleWidget_Constructor(leCircleWidget* cir);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -349,6 +352,9 @@ virtual leResult setFilled(leCircleWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_CIRCLE_WIDGET_ENABLED
 #endif /* LEGATO_CIRCLE_H */

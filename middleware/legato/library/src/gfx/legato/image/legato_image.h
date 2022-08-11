@@ -183,7 +183,7 @@ typedef struct leImage
     leStreamDescriptor header;
     leImageFormat format;
     lePixelBuffer buffer;
-    leImageFlags flags;
+    size_t flags;
 
     union
     {

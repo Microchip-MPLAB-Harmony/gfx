@@ -71,7 +71,7 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
     leWidgetEvent_TouchDown* evt;
     lePoint pnt;
 #if LE_TOUCH_ORIENTATION != 0
-    gfxIOCTLArg_DisplaySize dispSize;
+    leSize dispSize;
 #endif
 
     if(_state.enabled == LE_FALSE ||               // inputs are disabled
@@ -86,7 +86,7 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
     dispSize.width = 0;
     dispSize.height = 0;
 
-    leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &dispSize);
+    leRenderer_DisplaySize(&dispSize);
 #endif
 
 #if LE_TOUCH_ORIENTATION == 0
@@ -138,7 +138,7 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     leWidgetEvent_TouchUp* evt;
     lePoint pnt;
 #if LE_TOUCH_ORIENTATION != 0
-    gfxIOCTLArg_DisplaySize dispSize;
+    leSize dispSize;
 #endif
 
     if(id >= LE_MAX_TOUCH_STATES ||         // don't overrun array
@@ -154,7 +154,7 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     dispSize.width = 0;
     dispSize.height = 0;
 
-    leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &dispSize);
+    leRenderer_DisplaySize(&dispSize);
 #endif
 
 #if LE_TOUCH_ORIENTATION == 0
@@ -204,7 +204,7 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
     lePoint pnt;
     leListNode* node;
 #if LE_TOUCH_ORIENTATION != 0
-    gfxIOCTLArg_DisplaySize dispSize;
+    leSize dispSize;
 #endif
 
     if(id >= LE_MAX_TOUCH_STATES ||         // don't overrun array
@@ -215,7 +215,7 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
     dispSize.width = 0;
     dispSize.height = 0;
 
-    leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &dispSize);
+    leRenderer_DisplaySize(&dispSize);
 #endif
 
     // find any existing touch moved event and overwrite
@@ -314,18 +314,20 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
 leEventResult handleTouchDown(leWidgetEvent_TouchDown* evt)
 {
     leWidget* targetWidget = NULL;
-    leWidget* rootWidget;
-    int32_t x, y;
+    int32_t x = 0;
+    int32_t y = 0;
     int32_t i;
+    leState* state = leGetState();
+    leLayerState* layerState;
 
 #if LE_DRIVER_LAYER_MODE == 1
     gfxIOCTLArg_LayerRect layerRect;
 #endif
     
     // find the topmost widget on the topmost layer for the touch event
-    for(i = LE_LAYER_COUNT - 1; i >= 0; i--)
+    for(i = leGetState()->layerList.size - 1; i >= 0; i--)
     {
-        rootWidget = &leGetState()->rootWidget[i];
+        layerState = (leLayerState*)leList_Get(&state->layerList, i);
 
         x = evt->x;
         y = evt->y;
@@ -341,7 +343,7 @@ leEventResult handleTouchDown(leWidgetEvent_TouchDown* evt)
         layerRect.width = 0;
         layerRect.height = 0;
 
-        leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_LAYER_RECT, &layerRect);
+        leRenderer_DisplayInterface()->ioctl(GFX_IOCTL_GET_LAYER_RECT, &layerRect);
 
         // need to remember this offset for subsequent touch down/move events
         _state.driverAdjustX = layerRect.x;
@@ -351,7 +353,7 @@ leEventResult handleTouchDown(leWidgetEvent_TouchDown* evt)
         y -= layerRect.y;
 #endif
         
-        targetWidget = leUtils_PickFromWidget(rootWidget, x, y);
+        targetWidget = leUtils_PickFromWidget(&layerState->root, x, y);
         
         if(targetWidget != NULL)
             break; 

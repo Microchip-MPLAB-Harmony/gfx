@@ -49,6 +49,10 @@
 
 #if LE_ARC_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 // *****************************************************************************
@@ -77,11 +81,11 @@ typedef struct leArcWidget leArcWidget;
     leResult    (*setCenterAngle)(THIS_TYPE* _this, int32_t ang); \
     leBool      (*getRoundEdge)(const THIS_TYPE* _this); \
     leResult    (*setRoundEdge)(THIS_TYPE* _this, leBool rnd); \
-    
+
 typedef struct leArcWidgetVTable
 {
-	LE_ARCWIDGET_VTABLE(leArcWidget)
-} leArcWidgetVTable; 
+    LE_ARCWIDGET_VTABLE(leArcWidget)
+} leArcWidgetVTable;
 /**
   * @endcond
   *
@@ -278,6 +282,10 @@ virtual leResult setRoundEdge(THIS_TYPE* _this,
 
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_ARC_WIDGET_ENABLED

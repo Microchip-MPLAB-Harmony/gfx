@@ -49,6 +49,10 @@
 
 #if LE_LINEGRAPH_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -208,8 +212,8 @@ typedef struct leLineGraphWidget leLineGraphWidget;
 
 typedef struct leLineGraphWidgetVTable
 {
-	LE_LINEGRAPHWIDGET_VTABLE(leLineGraphWidget)
-} leLineGraphWidgetVTable; 
+    LE_LINEGRAPHWIDGET_VTABLE(leLineGraphWidget)
+} leLineGraphWidgetVTable;
 
 /**
   * @endcond
@@ -1450,7 +1454,9 @@ void leLineGraphWidget_Constructor(leLineGraphWidget* wgt);
     leResult - the result of the operation
 */
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_LINEGRAPH_WIDGET_ENABLED
 #endif /* LEGATO_WIDGET_LINE_GRAPH_H */

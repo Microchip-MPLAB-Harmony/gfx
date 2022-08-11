@@ -35,6 +35,10 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          25
 
@@ -119,7 +123,11 @@ static leResult setDirection(leProgressBarWidget* _this,
     _this->direction = dir;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -155,7 +163,11 @@ static leResult setValue(leProgressBarWidget* _this,
     }
     
     _invalidateBar(_this, oldVal, _this->value);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

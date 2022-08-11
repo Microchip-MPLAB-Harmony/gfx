@@ -26,6 +26,10 @@
 
 #include "gfx/legato/widget/groupbox/legato_widget_groupbox.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #if LE_GROUPBOX_WIDGET_ENABLED
 
 #include "gfx/legato/common/legato_error.h"
@@ -146,16 +150,23 @@ static leResult setString(leGroupBoxWidget* _this,
 
     _this->string = str;
 
-    _this->string->fn->setPreInvalidateCallback((leString*)_this->string,
-                                                (leString_InvalidateCallback)stringPreinvalidate,
-                                                _this);
+    if(_this->string != NULL)
+    {
+        _this->string->fn->setPreInvalidateCallback((leString*) _this->string,
+                                                    (leString_InvalidateCallback) stringPreinvalidate,
+                                                    _this);
 
-    _this->string->fn->setInvalidateCallback((leString*)_this->string,
-                                             (leString_InvalidateCallback)stringInvalidate,
-                                             _this);
+        _this->string->fn->setInvalidateCallback((leString*) _this->string,
+                                                 (leString_InvalidateCallback) stringInvalidate,
+                                                 _this);
 
-    invalidateTextRect(_this);
-    
+        invalidateTextRect(_this);
+    }
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

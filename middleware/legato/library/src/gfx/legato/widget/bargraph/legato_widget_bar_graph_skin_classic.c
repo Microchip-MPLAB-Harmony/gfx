@@ -707,6 +707,10 @@ static void _calculateCategoryPoints(leBarGraphWidget* graph)
     uint32_t totalSize = paintState.graphRect.width - 4;
     uint32_t catCount = graph->categories.size;
     uint32_t seriesCount = graph->dataSeriesArray.size;
+
+    if(seriesCount == 0)
+        return;
+
     paintState.categoryWidth = totalSize / catCount;
     paintState.barWidth = (paintState.categoryWidth - 2) / seriesCount;
     paintState.stackedWidth = paintState.categoryWidth - 4;

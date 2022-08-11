@@ -45,9 +45,9 @@ static void _shuffleRight(leArray* arr, uint32_t idx)
         arr->size++;
     }
     
-    for(i = arr->size - 1; i >= idx; i++)
+    for(i = arr->size - 1; i > idx; --i)
     {
-        arr->values[i+1] = arr->values[i];
+        arr->values[i] = arr->values[i-1];
     }
     
     arr->values[i] = NULL;

@@ -37,6 +37,12 @@
 #include "gfx/legato/widget/scrollbar/legato_widget_scrollbar.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -306,7 +312,11 @@ static leResult setSelectionMode(leListWidget* _this,
     _this->mode = mode;
     
     _this->fn->deselectAll(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -332,7 +342,11 @@ static leResult setAllowEmptySelection(leListWidget* _this,
     {
         _this->fn->setItemSelected(_this, 0, LE_TRUE);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -357,7 +371,11 @@ static leResult setIconPosition(leListWidget* _this,
     _this->iconPos = pos;
 
     _invalidateListArea(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -379,7 +397,11 @@ static leResult setIconMargin(leListWidget* _this,
     _this->iconMargin = mg;
 
     _invalidateListArea(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                         
@@ -418,7 +440,11 @@ static int32_t appendItem(leListWidget* _this)
     _leListWidget_RecalculateRowRect(_this, _this->items.size - 1);
 
     _recalculateScrollBarValues(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return _this->items.size - 1;
 }
 
@@ -452,7 +478,11 @@ static int32_t insertItem(leListWidget* _this,
     _leListWidget_RecalculateRowRect(_this, idx);
 
     _recalculateScrollBarValues(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return idx;
 }
 
@@ -484,7 +514,11 @@ static leResult removeItem(leListWidget* _this,
     }
         
     _recalculateScrollBarValues(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -508,7 +542,11 @@ static leResult removeAllItems(leListWidget* _this)
     leArray_Clear(&_this->items);
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -701,7 +739,11 @@ static leResult setItemSelected(leListWidget* _this,
             }
         }
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                  
@@ -719,7 +761,7 @@ static leResult toggleItemSelected(leListWidget* _this,
     
     if(item == NULL)
         return LE_FAILURE;
-        
+
     return _this->fn->setItemSelected(_this, idx, !item->selected);
 }
 
@@ -762,7 +804,11 @@ static leResult selectAll(leListWidget* _this)
     {
         _invalidateListArea(_this);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -795,7 +841,11 @@ static leResult deselectAll(leListWidget* _this)
     {
         _invalidateListArea(_this);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -914,7 +964,11 @@ static leResult setItemString(leListWidget* _this,
     _invalidateListArea(_this);
     
     _recalculateScrollBarValues(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                                
@@ -953,7 +1007,11 @@ static leResult setItemIcon(leListWidget* _this,
     _recalculateScrollBarValues(_this);
 
     _invalidateListArea(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -996,7 +1054,11 @@ static leResult setItemEnable(leListWidget* _this,
     }
     
     _invalidateListArea(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1013,7 +1075,11 @@ static leResult setItemVisible(leListWidget* _this,
     y = _getScrollBarRowLocation(_this, idx);
     
     _this->scrollbar->fn->setScrollValue(_this->scrollbar, y);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

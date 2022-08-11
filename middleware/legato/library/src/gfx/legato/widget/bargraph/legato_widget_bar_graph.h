@@ -47,7 +47,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_BARGRAPH_WIDGET_ENABLED
+#if LE_BARGRAPH_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/string/legato_dynamicstring.h"
 #include "gfx/legato/widget/legato_widget.h"
@@ -178,13 +182,12 @@ typedef struct leBarGraphCategory
     leResult                (*setStacked)(THIS_TYPE* _this, leBool stk); \
     leBool                  (*getFillGraphArea)(const THIS_TYPE* _this); \
     leResult                (*setFillGraphArea)(THIS_TYPE* _this, leBool fill); \
-    
-    
+
 
 typedef struct leBarGraphWidgetVTable
 {
-	LE_BARGRAPHWIDGET_VTABLE(leBarGraphWidget)
-} leBarGraphWidgetVTable; 
+    LE_BARGRAPHWIDGET_VTABLE(leBarGraphWidget)
+} leBarGraphWidgetVTable;
 
 /**
   * @endcond
@@ -986,6 +989,9 @@ virtual leResult setFillGraphArea(THIS_TYPE* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_BARGRAPH_WIDGET_ENABLED
 #endif /* LEGATO_WIDGET_BAR_GRAPH_H */

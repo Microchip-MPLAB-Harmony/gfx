@@ -48,7 +48,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_LABEL_WIDGET_ENABLED
+#if LE_LABEL_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/string/legato_string.h"
@@ -71,11 +75,11 @@ typedef struct leLabelWidget leLabelWidget;
     \
     leString*  (*getString)(const THIS_TYPE* _this); \
     leResult   (*setString)(THIS_TYPE* _this, leString* str); \
-    
+
 typedef struct leLabelWidgetVTable
 {
-	LE_LABELWIDGET_VTABLE(leLabelWidget)
-} leLabelWidgetVTable; 
+    LE_LABELWIDGET_VTABLE(leLabelWidget)
+} leLabelWidgetVTable;
 
 /**
   * @endcond
@@ -161,6 +165,10 @@ virtual leResult setString(leLabelWidget* _this,
                            const leString* str);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_LABEL_WIDGET_ENABLED

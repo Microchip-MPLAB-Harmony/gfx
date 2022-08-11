@@ -50,6 +50,10 @@
 ////////////////////////////// INCLUDES //////////////////////////////
 #include "gfx/legato/common/legato_common.h"
 
+#if defined LE_DEBUG && LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/core/legato_input.h"
@@ -65,6 +69,7 @@
 #include "gfx/legato/string/legato_dynamicstring.h"
 #include "gfx/legato/string/legato_fixedstring.h"
 #include "gfx/legato/string/legato_tablestring.h"
+#include "gfx/legato/common/legato_utils.h"
 
 #include "gfx/legato/widget/legato_editwidget.h"
 

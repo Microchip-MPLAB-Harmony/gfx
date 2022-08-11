@@ -50,6 +50,10 @@
 
 #if LE_KEYPAD_WIDGET_ENABLED == 1 && LE_BUTTON_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_editwidget.h"
 #include "gfx/legato/string/legato_string.h"
 
@@ -63,10 +67,10 @@ typedef struct leButtonWidget leButtonWidget;
   Summary:
     Key click event function callback type
 */
-typedef void (*leKeyPadWidget_KeyClickEvent)(leKeyPadWidget*,
-                                             leButtonWidget*,
-                                             uint32_t,
-                                             uint32_t);
+typedef void (* leKeyPadWidget_KeyClickEvent)(leKeyPadWidget*,
+                                              leButtonWidget*,
+                                              uint32_t,
+                                              uint32_t);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -134,9 +138,9 @@ typedef struct leKeyPadCell
 {
     leBool enabled; // indicates if the cell should be drawn
     leButtonWidget* button; // the button that handles the cell input events
-                            // and rendering
+    // and rendering
     leKeyPadCellAction action; // the action that occurs when the cell is
-                               // activated
+    // activated
     const leString* value; // the value that is passed to the edit event system
 } leKeyPadCell;
 
@@ -148,6 +152,7 @@ typedef struct leKeyPadCell
 #define LE_KEYPADWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
+    leResult              (*setCellArraySize)(THIS_TYPE* _this, uint32_t rows, uint32_t cols); \
     leKeyPadActionTrigger (*getKeyPadActionTrigger)(const THIS_TYPE* _this); \
     leResult              (*setKeyPadActionTrigger)(THIS_TYPE* _this, leKeyPadActionTrigger trg); \
     leKeyPadWidget_KeyClickEvent (*getKeyClickEventCallback)(const THIS_TYPE* _this); \
@@ -158,11 +163,11 @@ typedef struct leKeyPadCell
     leString*             (*getKeyValue)(const THIS_TYPE* _this, uint32_t row, uint32_t col); \
     leResult              (*setKeyValue)(THIS_TYPE* _this, uint32_t row, uint32_t col, const leString* val); \
     leButtonWidget*       (*getCellButton)(const THIS_TYPE* _this, uint32_t row, uint32_t col); \
-    
+
 typedef struct leKeyPadWidgetVTable
 {
-	LE_KEYPADWIDGET_VTABLE(leKeyPadWidget)
-} leKeyPadWidgetVTable; 
+    LE_KEYPADWIDGET_VTABLE(leKeyPadWidget)
+} leKeyPadWidgetVTable;
 
 /**
   * @endcond
@@ -188,7 +193,7 @@ typedef struct leKeyPadWidget
 
     leKeyPadActionTrigger trigger; //trigger for action and events
 
-    leKeyPadCell* cells; // key cell array
+    leKeyPadCell** cells; // key cell array
 
     leKeyPadWidget_KeyClickEvent clickEvt; // key click callback event
 } leKeyPadWidget;
@@ -479,6 +484,9 @@ virtual leResult setKeyClickEventCallback(leKeyPadWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_WIDGET_KEYPAD_ENABLED && LE_WIDGET_BUTTON_ENABLED
 #endif /* LEGATO_KEYPAD_H */

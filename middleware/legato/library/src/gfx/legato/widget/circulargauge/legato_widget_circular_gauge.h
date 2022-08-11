@@ -49,6 +49,10 @@
 
 #if LE_CIRCULARGAUGE_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/core/legato_scheme.h"
 #include "gfx/legato/datastructure/legato_array.h"
 #include "gfx/legato/string/legato_dynamicstring.h"
@@ -75,8 +79,8 @@ typedef struct leCircularGaugeWidget leCircularGaugeWidget;
  * @brief This function represents a value changed event callback.
  * @details Value change event callback is used indicate a value change.
  */
-typedef void (*leCircularGaugeWidget_ValueChangedEvent)(leCircularGaugeWidget*,
-                                                        int32_t value);
+typedef void (* leCircularGaugeWidget_ValueChangedEvent)(leCircularGaugeWidget*,
+                                                         int32_t value);
 
 
 /* internal use only */
@@ -165,8 +169,8 @@ typedef void (*leCircularGaugeWidget_ValueChangedEvent)(leCircularGaugeWidget*,
 
 typedef struct leCircularGaugeWidgetVTable
 {
-	LE_CIRCULARGAUGEWIDGET_VTABLE(leCircularGaugeWidget)
-} leCircularGaugeWidgetVTable; 
+    LE_CIRCULARGAUGEWIDGET_VTABLE(leCircularGaugeWidget)
+} leCircularGaugeWidgetVTable;
 
 /**
   * @endcond
@@ -325,7 +329,6 @@ typedef struct leCircularGaugeLabelRange
  */
 leCircularGaugeWidget* leCircularGaugeWidget_New(void);
 
-
 /**
  * @brief Initialize widget.
  * @details Initializes the leCircularGaugeWidget <span class="param">wgt</span>.
@@ -337,7 +340,6 @@ leCircularGaugeWidget* leCircularGaugeWidget_New(void);
  * @return void.
  */
 void leCircularGaugeWidget_Constructor(leCircularGaugeWidget* gauge);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -659,6 +661,10 @@ virtual leResult setValueChangedEventCallback(leCircularGaugeWidget* _this,
                                               leCircularGaugeWidget_ValueChangedEvent cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_CIRCULARGAUGE_WIDGET_ENABLED

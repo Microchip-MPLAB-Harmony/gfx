@@ -27,6 +27,10 @@
 #include <gfx/legato/legato.h>
 #include "gfx/legato/widget/radiobutton/legato_widget_radiobutton.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #if LE_RADIOBUTTON_WIDGET_ENABLED == 1
 
 #include "gfx/legato/common/legato_error.h"
@@ -190,7 +194,7 @@ static leBool getSelected(const leRadioButtonWidget* _this)
     LE_ASSERT_THIS();
 
     if(_this->group == NULL)
-        return LE_TRUE;
+        return _this->selected;
 
     return _this->group->selected == _this;
 }
@@ -215,7 +219,11 @@ static leResult setSelected(leRadioButtonWidget* _this)
     {
         _invalidateContents(_this);
     }
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -284,16 +292,23 @@ static leResult setString(leRadioButtonWidget* _this,
 
     _this->string = str;
 
-    _this->string->fn->setPreInvalidateCallback((leString*)_this->string,
-                                                (leString_InvalidateCallback)stringPreinvalidate,
-                                                _this);
+    if(_this->string != NULL)
+    {
+        _this->string->fn->setPreInvalidateCallback((leString*) _this->string,
+                                                    (leString_InvalidateCallback) stringPreinvalidate,
+                                                    _this);
 
-    _this->string->fn->setInvalidateCallback((leString*)_this->string,
-                                             (leString_InvalidateCallback)stringInvalidate,
-                                             _this);
-    
+        _this->string->fn->setInvalidateCallback((leString*) _this->string,
+                                                 (leString_InvalidateCallback) stringInvalidate,
+                                                 _this);
+    }
+
     _invalidateContents(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -317,7 +332,11 @@ static leResult setSelectedImage(leRadioButtonWidget* _this,
     _this->selectedImage = img;
 
     _invalidateContents(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -341,7 +360,11 @@ static leResult setUnselectedImage(leRadioButtonWidget* _this,
     _this->unselectedImage = img;
 
     _invalidateContents(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -365,7 +388,11 @@ static leResult setImagePosition(leRadioButtonWidget* _this,
     _this->imagePosition = pos;
     
     _invalidateContents(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -389,7 +416,11 @@ static leResult setImageMargin(leRadioButtonWidget* _this,
     _this->imageMargin = mg;
     
     _invalidateContents(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -460,7 +491,11 @@ static leResult setCircleButtonSize(leRadioButtonWidget* _this,
     _this->circleButtonSize = size;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

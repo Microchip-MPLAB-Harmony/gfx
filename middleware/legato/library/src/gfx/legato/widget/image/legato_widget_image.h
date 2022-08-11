@@ -48,7 +48,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_IMAGE_WIDGET_ENABLED
+#if LE_IMAGE_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -74,8 +78,8 @@ typedef struct leImage leImage;
 
 typedef struct leImageWidgetVTable
 {
-	LE_IMAGEWIDGET_VTABLE(leImageWidget)
-} leImageWidgetVTable; 
+    LE_IMAGEWIDGET_VTABLE(leImageWidget)
+} leImageWidgetVTable;
 
 /**
   * @endcond
@@ -206,6 +210,9 @@ virtual void setDebugDrawEndCallback(leImageWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_IMAGE_WIDGET_ENABLED
 #endif /* LEGATO_IMAGE_H */

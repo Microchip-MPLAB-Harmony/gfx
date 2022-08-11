@@ -37,6 +37,10 @@
 
 #include <math.h>
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -209,7 +213,11 @@ static leResult setRadius(leCircularSliderWidget* _this,
     _this->radius = rad;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -240,7 +248,11 @@ static leResult setStartAngle(leCircularSliderWidget* _this,
     _this->startAngle = angle;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -272,6 +284,10 @@ static leResult setSpanAngle(leCircularSliderWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -301,7 +317,11 @@ static leResult setValue(leCircularSliderWidget* _this,
     {
         _this->valueChangedCallback(_this, _this->value);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -323,7 +343,11 @@ static leResult setRoundEdges(leCircularSliderWidget* _this,
     _this->roundEdges = round;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -350,7 +374,11 @@ static leResult setStickyButton(leCircularSliderWidget* _this,
                             _calculateSnapValue(_this->snapDivisions,
                                                 _this->value));
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -358,7 +386,7 @@ static uint32_t getSnapDivisions(const leCircularSliderWidget* _this)
 {
     LE_ASSERT_THIS();
 
-    return _this->sticky;
+    return _this->snapDivisions;
 }
 
 static leResult setSnapDivisions(leCircularSliderWidget* _this,
@@ -381,6 +409,10 @@ static leResult setSnapDivisions(leCircularSliderWidget* _this,
                                                 _this->value));
     }
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -402,7 +434,11 @@ static leResult setTouchOnButtonOnly(leCircularSliderWidget* _this,
     _this->buttonTouch = buttonOnly;
     
     //_this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -502,7 +538,11 @@ static leResult setArcThickness(leCircularSliderWidget* _this,
     }
 
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -547,7 +587,11 @@ static leResult setArcRadius(leCircularSliderWidget* _this,
     }
         
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -584,7 +628,11 @@ static leResult setArcScheme(leCircularSliderWidget* _this,
     }
         
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -670,7 +718,11 @@ static leResult setArcVisible(leCircularSliderWidget* _this,
     }
         
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -692,7 +744,11 @@ static leResult setDirection(leCircularSliderWidget* _this,
     _this->direction = dir;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

@@ -49,6 +49,10 @@
 #include "gfx/legato/common/legato_common.h"
 #include "gfx/legato/datastructure/legato_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types and Constants
@@ -69,7 +73,7 @@ typedef enum leEventID
     LE_EVENT_TOUCH_UP, /**< Touch up event. */
     LE_EVENT_TOUCH_MOVE, /**< Touch move event. */
     LE_EVENT_LANGUAGE_CHANGED, /**< Language changed. */
-    
+
     // widget events
     LE_WIDGET_EVENT_PAINT = 100, /**< Paint event. */
     LE_WIDGET_EVENT_MOVED, /**< Moved event. */
@@ -96,7 +100,7 @@ typedef struct leEvent
  * @details Function pointer to define an event filter.
  * Event filters allow a receiver to discard undesirable events
  */
-typedef leBool (*leEvent_FilterEvent)(leEvent*);
+typedef leBool (* leEvent_FilterEvent)(leEvent*);
 
 // *****************************************************************************
 
@@ -177,14 +181,14 @@ typedef enum leEventResult
     
 */
 
- /**
-  * @brief Get Event Count.
-  * @details Returns the number of events listed in the current context.
-  * @code
-  * uint32_t nbr = leEvent_GetCount();
-  * @endcode
-  * @return number of events.
-  */
+/**
+ * @brief Get Event Count.
+ * @details Returns the number of events listed in the current context.
+ * @code
+ * uint32_t nbr = leEvent_GetCount();
+ * @endcode
+ * @return number of events.
+ */
 uint32_t leEvent_GetCount(void);
 
 // *****************************************************************************
@@ -308,5 +312,9 @@ leResult leEvent_ClearList(void);
  * @returns LE_SUCCESS if set, otherwise LE_FAILURE.
  */
 leResult leEvent_ProcessEvents(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_EVENT_H */

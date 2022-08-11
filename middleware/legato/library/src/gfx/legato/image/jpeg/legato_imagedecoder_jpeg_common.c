@@ -31,7 +31,7 @@
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/common/legato_rect.h"
 
-void jpeg_idct_islow (short *inbuf, uint16_t *quantptr);
+void jpeg_idct_islow_leg (short *inbuf, uint16_t *quantptr);
 
 
 static void JPEG_Seek(JPEGDECODER* decoder, long offset, int whence)
@@ -707,7 +707,7 @@ uint8_t JPEG_bDecodeOneBlock(JPEGDECODER *pJpegDecoder)
             pJpegDecoder->asOneBlock[bBlock][abZigzag[bByteCount++]] = JPEG_sGetBitsValue(pJpegDecoder, bHuffbyte & 0x0F);
         }
         pJpegDecoder->wBlockNumber++;
-        jpeg_idct_islow(&pJpegDecoder->asOneBlock[bBlock][0],pJpegDecoder->pwCurrentQuantTable);
+        jpeg_idct_islow_leg(&pJpegDecoder->asOneBlock[bBlock][0],pJpegDecoder->pwCurrentQuantTable);
     }
 
     return 0;

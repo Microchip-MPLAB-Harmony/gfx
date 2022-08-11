@@ -35,6 +35,10 @@
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           20
 #define DEFAULT_HEIGHT          100
 
@@ -254,7 +258,11 @@ static leResult setOrientation(leScrollBarWidget* _this,
     }
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -274,9 +282,18 @@ static leResult setMaximumValue(leScrollBarWidget* _this,
         return LE_SUCCESS;
         
     _this->max = val;
+
+    if(_this->value > _this->max)
+    {
+        _this->value = _this->max;
+    }
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }                                                 
 
@@ -298,7 +315,11 @@ static leResult setExtentValue(leScrollBarWidget* _this,
     _this->extent = val;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -325,7 +346,11 @@ static leResult setScrollPercentage(leScrollBarWidget* _this,
     }
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 } 
                                                                                                                
@@ -357,7 +382,11 @@ static leResult setScrollValue(leScrollBarWidget* _this,
     }
     
     _invalidateHandleRect(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -374,7 +403,11 @@ static leResult setStepSize(leScrollBarWidget* _this,
     LE_ASSERT_THIS();
         
     _this->step = val;
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

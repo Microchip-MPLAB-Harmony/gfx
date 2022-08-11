@@ -50,9 +50,9 @@ def loadModule():
 		cntlComponent.setDisplayType("LE LCC Display Driver")
 		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
 		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
-		cntlComponent.addDependency("SMC_CS", "SMC_CS", False, True)
+		cntlComponent.addDependency("EBI_CS", "EBI_CS", False, True)
 		### TMR dependency for PWM backlight control
-		cntlComponent.addDependency("TMR", "TMR", False, True)
-		cntlComponent.setDependencyEnabled("TMR", False)		
+		cntlComponent.addDependency("TCC", "PWM", False, True)
+		cntlComponent.addDependency("Backlight", "PWM", False)
 	else:
 		print("LE LCC module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

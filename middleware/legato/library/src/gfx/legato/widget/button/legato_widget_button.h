@@ -47,6 +47,10 @@
 
 #if LE_BUTTON_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 #include "gfx/legato/image/legato_image.h"
@@ -519,6 +523,10 @@ virtual leResult setReleasedEventCallback(leButtonWidget* _this,
                                           leButtonWidget_ReleasedEvent cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 

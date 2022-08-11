@@ -49,6 +49,10 @@
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/core/legato_stream.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 /**
  * @brief This enum represents a font.
@@ -481,6 +485,10 @@ leResult leFont_DrawGlyphData_Lookup(const leFont* fnt,
  * @return pointer to leFontStream.
  */
 leFontStream* leFont_GetStream(const leFont* fnt);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* LE_FONT_H */

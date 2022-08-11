@@ -34,6 +34,10 @@
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -113,7 +117,11 @@ static leResult _leRectangleWidget_SetThickness(leRectangleWidget* _this,
     _this->thickness = thk;
     
     _leRectangleWidget_InvalidateRect(_this);
-            
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

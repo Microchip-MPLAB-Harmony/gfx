@@ -50,11 +50,13 @@
 
 #if LE_WINDOW_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/string/legato_string.h"
-
-
 
 // *****************************************************************************
 // *****************************************************************************
@@ -71,13 +73,13 @@
 #define LE_WINDOWWIDGET_VTABLE(THIS_TYPE) \
     LE_WIDGET_VTABLE(THIS_TYPE) \
     uint32_t  (*getTitleHeight)(const THIS_TYPE* _this); \
-    leResult  (*setTitleHeight)(THIS_TYPE* this, uint32_t ht); \
+    leResult  (*setTitleHeight)(THIS_TYPE* _this, uint32_t ht); \
     leString* (*getString)(const THIS_TYPE* _this); \
     leResult  (*setString)(THIS_TYPE* _this, const leString* str); \
     leImage*  (*getIcon)(const THIS_TYPE* _this); \
     leResult  (*setIcon)(THIS_TYPE* _this, const leImage* img); \
-    uint32_t  (*getIconMargin)(const THIS_TYPE* this); \
-    leResult  (*setIconMargin)(THIS_TYPE* this, uint32_t mg); \
+    uint32_t  (*getIconMargin)(const THIS_TYPE* _this); \
+    leResult  (*setIconMargin)(THIS_TYPE* _this, uint32_t mg); \
     
 typedef struct leWindowWidgetVTable
 {
@@ -274,6 +276,10 @@ virtual leResult setIconMargin(const leWindowWidget* this, uint32_t mg);
 
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_WINDOW_WIDGET_ENABLED

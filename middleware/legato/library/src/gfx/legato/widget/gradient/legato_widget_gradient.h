@@ -47,7 +47,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_GRADIENT_WIDGET_ENABLED
+#if LE_GRADIENT_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -70,12 +74,12 @@ typedef struct leGradientWidget leGradientWidget;
     LE_WIDGET_VTABLE(THIS_TYPE) \
     \
     leDirection (*getDirection)(const THIS_TYPE* _this); \
-    leResult                  (*setDirection)(THIS_TYPE* _this, leDirection dir); \
+    leResult    (*setDirection)(THIS_TYPE* _this, leDirection dir); \
 
 typedef struct leGradientWidgetVTable
 {
-	LE_GRADIENTWIDGET_VTABLE(leGradientWidget)
-} leGradientWidgetVTable; 
+    LE_GRADIENTWIDGET_VTABLE(leGradientWidget)
+} leGradientWidgetVTable;
 
 /**
   * @endcond
@@ -126,7 +130,6 @@ leGradientWidget* leGradientWidget_New(void);
  */
 void leGradientWidget_Constructor(leGradientWidget* grad);
 
-
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
 
@@ -166,6 +169,9 @@ virtual leResult setDirection(leGradientWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_GRADIENT_WIDGET_ENABLED
 #endif /* LEGATO_RECTANGLE_H */

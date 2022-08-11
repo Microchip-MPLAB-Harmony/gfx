@@ -35,7 +35,7 @@
 #define BLOCK_HEADER_SIZE       (sizeof(Block))
 
 #if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
-#define BLOCK_FOOTER_SIZE       (sizeof(uint32_t))
+#define BLOCK_FOOTER_SIZE       (sizeof(size_t))
 #else
 #define BLOCK_FOOTER_SIZE       0
 #endif
@@ -76,7 +76,7 @@ struct Block;
 
 typedef struct Block
 {
-    uint32_t size;
+    size_t size;
 
     struct Block* prev;
     struct Block* next;
@@ -85,23 +85,23 @@ typedef struct Block
 
 #if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
 #if LE_USE_ALLOCATION_TRACKING == 1
-    uint32_t lineNumber;
+    size_t lineNumber;
     const char* funcName;
     const char* fileName;
 #endif
 
-    uint32_t checksum;
+    size_t checksum;
 #endif
 } Block;
 
-static void _subtractHeapSize(leVariableHeap* heap, uint32_t size)
+static void _subtractHeapSize(leVariableHeap* heap, size_t size)
 {
     heap->used -= size;
 
     LE_ASSERT(heap->used >= 0);
 }
 
-static void _addHeapSize(leVariableHeap* heap, uint32_t size)
+static void _addHeapSize(leVariableHeap* heap, size_t size)
 {
     heap->used += size;
 
@@ -114,7 +114,7 @@ static void _addHeapSize(leVariableHeap* heap, uint32_t size)
 }
 
 #if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
-static void _fillBlock(Block* blk, uint8_t val, uint32_t size)
+static void _fillBlock(Block* blk, uint8_t val, size_t size)
 {
     uint8_t* ptr = BLOCK_DATA_PTR(blk);
 
@@ -128,7 +128,7 @@ static void _writeFooter(Block* blk)
     /* write the tail checksum */
     ptr = BLOCK_FOOTER_PTR(blk);
 
-    *((uint32_t*)ptr) = blk->checksum;
+    *((size_t*)ptr) = blk->checksum;
 }
 #endif
 
@@ -211,7 +211,7 @@ static leBool _areAdjacent(Block* l, Block* r)
 }
 
 static Block* _createBlock(void* addr,
-                           uint32_t size,
+                           size_t size,
                            leBool isFree)
 {
     Block* blk = (Block*)addr;
@@ -221,7 +221,7 @@ static Block* _createBlock(void* addr,
     /* write the header */
     blk->size = size;
 #if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
-    blk->checksum = (uint32_t)blk ^ BLOCK_CHECKSUM;
+    blk->checksum = (size_t)blk ^ BLOCK_CHECKSUM;
 #endif
     blk->free = isFree;
 
@@ -233,7 +233,9 @@ static Block* _createBlock(void* addr,
     return blk;
 }
 
-static Block* _findPreviousBlock(leVariableHeap* heap, void* addr, Block* ignore)
+static Block* _findPreviousBlock(leVariableHeap* heap,
+                                 void* addr,
+                                 Block* ignore)
 {
     Block* blk = heap->allocList;
     Block* last = 0x0;
@@ -308,7 +310,7 @@ static Block* _findNextBlock(leVariableHeap* heap, void* addr/*, Block* ignore*/
     return last;
 }
 
-static uint32_t _freeSpaceLeft(leVariableHeap* heap, Block* blk)
+static size_t _freeSpaceLeft(leVariableHeap* heap, Block* blk)
 {
     Block* leftBlock = _findPreviousBlock(heap, blk, NULL);
 
@@ -318,7 +320,7 @@ static uint32_t _freeSpaceLeft(leVariableHeap* heap, Block* blk)
     return BLOCK_PHYSICAL_SIZE(leftBlock);
 }
 
-static uint32_t _freeSpaceRight(leVariableHeap* heap, Block* blk)
+static size_t _freeSpaceRight(leVariableHeap* heap, Block* blk)
 {
     Block* rightBlock = _findNextBlock(heap, blk/*, NULL*/);
 
@@ -332,9 +334,9 @@ static uint32_t _freeSpaceRight(leVariableHeap* heap, Block* blk)
 {
     Block* prevBlock = _findPreviousBlock(heap, addr, blk);
     Block* nextBlock = _findNextBlock(heap, addr, blk);
-    uint32_t startAddress = 0;
-    uint32_t endAddress = heap->size;
-    uint32_t availableSize;
+    size_t startAddress = 0;
+    size_t endAddress = heap->size;
+    size_t availableSize;
 
     if(prevBlock != NULL)
     {
@@ -352,7 +354,7 @@ static uint32_t _freeSpaceRight(leVariableHeap* heap, Block* blk)
 }*/
 
 #if 0
-static void _logicallyShrinkBlock(Block* blk, uint32_t size)
+static void _logicallyShrinkBlock(Block* blk, size_t size)
 {
     blk->size = size;
 
@@ -364,9 +366,9 @@ static void _logicallyShrinkBlock(Block* blk, uint32_t size)
 #endif
 
 #if 0
-static void _physicallyShrinkBlock(Block* blk, uint32_t size)
+static void _physicallyShrinkBlock(Block* blk, size_t size)
 {
-    uint32_t newCapacity = BLOCK_CAPACITY(size);
+    size_t newCapacity = BLOCK_CAPACITY(size);
 
     blk->capacity = newCapacity;
     blk->size = size;
@@ -383,7 +385,7 @@ static void _resizeFreeBlock(leVariableHeap* heap, Block* blk, int32_t delta, le
 {
     Block* newBlk;
     uint8_t* ptr;
-    uint32_t capacity;
+    size_t capacity;
 
     if(blk->free == LE_FALSE)
         return;
@@ -406,11 +408,11 @@ static void _resizeFreeBlock(leVariableHeap* heap, Block* blk, int32_t delta, le
     _insertIntoList(&heap->freeList, newBlk);
 }
 
-static void _resizeAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
+static void _resizeAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
     Block* newBlk;
     uint8_t* ptr;
-    uint32_t capacity;
+    size_t capacity;
 
     if(blk->free == LE_TRUE)
         return;
@@ -427,7 +429,8 @@ static void _resizeAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
 }
 #endif
 
-static void _resizeBlock(Block* blk, uint32_t size)
+static void _resizeBlock(Block* blk,
+                         size_t size)
 {
     /* write the header */
     blk->size = size;
@@ -439,9 +442,9 @@ static void _resizeBlock(Block* blk, uint32_t size)
 }
 
 #if 0
-static leResult _growAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
+static leResult _growAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
-    uint32_t newCapacity = BLOCK_CAPACITY(size);
+    size_t newCapacity = BLOCK_CAPACITY(size);
     Block* next = _findNextBlock(heap, (void*)blk/*, blk*/);
     int32_t delta;
 
@@ -461,10 +464,10 @@ static leResult _growAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
 }
 #endif
 
-static leBool _canSplit(Block* blk, uint32_t size)
+static leBool _canSplit(Block* blk, size_t size)
 {
-    uint32_t leftBlockSize = BLOCK_OVERHEAD_SIZE + size;
-    uint32_t rightBlockSize = BLOCK_OVERHEAD_SIZE + blk->size - size;
+    size_t leftBlockSize = BLOCK_OVERHEAD_SIZE + size;
+    size_t rightBlockSize = BLOCK_OVERHEAD_SIZE + blk->size - size;
 
     if(leftBlockSize + rightBlockSize < BLOCK_PHYSICAL_SIZE(blk) ||
        leftBlockSize < BLOCK_MINIMUM_SIZE ||
@@ -474,9 +477,9 @@ static leBool _canSplit(Block* blk, uint32_t size)
     return LE_TRUE;
 }
 
-static void _splitFreeBlock(leVariableHeap* heap, Block* blk, uint32_t size)
+static void _splitFreeBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
-    uint32_t rem;
+    size_t rem;
     Block *newBlock;
 
     rem = blk->size - size;
@@ -516,7 +519,7 @@ static Block* _combineFreeBlockPrev(leVariableHeap* heap,
                                     Block* blk)
 {
     Block* prev;
-    uint32_t size;
+    size_t size;
 
     if(blk->prev == NULL || _areAdjacent(blk->prev, blk) == LE_FALSE)
         return blk;
@@ -547,7 +550,7 @@ static Block* _combineFreeBlockNext(leVariableHeap* heap,
                                     Block* blk)
 {
     Block* next;
-    uint32_t size;
+    size_t size;
 
     if(blk->next == NULL || _areAdjacent(blk, blk->next) == LE_FALSE)
         return blk;
@@ -574,9 +577,9 @@ static Block* _combineFreeBlockNext(leVariableHeap* heap,
     return blk;
 }
 
-static leResult _shrinkAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
+static leResult _shrinkAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
-    uint32_t rem;
+    size_t rem;
 
     if(_canSplit(blk, size) == LE_FALSE)
         return LE_FAILURE;
@@ -602,7 +605,7 @@ static leResult _shrinkAllocBlock(leVariableHeap* heap, Block* blk, uint32_t siz
     return LE_SUCCESS;
 }
 
-static leResult _growAllocBlock(leVariableHeap* heap, Block* blk, uint32_t size)
+static leResult _growAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
     int32_t needed, current, remaining;
     int32_t freeRight;
@@ -682,7 +685,7 @@ static Block* _swapAllocBlockLeft(leVariableHeap* heap,
     return freeBlock;
 }
 
-static leResult _shiftLeftAndGrow(leVariableHeap* heap, Block** blk, uint32_t size)
+static leResult _shiftLeftAndGrow(leVariableHeap* heap, Block** blk, size_t size)
 {
     int32_t freeLeft, freeRight;
     Block* currentBlock = *blk;
@@ -716,7 +719,7 @@ static leResult _shiftLeftAndGrow(leVariableHeap* heap, Block** blk, uint32_t si
 #if LE_USE_ALLOCATION_TRACKING == 1
 static leResult _allocateBlock(leVariableHeap* heap,
                                Block* blk,
-                               uint32_t line,
+                               size_t line,
                                const char* func,
                                const char* file)
 #else
@@ -805,11 +808,11 @@ static leResult _freeBlock(leVariableHeap* heap,
 static leResult _validateBlock(Block* blk)
 {
     uint8_t* ptr;
-    uint32_t i;
+    size_t i;
 
-    LE_ASSERT((uint32_t)blk != 0xFEFEFEFE);
-    LE_ASSERT((uint32_t)blk->prev != 0xFEFEFEFE);
-    LE_ASSERT((uint32_t)blk->next != 0xFEFEFEFE);
+    LE_ASSERT((size_t)blk != 0xFEFEFEFE);
+    LE_ASSERT((size_t)blk->prev != 0xFEFEFEFE);
+    LE_ASSERT((size_t)blk->next != 0xFEFEFEFE);
 
     if(blk->prev != NULL)
     {
@@ -823,17 +826,17 @@ static leResult _validateBlock(Block* blk)
 
     // validate header checksum
 
-    LE_ASSERT(blk->checksum == ((uint32_t)blk ^ BLOCK_CHECKSUM));
+    LE_ASSERT(blk->checksum == ((size_t)blk ^ BLOCK_CHECKSUM));
 
-    if(blk->checksum != ((uint32_t)blk ^ BLOCK_CHECKSUM))
+    if(blk->checksum != ((size_t)blk ^ BLOCK_CHECKSUM))
         return LE_FAILURE;
 
     // validate footer checksum
     ptr = BLOCK_FOOTER_PTR(blk);
 
-    LE_ASSERT(*(uint32_t*)ptr == blk->checksum);
+    LE_ASSERT(*(size_t*)ptr == blk->checksum);
 
-    if(*(uint32_t*)ptr != blk->checksum)
+    if(*(size_t*)ptr != blk->checksum)
         return LE_FAILURE;
 
     // validate any padding values
@@ -890,7 +893,7 @@ static leResult _validateList(Block* blk)
 static leResult _validateSpace(leVariableHeap* heap)
 {
     Block* blk = NULL;
-    uint32_t size = 0;
+    size_t size = 0;
 
     if(heap->freeList == heap->data)
     {
@@ -906,7 +909,7 @@ static leResult _validateSpace(leVariableHeap* heap)
     if(blk == NULL)
         return LE_FAILURE;
 
-    while((uint32_t)blk < (uint32_t)heap->data + heap->size)
+    while((size_t)blk < (size_t)heap->data + heap->size)
     {
         if(_validatePointer(blk, heap->freeList) == LE_FAILURE &&
            _validatePointer(blk, heap->allocList) == LE_FAILURE)
@@ -921,7 +924,7 @@ static leResult _validateSpace(leVariableHeap* heap)
         blk = BLOCK_NEXT(blk);
     }
 
-    if((uint32_t)blk != ((uint32_t)heap->data) + heap->size)
+    if((size_t)blk != ((size_t)heap->data) + heap->size)
     {
         LE_ASSERT(1 == 0);
 
@@ -942,9 +945,9 @@ static leResult _validateSpace(leVariableHeap* heap)
 
 /*#if LE_USE_DEBUG_ALLOCATOR == 1
 #if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
-static uint32_t _countList(Block* blk)
+static size_t _countList(Block* blk)
 {
-    uint32_t count = 0;
+    size_t count = 0;
 
     while(blk != NULL)
     {
@@ -961,7 +964,7 @@ static uint32_t _countList(Block* blk)
 
 
 #if LE_VARIABLEHEAP_BESTFIT == 0
-static Block* _findFirstFit(leVariableHeap* heap, uint32_t size)
+static Block* _findFirstFit(leVariableHeap* heap, size_t size)
 {
     Block* blk = heap->freeList;
 
@@ -981,7 +984,7 @@ static Block* _findFirstFit(leVariableHeap* heap, uint32_t size)
     return blk;
 }
 #else
-static Block* _findBestFit(leVariableHeap* heap, uint32_t size)
+static Block* _findBestFit(leVariableHeap* heap, size_t size)
 {
     Block *blk, *best;
 
@@ -1006,7 +1009,7 @@ static Block* _findBestFit(leVariableHeap* heap, uint32_t size)
 
 leResult leVariableHeap_Init(leVariableHeap* heap,
                              void* data,
-                             uint32_t size)
+                             size_t size)
 {
     if(size % LE_VARIABLEHEAP_ALIGNMENT != 0)
         return LE_FAILURE;
@@ -1046,13 +1049,13 @@ void leVariableHeap_Destroy(leVariableHeap* heap)
 
 #if LE_USE_DEBUG_ALLOCATOR == 1
 void* leVariableHeap_Alloc(leVariableHeap* heap,
-                           uint32_t size,
-                           uint32_t lineNum,
+                           size_t size,
+                           size_t lineNum,
                            const char* funcName,
                            const char* fileName)
 #else
 void* leVariableHeap_Alloc(leVariableHeap* heap,
-                           uint32_t size)
+                           size_t size)
 #endif
 {
     Block *block;
@@ -1104,14 +1107,14 @@ void* leVariableHeap_Alloc(leVariableHeap* heap,
 #if LE_USE_DEBUG_ALLOCATOR == 1
 void* leVariableHeap_Realloc(leVariableHeap* heap,
                              void* ptr,
-                             uint32_t size,
-                             uint32_t lineNum,
+                             size_t size,
+                             size_t lineNum,
                              const char* funcName,
                              const char* fileName)
 #else
 void* leVariableHeap_Realloc(leVariableHeap* heap,
                              void* ptr,
-                             uint32_t size)
+                             size_t size)
 #endif
 {
     Block *blk;
@@ -1249,7 +1252,7 @@ leBool leVariableHeap_Contains(leVariableHeap* heap, void* ptr)
     return ptr >= heap->data && ptr < heapEnd;
 }
 
-uint32_t leVariableHeap_SizeOf(leVariableHeap* heap, void* ptr)
+size_t leVariableHeap_SizeOf(leVariableHeap* heap, void* ptr)
 {
     (void)heap; // unused
 

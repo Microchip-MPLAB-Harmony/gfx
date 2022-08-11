@@ -262,7 +262,7 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
     if(graph->ticksLabelFont == NULL)
         return;
 
-    sprintf(paintState.strbuff, "%ld", graph->minValue);
+    sprintf(paintState.strbuff, "%d", (int32_t)graph->minValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff,
                               graph->ticksLabelFont,
@@ -271,7 +271,7 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
     leStringUtils_KerningRect((leRasterFont*)graph->ticksLabelFont,
                               &minRect);
 
-    sprintf(paintState.strbuff, "%ld", graph->maxValue);
+    sprintf(paintState.strbuff, "%d", (int32_t)graph->maxValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxRect);
 
@@ -648,7 +648,7 @@ static void fillRegion(leLineGraphWidget* graph,
                        leColor clr)
 {
     leLineGraphCategory* prevCategory;
-    int32_t prevOldValue;
+    size_t prevOldValue;
     //Get the four points
     lePoint nowOld, nowNew; //Old and new points of current category
     lePoint prevOld, prevNew; //old and new points of previous category
@@ -667,7 +667,7 @@ static void fillRegion(leLineGraphWidget* graph,
     nowOld.y = paintState.originPoint.y - (int32_t) ((float) (category->stackValue  - paintState.originValue) * paintState.pixelsPerUnit);
 
     arrayVal = leArray_Get(&series->data, categoryIndex - 1);
-    prevOldValue = (int32_t)arrayVal;
+    prevOldValue = (size_t)arrayVal;
     prevOld.y = paintState.originPoint.y - (int32_t) ((float) (prevCategory->stackValue - prevOldValue  - paintState.originValue) * paintState.pixelsPerUnit);
 
     //Fill the region using vertical lines for now
@@ -706,35 +706,35 @@ static void fillRegion(leLineGraphWidget* graph,
 
 static void drawStackedFills(leLineGraphWidget* graph)
 {
-    int32_t categoryIndex;
-    int32_t seriesIndex;
+    size_t categoryIndex;
+    size_t seriesIndex;
     lePoint prevPoint;
     lePoint valuePoint;
-    int32_t topValue;
-    int32_t value = 0;
+    size_t topValue;
+    size_t value = 0;
     leLineGraphDataSeries* series;
     leLineGraphCategory* category;
     void* arrayVal;
     
-    for (categoryIndex = 0; (categoryIndex < (int32_t)graph->categories.size); categoryIndex++)
+    for (categoryIndex = 0; (categoryIndex < graph->categories.size); categoryIndex++)
     {
         category = leArray_Get(&graph->categories, categoryIndex);
         category->stackValue = 0;
     }
 
-    for (seriesIndex = 0; seriesIndex < (int32_t)graph->dataSeries.size; seriesIndex++)
+    for (seriesIndex = 0; seriesIndex < graph->dataSeries.size; seriesIndex++)
     {
         prevPoint = paintState.originPoint;
         valuePoint = paintState.originPoint;
 
         series = leArray_Get(&graph->dataSeries, seriesIndex);
 
-        for (categoryIndex = 0; (categoryIndex < (int32_t)graph->categories.size); categoryIndex++)
+        for (categoryIndex = 0; (categoryIndex < graph->categories.size); categoryIndex++)
         {
-            if (categoryIndex < (int32_t)series->data.size)
+            if (categoryIndex < series->data.size)
             {
                 arrayVal = leArray_Get(&series->data, categoryIndex);
-                value = (int32_t)arrayVal;
+                value = (size_t)arrayVal;
             }
             
             category = leArray_Get(&graph->categories, categoryIndex);
@@ -793,7 +793,7 @@ static void drawUnstackedFills(leLineGraphWidget* graph)
                  categoryIndex++)
             {
                 arrayVal = leArray_Get(&series->data, categoryIndex);
-                value = (int32_t)arrayVal;
+                value = (int32_t)(size_t)arrayVal;
 
                 if (graph->fillValueArea == LE_TRUE && (int32_t)graph->categories.size > 1)
                 {
@@ -1143,7 +1143,7 @@ static void drawUnstackedLines(leLineGraphWidget* graph)
 
         for(catIdx = 0; catIdx < graph->categories.size; ++catIdx)
         {
-            int32_t value = (int32_t)series->data.values[catIdx];
+            int32_t value = (int32_t)(size_t)series->data.values[catIdx];
 
             if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
             {
@@ -1266,7 +1266,7 @@ static void drawStackedLines(leLineGraphWidget* graph)
         {
             cat = graph->categories.values[catIdx];
 
-            int32_t value = (int32_t)series->data.values[catIdx];
+            size_t value = (size_t)series->data.values[catIdx];
 
             if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
             {

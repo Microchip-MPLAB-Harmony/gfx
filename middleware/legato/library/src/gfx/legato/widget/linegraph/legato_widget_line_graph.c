@@ -35,6 +35,12 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
+
 #define DEFAULT_WIDTH              101
 #define DEFAULT_HEIGHT             101
 
@@ -245,7 +251,11 @@ static leResult setTickLength(leLineGraphWidget* _this,
     _this->tickLength = length;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -267,7 +277,11 @@ static leResult setStacked(leLineGraphWidget* _this,
     _this->stacked = stacked;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -298,7 +312,11 @@ static leResult setMaxValue(leLineGraphWidget* _this,
     _this->maxValue = value;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -329,7 +347,11 @@ static leResult setMinValue(leLineGraphWidget* _this,
     _this->minValue = value;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -357,7 +379,11 @@ static leResult setValueAxisLabelsVisible(leLineGraphWidget* _this,
     _this->valueAxisLabelsVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -379,7 +405,11 @@ static leResult setFillGraphArea(leLineGraphWidget* _this,
     _this->fillGraphArea = fill;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -401,7 +431,11 @@ static leResult setFillSeriesArea(leLineGraphWidget* _this,
     _this->fillValueArea = fill;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -429,7 +463,11 @@ static leResult setGridLinesVisible(leLineGraphWidget* _this,
     _this->valueGridLinesVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -457,7 +495,11 @@ static leResult setValueAxisTicksVisible(leLineGraphWidget* _this,
     _this->valueAxisTicksVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -485,7 +527,11 @@ static leResult setValueAxisTickInterval(leLineGraphWidget* _this,
     _this->tickInterval = interval;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -513,7 +559,11 @@ static leResult setValueAxisSubtickInterval(leLineGraphWidget* _this,
     _this->subtickInterval = interval;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -541,7 +591,11 @@ static leResult setValueAxisSubticksVisible(leLineGraphWidget* _this,
     _this->valueAxisSubticksVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -563,7 +617,11 @@ static leResult setCategoryAxisTicksVisible(leLineGraphWidget* _this,
     _this->categAxisTicksVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -581,13 +639,17 @@ static int32_t addCategory(leLineGraphWidget* _this)
     
     category->stackValue = 0;
     category->text = NULL;
-    
-    leArray_PushBack(&_this->categories, category);
-    
+
     id = _this->categories.size;
-    
+
+    leArray_PushBack(&_this->categories, category);
+
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return id;
 }
 
@@ -650,7 +712,11 @@ static leResult setCategoryString(leLineGraphWidget* _this,
                                               _this);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -674,13 +740,17 @@ static int32_t addSeries(leLineGraphWidget* _this)
     series->pointType = LINE_GRAPH_DATA_POINT_CIRCLE;
     series->fillPoints = LE_TRUE;
     series->pointSize = DEFAULT_POINT_SIZE;
-    
-    leArray_PushBack(&_this->dataSeries, series);
-    
+
     id = _this->dataSeries.size;
-    
+
+    leArray_PushBack(&_this->dataSeries, series);
+
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return id;
 }
 
@@ -703,12 +773,16 @@ static int32_t addDataToSeries(leLineGraphWidget* _this,
     
     series = leArray_Get(&_this->dataSeries, seriesID);
     
-    leArray_PushBack(&series->data, (void*)value);
+    leArray_PushBack(&series->data, (void*)(size_t)value);
 
     idx = series->data.size - 1;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return idx;
 }
 
@@ -737,7 +811,7 @@ static leResult setDataInSeries(leLineGraphWidget* _this,
                         index,
                         &prevDamagedRect);
 
-    series->data.values[index] = (void*)value;
+    series->data.values[index] = (void*)(size_t)value;
 
     getValueDamagedRect(_this,
                         seriesID,
@@ -747,7 +821,11 @@ static leResult setDataInSeries(leLineGraphWidget* _this,
     leRectCombine(&prevDamagedRect, &damagedRect, &damagedRect);
 
     _this->fn->_damageArea(_this, &damagedRect);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -796,7 +874,11 @@ static leResult setSeriesScheme(leLineGraphWidget* _this,
     series->scheme = scheme;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -842,7 +924,11 @@ static leResult setSeriesFillPoints(leLineGraphWidget* _this,
     series->fillPoints = fill;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -888,7 +974,11 @@ static leResult setSeriesLinesVisible(leLineGraphWidget* _this,
     series->drawLines = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -934,7 +1024,11 @@ static leResult setSeriesPointType(leLineGraphWidget* _this,
     series->pointType = type;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -980,7 +1074,11 @@ static leResult setSeriesPointSize(leLineGraphWidget* _this,
     series->pointSize = size;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1023,7 +1121,11 @@ static leResult clear(leLineGraphWidget* _this)
     leArray_Clear(&_this->dataSeries);
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1035,7 +1137,11 @@ static leResult setTicksLabelFont(leLineGraphWidget* _this,
     _this->ticksLabelFont = font;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1057,7 +1163,11 @@ static leResult setCategoryAxisLabelsVisible(leLineGraphWidget* _this,
     _this->categAxisLabelsVisible = visible;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1085,7 +1195,11 @@ static leResult setValueAxisTicksPosition(leLineGraphWidget* _this,
     _this->valueAxisTicksPosition = position;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS; 
 }
 
@@ -1113,7 +1227,11 @@ static leResult setValueAxisSubticksPosition(leLineGraphWidget* _this,
     _this->valueAxisSubticksPosition = position;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;     
 }
 
@@ -1136,7 +1254,11 @@ static leResult setCategoryAxisTicksPosition(leLineGraphWidget* _this,
     _this->categAxisTicksPosition = position;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;      
 }
 
@@ -1223,7 +1345,7 @@ static void getValuePoint(const leLineGraphWidget* _this,
                 break;
 
             val = leArray_Get(&series->data, categoryIndex);
-            value = (int32_t)(val);
+            value = (int32_t)(size_t)(val);
             
             //if(valuePtr != NULL)
             //{
@@ -1252,7 +1374,7 @@ static void getValuePoint(const leLineGraphWidget* _this,
         }
 
         val = leArray_Get(&series->data, categoryIndex);
-        value = (int32_t)val;
+        value = (int32_t)(size_t)val;
         
         //if(valuePtr != NULL)
         //{

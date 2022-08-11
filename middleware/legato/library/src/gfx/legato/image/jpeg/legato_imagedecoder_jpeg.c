@@ -216,7 +216,7 @@ static leResult _draw(const leImage* img,
 
     JPEG_JpegDecoder.blitPtr = blitToFrameBuffer;
     JPEG_JpegDecoder.globalAlpha = a;
-    leRenderer_GetDrawRect(&JPEG_JpegDecoder.clipRect);
+    leRenderer_GetClipRect(&JPEG_JpegDecoder.clipRect);
     JPEG_JpegDecoder.wStartY = 0;
     JPEG_JpegDecoder.wStartX = 0;
     JPEG_JpegDecoder.wDrawWidth = img->buffer.size.width;
@@ -333,7 +333,7 @@ static leResult _render(const leImage* src,
     JPEG_JpegDecoder.imageWriteBuffer = &dst->buffer;
     JPEG_JpegDecoder.readPtr = &internalMemoryRead;
     JPEG_JpegDecoder.blitPtr = blitToImage;
-    leRenderer_GetDrawRect(&JPEG_JpegDecoder.clipRect);
+    leRenderer_GetClipRect(&JPEG_JpegDecoder.clipRect);
     JPEG_JpegDecoder.wStartY = 0;
     JPEG_JpegDecoder.wStartX = 0;
     JPEG_JpegDecoder.wDrawWidth = src->buffer.size.width;

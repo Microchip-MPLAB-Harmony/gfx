@@ -50,11 +50,14 @@
 
 #if LE_LIST_WIDGET_ENABLED == 1 && LE_SCROLLBAR_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/list/legato_widget_list.h"
 #include "gfx/legato/widget/scrollbar/legato_widget_scrollbar.h"
-
 
 typedef struct leListWidget leListWidget;
 
@@ -69,9 +72,9 @@ typedef struct leListWidget leListWidget;
  * @brief Used to define a item selected changed event callback function.
  * @details .
  */
-typedef void (*leListWidget_SelectedItemChangedEvent)(leListWidget*,
-                                                      uint32_t idx,
-                                                      leBool selected);
+typedef void (* leListWidget_SelectedItemChangedEvent)(leListWidget*,
+                                                       uint32_t idx,
+                                                       leBool selected);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -174,16 +177,16 @@ typedef struct leListWidget leListWidget;
     leResult      (*setItemVisible)(THIS_TYPE* _this, int32_t idx); \
     leListWidget_SelectedItemChangedEvent (*getSelectedItemChangedEventCallback)(const THIS_TYPE* _this); \
     leResult      (*setSelectedItemChangedEventCallback)(THIS_TYPE* _this, leListWidget_SelectedItemChangedEvent cb); \
-    
+
 typedef struct leListWidgetVTable
 {
-	LE_LISTWIDGET_VTABLE(leListWidget)
-} leListWidgetVTable; 
+    LE_LISTWIDGET_VTABLE(leListWidget)
+} leListWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /**
@@ -201,7 +204,7 @@ typedef struct leListWidget
 
     leListWidget_SelectionMode mode; // list selection mode
     leBool allowEmpty; // indicates if the list must always have at least one
-                       // selected item
+    // selected item
 
     leArray items; // list containing the list items
 
@@ -1219,6 +1222,9 @@ virtual leResult setSelectedItemChangedEventCallback(leListWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_LIST_WIDGET_ENABLED && LE_SCROLLBAR_WIDGET_ENABLED
 #endif /* LEGATO_LISTWIDGET_H */

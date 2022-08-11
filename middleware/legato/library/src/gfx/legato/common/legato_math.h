@@ -49,6 +49,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Used to define the types of trig functions
  * @details Trigonomtry is used in Legato.
@@ -63,7 +67,7 @@ typedef enum
  * @brief Used to define the basic four quandrants of a coordinate plane
  * @details .
  */
-typedef enum 
+typedef enum
 {
     LE_Q1,
     LE_Q2,
@@ -75,7 +79,7 @@ typedef enum
  * @brief Used to define arc direction
  * @details The parameters CW and CCW enable you to define the direction of the arc.
  */
-typedef enum 
+typedef enum
 {
     LE_CCW,     /**< counter clock wise. */
     LE_CW,      /**< clock wise. */
@@ -1014,5 +1018,9 @@ void leResolveAngles(int32_t startAngle,
                      leResolvedAngleRanges* res);
 
 float leRound(float flt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LE_MATH_H */

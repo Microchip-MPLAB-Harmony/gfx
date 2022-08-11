@@ -36,6 +36,9 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
 
 #define DEFAULT_WIDTH           200
 #define DEFAULT_HEIGHT          150
@@ -120,6 +123,9 @@ void leRadialMenuWidget_Constructor(leRadialMenuWidget* _this)
     _this->widget.rect.width = DEFAULT_WIDTH;
     _this->widget.rect.height = DEFAULT_HEIGHT;
 
+    _this->prominentIndex = 0;
+    _this->highlightProminent = LE_FALSE;
+
     _this->drawEllipse = LE_TRUE;
 
     _this->widget.style.borderType = LE_WIDGET_BORDER_NONE;
@@ -127,7 +133,7 @@ void leRadialMenuWidget_Constructor(leRadialMenuWidget* _this)
 
     _this->widget.style.halign = LE_HALIGN_CENTER;
     _this->widget.style.valign = LE_VALIGN_MIDDLE;
-    
+
     _this->ellipse.a = DEFAULT_A;
     _this->ellipse.b = DEFAULT_B;
     _this->ellipse.theta = DEFAULT_THETA;
@@ -156,7 +162,11 @@ void leRadialMenuWidget_Constructor(leRadialMenuWidget* _this)
     _this->rotation = 0;
     _this->rotationCounter = 0;
     _this->rotationTick = 0;
-    
+
+    _this->touchPressed = LE_FALSE;
+    _this->rotationDegrees = 0;
+    _this->angleSlice = 0;
+
     leList_Create(&_this->widgetList);
 
     _recalculateTouchRect(_this);
@@ -181,11 +191,10 @@ void _leWidget_Destructor(leWidget* wgt);
 static void destructor(leRadialMenuWidget* _this)
 {
     leRadialMenuItemNode* item;
-    uint32_t i;
 
-    for(i = 0; i < _this->widgetList.size; i++)
+    while(_this->widgetList.size > 0)
     {
-        item = leList_Get(&_this->widgetList, i);
+        item = leList_Get(&_this->widgetList, 0);
 
         // free all widgets
         if(item->widget != NULL)
@@ -417,7 +426,11 @@ static leResult setHighlightProminent(leRadialMenuWidget* _this,
     _this->highlightProminent = enable;
 
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -462,30 +475,21 @@ static leResult setProminent(leRadialMenuWidget* _this,
     if(item == NULL)
         return LE_FALSE;
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return _this->fn->setProminentIndex(_this, leList_Find(&_this->widgetList, item));
 }
 
 static int32_t getProminentIndex(const leRadialMenuWidget* _this)
 {
-    uint32_t i;
-    leRadialMenuItemNode* item = NULL;
-    
     LE_ASSERT_THIS();
     
     if(_this->widgetList.size == 0)
         return -1;
     
-    for(i = 0; i < _this->widgetList.size; ++i)
-    {
-        item = leList_Get(&_this->widgetList, i);
-        
-        if (item->state == LE_RMI_PROMINENT)
-        {
-            return (int32_t)i;
-        }
-    }
-    
-    return -1;
+    return _this->prominentIndex;
 }
 
 static leResult setProminentIndex(leRadialMenuWidget* _this,
@@ -501,7 +505,11 @@ static leResult setProminentIndex(leRadialMenuWidget* _this,
     _this->positionsInvalid = LE_TRUE;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -518,7 +526,11 @@ static leResult setNumberOfItemsShown(leRadialMenuWidget* _this,
     _this->positionsInvalid = LE_TRUE;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -553,10 +565,15 @@ static leResult addChild(leRadialMenuWidget* _this,
     leList_PushBack(&_this->widgetList, item);
     
     _leWidget_AddChild((leWidget*)_this, widget);
-    
+
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -594,9 +611,14 @@ static leResult insertChild(leRadialMenuWidget* _this,
 
     _leWidget_InsertChild((leWidget*)_this, widget, idx);
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -624,7 +646,7 @@ static leResult removeChild(leRadialMenuWidget* _this,
     
     leList_Remove(&_this->widgetList, item);
     
-    LE_FREE(&item);
+    LE_FREE(item);
     item = NULL;
 
     _leWidget_RemoveChild((leWidget*)_this, widget);
@@ -634,10 +656,15 @@ static leResult removeChild(leRadialMenuWidget* _this,
         _this->itemsShown = _this->widgetList.size;
     }
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -674,9 +701,14 @@ static leResult removeChildAt(leRadialMenuWidget* _this,
         _this->itemsShown = _this->widgetList.size;
     }
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -699,7 +731,7 @@ static leResult removeAllChildren(leRadialMenuWidget* _this)
         
         if (item != NULL)
         {
-            LE_FREE(&item);
+            LE_FREE(item);
             
             item = NULL;
         }
@@ -718,10 +750,15 @@ static leResult removeAllChildren(leRadialMenuWidget* _this)
 
     _this->itemsShown = 3;
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -740,7 +777,11 @@ static leResult setScaleMode(leRadialMenuWidget* _this,
     _this->positionsInvalid = LE_TRUE;
 
     _this->state = LE_RADIAL_MENU_RESET_TO_INPUT_POS;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -755,10 +796,14 @@ static leResult setScaleRange(leRadialMenuWidget* _this,
     
     _this->maxSizePercent = leClampi(MIN_SIZE_PERCENT, MAX_SIZE_PERCENT, max);
     _this->minSizePercent = leClampi(MIN_SIZE_PERCENT, MAX_SIZE_PERCENT, min);
-    
-    _this->ellipse.invalid = LE_TRUE;
+
+    _this->positionsInvalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;    
 }
@@ -788,10 +833,14 @@ static leResult setBlendMode(leRadialMenuWidget* _this,
     
     _this->fn->invalidate(_this);
 
-    _this->positionsInvalid = LE_TRUE;
+    //_this->positionsInvalid = LE_TRUE;
 
     _this->state = LE_RADIAL_MENU_RESET_TO_INPUT_POS;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -811,6 +860,10 @@ static leResult setBlendRange(leRadialMenuWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -825,7 +878,11 @@ static leResult setDrawEllipse(leRadialMenuWidget* _this,
     _this->drawEllipse = enable;
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -843,7 +900,11 @@ static leResult setTouchArea(leRadialMenuWidget* _this,
     _this->touchHeight = height;
 
     _recalculateTouchRect(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;    
 }
 
@@ -864,9 +925,14 @@ static leResult setMajorAxis(leRadialMenuWidget* _this,
 
     _this->ellipse.a = a;
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -888,9 +954,14 @@ static leResult setMinorAxis(leRadialMenuWidget* _this,
 
     _this->ellipse.b = b;
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -912,9 +983,14 @@ static leResult setTheta(leRadialMenuWidget* _this,
 
     _this->ellipse.theta = leClampi(MIN_THETA, MAX_THETA, theta);
 
+    _this->positionsInvalid = LE_TRUE;
     _this->ellipse.invalid = LE_TRUE;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1116,7 +1192,7 @@ void _leRadialMenuWidget_GenerateVTable()
     radialMenuWidgetVTable.insertChild = insertChild,
     radialMenuWidgetVTable.removeChild = removeChild,
     radialMenuWidgetVTable.removeChildAt = removeChildAt,
-    radialMenuWidgetVTable.removeAllChildren = removeAllChildren,
+    radialMenuWidgetVTable.removeAllChildren = (void*)removeAllChildren,
     
     /* member functions */
     radialMenuWidgetVTable.isProminent = isProminent;
@@ -1132,12 +1208,6 @@ void _leRadialMenuWidget_GenerateVTable()
     radialMenuWidgetVTable.setMinorAxis = setMinorAxis,
     radialMenuWidgetVTable.getTheta = getTheta;
     radialMenuWidgetVTable.setTheta = setTheta;
-    radialMenuWidgetVTable.setEllipseType = setEllipseType;
-    //radialMenuWidgetVTable.addWidget = addWidget;
-    //radialMenuWidgetVTable.removeWidget = removeWidget;
-    //radialMenuWidgetVTable.getWidgetAtIndex = getWidgetAtIndex;
-    //radialMenuWidgetVTable.setWidgetAtIndex = setWidgetAtIndex;
-    //radialMenuWidgetVTable.removeAllWidgets = removeAllWidgets;
     radialMenuWidgetVTable.setScaleMode = setScaleMode;
     radialMenuWidgetVTable.setScaleRange = setScaleRange;
     radialMenuWidgetVTable.setBlendMode = setBlendMode;

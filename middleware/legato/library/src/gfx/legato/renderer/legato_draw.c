@@ -23,14 +23,16 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+#include "gfx/legato/legato_config.h"
+
+#if LE_DEBUG_RENDERER == 0
+
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/renderer/legato_gpu.h"
 
-/* renderer function use only */
-extern leRenderState _rendererState;
 
 static struct DrawFunctionState
 {
@@ -157,12 +159,14 @@ static leResult _RGBFill(int32_t x,
                          uint32_t a)
 {
     lePoint pnt;
-    leRect fillRect;
+    leRect fillRect, frameRect;
     (void)a; // unused
 
     // adjust for rectangle position
-    pnt.x = x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    pnt.y = y - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    pnt.x = x - frameRect.x;
+    pnt.y = y - frameRect.y;
 
     fillRect.x = pnt.x;
     fillRect.y = pnt.y;
@@ -208,7 +212,7 @@ static leResult _RGBBlendFill(int32_t x,
     uint32_t w, h;
 
     lePoint pnt;
-    leRect fillRect;
+    leRect fillRect, frameRect;
 
     //if(a == 0)
     //    return LE_SUCCESS;
@@ -217,8 +221,10 @@ static leResult _RGBBlendFill(int32_t x,
     //    return _RGBFill(x, y, width, height, clr, 0);
 
     // adjust for rectangle position
-    pnt.x = x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    pnt.y = y - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    pnt.x = x - frameRect.x;
+    pnt.y = y - frameRect.y;
 
     fillRect.x = pnt.x;
     fillRect.y = pnt.y;
@@ -252,11 +258,14 @@ static leResult _MonoFill(int32_t x,
                           uint32_t a)
 {
     lePoint pnt;
+    leRect frameRect;
     (void)a; // unused
 
     // adjust for rectangle position
-    pnt.x = x - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    pnt.y = y - _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    pnt.x = x - frameRect.x;
+    pnt.y = y - frameRect.y;
 
 #if LE_RENDER_ORIENTATION != 0
     leRect rotRect;
@@ -286,9 +295,13 @@ static leResult _MonoFill(int32_t x,
 leColor leRenderer_GetPixel(int32_t x,
                             int32_t y)
 {
+    leRect frameRect;
+
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
 
 #if LE_RENDER_ORIENTATION != 0
     leUtils_PointLogicalToScratch((int16_t*)&x, (int16_t*)&y);
@@ -303,12 +316,16 @@ leResult leRenderer_GetPixel_Safe(int32_t x,
                                   int32_t y,
                                   leColor* clr)
 {
+    leRect frameRect;
+
     if(leRenderer_CullDrawXY(x, y) == LE_TRUE)
         return LE_FAILURE;
 
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
 
 #if LE_RENDER_ORIENTATION != 0
     leUtils_PointLogicalToScratch((int16_t*)&x, (int16_t*)&y);
@@ -321,13 +338,18 @@ leResult leRenderer_GetPixel_Safe(int32_t x,
     return LE_SUCCESS;
 }
 
+
 leResult leRenderer_PutPixel(int32_t x,
                              int32_t y,
                              leColor clr)
 {
+    leRect frameRect;
+
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
     
     return _drawFunction.putPixel(x, y, clr, 0);
 }
@@ -336,12 +358,16 @@ leResult leRenderer_PutPixel_Safe(int32_t x,
                                   int32_t y,
                                   leColor clr)
 {
+    leRect frameRect;
+
     if(leRenderer_CullDrawXY(x, y) == LE_TRUE)
         return LE_FAILURE;
 
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
 
     return _drawFunction.putPixel(x, y, clr, 0);
 }
@@ -351,9 +377,13 @@ leResult leRenderer_BlendPixel(int32_t x,
                                leColor clr,
                                uint32_t a)
 {
+    leRect frameRect;
+
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
     
     return _drawFunction.blendPixel(x, y, clr, a);
 }
@@ -363,12 +393,16 @@ leResult leRenderer_BlendPixel_Safe(int32_t x,
                                     leColor clr,
                                     uint32_t a)
 {
+    leRect frameRect;
+
     if(leRenderer_CullDrawXY(x, y) == LE_TRUE)
         return LE_FAILURE;
 
     // adjust for rectangle position
-    x -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].x;
-    y -= _rendererState.layerStates[_rendererState.layerIdx].frameRectList.rects[_rendererState.frameRectIdx].y;
+    leRenderer_GetFrameRect(&frameRect);
+
+    x -= frameRect.x;
+    y -= frameRect.y;
 
     return _drawFunction.blendPixel(x, y, clr, a);
 }
@@ -425,3 +459,5 @@ void _leRenderer_InitDrawForMode(leColorMode mode)
         { }
     }
 }
+
+#endif // LE_DEBUG_RENDERER

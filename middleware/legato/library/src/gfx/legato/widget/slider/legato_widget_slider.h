@@ -47,7 +47,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_SLIDER_WIDGET_ENABLED
+#if LE_SLIDER_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/string/legato_string.h"
@@ -96,7 +100,7 @@ typedef struct leSliderWidget leSliderWidget;
  * @details The callback is used indicate a value has changed.
  * @details .
  */
-typedef void (*leSliderWidget_ValueChangedEvent)(leSliderWidget*);
+typedef void (* leSliderWidget_ValueChangedEvent)(leSliderWidget*);
 
 /* internal use only */
 /**
@@ -122,11 +126,11 @@ typedef void (*leSliderWidget_ValueChangedEvent)(leSliderWidget*);
     leResult  (*step)(THIS_TYPE* _this, int32_t amt); \
     leSliderWidget_ValueChangedEvent (*getValueChangedEventCallback)(const THIS_TYPE* _this); \
     leResult  (*setValueChangedEventCallback)(THIS_TYPE* _this, leSliderWidget_ValueChangedEvent cb);
-    
+
 typedef struct leSliderWidgetVTable
 {
-	LE_SLIDERWIDGET_VTABLE(leSliderWidget)
-} leSliderWidgetVTable; 
+    LE_SLIDERWIDGET_VTABLE(leSliderWidget)
+} leSliderWidgetVTable;
 
 /**
   * @endcond
@@ -208,7 +212,6 @@ leSliderWidget* leSliderWidget_New(void);
  * @return void.
  */
 void leSliderWidget_Constructor(leSliderWidget* sld);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -636,8 +639,9 @@ virtual leResult setValueChangedEventCallback(leSliderWidget* _this,
 #undef THIS_TYPE
 #endif
 
-
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_SLIDER_WIDGET_ENABLED
 #endif /* LEGATO_SLIDER_H */

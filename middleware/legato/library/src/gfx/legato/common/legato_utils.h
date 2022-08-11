@@ -48,6 +48,10 @@
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/core/legato_scheme.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct leWidget leWidget;
 typedef struct leList leList;
 
@@ -75,7 +79,6 @@ typedef struct leList leList;
 leWidget* leUtils_PickFromWidget(const leWidget* wgt,
                                  int32_t x,
                                  int32_t y);
-
 
 /**
  * @brief Converts a point from widget space into screen space.
@@ -173,7 +176,6 @@ void leUtils_RectToParentSpace(const leWidget* widget,
 void leUtils_RectFromParentSpace(const leWidget* widget,
                                  leRect* rect);
 
-
 /**
  * @brief Convert  rectangle from widget local space to screen space.
  * @details Converts <span class="param">rect</span> from
@@ -205,6 +207,21 @@ void leUtils_RectToScreenSpace(const leWidget* widget,
  */
 leBool leUtils_ChildIntersectsParent(const leWidget* parent,
                                      const leWidget* child);
+
+/**
+ * @brief Clips a widget's rectangle to the widget tree hierarchy
+ * @details Clips a widget's rectangle to the widget tree hierarchy
+ * @code
+ * const leWidget* parent;
+ * struct leRect* result
+ * leUtils_ClipRectToAncestors(widget, &result);
+ * @endcode
+ * @param widget the parent widget.
+ * @param result the clipped rectangle
+ * @return void.
+ */
+void leUtils_ClipRectToAncestors(const leWidget* wgt,
+                                 struct leRect* rct);
 
 /**
  * @brief Get next highest Z order widget in the tree from 'wgt'.
@@ -359,7 +376,13 @@ void leUtils_PointLogicalToScratch(int16_t* x,
 
 void leUtils_RectLogicalToScratch(leRect* rect);
 
+
 const leBlendLookupTable* leUtils_GetSchemeLookupTable(const leScheme* schm,
                                                        leColor foreground,
                                                        leColor background);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // LEGATO_UTILS_H

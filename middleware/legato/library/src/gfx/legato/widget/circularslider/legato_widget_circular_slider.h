@@ -50,6 +50,10 @@
 
 #if LE_CIRCULARSLIDER_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 // *****************************************************************************
@@ -756,6 +760,10 @@ virtual leResult setReleasedEventCallback(leCircularSliderWidget* _this,
                                           leCircularSliderWidget_ReleasedEvent cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_CIRCULARSLIDER_WIDGET_ENABLED

@@ -36,6 +36,11 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          25
 
@@ -243,7 +248,11 @@ static leResult setCursorDelay(leTextFieldWidget* _this,
         return LE_FAILURE;
 
     _this->cursorDelay = dt;
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -265,7 +274,11 @@ static leResult setCursorEnabled(leTextFieldWidget* _this,
     _this->cursorEnable = en;
 
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -289,7 +302,11 @@ static leResult setCursorPosition(leTextFieldWidget* _this,
     _this->cursorVisible = LE_TRUE;
 
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -304,12 +321,24 @@ static leResult setString(leTextFieldWidget* _this,
                           const leString* str)
 {
     LE_ASSERT_THIS();
-    
-    _this->text.fn->setFromString(&_this->text, str);
-    _this->cursorPos = _this->text.length;
+
+    if(str == NULL)
+    {
+        _this->text.fn->clear(&_this->text);
+        _this->cursorPos = 0;
+    }
+    else
+    {
+        _this->text.fn->setFromString(&_this->text, str);
+        _this->cursorPos = _this->text.length;
+    }
 
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -328,6 +357,10 @@ static leResult setFont(leTextFieldWidget* _this,
     _this->text.fn->setFont(&_this->text, fnt);
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -348,27 +381,34 @@ static leResult setHintString(leTextFieldWidget* _this,
     {
         _invalidateText(_this);
 
-        _this->hintText->fn->setPreInvalidateCallback((leString*)_this->hintText,
+        _this->hintText->fn->setPreInvalidateCallback((leString*) _this->hintText,
                                                       NULL,
                                                       NULL);
 
-        _this->hintText->fn->setInvalidateCallback((leString*)_this->hintText,
+        _this->hintText->fn->setInvalidateCallback((leString*) _this->hintText,
                                                    NULL,
                                                    NULL);
     }
 
     _this->hintText = str;
 
-    _this->hintText->fn->setPreInvalidateCallback((leString*)_this->hintText,
-                                                  (leString_InvalidateCallback)stringPreinvalidate,
-                                                  _this);
+    if(_this->hintText != NULL)
+    {
+        _this->hintText->fn->setPreInvalidateCallback((leString*) _this->hintText,
+                                                      (leString_InvalidateCallback) stringPreinvalidate,
+                                                      _this);
 
-    _this->hintText->fn->setInvalidateCallback((leString*)_this->hintText,
-                                               (leString_InvalidateCallback)stringInvalidate,
-                                               _this);
+        _this->hintText->fn->setInvalidateCallback((leString*) _this->hintText,
+                                                   (leString_InvalidateCallback) stringInvalidate,
+                                                   _this);
 
-    _invalidateText(_this);
-    
+        _invalidateText(_this);
+    }
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -381,6 +421,10 @@ static leResult setClearValueOnFirstEdit(leTextFieldWidget* _this,
         return LE_FAILURE;
 
     _this->clearOnFirstEdit = clear;
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }

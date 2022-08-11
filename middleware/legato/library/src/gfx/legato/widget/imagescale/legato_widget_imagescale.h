@@ -49,7 +49,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_IMAGESCALE_WIDGET_ENABLED
+#if LE_IMAGESCALE_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
@@ -91,7 +95,7 @@ typedef struct leImageScaleWidget leImageScaleWidget;
 
 typedef struct leImageScaleWidgetVTable
 {
-	LE_IMAGEPLUSWIDGET_VTABLE(leImageScaleWidget)
+    LE_IMAGEPLUSWIDGET_VTABLE(leImageScaleWidget)
 } leImageScaleWidgetVTable;
 
 /**
@@ -107,7 +111,7 @@ typedef struct leImageScaleWidgetVTable
 typedef struct leImageScaleWidget
 {
     leWidget widget; // widget base class
-    
+
     const leImageScaleWidgetVTable* fn;
 
     const leImage* image; // pointer to image asset
@@ -753,6 +757,9 @@ virtual leResult setResizeFilter(leImageScaleWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_IMAGESCALE_WIDGET_ENABLED
 #endif /* LEGATO_IMAGE_H */

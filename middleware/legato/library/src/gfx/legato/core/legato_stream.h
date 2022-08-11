@@ -31,6 +31,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 /* Structure:
     leStreamDescriptor
@@ -469,4 +473,9 @@ void leApplication_MediaCloseRequest(leStream* stream);
  * @endcond
  *
  */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* LE_STREAM_H */

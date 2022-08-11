@@ -36,6 +36,26 @@
     <#lt>        ${rtosTaskPriority},
     <#lt>        (TaskHandle_t*)NULL
     <#lt>    );
+<#elseif HarmonyCore.SELECT_RTOS == "ThreadX">
+    <#lt>    /* Allocate the stack for Legato thread */
+    <#lt>    tx_byte_allocate(&byte_pool_0,
+    <#lt>        (VOID **) &_LEGATO_Task_Stk_Ptr,
+    <#lt>        ${rtosTaskSize},
+    <#lt>        TX_NO_WAIT
+    <#lt>    );
+
+    <#lt>    /* create the Legato thread */
+    <#lt>    tx_thread_create(&_LEGATO_Task_TCB,
+    <#lt>        "_LEGATO_Tasks",
+    <#lt>        _LEGATO_Tasks,
+    <#lt>        32,
+    <#lt>        _LEGATO_Task_Stk_Ptr,
+    <#lt>        ${rtosTaskSize},
+    <#lt>        ${rtosTaskPriority},
+    <#lt>        ${rtosTaskPriority},
+    <#lt>        TX_NO_TIME_SLICE,
+    <#lt>        TX_AUTO_START
+    <#lt>    );
 </#if>
 </#if>
 <#--

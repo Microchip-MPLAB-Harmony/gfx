@@ -50,6 +50,10 @@
 
 #if LE_SCROLLBAR_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/string/legato_string.h"
 
@@ -95,7 +99,7 @@ typedef struct leScrollBarWidget leScrollBarWidget;
   Summary:
     Value changed event function callback type
 */
-typedef void (*leScrollBarWidget_ValueChangedEvent)(leScrollBarWidget*);
+typedef void (* leScrollBarWidget_ValueChangedEvent)(leScrollBarWidget*);
 
 /* internal use only */
 /**
@@ -122,16 +126,16 @@ typedef void (*leScrollBarWidget_ValueChangedEvent)(leScrollBarWidget*);
     leResult      (*stepForward)(THIS_TYPE* _this); \
     leScrollBarWidget_ValueChangedEvent (*getValueChangedEventCallback)(const THIS_TYPE* _this); \
     leResult      (*setValueChangedEventCallback)(THIS_TYPE* _this, leScrollBarWidget_ValueChangedEvent cb); \
-    
+
 typedef struct leScrollBarWidgetVTable
 {
-	LE_SCROLLBARWIDGET_VTABLE(leScrollBarWidget)
-} leScrollBarWidgetVTable; 
+    LE_SCROLLBARWIDGET_VTABLE(leScrollBarWidget)
+} leScrollBarWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /**
@@ -726,6 +730,9 @@ virtual leResult setValueChangedEventCallback(leScrollBarWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_SCROLLBAR_WIDGET_ENABLED
 #endif /* LEGATO_SCROLLBAR_H */

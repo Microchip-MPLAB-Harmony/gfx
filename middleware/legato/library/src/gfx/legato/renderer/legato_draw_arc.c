@@ -32,9 +32,6 @@
 
 #define ARC_MAX 50000
 
-/* renderer function use only */
-extern leRenderState _rendererState;
-
 typedef struct ArcDrawState
 {
     leRect arcArea;
@@ -113,7 +110,10 @@ leResult leRenderer_ArcLine(int32_t x,
 {
     int32_t sa = startAngle;
     lePoint p;
+    leRect drawRect;
     (void)a; // unused
+
+    leRenderer_GetClipRect(&drawRect);
 
     while (sa != (startAngle + startAngle))
     {
@@ -122,7 +122,7 @@ leResult leRenderer_ArcLine(int32_t x,
         p.x += x;
         p.y += y;
         
-        if(leRectContainsPoint(&_rendererState.drawRect, &p) == LE_TRUE)
+        if(leRectContainsPoint(&drawRect, &p) == LE_TRUE)
         {
             leRenderer_PutPixel(p.x, p.y, clr);
         }

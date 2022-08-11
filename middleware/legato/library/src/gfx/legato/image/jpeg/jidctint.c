@@ -122,7 +122,7 @@
  * cK represents sqrt(2) * cos(K*pi/16).
  */
 
-void jpeg_idct_islow (short *inbuf, uint16_t *quantptr)
+void jpeg_idct_islow_leg (short *inbuf, uint16_t *quantptr)
 {
   long tmp0, tmp1, tmp2, tmp3;
   long tmp10, tmp11, tmp12, tmp13;

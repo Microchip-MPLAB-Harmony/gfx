@@ -57,6 +57,10 @@
 
 #include "gfx/legato/widget/legato_widget.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* internal use only */
 /**
   * @cond INTERNAL
@@ -234,8 +238,8 @@ typedef enum leMouseButton
 typedef struct leTouchState
 {
     uint32_t valid; /**< Valid touch. */
-    int32_t  x; /**< x coordinate location. */
-    int32_t  y; /**< y coordinate location. */
+    int32_t x; /**< x coordinate location. */
+    int32_t y; /**< y coordinate location. */
 } leTouchState;
 
 // *****************************************************************************
@@ -468,5 +472,9 @@ leEventResult _leInput_HandleInputEvent(leEvent* evt);
   * @endcond
   *
   */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_INPUT_H */

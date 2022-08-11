@@ -50,6 +50,10 @@
 
 #if LE_RADIALMENU_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/image/legato_widget_image.h"
 #include "gfx/legato/datastructure/legato_list.h"
@@ -57,7 +61,7 @@
 
 typedef struct leRadialMenuWidget leRadialMenuWidget;
 
-typedef void (*leRadialMenuWidget_ItemProminenceChangedEvent)(leRadialMenuWidget*, leWidget*, int32_t);
+typedef void (* leRadialMenuWidget_ItemProminenceChangedEvent)(leRadialMenuWidget*, leWidget*, int32_t);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -71,9 +75,9 @@ typedef void (*leRadialMenuWidget_ItemProminenceChangedEvent)(leRadialMenuWidget
 typedef enum leRadialMenuWidgetState
 {
     LE_RADIAL_MENU_INIT,
-	LE_RADIAL_MENU_INPUT_READY,
-	LE_RADIAL_MENU_HANDLE_USER_MOVE_REQUEST,
-    LE_RADIAL_MENU_RESET_TO_INPUT_POS            
+    LE_RADIAL_MENU_INPUT_READY,
+    LE_RADIAL_MENU_HANDLE_USER_MOVE_REQUEST,
+    LE_RADIAL_MENU_RESET_TO_INPUT_POS
 } leRadialMenuWidgetState;
 
 /**
@@ -82,9 +86,9 @@ typedef enum leRadialMenuWidgetState
  */
 typedef enum leRadialMenuWidgetInterpolationMode
 {
-	LE_RADIAL_MENU_INTERPOLATE_OFF,
-	LE_RADIAL_MENU_INTERPOLATE_GRADUAL,
-	LE_RADIAL_MENU_INTERPOLATE_PROMINENT
+    LE_RADIAL_MENU_INTERPOLATE_OFF,
+    LE_RADIAL_MENU_INTERPOLATE_GRADUAL,
+    LE_RADIAL_MENU_INTERPOLATE_PROMINENT
 } leRadialMenuWidgetInterpolationMode;
 
 /* internal use only */
@@ -120,13 +124,13 @@ typedef enum leRadialMenuWidgetInterpolationMode
 
 typedef struct leRadialMenuWidgetVTable
 {
-	LE_RADIALMENUWIDGET_VTABLE(leRadialMenuWidget)
-} leRadialMenuWidgetVTable; 
+    LE_RADIALMENUWIDGET_VTABLE(leRadialMenuWidget)
+} leRadialMenuWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 enum leRadialMenuItemState
 {
@@ -169,10 +173,10 @@ typedef struct leRadialMenuItemNode
 typedef struct leRadialMenuWidget
 {
     leWidget widget; // widget base class
-    
+
     const leRadialMenuWidgetVTable* fn;
 
-	leRadialMenuWidgetState state;
+    leRadialMenuWidgetState state;
 
     int32_t prominentIndex;
 
@@ -181,7 +185,7 @@ typedef struct leRadialMenuWidget
 
     struct
     {
-	leBool invalid;
+        leBool invalid;
         int32_t a;  // the half-length of the 0-180 axis of the ellipse
         int32_t b;  // the half-length of the 90-270 axis of the ellipse
         int32_t theta; // the angle of rotation of the entire ellipse
@@ -189,17 +193,17 @@ typedef struct leRadialMenuWidget
 
     struct
     {
-	    uint32_t maxWidth;
-	    uint32_t maxHeight;
-	    uint32_t alpha;
-	    int32_t firstVisibleItem;
-	    uint32_t lastZ;
+        uint32_t maxWidth;
+        uint32_t maxHeight;
+        uint32_t alpha;
+        int32_t firstVisibleItem;
+        uint32_t lastZ;
     } paintState;
 
     leBool touchPressed; // keep track of users touch input
     int32_t rotationDegrees;
     int32_t angleSlice;
-    
+
     leRadialMenuWidgetInterpolationMode scaleMode;  // the enable item size scaling within the widget
 
     int32_t maxSizePercent;  // the maximum size scale between 1 - 200%
@@ -234,7 +238,7 @@ typedef struct leRadialMenuWidget
     uint32_t itemsShown; // keeps count of how many items to visible, this number should be less than or equal to total number of widget items
     leList widgetList; // this is the list of widgets
     leBool positionsInvalid;
-    
+
     leRadialMenuWidget_ItemProminenceChangedEvent itemProminenceChangedEvent; // whenever a new item is in prominence event callback
 } leRadialMenuWidget;
 
@@ -1054,6 +1058,10 @@ virtual leResult setItemProminenceChangedEventCallback(leRadialMenuWidget* _this
                                                        leRadialMenuWidget_ItemProminenceChangedEvent cb)
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_RADIALMENU_WIDGET_ENABLED

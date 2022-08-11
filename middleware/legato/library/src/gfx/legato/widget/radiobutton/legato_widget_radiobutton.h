@@ -50,6 +50,10 @@
 
 #if LE_RADIOBUTTON_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/radiobutton/legato_radiobutton_group.h"
@@ -71,7 +75,7 @@ typedef struct leRadioButtonGroup leRadioButtonGroup;
  * selection.
  * @details .
  */
-typedef void (*leRadioButtonWidget_SelectedEvent)(leRadioButtonWidget*);
+typedef void (* leRadioButtonWidget_SelectedEvent)(leRadioButtonWidget*);
 
 // *****************************************************************************
 /* Function Pointer:
@@ -86,7 +90,7 @@ typedef void (*leRadioButtonWidget_SelectedEvent)(leRadioButtonWidget*);
  * deselection.
  * @details .
  */
-typedef void (*leRadioButtonWidget_DeselectedEvent)(leRadioButtonWidget*);
+typedef void (* leRadioButtonWidget_DeselectedEvent)(leRadioButtonWidget*);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -124,16 +128,16 @@ typedef void (*leRadioButtonWidget_DeselectedEvent)(leRadioButtonWidget*);
     leResult            (*setDeselectedEventCallback)(THIS_TYPE* _this, leRadioButtonWidget_DeselectedEvent cb); \
     uint32_t            (*getCircleButtonSize)(const THIS_TYPE* _this); \
     leResult            (*setCircleButtonSize)(THIS_TYPE* _this, uint32_t sz); \
-    
+
 typedef struct leRadioButtonWidgetVTable
 {
-	LE_RADIOBUTTONWIDGET_VTABLE(leRadioButtonWidget)
-} leRadioButtonWidgetVTable; 
+    LE_RADIOBUTTONWIDGET_VTABLE(leRadioButtonWidget)
+} leRadioButtonWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /* Enumeration:
@@ -170,9 +174,9 @@ typedef struct leRadioButtonWidget
 
     const leImage* selectedImage; // button custom selected image
     const leImage* unselectedImage; // buton custom unselected image
-    
+
     leRelativePosition imagePosition; // image icon relative position
-    
+
     uint32_t imageMargin; // image margin
     uint32_t circleButtonSize; // size of radio circle button in pixels
 
@@ -233,7 +237,6 @@ leRadioButtonWidget* leRadioButtonWidget_New(void);
  * @return void.
  */
 void leRadioButtonWidget_Constructor(leRadioButtonWidget* wgt);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -783,6 +786,10 @@ virtual leResult setDeselectedEventCallback(leRadioButtonWidget* _this,
                                             leRadioButtonWidget_DeselectedEvent cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_RADIOBUTTON_WIDGET_ENABLED

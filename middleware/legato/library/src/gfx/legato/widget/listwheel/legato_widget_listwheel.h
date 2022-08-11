@@ -50,6 +50,10 @@
 
 #if LE_LISTWHEEL_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //#include "gfx/legato/datastructure/legato_list.h"
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
@@ -68,8 +72,8 @@ typedef struct leListWheelWidget leListWheelWidget;
  * @brief Used to define a item changed event callback function.
  * @details .
  */
-typedef void (*leListWheelWidget_SelectedItemChangedEvent)(leListWheelWidget*,
-                                                           int32_t idx);
+typedef void (* leListWheelWidget_SelectedItemChangedEvent)(leListWheelWidget*,
+                                                            int32_t idx);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -188,16 +192,16 @@ typedef struct leListWheelWidget leListWheelWidget;
     leResult            (*setZoomEffects)(THIS_TYPE* _this, leListWheelZoomEffects zfx); \
     leBool              (*getAutoHideWheel)(const THIS_TYPE* _this); \
     leResult            (*setAutoHideWheel)(THIS_TYPE* _this, leBool b); \
-    
+
 typedef struct leListWheelWidgetVTable
 {
-	LE_LISTWHEELWIDGET_VTABLE(leListWheelWidget)
-} leListWheelWidgetVTable; 
+    LE_LISTWHEELWIDGET_VTABLE(leListWheelWidget)
+} leListWheelWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /**
@@ -215,31 +219,31 @@ typedef struct leListWheelWidget
     leArray items; // list of items for the wheel
     int32_t selectedItem; // currently selected item
     int32_t visibleItems; // number of visible items in the wheel
-                          // must be odd and >= 3
+    // must be odd and >= 3
     int32_t topItem; // the current top item
 
     leRelativePosition iconPos; // the icon position of the items
     uint32_t iconMargin; // the icon margin of the items
 
     leBool showIndicators; // controls the visibility of the horizontal
-                           // indicator bars in the center of the widget
+    // indicator bars in the center of the widget
     uint32_t indicatorArea; // controls the distance between the indicator bars
 
     uint32_t shaded; // determins if the background of the widget uses gradient
-                     // shading to show depth
+    // shading to show depth
 
     int32_t cycleDistance; // determins the amount of drag distance needed
-                           // to cycle between items
+    // to cycle between items
     int32_t cycleDelta; // tracks the current amount of drag distance
 
     // these track drag movement over time
     int32_t firstTouchY;
     int32_t touchY;
     int32_t lastTouchY;
-    leBool  stillTouching;
+    leBool stillTouching;
 
     int32_t minFlickDelta; // amount of distance that must be dragged in a single
-                           // frame to trigger momentum mode
+    // frame to trigger momentum mode
 
     int32_t momentum; // current momentum value
     int32_t maxMomentum; // maximum momentum value
@@ -299,7 +303,6 @@ leListWheelWidget* leListWheelWidget_New(void);
  * @return void.
  */
 void leListWheelWidget_Constructor(leListWheelWidget* wgt);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -1624,6 +1627,9 @@ virtual leResult setAutoHideWheel(leListWheelWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_LISTWHEEL_WIDGET_ENABLED
 #endif /* LEGATO_LISTWHEELWIDGET_H */

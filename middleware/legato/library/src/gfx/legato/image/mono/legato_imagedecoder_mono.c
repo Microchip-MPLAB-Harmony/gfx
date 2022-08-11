@@ -102,7 +102,7 @@ static leResult _draw(const leImage* img,
     leRect dmgRect;
     (void)a; // unused
 
-    leRenderer_GetDrawRect(&dmgRect);
+    leRenderer_GetClipRect(&dmgRect);
 
     // only allow a new setup if there isn't a current one
     if(_state.mode != LE_MONO_MODE_NONE)

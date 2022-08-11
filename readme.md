@@ -31,57 +31,74 @@ Graphics application examples can be found at various [device-family specific re
 The key features of the MPLAB® Harmony Graphics Suite are the following:
 
 - Hardware optimized for use with Microchip 32-bit SAM and PIC® devices
-- Compatible component for use with Microchip Harmony 3 Configurator (MHC)
+- Compatible component for use with MPLAB Code Configurator (MCC)
+- **Microchip Graphics Composer with Legato** WYSWYG UI designer tool for Windows, Linux and Mac
 - Written in C with MISRA C (Mandatory) compliancy
-- RTOS and non-RTOS support
+- RTOS (FreeRTOS, ThreadX) and non-RTOS support
 - Configurable widget building blocks buttons, labels, lists, sliders, and images
 - Rich tool set: Heap Estimator, Event Manager, Palette generator, Asset Manager, String and Font interface, DDR memory organizer
 - Hardware integrated for Microchip GPU and display controller peripherals
 - Support for single and double frame buffers
 - Multi-language font support
 - External input support for use with capacitive, resistive and other devices
-- UI design editor for what-you-see-what-you-get (WYSWYG) graphics layouts
 - Fluid-UI support for alpha-blending, animations, scaling
 - Pixel format support for RGBA8888, RGB888, RGB565, RGB5551, RGB332, GS8
 - Multi-image support for industry standard formats, compression choices, external memory accessibility
 - Fully functional demonstrations and quick-starts to enable new development
 - Low memory and low power configurable
-- Segmented LCD Controller driver
+- Segmented LCD support
+- Image Sensor support
 
 
 # Contents Summary
 
-| Folder     | Description                                  |
-|------------|----------------------------------------------|
-| Legato   | Legato graphics library, drivers, applications, and tools. |
-| Blank    | Blank graphics interface for third-party graphics libraries |
-
+***
 ## Legato Graphics
-
-The performance improved graphics for MPLAB® Harmony Graphics Suite. Supports Microchip PIC32 and SAM microcontrollers.
+***
+The performance-improved graphics for MPLAB® Harmony Graphics Suite. Supports Microchip PIC32 and SAM microcontrollers and microprocessors
 
 | Category | Item | Description | Release Type |
 | --- | --- | ---- |---- |
-| drivers|  glcd | Driver for the GLCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   2dgpu | Driver for the 2DGPU graphics processor |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+| drivers|  glcd | Driver for the GLCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   2dgpu | Driver for the 2DGPU graphics processor |![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   lcc |  Driver for the LCC software display controller| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   gfx2d | Driver for the GFX2D graphics processor| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   lcdc | Driver for the LCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   slcd | Driver for the Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   external controller |  Driver generator for external display controllers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   external controller |  Driver generator for external display controllers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   ssd1963 | Driver for the ssd1963 display controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |
 |      |   ili9488  | Display Driver for the ili9488 controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |
-|      |   parallel_ebi | Interface to the parallel EBI registers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   parallel_portgroup | Inteface to the parallel portgroup registers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   parallel_smc | Interface to the parallel smc registers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   spi | Interface to the spi registers | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   parallel_ebi | Interface to the parallel EBI registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   parallel_portgroup | Inteface to the parallel portgroup registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   parallel_smc | Interface to the parallel smc registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   spi | Interface to the spi registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 | library    | legato | Graphics library | ![app-beta](https://img.shields.io/badge/library-beta-orange?style=plastic) |
-| designer | legato MHGC |Harmony graphics composer for Legato| ![app-beta](https://img.shields.io/badge/tool-beta-orange?style=plastic) |
+| designer | MGC Legato | Microchip Graphics Composer with Legato| ![app-beta](https://img.shields.io/badge/tool-beta-orange?style=plastic) |
 
 ***
 ## Blank Library Interface
 ***
 **Blank Library Interface** - the library interface which easily allows a third-party graphics library direct access to the display framebuffer.  Blank library applications are available at various [device-family specific repositories](https://microchip-mplab-harmony.github.io/gfx/apps/readme.html).
+***
+## Image Sensor Support
+***
+Image Sensor Controller Drivers for SAM microprocessors and Image Sensor Drivers
+
+| Category | Item | Description | Release Type |
+| --- | --- | ---- |---- |
+| drivers|  isi | Driver for the Image Sensor Interface peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   isc | Driver for the Image Sensor Controller peripheral |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   cam | Driver for the OV5640 image sensor module |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+***
+***
+## Segmented LCD Support
+***
+Controller Drivers for Segemented LCDs for SAM microcontrollers
+
+| Category | Item | Description | Release Type |
+| --- | --- | ---- |---- |
+| drivers|  slcc | Low-Cost Controllerless Driver for the Segmented LCD displays | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   slcd | Driver for the SAM L22 Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+***
 ## Aria Graphics
 
 ***

@@ -93,7 +93,8 @@ typedef unsigned __int64     uint64_t;
 #ifdef __cplusplus
     extern "C" {
 #endif
-        
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types and Constants
@@ -413,6 +414,9 @@ typedef void* leBuffer;
 typedef uint16_t leChar;
 
 #define LE_UNKNOWN_GLYPH  0xFFFF
+
+#define LE_PCALL(var, func, args...) var->fn->func(var, ## args)
+#define LE_OCALL(var, func, args...) var.fn->func(&var, ## args)
 
 #ifdef __cplusplus
     }

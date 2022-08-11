@@ -48,7 +48,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_LINE_WIDGET_ENABLED
+#if LE_LINE_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -206,6 +210,9 @@ virtual leResult setEndPoint(leLineWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_LINE_WIDGET_ENABLED
 #endif /* LEGATO_LINE_H */

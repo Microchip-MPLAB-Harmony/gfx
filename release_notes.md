@@ -8,6 +8,43 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.11.0
+
+### New Features
+
+* Replaced Legato Graphics Composer with **Microchip Graphics Composer with Legato**
+* SAMA5D2: Added support for Image Sensor Controller (ISC)
+* Added SLCC: Low-Cost Controllerless driver for Segmented LCD
+* Added support for OV5640 image sensor
+* Added support for Azure RTOS ThreadX
+
+### Issues Fixed
+
+
+* MH3-44161 Legato button toggle-able behavior
+* MH3-45241 Better user experience with adding layers in Legato Composer
+* MH3-45460 Legato Composer - remember last location for importing assets
+* MH3-55204 png & RGBA images display incorrectly in legato
+* MH3-61178 Embed videos to Gfx canvas documentation
+* MH3-62199 Legato Composer - Alpha blending doesn't work
+* MH3-62217 very hard to check/uncheck the checkbox
+* MH3-63790 Legato - LineGraph code generated doesn't build
+* MH3-68565 RGDB BSP LED switches defaults to analog, needs to be output/input
+* MH3-68613 Harmony 3 - Legato: toChar pointer method of leTableString doesn't have any method assigned
+* MH3-68614 Harmony 3 - Legato: leSetLanguageChangedCallback() is not present
+* MH3-69308 5" Display MHC Component Timing is incorrect
+* MH3-69618 LCDDISP/DISP signal from PIC32MZ development boards must be driven high
+* MH3-69638 Point Rotation Is Incorrect in 270 mode
+* MH3-69769 Bug in the keypad widget in harmony graphics
+* MH3-69853 Direct Blit causes exception
+* MH3-69854 Unable to delete multiple selected images in Composer 
+* MH3-69925 Add support for Global alpha for LCDC driver 
+
+
+* Microchip Graphics Composer v1.3.0a 
+  * Legato Plugin Linux/Windows/Mac Build v2.2.4b 
+
+
 ## Graphics Release v3.10.0
 
 ### New Features
@@ -49,10 +86,12 @@ nav_order: 99
 
 ### New Features
 
+
 * Displays and Template support for PIC32MZ DA Radial Development Board
 * Duplicate Screen Button in Graphics Composer
 
 ### Issues Fixed
+
 
 * MH3-59974 MZ DA GPU incorrect in blit-ing images with semi-transparent pixels
 * MH3-50911	MZ DA GPU blit preprocessed images has artifacts with width not multiple of 4
@@ -71,6 +110,7 @@ nav_order: 99
 * MH3-51215	Master clock value in GLCD component does not match out value from REFCLK5
 * MH3-59484	GFX: PIC32MZDA - Clock Setting in LE GLCD Configuration Options window does not get updated
 
+
 * Legato Composer Linux/PC Build v1.20.2b
 * Legato Composer Mac Build v1.20.2b
 
@@ -83,6 +123,7 @@ nav_order: 99
 
 ### Issues Fixed
 
+
 * MH3-51543	GFX Composer: Memory mapped locations ID are not set to 0
 * MH3-51576	Can't load a Aria Composer Project using Legato Composer
 * MH3-53057	Composer crashes when importing Aria project
@@ -90,6 +131,7 @@ nav_order: 99
 * MH3-54915	Legato Checkbox Widget Bevel Generates Exception, doesn't respond to Touch
 * MH3-54996	Legato leWidget* root variables issue
 * Fixed LCDC driver double buffer issue
+
  
 * Legato Composer Linux/PC Build v1.16.6b
 * Legato Composer Mac Build v1.16.6b
@@ -103,6 +145,7 @@ nav_order: 99
 
 ### Issues Fixed
 
+
 * MH3-45527	add touch rotation to generic touch controller
 * MH3-51417	Evaluate GPU blit of pre-processed images
 * MH3-51419	Evaluate how GFX2D handles image blits with non-opaque pixels differently with Base Layer vs OVR1 and OVR2
@@ -114,6 +157,7 @@ nav_order: 99
 * MH3-51845	LCDC Driver Layer DMA interrupt not firing
 * MH3-52004	Add Layer IRQ Callback in LCDC driver
 * MH3-52089	Double buffering feature appears broken for LCDC (SAM 9x60/A5D2)
+
  
 * Legato Composer Linux/PC Build v1.14.4b
 * Legato Composer Mac Build v1.14.4b
@@ -129,6 +173,7 @@ nav_order: 99
 
 ### Issues Fixed
 
+
 * MH3-46974	Reset sequence not proper for OLED C click
 * MH3-46942	No test for invalid index parameter in list widget code
 * MH3-50874	Legato Radio button widget doesn't work after destroying it
@@ -139,6 +184,7 @@ nav_order: 99
 * MH3-51106	Legato GFX - The Radio button CallbackEvent function are not generated
 * MH3-51130	Legato Composer - Image Manager Tree Drag Crash
 * MH3-51402	GFX Legato "Uses Cache" option for LCC doesn't work if is unchecked for ATSAME70Q21B
+
 
 * Legato Composer Linux/PC Build v1.14.4b
 * Legato Composer Mac Build v1.14.4b
@@ -269,15 +315,21 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 
 ### Development Tools
 
+
 * [MPLAB® X IDE v6.00 or above](https://www.microchip.com/mplab/mplab-x-ide)
-* [MPLAB® XC32 C/C++ Compiler v2.50 or above](https://www.microchip.com/mplab/compilers)
+* [MPLAB® XC32 C/C++ Compiler v3.01 or above](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    * [MPLAB® Code Configurator (MCC) v5.1.9](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+	
+	OR
+    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
 
 ### Dependent Components
 
-* [Core v3.11.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.0)
-* [Touch v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.11.1)
+
+* [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
+* [Touch v3.12.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.12.1)
 * [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
 
 

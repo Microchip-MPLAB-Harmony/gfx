@@ -52,6 +52,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 /* Structure:
     leRectArray
@@ -441,5 +445,9 @@ leResult leRectArray_CropToSizeY(leRectArray* arr, uint32_t size);
  * @returns LE_SUCCESS , otherwise LE_FAILURE.
  */
 leResult leRectArray_CropToSizeX(leRectArray* arr, uint32_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_RECTARRAY_H */

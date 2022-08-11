@@ -32,6 +32,26 @@
     <#lt>        ${rtosTaskPriority},
     <#lt>        (TaskHandle_t*)NULL
     <#lt>    );
+<#elseif HarmonyCore.SELECT_RTOS == "ThreadX">
+    <#lt>    /* Allocate the stack for LCC thread */
+    <#lt>    tx_byte_allocate(&byte_pool_0,
+    <#lt>        (VOID **) &_LCC_Task_Stk_Ptr,
+    <#lt>        ${rtosTaskSize},
+    <#lt>        TX_NO_WAIT
+    <#lt>    );
+
+    <#lt>    /* create the LCC thread */
+    <#lt>    tx_thread_create(&_LCC_Task_TCB,
+    <#lt>        "_LCC_Tasks",
+    <#lt>        _LCC_Tasks,
+    <#lt>        31,
+    <#lt>        _LCC_Task_Stk_Ptr,
+    <#lt>        ${rtosTaskSize},
+    <#lt>        ${rtosTaskPriority},
+    <#lt>        ${rtosTaskPriority},
+    <#lt>        TX_NO_TIME_SLICE,
+    <#lt>        TX_AUTO_START
+    <#lt>    );
 </#if>
 <#--
 /*******************************************************************************

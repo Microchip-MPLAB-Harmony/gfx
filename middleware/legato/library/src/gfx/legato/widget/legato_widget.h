@@ -54,6 +54,11 @@
 #include "gfx/legato/core/legato_scheme.h"
 #include "gfx/legato/datastructure/legato_array.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* internal use only */
 /**
   * @cond INTERNAL
@@ -132,7 +137,7 @@ typedef enum leWidgetType
 #if LE_GROUPBOX_WIDGET_ENABLED == 1
     LE_WIDGET_GROUPBOX,
 #endif
-#if LE_KEYPAD_WIDGET_ENABLED  == 1 && LE_BUTTON_WIDGET_ENABLED == 1
+#if LE_KEYPAD_WIDGET_ENABLED == 1 && LE_BUTTON_WIDGET_ENABLED == 1
     LE_WIDGET_KEYPAD,
 #endif
 #if LE_LABEL_WIDGET_ENABLED == 1
@@ -216,9 +221,6 @@ Enumeration:
  * None - No background fill.  Widget must defer to its parent to erase dirty
  * pixels.  This may cause additional overhead as clean pixels may be repainted as well.
  * Fill - a scheme color is used to fill the widget rectangle.
- * Cache - a local framebuffer cache is maintained by the widget and used to
- * clean up dirty pixels.  Will not cause a parent repaint event but will use additional
- *  memory to contain the cache.
  */
 typedef enum leBackgroundType
 {
@@ -314,7 +316,7 @@ typedef enum leWidgetDrawState
 typedef struct leWidget_MoveEvent
 {
     leEvent evt;
-    
+
     int32_t oldX;
     int32_t oldY;
     int32_t newX;
@@ -328,7 +330,7 @@ typedef struct leWidget_MoveEvent
 typedef struct leWidget_ResizeEvent
 {
     leEvent evt;
-    
+
     uint32_t oldWidth;
     uint32_t oldHeight;
     uint32_t newWidth;
@@ -463,7 +465,7 @@ typedef struct
      * @param param1 void.
      * @return number of events.
      */
-    leBool (*filterEvent)(leWidget* target, leWidgetEvent* evt, void* data);
+    leBool (* filterEvent)(leWidget* target, leWidgetEvent* evt, void* data);
     void* data;
 } leWidgetEventFilter;
 
@@ -555,26 +557,25 @@ typedef struct leWidget leWidget;
     void               (*_invalidateBorderAreas)(const THIS_TYPE* _this); \
     void               (*_damageArea)(const THIS_TYPE* _this, leRect* rect); \
     void               (*_paint)(THIS_TYPE* _this); \
-    
+
 typedef struct leWidgetVTable
 {
-	LE_WIDGET_VTABLE(leWidget)
+    LE_WIDGET_VTABLE(leWidget)
 } leWidgetVTable;
-
 
 typedef struct leWidget leWidget;
 typedef struct leRectArray leRectArray;
 
-typedef void (*leWidget_DrawFunction_FnPtr)(void*);
+typedef void (* leWidget_DrawFunction_FnPtr)(void*);
 
 enum leWidgetFlags
 {
-    LE_WIDGET_ENABLED      = 0x1,  // indicates that the widget is enabled
-    LE_WIDGET_VISIBLE      = 0x2,  // indicates that the widget is visible
+    LE_WIDGET_ENABLED = 0x1,  // indicates that the widget is enabled
+    LE_WIDGET_VISIBLE = 0x2,  // indicates that the widget is visible
     LE_WIDGET_ALPHAENABLED = 0x4,  // indicates that the widget is using alpha blending
-    LE_WIDGET_ISROOT       = 0x8,  // indicates that this widget is a root widget
+    LE_WIDGET_ISROOT = 0x8,  // indicates that this widget is a root widget
     LE_WIDGET_IGNOREEVENTS = 0x10, // indicates that the widget should ignore input/focus events
-    LE_WIDGET_IGNOREPICK   = 0x20  // indicates that the widget should be ignored for pick tests
+    LE_WIDGET_IGNOREPICK = 0x20  // indicates that the widget should be ignored for pick tests
 };
 
 typedef struct leWidgetStyle
@@ -622,7 +623,7 @@ typedef struct leWidgetStatus
 typedef struct leWidget
 {
     const leWidgetVTable* fn;
-    
+
     uint32_t id;  // the id of the widget
     leWidgetType type; // the type of the widget
 
@@ -635,7 +636,7 @@ typedef struct leWidget
     leMargin margin; // the margin settings for the widget
 
     uint32_t drawCount; // number of times this widget has been drawn
-                        // for the active screen
+    // for the active screen
 
     leWidget_DrawFunction_FnPtr drawFunc; // the next draw function to call
 
@@ -2798,5 +2799,9 @@ void _leWidget_ResizeEvent(leWidget*, leWidget_ResizeEvent*);
 void _leWidget_FocusLostEvent(leWidget*);
 void _leWidget_FocusGainedEvent(leWidget*);
 void _leWidget_LanguageChangeEvent(leWidget*);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_WIDGET_H */

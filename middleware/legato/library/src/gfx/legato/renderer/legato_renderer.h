@@ -30,6 +30,11 @@
 #define LEGATO_RENDERER_H
 
 #include "gfx/legato/common/legato_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/common/legato_pixelbuffer.h"
 #include "gfx/legato/common/legato_rect.h"
 #include "gfx/legato/datastructure/legato_rectarray.h"
@@ -39,86 +44,7 @@
 
 
 // *****************************************************************************
-/**
- * @brief This enum represents state of the renderer.
- * @details This enum type describes the state at which a
- * widget is being drawn.
- */
-typedef enum leFrameState
-{
-    LE_FRAME_READY = 0,
-    LE_FRAME_PREFRAME,
-    LE_FRAME_PRELAYER,
-    LE_FRAME_PRERECT,
-    LE_FRAME_PREWIDGET,
-    LE_FRAME_DRAWING,
-    LE_FRAME_POSTWIDGET,
-    LE_FRAME_POSTRECT,
-    LE_FRAME_WAITFORBUFFER,
-    LE_FRAME_POSTLAYER,
-    LE_FRAME_POSTFRAME,
-} leFrameState;
 
-typedef struct leRenderLayerState
-{
-    leRectArray prevDamageRects;    // previous damaged rectangle list
-    leRectArray currentDamageRects; // queued damaged rectangle list
-    leRectArray pendingDamageRects; // pending damaged rectangle list
-                                    // these are rectangles added during
-                                    // a frame in progress
-
-    leRectArray scratchRectList; // used for rectangle culling phase
-    leRectArray frameRectList;   // rects to draw for a frame
-
-    leBool drawingPrev;           // indicates if the layer is currently
-                                  // drawing from its previous rectangle
-                                  // array
-} leRenderLayerState;
-
-/**
- * @brief This structs represents global state of the renderer.
- * @details This struct type describes the state at which a
- * widget is being drawn.
- */
-typedef struct leRenderState
-{
-    const gfxDisplayDriver* dispDriver;  // the display driver pointer
-    const gfxGraphicsProcessor* gpuDriver; // the gpu driver pointer
-    
-    uint32_t layerIdx;           // the current layer index
-
-    //leRect displayRect;          // the driver physical display rectangle
-    uint32_t bufferCount;        // the number of scratch buffers the library supports
-
-    uint32_t frameRectIdx;       // the current frame draw rectangle index
-    leWidget* currentWidget;     // the widget that is currently drawing
-    
-    leRect drawRect;              // the current damage rectangle clipped
-                                  // to the currently rendering widget
-
-    leRenderLayerState layerStates[LE_LAYER_COUNT];
-
-    leFrameState frameState;      // the current frame render state
-
-    uint32_t drawCount;           // the number of times the screen has drawn
-
-    uint32_t frameDrawCount;      // the number of widgets that have rendered
-                                  // on the screen
-
-    uint32_t deltaTime;           // stores delta time for updates that happen
-                                  // during rendering
-
-#if LE_ALPHA_BLENDING_ENABLED == 1
-    leBool alphaEnable;           // the global alpha enabled flag
-    uint8_t alpha;                // the current global alpha value
-#endif
-                                  
-    lePalette* globalPalette;     // the pointer to the global palette
-
-    int32_t currentScratchBuffer; // the index of the current scratch buffer
-
-    gfxIOCTLArg_Value val;
-} leRenderState;
 
 typedef struct leGradient
 {
@@ -127,6 +53,8 @@ typedef struct leGradient
     leColor c2;
     leColor c3;
 } leGradient;
+
+struct leLayerState;
 
 /* internal use only */
 /**
@@ -143,6 +71,39 @@ void leRenderer_Shutdown(void);
   *
   */
 
+// *****************************************************************************
+/* Function:
+    const gfxDisplayDriver* leRenderer_DisplayInterface(void)
+
+  Summary:
+    Returns the pointer to the display driver interface that the renderer was
+    initialized with.
+
+  Description:
+    Returns the pointer to the display driver interface that the renderer was
+    initialized with.
+
+  Returns:
+    const gfxDisplayDriver* - the display driver interface
+*/
+const gfxDisplayDriver* leRenderer_DisplayInterface(void);
+
+// *****************************************************************************
+/* Function:
+    const gfxGraphicsProcessor* leRenderer_GPUInterface(void)
+
+  Summary:
+    Returns the pointer to the GPU driver interface that the renderer was
+    initialized with.
+
+  Description:
+    Returns the pointer to the GPU driver interface that the renderer was
+    initialized with.
+
+  Returns:
+    const gfxGraphicsProcessor* - the GPU driver interface
+*/
+const gfxGraphicsProcessor* leRenderer_GPUInterface(void);
 
 // *****************************************************************************
 /* Function:
@@ -170,20 +131,77 @@ void leRenderer_Paint(void);
 
 // *****************************************************************************
 /* Function:
-    leRenderState* leGetRenderState();
+    leBool leRenderer_IsIdle(void);
 
   Summary:
-    Gets a pointer to the current render state.  Use with caution.
+    Returns LE_TRUE if there is no frame in progress
 
   Description:
-    Gets a pointer to the current render state.  Use with caution.
+    Returns LE_TRUE if there is no frame in progress
 
   Parameters:
 
   Returns:
-    leRenderState* - the current render state
+    leBool - true if the renderer is idle
 */
-leRenderState* leGetRenderState(void);
+leBool leRenderer_IsIdle(void);
+
+// *****************************************************************************
+/* Function:
+    void leRenderer_GetDisplaySize(leSize* sz);
+
+  Summary:
+    Returns the size of the display as reported by the display driver.
+
+  Description:
+    Returns the size of the display as reported by the display driver.  This
+    function does not test the pointer for validity
+
+  Parameters:
+    leSize* sz - pointer to an leSize object
+
+  Returns:
+    void
+*/
+void leRenderer_DisplaySize(leSize* sz);
+
+// *****************************************************************************
+/* Function:
+    leRect leRenderer_GetClipRect(void);
+
+  Summary:
+    Returns a rectangle containing the current clipping area.
+
+  Description:
+    Returns a rectangle containing the current clipping area.  Should only be called
+    during frame rendering.  This function does not test the pointer for validity
+
+  Parameters:
+    leRect* rct - pointer to an leRect object
+
+  Returns:
+    void
+*/
+void leRenderer_GetClipRect(leRect* rct);
+
+// *****************************************************************************
+/* Function:
+    leRect leRenderer_GetFrameRect(void);
+
+  Summary:
+    Returns the rect for the current frame rectangle.
+
+  Description:
+    Returns the rect for the current frame rectangle. This function does not test
+    the pointer for validity
+
+  Parameters:
+    leRect* rct - pointer to an leRect object
+
+  Returns:
+    void
+*/
+void leRenderer_GetFrameRect(leRect* rct);
 
 // *****************************************************************************
 /* Function:
@@ -306,7 +324,7 @@ leColor leRenderer_ConvertColor(leColor inColor, leColorMode inMode);
   Returns:
     void
 */
-void leRenderer_GetDrawRect(leRect* rect);
+//void leRenderer_GetDrawRect(leRect* rect);
 
 // *****************************************************************************
 /* Function:
@@ -943,11 +961,30 @@ leResult leRenderer_EllipseLine(int32_t x,
                                 int32_t startAngle,
                                 int32_t endAngle,
                                 leColor clr,
-                                uint32_t alpha);                                                                         
-                             
+                                uint32_t alpha);
+
 /**
   * @endcond
   *
   */
+
+
+/* internal use only */
+/**
+  * @cond INTERNAL
+  *
+  */
+leResult _leRenderer_CreateLayerState(struct leLayerState* st);
+
+void _leRenderer_DestroyLayerState(struct leLayerState* st);
+
+/**
+  * @endcond
+  *
+  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LEGATO_RENDERER_H

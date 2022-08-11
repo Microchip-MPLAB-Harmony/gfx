@@ -35,6 +35,9 @@
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
 
 #define DEFAULT_WIDTH           20
 #define DEFAULT_HEIGHT          100
@@ -220,7 +223,11 @@ static leResult setOrientation(leSliderWidget* _this,
     }
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -244,7 +251,11 @@ static leResult setGripSize(leSliderWidget* _this,
     _this->grip = size;
     
     invalidateHandle(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -274,6 +285,10 @@ static leResult setMinimumValue(leSliderWidget* _this,
         _this->valueChangedEvent(_this);
     }
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -302,6 +317,10 @@ static leResult setMaximumValue(leSliderWidget* _this,
     {
         _this->valueChangedEvent(_this);
     }
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -335,6 +354,10 @@ static leResult setPercentage(leSliderWidget* _this,
     {
         _this->valueChangedEvent(_this);
     }
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -374,7 +397,11 @@ static leResult setValue(leSliderWidget* _this,
     {
         _this->valueChangedEvent(_this);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -435,7 +462,11 @@ static leResult setValueChangedEventCallback(leSliderWidget* _this,
         return LE_FAILURE;
 
     _this->valueChangedEvent = cb;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

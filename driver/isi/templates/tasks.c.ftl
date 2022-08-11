@@ -22,7 +22,37 @@
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
 -->
-    DRV_ISI_Tasks();
+<#if HarmonyCore.SELECT_RTOS == "BareMetal">
+    <#lt>    DRV_ISI_Tasks();
+<#elseif HarmonyCore.SELECT_RTOS == "FreeRTOS">
+    <#lt>    xTaskCreate( _DRV_ISI_Tasks,
+    <#lt>        "DRV_ISI_Tasks",
+    <#lt>        ${RTOSStackSize},
+    <#lt>        (void*)NULL,
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        (TaskHandle_t*)NULL
+    <#lt>    );
+<#elseif HarmonyCore.SELECT_RTOS == "ThreadX">
+    <#lt>    /* Allocate the stack for Input thread */
+    <#lt>    tx_byte_allocate(&byte_pool_0,
+    <#lt>        (VOID **) &_DRV_ISI_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        TX_NO_WAIT
+    <#lt>    );
+
+    <#lt>    /* create the DRV_ISI thread */
+    <#lt>    tx_thread_create(&_DRV_ISI_Task_TCB,
+    <#lt>        "_DRV_ISI_Tasks",
+    <#lt>        _DRV_ISI_Tasks,
+    <#lt>        28,
+    <#lt>        _DRV_ISI_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        TX_NO_TIME_SLICE,
+    <#lt>        TX_AUTO_START
+    <#lt>    );
+</#if>
 <#--
 /*******************************************************************************
  End of File

@@ -33,6 +33,10 @@
 #include "gfx/legato/memory/legato_memory.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -193,7 +197,11 @@ static leResult setImageCount(leImageSequenceWidget* _this,
                                                 
     _this->count = count;
     _this->activeIdx = 0; // just restart
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -226,7 +234,11 @@ static leResult setImage(leImageSequenceWidget* _this,
     {
         _this->fn->invalidate(_this);
     }
-       
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
                                               
@@ -251,7 +263,11 @@ static leResult setImageDelay(leImageSequenceWidget* _this,
         return LE_FAILURE;
         
     _this->images[idx].delay = delay;
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -284,7 +300,11 @@ static leResult setImageHAlignment(leImageSequenceWidget* _this,
     {
         _this->fn->invalidate(_this);
     }
-       
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -317,7 +337,11 @@ static leResult setImageVAlignment(leImageSequenceWidget* _this,
     {
         _this->fn->invalidate(_this);
     }
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -369,7 +393,11 @@ static leResult setRepeat(leImageSequenceWidget* _this,
     LE_ASSERT_THIS();
         
     _this->repeat = repeat;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -390,7 +418,11 @@ static leResult showImage(leImageSequenceWidget* _this,
     }
     
     _this->fn->invalidate(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -409,7 +441,11 @@ static leResult showNextImage(leImageSequenceWidget* _this)
     {
         _this->fn->showImage(_this, _this->activeIdx + 1);
     }
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -428,7 +464,11 @@ static leResult showPreviousImage(leImageSequenceWidget* _this)
     {
         _this->fn->showImage(_this, _this->activeIdx - 1);
     }
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

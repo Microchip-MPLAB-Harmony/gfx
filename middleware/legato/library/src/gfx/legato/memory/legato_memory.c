@@ -36,14 +36,28 @@
 
 #if LE_FIXEDHEAP_ENABLE == 1
 
+#define FIXED_HEAP_COUNT 6
+
 #include "gfx/legato/memory/legato_fixedheap.h"
 
-uint8_t LE_COHERENT_MEMORY fixedHeap16[LE_FIXEDHEAP_BLOCK_SIZE(16) * LE_FIXEDHEAP_SIZE_16];
-uint8_t LE_COHERENT_MEMORY fixedHeap32[LE_FIXEDHEAP_BLOCK_SIZE(32) * LE_FIXEDHEAP_SIZE_32];
-uint8_t LE_COHERENT_MEMORY fixedHeap64[LE_FIXEDHEAP_BLOCK_SIZE(64) * LE_FIXEDHEAP_SIZE_64];
-uint8_t LE_COHERENT_MEMORY fixedHeap128[LE_FIXEDHEAP_BLOCK_SIZE(128) * LE_FIXEDHEAP_SIZE_128];
-uint8_t LE_COHERENT_MEMORY fixedHeap196[LE_FIXEDHEAP_BLOCK_SIZE(196) * LE_FIXEDHEAP_SIZE_196];
-uint8_t LE_COHERENT_MEMORY fixedHeap256[LE_FIXEDHEAP_BLOCK_SIZE(256) * LE_FIXEDHEAP_SIZE_256];
+#if LE_DEBUG == 0
+static uint8_t LE_COHERENT_MEMORY fixedHeap16[LE_FIXEDHEAP_BLOCK_SIZE(16) * LE_FIXEDHEAP_SIZE_16];
+static uint8_t LE_COHERENT_MEMORY fixedHeap32[LE_FIXEDHEAP_BLOCK_SIZE(32) * LE_FIXEDHEAP_SIZE_32];
+static uint8_t LE_COHERENT_MEMORY fixedHeap64[LE_FIXEDHEAP_BLOCK_SIZE(64) * LE_FIXEDHEAP_SIZE_64];
+static uint8_t LE_COHERENT_MEMORY fixedHeap128[LE_FIXEDHEAP_BLOCK_SIZE(128) * LE_FIXEDHEAP_SIZE_128];
+static uint8_t LE_COHERENT_MEMORY fixedHeap196[LE_FIXEDHEAP_BLOCK_SIZE(196) * LE_FIXEDHEAP_SIZE_196];
+static uint8_t LE_COHERENT_MEMORY fixedHeap256[LE_FIXEDHEAP_BLOCK_SIZE(256) * LE_FIXEDHEAP_SIZE_256];
+
+static uint8_t* fixedHeapData[FIXED_HEAP_COUNT] =
+{
+    (void*)&fixedHeap16,
+    (void*)&fixedHeap32,
+    (void*)&fixedHeap64,
+    (void*)&fixedHeap128,
+    (void*)&fixedHeap196,
+    (void*)&fixedHeap256
+};
+#endif // LE_DEBUG
 
 typedef struct leFixedMemoryPoolDef
 {
@@ -54,22 +68,26 @@ typedef struct leFixedMemoryPoolDef
 
 static leFixedMemoryPoolDef fixedPoolDefs[] =
 {
-{ 16, LE_FIXEDHEAP_SIZE_16, fixedHeap16 },
-{ 32, LE_FIXEDHEAP_SIZE_32, fixedHeap32 },
-{ 64, LE_FIXEDHEAP_SIZE_64, fixedHeap64 },
-{ 128, LE_FIXEDHEAP_SIZE_128, fixedHeap128 },
-{ 196, LE_FIXEDHEAP_SIZE_196, fixedHeap196 },
-{ 256, LE_FIXEDHEAP_SIZE_256, fixedHeap256 },
-{ 0, 0, NULL }
+    { 16, LE_FIXEDHEAP_SIZE_16, NULL },
+    { 32, LE_FIXEDHEAP_SIZE_32, NULL },
+    { 64, LE_FIXEDHEAP_SIZE_64, NULL },
+    { 128, LE_FIXEDHEAP_SIZE_128, NULL },
+    { 196, LE_FIXEDHEAP_SIZE_196, NULL },
+    { 256, LE_FIXEDHEAP_SIZE_256, NULL },
+    { 0, 0, NULL }
 };
 
-leFixedHeap fixedHeaps[LE_FIXED_HEAP_COUNT];
+static leFixedHeap fixedHeaps[LE_FIXED_HEAP_COUNT];
 
+#endif // LE_FIXEDHEAP_ENABLE
+
+#if LE_DEBUG == 0
+static uint8_t LE_COHERENT_MEMORY variableHeapData[LE_VARIABLEHEAP_SIZE];
+#else
+static uint8_t* variableHeapData;
 #endif
 
-uint8_t LE_COHERENT_MEMORY variableHeapData[LE_VARIABLEHEAP_SIZE];
-
-leVariableHeap variableHeap;
+static leVariableHeap variableHeap;
 
 leResult leMemory_Init()
 {
@@ -78,6 +96,18 @@ leResult leMemory_Init()
     leFixedHeap* heap;
 
     memset(&fixedHeaps, 0, sizeof(fixedHeaps));
+
+
+    for(i = 0; i < FIXED_HEAP_COUNT; ++i)
+    {
+#if LE_DEBUG == 0
+        fixedPoolDefs[i].data = fixedHeapData[i];
+#else
+        fixedPoolDefs[i].data = malloc(fixedPoolDefs[i].size * fixedPoolDefs[i].count);
+#endif
+    }
+
+    i = 0;
 
     while(fixedPoolDefs[i].data != NULL)
     {
@@ -89,7 +119,11 @@ leResult leMemory_Init()
                          fixedPoolDefs[i].data);
 
         i++;
-    }
+     }
+#endif // LE_FIXEDHEAP_ENABLE
+
+#if LE_DEBUG == 1
+    variableHeapData = malloc(LE_VARIABLEHEAP_SIZE);
 #endif
 
     leVariableHeap_Init(&variableHeap,

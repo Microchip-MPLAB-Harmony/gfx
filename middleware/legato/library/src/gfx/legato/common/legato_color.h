@@ -47,13 +47,16 @@
 #ifndef LE_COLOR_H
 #define LE_COLOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/common/legato_common.h"
 
 /**
   * @cond INTERNAL
   */
-typedef uint32_t               leColor;
-
+typedef uint32_t leColor;
 
 #define LE_COLOR_MAX_SIZE      4
 
@@ -113,21 +116,21 @@ typedef uint32_t               leColor;
  */
 typedef enum leColorMask
 {
-    LE_COLOR_MASK_GS_8      = 0x1,
-    LE_COLOR_MASK_PALETTE   = 0x1,
-    LE_COLOR_MASK_RGB_332   = 0x4,
-    LE_COLOR_MASK_RGB_565   = 0x8,
+    LE_COLOR_MASK_GS_8 = 0x1,
+    LE_COLOR_MASK_PALETTE = 0x1,
+    LE_COLOR_MASK_RGB_332 = 0x4,
+    LE_COLOR_MASK_RGB_565 = 0x8,
     LE_COLOR_MASK_RGBA_5551 = 0x10,
-    LE_COLOR_MASK_RGB_888   = 0x20,
+    LE_COLOR_MASK_RGB_888 = 0x20,
     LE_COLOR_MASK_RGBA_8888 = 0x40,
     LE_COLOR_MASK_ARGB_8888 = 0x80,
-    LE_COLOR_MASK_ALL = LE_COLOR_MASK_GS_8      |
-                        LE_COLOR_MASK_RGB_332   |
-                        LE_COLOR_MASK_RGB_565   |
-                        LE_COLOR_MASK_RGBA_5551 |
-                        LE_COLOR_MASK_RGB_888   | 
-                        LE_COLOR_MASK_RGBA_8888 |
-                        LE_COLOR_MASK_ARGB_8888
+    LE_COLOR_MASK_ALL = LE_COLOR_MASK_GS_8 |
+    LE_COLOR_MASK_RGB_332 |
+    LE_COLOR_MASK_RGB_565 |
+    LE_COLOR_MASK_RGBA_5551 |
+    LE_COLOR_MASK_RGB_888 |
+    LE_COLOR_MASK_RGBA_8888 |
+    LE_COLOR_MASK_ARGB_8888
 } leColorMask;
 
 // *****************************************************************************
@@ -223,7 +226,7 @@ typedef struct leColorModeInfo
         uint32_t blue;
         uint32_t alpha;
     } mask;                     /**< individual color mask. */
-    
+
     struct
     {
         uint8_t red;
@@ -231,7 +234,7 @@ typedef struct leColorModeInfo
         uint8_t blue;
         uint8_t alpha;
     } shift;
-    
+
 } leColorModeInfo;
 
 // *****************************************************************************
@@ -534,7 +537,7 @@ leColor leColorConvert(leColorMode mode_in,
     
   Remarks:
     
-*/    
+*/
 /**
  * @brief Get color from RGBA blend
  * @details Gets a color from the blend of RGBA <span class="param">fore</span>
@@ -630,7 +633,7 @@ leColor leColorLerp(leColor l,
                     leColor r,
                     uint32_t percent,
                     leColorMode mode);
-                                   
+
 // *****************************************************************************
 /* Function:
     leColor leColorBilerp(leColor c00,
@@ -701,5 +704,8 @@ leColor leColorBilerp(leColor c00,
 leColor leColorSwap(leColor clr,
                     leColorMode mode);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LE_COLOR_H */

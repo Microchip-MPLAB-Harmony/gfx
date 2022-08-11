@@ -50,6 +50,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 /* Structure:
     leListNode
@@ -68,7 +72,7 @@
 typedef struct leListNode
 {
     struct leListNode* next; /**< The next list node. */
-    void*  val; /**< The value at a node. */
+    void* val; /**< The value at a node. */
 } leListNode;
 
 
@@ -322,5 +326,9 @@ void leList_Clear(leList* list);
  * @return void.
  */
 void leList_Destroy(leList* list);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_LIST_H */

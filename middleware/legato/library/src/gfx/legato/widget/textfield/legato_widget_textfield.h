@@ -50,6 +50,10 @@
 
 #if LE_TEXTFIELD_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_editwidget.h"
 #include "gfx/legato/string/legato_dynamicstring.h"
 
@@ -66,7 +70,7 @@ typedef struct leTextFieldWidget leTextFieldWidget;
  * @brief This function represents a text changed event callback.
  * @details The callback is used indicate a text changed has occured.
  */
-typedef void (*leTextFieldWidget_TextChangedCallback)(leTextFieldWidget*);
+typedef void (* leTextFieldWidget_TextChangedCallback)(leTextFieldWidget*);
 
 // *****************************************************************************
 /* Function Pointer:
@@ -79,7 +83,7 @@ typedef void (*leTextFieldWidget_TextChangedCallback)(leTextFieldWidget*);
  * @brief This function represents a focus change callback.
  * @details The callback is used indicate a focus change has occured.
  */
-typedef void (*leTextFieldWidget_FocusChangedCallback)(leTextFieldWidget*, leBool);
+typedef void (* leTextFieldWidget_FocusChangedCallback)(leTextFieldWidget*, leBool);
 
 /* internal use only */
 /**
@@ -107,11 +111,11 @@ typedef void (*leTextFieldWidget_FocusChangedCallback)(leTextFieldWidget*, leBoo
     leResult   (*setTextChangedEventCallback)(THIS_TYPE* _this, leTextFieldWidget_TextChangedCallback cb); \
     leTextFieldWidget_FocusChangedCallback (*getFocusChangedEventCallback)(const THIS_TYPE* _this); \
     leResult   (*setFocusChangedEventCallback)(THIS_TYPE* _this, leTextFieldWidget_FocusChangedCallback cb); \
-    
+
 typedef struct leTextFieldWidgetVTable
 {
-	LE_TEXTFIELDWIDGET_VTABLE(leTextFieldWidget)
-} leTextFieldWidgetVTable; 
+    LE_TEXTFIELDWIDGET_VTABLE(leTextFieldWidget)
+} leTextFieldWidgetVTable;
 
 // DOM-IGNORE-END
 
@@ -179,7 +183,6 @@ leTextFieldWidget* leTextFieldWidget_New(void);
  * @return void.
  */
 void leTextFieldWidget_Constructor(leTextFieldWidget* wgt);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -445,6 +448,10 @@ virtual leResult setFocusChangedEventCallback(leTextFieldWidget* _this,
                                               leTextFieldWidget_FocusChangedCallback cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_TEXTFIELD_WIDGET_ENABLED

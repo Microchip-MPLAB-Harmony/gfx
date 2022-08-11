@@ -33,6 +33,26 @@
     <#lt>        ${RTOSTaskPriority},
     <#lt>        (TaskHandle_t*)NULL
     <#lt>    );
+<#elseif HarmonyCore.SELECT_RTOS == "ThreadX">
+    <#lt>    /* Allocate the stack for Input thread */
+    <#lt>    tx_byte_allocate(&byte_pool_0,
+    <#lt>        (VOID **) &_SYS_INPUT_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        TX_NO_WAIT
+    <#lt>    );
+
+    <#lt>    /* create the SYS_INPUT thread */
+    <#lt>    tx_thread_create(&_SYS_INPUT_Task_TCB,
+    <#lt>        "_SYS_INPUT_Tasks",
+    <#lt>        _SYS_INPUT_Tasks,
+    <#lt>        30,
+    <#lt>        _SYS_INPUT_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        TX_NO_TIME_SLICE,
+    <#lt>        TX_AUTO_START
+    <#lt>    );
 </#if>
 <#--
 /*******************************************************************************

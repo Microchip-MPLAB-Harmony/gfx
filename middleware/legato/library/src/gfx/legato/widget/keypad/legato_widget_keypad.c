@@ -35,6 +35,10 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/button/legato_widget_button.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           200
 #define DEFAULT_HEIGHT          200
 
@@ -42,16 +46,113 @@ static
 #if LE_DYNAMIC_VTABLES == 0
 const
 #endif
+
 leKeyPadWidgetVTable keyPadWidgetVTable;
 
-static void resizeCells(leKeyPadWidget* _this,
-                        leWidget_ResizeEvent* evt)
+static void buttonClicked(leButtonWidget* btn);
+
+static leResult _findButtonCell(leKeyPadWidget* _this,
+                                leButtonWidget* btn,
+                                uint32_t* row,
+                                uint32_t* col)
+{
+    uint32_t r, c;
+
+    for(r = 0; r < _this->rows; ++r)
+    {
+        for(c = 0; c < _this->cols; ++c)
+        {
+            if(_this->cells[r][c].button == btn)
+            {
+                *row = r;
+                *col = c;
+
+                return LE_SUCCESS;
+            }
+        }
+    }
+
+    return LE_FAILURE;
+}
+
+static void _reallocateCells(leKeyPadWidget* _this,
+                             uint32_t rows,
+                             uint32_t cols)
+{
+    leKeyPadCell** newCells;
+    uint32_t r, c;
+
+    // create new array
+    newCells = LE_MALLOC(rows * sizeof(leKeyPadCell**));
+
+    memset(newCells, 0, rows * sizeof(leKeyPadCell**));
+
+    for(r = 0; r < rows; ++r)
+    {
+        newCells[r] = LE_MALLOC(cols * sizeof(leKeyPadCell));
+
+        memset(newCells[r], 0, cols * sizeof(leKeyPadCell));
+    }
+
+    // copy old values or initialize new cells
+    for(r = 0; r < rows; ++r)
+    {
+        for(c = 0; c < cols; ++c)
+        {
+            if(r >= _this->rows || c >= _this->cols)
+            {
+                newCells[r][c].button = leButtonWidget_New();
+
+                LE_ASSERT(newCells[r][c].button != NULL);
+
+                LE_PCALL(newCells[r][c].button, setPressedEventCallback, (leButtonWidget_PressedEvent)buttonClicked);
+                LE_PCALL(newCells[r][c].button, setReleasedEventCallback, (leButtonWidget_PressedEvent)buttonClicked);
+
+                _this->fn->addChild(_this, (leWidget*)newCells[r][c].button);
+            }
+            else
+            {
+                newCells[r][c] = _this->cells[r][c];
+            }
+        }
+    }
+
+    // delete old out-of-bound values
+    for(r = 0; r < _this->rows; ++r)
+    {
+        for(c = 0; c < _this->cols; ++c)
+        {
+            if(r >= rows || c >= cols)
+            {
+                LE_PCALL(_this, removeChild, (leWidget*)_this->cells[r][c].button);
+
+                leWidget_Delete((leWidget*)_this->cells[r][c].button);
+            }
+        }
+    }
+
+    // free old array
+    if(_this->cells != NULL)
+    {
+        for(r = 0; r < _this->rows; ++r)
+        {
+            LE_FREE(_this->cells[r]);
+        }
+
+        LE_FREE(_this->cells);
+    }
+
+    // set new array
+    _this->rows = rows;
+    _this->cols = cols;
+    _this->cells = newCells;
+}
+
+static void _resizeCells(leKeyPadWidget* _this)
 {
     uint32_t width, height, wrem, hrem, row, col, wmod, hmod;
     int32_t x, y;
     leButtonWidget* btn;
-
-    (void)evt; // unused
 
     if(_this->widget.children.size == 0)
         return;
@@ -94,9 +195,18 @@ static void resizeCells(leKeyPadWidget* _this,
     }
 }
 
+static void _resizeCellEvent(leKeyPadWidget* _this,
+                             leWidget_ResizeEvent* evt)
+{
+    (void)evt; // unused
+
+    _resizeCells(_this);
+}
+
 static void buttonClicked(leButtonWidget* btn)
 {
-    int32_t id, row, col;
+    uint32_t row = 0;
+    uint32_t col = 0;
     leKeyPadWidget* _this = (leKeyPadWidget*)btn->widget.parent;
     
     LE_ASSERT_THIS();
@@ -104,12 +214,9 @@ static void buttonClicked(leButtonWidget* btn)
     if ((btn->fn->getPressed(btn) == LE_TRUE && _this->trigger == LE_KEYPAD_TRIGGER_KEYRELEASED) ||
         (btn->fn->getPressed(btn) == LE_FALSE && _this->trigger == LE_KEYPAD_TRIGGER_KEYPRESSED))
         return;
-        
-    id = _this->fn->getIndexOfChild(_this, (leWidget*)btn);
-    
-    row = id / _this->cols;
-    col = id % _this->cols; 
-    
+
+    _findButtonCell(_this, btn, &row, &col);
+
     if(_this->clickEvt != NULL)
     {
         _this->clickEvt(_this, btn, row, col);
@@ -117,23 +224,23 @@ static void buttonClicked(leButtonWidget* btn)
     
     //printf("%i, %i\n", row, col);
     
-    if(_this->cells[id].action == LE_KEYPAD_CELL_ACTION_APPEND)
+    if(_this->cells[row][col].action == LE_KEYPAD_CELL_ACTION_APPEND)
     {
-        _leEditWidget_Append(_this->cells[id].value);
+        _leEditWidget_Append(_this->cells[row][col].value);
     }
-    else if(_this->cells[id].action == LE_KEYPAD_CELL_ACTION_SET)
+    else if(_this->cells[row][col].action == LE_KEYPAD_CELL_ACTION_SET)
     {
-        _leEditWidget_Set(_this->cells[id].value);
+        _leEditWidget_Set(_this->cells[row][col].value);
     }
-    else if(_this->cells[id].action == LE_KEYPAD_CELL_ACTION_BACKSPACE)
+    else if(_this->cells[row][col].action == LE_KEYPAD_CELL_ACTION_BACKSPACE)
     {
         _leEditWidget_Backspace();
     }
-    else if(_this->cells[id].action == LE_KEYPAD_CELL_ACTION_CLEAR)
+    else if(_this->cells[row][col].action == LE_KEYPAD_CELL_ACTION_CLEAR)
     {
         _leEditWidget_Clear();
     }
-    else if(_this->cells[id].action == LE_KEYPAD_CELL_ACTION_ACCEPT)
+    else if(_this->cells[row][col].action == LE_KEYPAD_CELL_ACTION_ACCEPT)
     {
         _leEditWidget_Accept();
     }
@@ -158,8 +265,8 @@ void leKeyPadWidget_Constructor(leKeyPadWidget* _this,
                                 uint32_t rows,
                                 uint32_t cols)
 {
-    leButtonWidget* button;
-    uint32_t i;
+    //leButtonWidget* button;
+    //uint32_t i;
     
     leWidget_Constructor((leWidget*)_this);
     
@@ -174,11 +281,14 @@ void leKeyPadWidget_Constructor(leKeyPadWidget* _this,
     _this->widget.style.borderType = LE_WIDGET_BORDER_BEVEL;
     _this->widget.style.backgroundType = LE_WIDGET_BACKGROUND_NONE;
     
-    _this->rows = rows;
-    _this->cols = cols;
+    _this->rows = 0;
+    _this->cols = 0;
     
     _this->trigger = LE_KEYPAD_TRIGGER_KEYRELEASED;
-    
+
+    _reallocateCells(_this, rows, cols);
+
+#if 0
     _this->cells = LE_MALLOC(rows * cols * sizeof(leKeyPadCell));
     
     for(i = 0; i < rows * cols; i++)
@@ -196,10 +306,11 @@ void leKeyPadWidget_Constructor(leKeyPadWidget* _this,
         
         _this->fn->addChild(_this, (leWidget*)button);
     }
+#endif
 
     _this->clickEvt = NULL;
 
-    resizeCells(_this, NULL);
+    _resizeCells(_this);
 }
 
 void _leWidget_Destructor(leWidget* _this);
@@ -222,6 +333,26 @@ leKeyPadWidget* leKeyPadWidget_New(uint32_t rows, uint32_t cols)
     return pad;
 }
 
+static leResult setCellArraySize(leKeyPadWidget* _this,
+                                 uint32_t rows,
+                                 uint32_t cols)
+{
+    LE_ASSERT_THIS();
+
+    if(_this->rows == rows && _this->cols == cols)
+        return LE_FAILURE;
+
+    _reallocateCells(_this, rows, cols);
+
+    _resizeCells(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
+    return LE_SUCCESS;
+}
+
 static leKeyPadActionTrigger getKeyPadActionTrigger(const leKeyPadWidget* _this)
 {
     LE_ASSERT_THIS();
@@ -235,7 +366,11 @@ static leResult setKeyPadActionTrigger(leKeyPadWidget* _this,
     LE_ASSERT_THIS();
 
     _this->trigger = trigger;
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -264,12 +399,16 @@ static leResult setKeyVisible(leKeyPadWidget* _this,
     leButtonWidget* btn;
     
     LE_ASSERT_THIS();
-    
-    if(row * _this->cols + col > _this->rows * _this->cols)
+
+    if(row >= _this->rows || col >= _this->cols)
         return LE_FAILURE;
         
     btn = _this->fn->getCellButton(_this, row, col);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return btn->fn->setVisible(btn, enabled);
 }
 
@@ -279,10 +418,10 @@ static leKeyPadCellAction getKeyAction(const leKeyPadWidget* _this,
 {
     LE_ASSERT_THIS();
     
-    if(row * _this->cols + col > _this->rows * _this->cols)
+    if(row >= _this->rows || col >= _this->cols)
         return 0;
     
-    return _this->cells[row * _this->cols + col].action;
+    return _this->cells[row][col].action;
 }
                                                
 static leResult setKeyAction(leKeyPadWidget* _this,
@@ -292,11 +431,15 @@ static leResult setKeyAction(leKeyPadWidget* _this,
 {
     LE_ASSERT_THIS();
     
-    if(row * _this->cols + col > _this->rows * _this->cols)
+    if(row >= _this->rows || col >= _this->cols)
         return LE_FAILURE;
         
-    _this->cells[row * _this->cols + col].action = action;
-        
+    _this->cells[row][col].action = action;
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -304,10 +447,10 @@ static leString* getKeyValue(const leKeyPadWidget* _this,
                              uint32_t row,
                              uint32_t col)
 {
-    if(row * _this->cols + col > _this->rows * _this->cols)
+    if(row >= _this->rows || col >= _this->cols)
         return NULL;
     
-    return (leString*)_this->cells[row * _this->cols + col].value;
+    return (leString*)_this->cells[row][col].value;
 }
 
 static leResult setKeyValue(leKeyPadWidget* _this,
@@ -315,10 +458,10 @@ static leResult setKeyValue(leKeyPadWidget* _this,
                             uint32_t col,
                             const leString* val)
 {
-    if(row * _this->cols + col > _this->rows * _this->cols)
+    if(row >= _this->rows || col >= _this->cols)
         return LE_FAILURE;
 
-    _this->cells[row * _this->cols + col].value = val;
+    _this->cells[row][col].value = val;
 
     _this->fn->invalidate(_this);
 
@@ -337,7 +480,7 @@ static leButtonWidget* getCellButton(const leKeyPadWidget* _this,
         return NULL;
        
     btn = (leButtonWidget*)_this->fn->getChildAtIndex(_this, (row * _this->cols) + col);
-    
+
     return btn;
 }
 
@@ -359,11 +502,12 @@ void _leKeyPadWidget_GenerateVTable()
     
     /* overrides from base class */
     keyPadWidgetVTable._destructor = destructor;
-    keyPadWidgetVTable.resizeEvent = resizeCells;
+    keyPadWidgetVTable.resizeEvent = _resizeCellEvent;
     keyPadWidgetVTable._paint = _leKeyPadWidget_Paint;
     keyPadWidgetVTable.languageChangeEvent = handleLanguageChangeEvent;
     
     /* member functions */
+    keyPadWidgetVTable.setCellArraySize = setCellArraySize;
     keyPadWidgetVTable.getKeyPadActionTrigger = getKeyPadActionTrigger;
     keyPadWidgetVTable.setKeyPadActionTrigger = setKeyPadActionTrigger;
     keyPadWidgetVTable.getKeyClickEventCallback = getKeyClickEventCallback;
@@ -460,11 +604,12 @@ static const leKeyPadWidgetVTable keyPadWidgetVTable =
 
     /* overrides from base class */
     ._destructor = destructor,
-    .resizeEvent = resizeCells,
+    .resizeEvent = _resizeCellEvent,
     ._paint = _leKeyPadWidget_Paint,
     .languageChangeEvent = handleLanguageChangeEvent,
 
     /* member functions */
+    .setCellArraySize = setCellArraySize,
     .getKeyPadActionTrigger = getKeyPadActionTrigger,
     .setKeyPadActionTrigger = setKeyPadActionTrigger,
     .getKeyClickEventCallback = getKeyClickEventCallback,

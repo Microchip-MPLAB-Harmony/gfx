@@ -50,6 +50,10 @@
 
 #if LE_IMAGESEQUENCE_WIDGET_ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/string/legato_string.h"
@@ -922,6 +926,10 @@ virtual leResult setImageChangedEventCallback(leImageSequenceWidget* _this,
                                               leImageSequenceImageChangedEvent_FnPtr cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_IMAGESEQUENCE_WIDGET_ENABLED

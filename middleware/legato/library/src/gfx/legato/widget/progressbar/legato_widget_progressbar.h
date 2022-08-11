@@ -49,6 +49,10 @@
 
 #if LE_PROGRESSBAR_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/widget/legato_widget.h"
 
 // *****************************************************************************
@@ -106,7 +110,7 @@ typedef enum leProgressBarDirection
  * @details The callback is used indicate a value has changed.
  * @details .
  */
-typedef void (*leProgressBar_ValueChangedEventCallback)(leProgressBar*, uint32_t);
+typedef void (* leProgressBar_ValueChangedEventCallback)(leProgressBar*, uint32_t);
 
 /* internal use only */
 /**
@@ -123,16 +127,16 @@ typedef void (*leProgressBar_ValueChangedEventCallback)(leProgressBar*, uint32_t
     leResult               (*setValue)(THIS_TYPE* _this, uint32_t value); \
     leProgressBar_ValueChangedEventCallback (*getValueChangedEventCallback)(const THIS_TYPE* _this); \
     leResult               (*setValueChangedCallback)(THIS_TYPE* _this, leProgressBar_ValueChangedEventCallback cb); \
-    
+
 typedef struct leProgressBarWidgetVTable
 {
-	LE_PROGRESSBARWIDGET_VTABLE(leProgressBarWidget)
-} leProgressBarWidgetVTable; 
+    LE_PROGRESSBARWIDGET_VTABLE(leProgressBarWidget)
+} leProgressBarWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /**
@@ -287,6 +291,9 @@ virtual leResult setValueChangedCallback(leProgressBarWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_PROGRESSBAR_WIDGET_ENABLED
 #endif /* LEGATO_PROGRESSBAR_H */

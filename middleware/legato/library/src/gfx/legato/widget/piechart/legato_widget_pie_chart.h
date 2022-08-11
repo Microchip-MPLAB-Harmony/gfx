@@ -49,6 +49,10 @@
 
 #if LE_PIECHART_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/font/legato_font.h"
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -86,7 +90,7 @@ typedef struct lePieChartWidget lePieChartWidget;
  * @brief Used to define a pie chart pressed event callback function.
  * @details .
  */
-typedef void (*lePieChartWidget_PressedEvent)(lePieChartWidget*, uint32_t);
+typedef void (* lePieChartWidget_PressedEvent)(lePieChartWidget*, uint32_t);
 
 
 /* internal use only */
@@ -121,16 +125,16 @@ typedef struct lePieChartWidget lePieChartWidget;
     leResult            (*setLabelsVisible)(THIS_TYPE* _this, leBool vis); \
     uint32_t            (*getLabelsOffset)(const THIS_TYPE* _this); \
     leResult            (*setLabelsOffset)(THIS_TYPE* _this, uint32_t offs); \
-    
+
 typedef struct lePieChartWidgetVTable
 {
-	LE_PIECHARTWIDGET_VTABLE(lePieChartWidget)
-} lePieChartWidgetVTable; 
+    LE_PIECHARTWIDGET_VTABLE(lePieChartWidget)
+} lePieChartWidgetVTable;
 
-    /**
-      * @endcond
-      *
-      */
+/**
+  * @endcond
+  *
+  */
 
 // *****************************************************************************
 /**
@@ -188,7 +192,6 @@ lePieChartWidget* lePieChartWidget_New(void);
  * @return void.
  */
 void lePieChartWidget_Constructor(lePieChartWidget* wgt);
-
 
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
@@ -930,6 +933,10 @@ virtual leResult setPressedEventCallback(lePieChartWidget* _this,
                                          lePieChartWidget_PressedEvent cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_PIECHART_WIDGET_ENABLED

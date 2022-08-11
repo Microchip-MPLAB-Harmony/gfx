@@ -127,7 +127,7 @@ uint32_t _leTableString_Length(const leTableString* _this)
 
     LE_ASSERT_THIS();
 
-    if(_this->index == LE_STRING_NULLIDX)
+    if(tbl == NULL || _this->index == LE_STRING_NULLIDX)
         return 0;
     
     info.stringIndex = _this->index;

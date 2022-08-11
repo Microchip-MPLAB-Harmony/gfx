@@ -50,6 +50,10 @@
 
 #if LE_RADIOBUTTON_WIDGET_ENABLED == 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "gfx/legato/datastructure/legato_array.h"
 
 // *****************************************************************************
@@ -132,10 +136,10 @@ leResult leRadioButtonGroup_Create(leRadioButtonGroup** grp);
         void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp)
  
     Summary:
-        This function destroys the GFX_GOL_RADIOBUTTON group 
+        This function destroys the radio button group
 
     Description:
-        This function destroys he GFX_GOL_RADIOBUTTON group with the
+        This function destroys he radio button group with the
         given pointer. It frees the memory allocated to the button group and clears the button list.
         
     Parameters:
@@ -187,7 +191,7 @@ void leRadioButtonGroup_Destroy(leRadioButtonGroup* grp);
  * @param param1 wgt is the widget to initialize
  * @return void.
  */
-leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp,leRadioButtonWidget* btn);
+leResult leRadioButtonGroup_AddButton(leRadioButtonGroup* grp, leRadioButtonWidget* btn);
 
 /*    Function:
         leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
@@ -256,7 +260,10 @@ leResult leRadioButtonGroup_RemoveButton(leRadioButtonGroup* grp,
  */
 leResult leRadioButtonGroup_SelectButton(leRadioButtonGroup* grp,
                                          leRadioButtonWidget* btn);
-                                                    
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_RADIOBUTTON_WIDGET_ENABLED
 #endif /* LEGATO_RADIOBUTTON_GROUP_H */

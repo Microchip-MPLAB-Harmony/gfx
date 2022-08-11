@@ -52,6 +52,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 /**
  * @brief This struct represents a array.
@@ -297,5 +301,9 @@ leResult leArray_Copy(leArray* src, leArray* dest);
  * @return LE_SUCCESS if cleared, otherwise LE_FAILURE.
  */
 leResult leArray_Clear(leArray* arr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_ARRAY_H */

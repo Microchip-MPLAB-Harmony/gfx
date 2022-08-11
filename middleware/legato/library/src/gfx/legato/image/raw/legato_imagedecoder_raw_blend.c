@@ -36,7 +36,6 @@ void _leRawImageDecoder_InjectStage(leRawDecodeState* state,
 struct InternalBlendStage
 {
     leRawDecodeStage base;
-    leRenderState* renderer;
 };
 
 static LE_COHERENT_ATTR struct InternalBlendStage blendStage;
@@ -130,7 +129,6 @@ void _leRawImageDecoder_BlendStage_Internal(leRawDecodeState* state)
     }
 
     blendStage.base.state = state;
-    blendStage.renderer = leGetRenderState();
 
     _leRawImageDecoder_InjectStage(state, (void*)&blendStage);
 }

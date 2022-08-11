@@ -103,19 +103,30 @@ static void drawBorder(leWidget* wdg)
 
 void _leWidget_Paint(leWidget* wdg)
 {
-    if(wdg->status.drawState == NOT_STARTED)
+    switch(wdg->status.drawState)
     {
-        paintState.alpha = 255;
+        case NOT_STARTED:
+        {
+            paintState.alpha = 255;
 
 #if LE_ALPHA_BLENDING_ENABLED == 1
-        if(wdg->fn->getCumulativeAlphaEnabled(wdg) == LE_TRUE)
-        {
-            paintState.alpha = wdg->fn->getCumulativeAlphaAmount(wdg);
-        }
+            if(wdg->fn->getCumulativeAlphaEnabled(wdg) == LE_TRUE)
+            {
+                paintState.alpha = wdg->fn->getCumulativeAlphaAmount(wdg);
+            }
 #endif
 
-        wdg->drawFunc = (leWidget_DrawFunction_FnPtr)&drawBackground;
+            wdg->drawFunc = (leWidget_DrawFunction_FnPtr) &drawBackground;
+
+            break;
+        }
+        case DONE:
+        {
+            return;
+        }
+        default:
+        { }
     }
-    
+
     wdg->drawFunc((leWidget*)wdg);
 }

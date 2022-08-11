@@ -36,6 +36,10 @@
 
 #include "gfx/legato/common/legato_math.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -136,7 +140,11 @@ static leResult setRadius(leCircularGaugeWidget* _this,
     _this->radius = rad;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -160,7 +168,11 @@ static leResult setStartAngle(leCircularGaugeWidget* _this,
     _this->startAngle = angle;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -193,7 +205,11 @@ static leResult setCenterAngle(leCircularGaugeWidget* _this,
     _this->centerAngle = angle;
 
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -221,6 +237,10 @@ static leResult setValue(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -232,6 +252,7 @@ static int32_t addArc(leCircularGaugeWidget* _this,
                       uint32_t thickness)
 {
     leCircularGaugeArc * arc;
+    int32_t idx = -1;
     
     LE_ASSERT_THIS();
 
@@ -260,11 +281,17 @@ static int32_t addArc(leCircularGaugeWidget* _this,
     arc->scheme = scheme;
     arc->thickness = thickness;
 
+    idx = (int32_t)_this->arcsArray.size;
+
     leArray_PushBack(&_this->arcsArray, arc);
 
     _this->fn->invalidate(_this);
-        
-    return (int32_t)_this->arcsArray.size;
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
+    return idx;
 }
 
 static leResult deleteArc(leCircularGaugeWidget* _this,
@@ -289,6 +316,10 @@ static leResult deleteArc(leCircularGaugeWidget* _this,
         _this->fn->invalidate(_this);
     }
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -309,7 +340,11 @@ static leResult deleteAllArcs(leCircularGaugeWidget* _this)
     leArray_Clear(&_this->arcsArray);
 
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -351,6 +386,10 @@ static leResult setArcEnabled(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -387,6 +426,10 @@ static leResult setArcStartAngle(leCircularGaugeWidget* _this,
     arc->startAngle = ang;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -425,6 +468,10 @@ static leResult setArcEndAngle(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -458,6 +505,10 @@ static leResult setArcOffset(leCircularGaugeWidget* _this,
     arc->offset = offs;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -493,6 +544,10 @@ static leResult setArcScheme(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -527,6 +582,10 @@ static leResult setArcThickness(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -539,6 +598,7 @@ static int32_t addTickRange(leCircularGaugeWidget* _this,
                             uint32_t div)
 {
     leCircularGaugeTickRange* tick;
+    int32_t idx = -1;
     
     LE_ASSERT_THIS();
 
@@ -578,11 +638,17 @@ static int32_t addTickRange(leCircularGaugeWidget* _this,
     tick->thickness = thickness;
     tick->divisions = div;
 
+    idx = (int32_t)_this->ticksArray.size;
+
     leArray_PushBack(&_this->ticksArray, tick);
 
     _this->fn->invalidate(_this);
-        
-    return (int32_t)_this->ticksArray.size;
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
+    return idx;
 }
 
 static leResult deleteTickRange(leCircularGaugeWidget* _this,
@@ -607,6 +673,10 @@ static leResult deleteTickRange(leCircularGaugeWidget* _this,
         _this->fn->invalidate(_this);
     }
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -627,6 +697,10 @@ static leResult deleteAllTickRanges(leCircularGaugeWidget* _this)
     leArray_Clear(&_this->ticksArray);
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -669,6 +743,10 @@ static leResult setTickRangeEnabled(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -705,6 +783,10 @@ static leResult setTickRangeStartAngle(leCircularGaugeWidget* _this,
     tick->startAngle = ang;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -743,6 +825,10 @@ static leResult setTickRangeEndAngle(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -776,6 +862,10 @@ static leResult setTickRangeOffset(leCircularGaugeWidget* _this,
     tick->offset = offs;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -811,6 +901,10 @@ static leResult setTickRangeScheme(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -844,6 +938,10 @@ static leResult setTickRangeThickness(leCircularGaugeWidget* _this,
     tick->thickness = thk;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -879,6 +977,10 @@ static leResult setTickRangeDivisions(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -891,6 +993,7 @@ static int32_t addLabelRange(leCircularGaugeWidget* _this,
                               uint32_t div)
 {
     leCircularGaugeLabelRange* label;
+    int32_t idx = -1;
 
     LE_ASSERT_THIS();
 
@@ -927,11 +1030,17 @@ static int32_t addLabelRange(leCircularGaugeWidget* _this,
     label->font = fnt;
     label->divisions = div;
 
+    idx = (int32_t)_this->labelsArray.size;
+
     leArray_PushBack(&_this->labelsArray, label);
 
     _this->fn->invalidate(_this);
 
-    return (int32_t)_this->labelsArray.size;
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
+    return idx;
 }
 
 static leResult deleteLabelRange(leCircularGaugeWidget* _this,
@@ -956,6 +1065,10 @@ static leResult deleteLabelRange(leCircularGaugeWidget* _this,
         _this->fn->invalidate(_this);
     }
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return res;
 }
 
@@ -976,6 +1089,10 @@ static leResult deleteAllLabelRanges(leCircularGaugeWidget* _this)
     leArray_Clear(&_this->labelsArray);
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1018,6 +1135,10 @@ static leResult setLabelRangeEnabled(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1055,6 +1176,10 @@ static leResult setLabelRangeStartAngle(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1088,6 +1213,10 @@ static leResult setLabelRangeEndAngle(leCircularGaugeWidget* _this,
     label->endAngle = ang;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1126,6 +1255,10 @@ static leResult setLabelRangeOffset(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1159,6 +1292,10 @@ static leResult setLabelRangeScheme(leCircularGaugeWidget* _this,
     label->scheme = schm;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1194,6 +1331,10 @@ static leResult setLabelRangeFont(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1228,6 +1369,10 @@ static leResult setLabelRangeDivisions(leCircularGaugeWidget* _this,
 
     _this->fn->invalidate(_this);
 
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1249,6 +1394,10 @@ static leResult setHandVisible(leCircularGaugeWidget* _this,
     _this->handVisible = visible;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1274,7 +1423,11 @@ static leResult setHandRadius(leCircularGaugeWidget* _this,
     _this->handRadius = length;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1296,6 +1449,10 @@ static leResult setCenterCircleVisible(leCircularGaugeWidget* _this,
     _this->centerCircleVisible = visible;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -1321,7 +1478,11 @@ static leResult setCenterCircleRadius(leCircularGaugeWidget* _this,
     _this->centerCircleRadius = rad;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -1346,7 +1507,11 @@ static leResult setCenterCircleThickness(leCircularGaugeWidget* _this,
     _this->centerCircleThickness = thickness;
     
     _this->fn->invalidate(_this);
-        
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

@@ -33,6 +33,26 @@
     <#lt>        ${RTOSTaskPriority},
     <#lt>        (TaskHandle_t*)NULL
     <#lt>    );
+<#elseif HarmonyCore.SELECT_RTOS == "ThreadX">
+    <#lt>    /* Allocate the stack for Input thread */
+    <#lt>    tx_byte_allocate(&byte_pool_0,
+    <#lt>        (VOID **) &_DRV_TOUCH_CONTROLLER_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        TX_NO_WAIT
+    <#lt>    );
+
+    <#lt>    /* create the DRV_TOUCH_CONTROLLER thread */
+    <#lt>    tx_thread_create(&_DRV_TOUCH_CONTROLLER_Task_TCB,
+    <#lt>        "_DRV_TOUCH_CONTROLLER_Tasks",
+    <#lt>        _DRV_TOUCH_CONTROLLER_Tasks,
+    <#lt>        29,
+    <#lt>        _DRV_TOUCH_CONTROLLER_Task_Stk_Ptr,
+    <#lt>        ${RTOSStackSize},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        ${RTOSTaskPriority},
+    <#lt>        TX_NO_TIME_SLICE,
+    <#lt>        TX_AUTO_START
+    <#lt>    );
 </#if>
 <#--
 /*******************************************************************************

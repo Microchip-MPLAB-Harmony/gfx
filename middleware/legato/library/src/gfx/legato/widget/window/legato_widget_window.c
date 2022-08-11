@@ -34,6 +34,10 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/widget/legato_widget.h"
 
+#if LE_DEBUG == 1
+#include "gfx/legato/core/legato_debug.h"
+#endif
+
 #define DEFAULT_WIDTH           100
 #define DEFAULT_HEIGHT          100
 
@@ -143,7 +147,7 @@ static uint32_t getTitleHeight(const leWindowWidget* _this)
 {
     LE_ASSERT_THIS();
 
-    return _this->iconMargin;
+    return _this->titleHeight;
 }
 
 static leResult setTitleHeight(leWindowWidget* _this,
@@ -157,6 +161,10 @@ static leResult setTitleHeight(leWindowWidget* _this,
     _this->titleHeight = ht;
 
     _this->fn->invalidate(_this);
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
 
     return LE_SUCCESS;
 }
@@ -188,16 +196,23 @@ static leResult setString(leWindowWidget* _this,
 
     _this->title = str;
 
-    _this->title->fn->setPreInvalidateCallback((leString*)_this->title,
-                                               (leString_InvalidateCallback)stringPreinvalidate,
-                                               _this);
+    if(_this->title != NULL)
+    {
+        _this->title->fn->setPreInvalidateCallback((leString*) _this->title,
+                                                   (leString_InvalidateCallback) stringPreinvalidate,
+                                                   _this);
 
-    _this->title->fn->setInvalidateCallback((leString*)_this->title,
-                                            (leString_InvalidateCallback)stringInvalidate,
-                                            _this);
+        _this->title->fn->setInvalidateCallback((leString*) _this->title,
+                                                (leString_InvalidateCallback) stringInvalidate,
+                                                _this);
 
-    _invalidateTitleBar(_this);
-    
+        _invalidateTitleBar(_this);
+    }
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -219,7 +234,11 @@ static leResult setIcon(leWindowWidget* _this,
     _this->icon = img;
     
     _invalidateTitleBar(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -241,7 +260,11 @@ static leResult setIconMargin(leWindowWidget* _this,
     _this->iconMargin = mg;
 
     _invalidateTitleBar(_this);
-    
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
     return LE_SUCCESS;
 }
 

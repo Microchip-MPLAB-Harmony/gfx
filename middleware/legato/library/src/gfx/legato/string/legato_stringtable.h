@@ -33,6 +33,10 @@
 #include "gfx/legato/common/legato_common.h"
 #include "gfx/legato/font/legato_font.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // defines meta data sizes for the string table, don't change!
 #define LE_STRING_ARRAY_SIZE      4
 #define LE_STRING_ENTRY_SIZE      2
@@ -222,5 +226,8 @@ leResult leStringTable_StringLookup(const leStringTable* table,
 leResult leStringTable_GetStringLength(const leStringTable* table,
                                        leStringInfo* info);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_STRINGTABLE_H */

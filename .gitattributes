@@ -23,4 +23,5 @@
 *.otf binary
 *.pdf binary
 *.dot binary
+*.elf binary
 middleware/legato/composer/** binary

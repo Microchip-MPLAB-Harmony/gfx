@@ -229,8 +229,9 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
                       const gfxGraphicsProcessor* gpuDriver)
 {
     uint32_t idx;
-    leWidget* root;
-    gfxIOCTLArg_DisplaySize disp;
+    //leLayerState* layerState;
+    //leWidget* root;
+    //leSize disp;
     
     if(_initialized == LE_TRUE)
         return LE_FAILURE;
@@ -263,18 +264,26 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
     
     leImage_InitDecoders();
 
+    leList_Create(&_state.layerList);
+
+#if 0
     for(idx = 0; idx < LE_LAYER_COUNT; idx++)
     {
-        root = &_state.rootWidget[idx];
+        layerState = LE_MALLOC(sizeof(struct leLayerState));
+
+        LE_ASSERT(layerState != NULL);
+
+        leList_PushBack(&_state.layerList,
+                        layerState);
+
+        root = &layerState->root;
         
         leWidget_Constructor(root);
 
-        disp.width = 0;
-        disp.height = 0;
+        leRenderer_DisplaySize(&disp);
 
         dispDriver->ioctl(GFX_IOCTL_SET_ACTIVE_LAYER, &idx);
-        dispDriver->ioctl(GFX_IOCTL_GET_DISPLAY_SIZE, &disp);
-        
+
         root->rect.x = 0;
         root->rect.y = 0;
 
@@ -291,29 +300,38 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
         root->flags |= LE_WIDGET_IGNOREEVENTS;
         root->flags |= LE_WIDGET_IGNOREPICK;
 
-        _state.layerStates[idx].colorMode = LE_DEFAULT_COLOR_MODE;
+        layerState->colorMode = LE_DEFAULT_COLOR_MODE;
     }
-    
+#endif
+
     _initialized = LE_TRUE;
+
+    for(idx = 0; idx < LE_LAYER_COUNT; idx++)
+    {
+        leAddLayer();
+    }
 
     return LE_SUCCESS;
 }
 
 void leShutdown()
 {
-    uint32_t idx;
-    leWidget* root;
-    
+    leLayerState* layer;
+
     if(_initialized == LE_FALSE)
         return;
-    
-    for(idx = 0; idx < LE_LAYER_COUNT; idx++)
+
+    while(_state.layerList.size > 0)
     {
-        root = &_state.rootWidget[idx];
-        
-        root->fn->_destructor(root);
+        layer = (leLayerState*) leList_Get(&_state.layerList, 0);
+
+        leList_PopFront(&_state.layerList);
+
+        LE_OCALL(layer->root, _destructor);
+
+        LE_FREE(layer);
     }
-    
+
     leRenderer_Shutdown();
     leInput_Shutdown();
     leEvent_Shutdown();
@@ -340,15 +358,18 @@ static void updateWidget(leWidget* wgt, uint32_t dt)
 
 static void updateWidgets(uint32_t dt)
 {
-    int32_t i;
+    leLayerState* layer;
+    uint32_t i;
 
     if(leIsDrawing() == LE_TRUE)
         return;
 
     // iterate over all existing layers for update
-    for(i = 0; i < LE_LAYER_COUNT; i++)
+    for(i = 0; i < _state.layerList.size; i++)
     {
-        updateWidget(&_state.rootWidget[i], dt);
+        layer = (leLayerState*)leList_Get(&_state.layerList, i);
+
+        updateWidget(&layer->root, dt);
     }
 }
 
@@ -357,12 +378,16 @@ leResult leUpdate(uint32_t dt)
 #if LE_DRIVER_LAYER_MODE == 1
     uint32_t itr;
     gfxIOCTLArg_LayerRect layerRect;
+    leState* state;
+    leLayerState* layerState;
 #endif
 
     leEvent_ProcessEvents();
 
 #if LE_DRIVER_LAYER_MODE == 1
-    for(itr = 0; itr < LE_LAYER_COUNT; ++itr)
+    state = leGetState();
+
+    for(itr = 0; itr < state->layerList.size; ++itr)
     {
         layerRect.base.id = itr;
         layerRect.x = 0;
@@ -370,23 +395,24 @@ leResult leUpdate(uint32_t dt)
         layerRect.width = 0;
         layerRect.height = 0;
 
-        leGetRenderState()->dispDriver->ioctl(GFX_IOCTL_GET_LAYER_RECT, &layerRect);
+        leRenderer_DisplayInterface()->ioctl(GFX_IOCTL_GET_LAYER_RECT, &layerRect);
+        layerState = (leLayerState*)leList_Get(&state->layerList, itr);
 
-        _state.layerStates[itr].driverPosition.x = layerRect.x;
-        _state.layerStates[itr].driverPosition.y = layerRect.y;
+        layerState->driverPosition.x = layerRect.x;
+        layerState->driverPosition.y = layerRect.y;
 
-        _state.rootWidget[itr].fn->setPosition(&_state.rootWidget[itr],
-                                               0,
-                                               0);
+        layerState->root.fn->setPosition(&layerState->root,
+                                         0,
+                                         0);
 
 #if LE_RENDER_ORIENTATION == 90 || LE_RENDER_ORIENTATION == 270
-        _state.rootWidget[itr].fn->setSize(&_state.rootWidget[itr],
-                                           layerRect.height,
-                                           layerRect.width);
+        layerState->root.fn->setSize(&layerState->root,
+                                     layerRect.height,
+                                     layerRect.width);
 #else
-        _state.rootWidget[itr].fn->setSize(&_state.rootWidget[itr],
-                                           layerRect.width,
-                                           layerRect.height);
+        layerState->root.fn->setSize(&layerState->root,
+                                     layerRect.width,
+                                     layerRect.height);
 #endif
     }
 #endif
@@ -416,40 +442,146 @@ leResult leUpdate(uint32_t dt)
     return LE_SUCCESS;
 }
 
+uint32_t leLayerCount(void)
+{
+    if(_initialized == LE_FALSE)
+        return 0;
+
+    return _state.layerList.size;
+}
+
+int32_t leAddLayer(void)
+{
+    leLayerState* layer;
+    leWidget* root;
+    leSize disp;
+    int32_t idx = _state.layerList.size;
+
+    if(_initialized == LE_FALSE)
+        return LE_FAILURE;
+
+    layer = LE_MALLOC(sizeof(struct leLayerState));
+
+    LE_ASSERT(layer != NULL);
+
+    _leRenderer_CreateLayerState(layer);
+
+    leList_PushBack(&_state.layerList,
+                    layer);
+
+    root = &layer->root;
+
+    leWidget_Constructor(root);
+
+    disp.width = 0;
+    disp.height = 0;
+
+    leRenderer_DisplaySize(&disp);
+
+    root->rect.x = 0;
+    root->rect.y = 0;
+
+#if LE_RENDER_ORIENTATION == 0 || LE_RENDER_ORIENTATION == 180
+    root->rect.width = disp.width;
+    root->rect.height = disp.height;
+#else
+    root->rect.width = disp.height;
+    root->rect.height = disp.width;
+#endif
+
+    root->fn->invalidate(root);
+    root->flags |= LE_WIDGET_ISROOT;
+    root->flags |= LE_WIDGET_IGNOREEVENTS;
+    root->flags |= LE_WIDGET_IGNOREPICK;
+
+    layer->colorMode = LE_DEFAULT_COLOR_MODE;
+
+    return idx;
+}
+
+leResult leRemoveLayer(uint32_t idx)
+{
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
+        return LE_FAILURE;
+
+    layer = leList_Get(&_state.layerList, idx);
+
+    _leRenderer_DestroyLayerState(layer);
+
+    leList_Remove(&_state.layerList, layer);
+
+    LE_OCALL(layer->root, _destructor);
+
+    LE_FREE(layer);
+
+    return LE_SUCCESS;
+}
+
+leLayerState* leGetLayerState(uint32_t idx)
+{
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
+        return NULL;
+
+    return (leLayerState*)leList_Get(&_state.layerList, idx);
+}
+
 leColorMode leGetLayerColorMode(uint32_t idx)
 {
-    if(idx >= LE_LAYER_COUNT)
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
         return LE_COLOR_MODE_GS_8;
 
-    return _state.layerStates[idx].colorMode;
+    layer = (leLayerState*)leList_Get(&_state.layerList, idx);
+
+    return layer->colorMode;
 }
 
 leResult leSetLayerColorMode(uint32_t idx,
                              leColorMode mode)
 {
-    if(idx >= LE_LAYER_COUNT)
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
         return LE_FAILURE;
 
-    _state.layerStates[idx].colorMode = mode;
+    layer = (leLayerState*)leList_Get(&_state.layerList, idx);
+
+    if(layer->colorMode == mode)
+        return LE_FAILURE;
+
+    layer->colorMode = mode;
+
+    leRedrawAll();
 
     return LE_SUCCESS;
 }
 
 leBool leGetLayerRenderHorizontal(uint32_t idx)
 {
-    if(idx >= LE_LAYER_COUNT)
-        return LE_FALSE;
+    leLayerState* layer;
 
-    return _state.layerStates[idx].renderHorizontal;
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
+        return LE_FAILURE;
+
+    layer = (leLayerState*)leList_Get(&_state.layerList, idx);
+
+    return layer->renderHorizontal;
 }
 
 leResult leSetLayerRenderHorizontal(uint32_t idx,
                                     leBool horz)
 {
-    if(idx >= LE_LAYER_COUNT)
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || idx >= _state.layerList.size)
         return LE_FAILURE;
 
-    _state.layerStates[idx].renderHorizontal = horz;
+    layer = (leLayerState*)leList_Get(&_state.layerList, idx);
+
+    layer->renderHorizontal = horz;
 
     return LE_SUCCESS;
 }
@@ -495,15 +627,19 @@ void leSetStringLanguage(uint32_t id)
 {
     uint32_t i;
 
+    leLayerState* layer;
+
     if(_state.languageID == id)
         return;
 
     _state.languageID = id;
 
     // iterate over all existing layers for update
-    for(i = 0; i < LE_LAYER_COUNT; i++)
+    for(i = 0; i < _state.layerList.size; i++)
     {
-        updateWidgetLanguage(&_state.rootWidget[i]);
+        layer = (leLayerState*)leList_Get(&_state.layerList, i);
+
+        updateWidgetLanguage(&layer->root);
     }
 }
 
@@ -572,45 +708,52 @@ leResult leSetEditWidget(leEditWidget* widget)
 
 void leRedrawAll()
 {
-    uint32_t layer;
-    leWidget* root;
+    leLayerState* layer;
+    uint32_t itr;
 
-    for(layer = 0; layer < LE_LAYER_COUNT; layer++)
+    for(itr = 0; itr < _state.layerList.size; itr++)
     {
-        root = &_state.rootWidget[layer];
+        layer = (leLayerState*)leList_Get(&_state.layerList, itr);
 
-        root->fn->invalidate(root);
+        LE_OCALL(layer->root, invalidate);
     }
 }
 
 leBool leIsDrawing()
 {
-    return leGetRenderState()->frameState > LE_FRAME_PREFRAME;
+    return !leRenderer_IsIdle();
 }
 
 leResult leAddRootWidget(leWidget* wgt,
-                         uint32_t layer)
+                         uint32_t layerIdx)
 {
-    if(wgt == NULL || layer > LE_LAYER_COUNT - 1)
+    leLayerState* layer;
+
+    if(wgt == NULL || layerIdx >= _state.layerList.size)
         return LE_FAILURE;
+
+    layer = (leLayerState*)leList_Get(&_state.layerList, layerIdx);
+
+    leRenderer_DamageArea(&wgt->rect, layerIdx);
         
-    leRenderer_DamageArea(&wgt->rect, layer);
-        
-    return _state.rootWidget[layer].fn->addChild(&_state.rootWidget[layer], wgt);
+    return LE_OCALL(layer->root, addChild, wgt);
 }
 
-leResult leRemoveRootWidget(leWidget* wgt, uint32_t layer)
+leResult leRemoveRootWidget(leWidget* wgt, uint32_t layerIdx)
 {
     leRect rect;
+    leLayerState* layer;
     
     if(wgt == NULL)
         return LE_FAILURE;
         
     rect = wgt->rect;
-        
-    if(_state.rootWidget[layer].fn->removeChild(&_state.rootWidget[layer], wgt) == LE_SUCCESS)
+
+    layer = (leLayerState*)leList_Get(&_state.layerList, layerIdx);
+
+    if(LE_OCALL(layer->root, removeChild, wgt) == LE_SUCCESS)
     {
-        leRenderer_DamageArea(&rect, layer);
+        leRenderer_DamageArea(&rect, layerIdx);
         
         return LE_SUCCESS;
     }
@@ -625,9 +768,10 @@ leBool leWidgetIsInScene(const leWidget* wgt)
 
 int32_t leGetWidgetLayer(const leWidget* wgt)
 {
-    int32_t layer;
+    uint32_t layerIdx;
     leWidget* root;
     leWidget* wgtRoot;
+    leLayerState* layer;
 
     if(wgt == NULL)
         return LE_FALSE;
@@ -637,12 +781,14 @@ int32_t leGetWidgetLayer(const leWidget* wgt)
     if(wgtRoot == NULL)
         return LE_FALSE;
 
-    for(layer = 0; layer < LE_LAYER_COUNT; layer++)
+    for(layerIdx = 0; layerIdx < _state.layerList.size; layerIdx++)
     {
-        root = &_state.rootWidget[layer];
+        layer = (leLayerState*)leList_Get(&_state.layerList, layerIdx);
+
+        root = &layer->root;
 
         if(root == wgtRoot)
-            return layer;
+            return layerIdx;
     }
 
     return -1;

@@ -32,6 +32,10 @@
 
 #include "gfx/legato/string/legato_string.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LE_STRING_NULLIDX -1
 
 /* internal use only */
@@ -204,5 +208,8 @@ virtual uint32_t sizeInBytes(const leTableString* this);
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LEGATO_TABLESTRING_H */

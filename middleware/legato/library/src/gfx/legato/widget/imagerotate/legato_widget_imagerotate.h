@@ -48,7 +48,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_IMAGEROTATE_WIDGET_ENABLED
+#if LE_IMAGEROTATE_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/widget/legato_widget.h"
@@ -79,7 +83,7 @@ typedef struct leImageRotateWidget leImageRotateWidget;
 
 typedef struct leImageRotateWidgetVTable
 {
-	LE_IMAGEROTATEWIDGET_VTABLE(leImageRotateWidget)
+    LE_IMAGEROTATEWIDGET_VTABLE(leImageRotateWidget)
 } leImageRotateWidgetVTable;
 
 // DOM-IGNORE-END
@@ -106,7 +110,7 @@ typedef struct leImageRotateWidgetVTable
 typedef struct leImageRotateWidget
 {
     leWidget widget; // widget base class
-    
+
     const leImageRotateWidgetVTable* fn;
 
     const leImage* image; // pointer to image asset
@@ -289,6 +293,9 @@ virtual leResult setFilter(leImageRotateWidget* _this,
 #undef THIS_TYPE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LE_IMAGEROTATE_WIDGET_ENABLED
 #endif /* LEGATO_IMAGEROTATE_H */

@@ -105,7 +105,7 @@ leResult leRenderer_HorzGradientRect(const leRect* rect,
                                  
         leRenderer_VertLine(drawPoint.x,
                             drawPoint.y,
-                            rect->y + rect->height,
+                            rect->height,
                             clr,
                             a);
     }
@@ -136,7 +136,7 @@ leResult leRenderer_VertGradientRect(const leRect* rect,
                                  
         leRenderer_HorzLine(drawPoint.x,
                             drawPoint.y,
-                            rect->x + rect->width,
+                            rect->width,
                             clr,
                             a);
     }

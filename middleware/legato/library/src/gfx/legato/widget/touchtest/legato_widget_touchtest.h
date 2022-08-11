@@ -48,7 +48,11 @@
 
 #include "gfx/legato/common/legato_common.h"
 
-#if LE_TOUCHTEST_WIDGET_ENABLED
+#if LE_TOUCHTEST_WIDGET_ENABLED == 1
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "gfx/legato/widget/legato_widget.h"
 
@@ -106,7 +110,7 @@ typedef struct leTouchTestWidget leTouchTestWidget;
  * @brief This function represents a point added event callback.
  * @details The callback is used indicate a point added has occured.
  */
-typedef void (*leTouchTestWidget_PointAddedEventCallback)(leTouchTestWidget*, lePoint*);
+typedef void (* leTouchTestWidget_PointAddedEventCallback)(leTouchTestWidget*, lePoint*);
 
 
 /* internal use only */
@@ -122,11 +126,11 @@ typedef void (*leTouchTestWidget_PointAddedEventCallback)(leTouchTestWidget*, le
     leResult  (*clearPoints)(THIS_TYPE* _this); \
     leTouchTestWidget_PointAddedEventCallback (*getPointAddedEventCallback)(const THIS_TYPE* _this); \
     leResult  (*setPointAddedEventCallback)(THIS_TYPE* _this, leTouchTestWidget_PointAddedEventCallback cb); \
-    
+
 typedef struct leTouchTestWidgetVTable
 {
-	LE_TOUCHTESTWIDGET_VTABLE(leTouchTestWidget)
-} leTouchTestWidgetVTable; 
+    LE_TOUCHTESTWIDGET_VTABLE(leTouchTestWidget)
+} leTouchTestWidgetVTable;
 
 /**
   * @endcond
@@ -254,6 +258,10 @@ virtual leResult setPointAddedEventCallback(leTouchTestWidget* _this,
                                     leTouchTestWidget_PointAddedEventCallback cb);
 
 #undef THIS_TYPE
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // LE_TOUCHTEST_WIDGET_ENABLED

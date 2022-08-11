@@ -91,7 +91,7 @@ def instantiateComponent(comp):
 	VertPulseWidth = comp.createIntegerSymbol("VertPulseWidth", VertMenu)
 	VertPulseWidth.setLabel("Vertical Pulse Width")
 	VertPulseWidth.setDescription("The vertical pulse width.")
-	VertPulseWidth.setDefaultValue(10)
+	VertPulseWidth.setDefaultValue(3)
 	VertPulseWidth.setReadOnly(True)
 	
 	VertBackPorch = comp.createIntegerSymbol("VertBackPorch", VertMenu)

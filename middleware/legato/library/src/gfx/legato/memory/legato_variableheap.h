@@ -58,8 +58,8 @@
     void* data - pointer to the heap data
     void* allocList - a linked list of allocation data blocks
     void* freeList - a linked list of free data blocks
-    uint32_t allocBlockCount - the number of blocks currently allocated
-    uint32_t freeBlockCount - the number of blocks in the free list
+    size_t allocBlockCount - the number of blocks currently allocated
+    size_t freeBlockCount - the number of blocks in the free list
 */
 /**
  * @brief This struct represents a variable heap.
@@ -80,8 +80,8 @@ typedef struct leVariableHeap
     void* allocList;
     void* freeList;
 
-    uint32_t allocBlockCount;
-    uint32_t freeBlockCount;
+    size_t allocBlockCount;
+    size_t freeBlockCount;
 } leVariableHeap;
 
 // *****************************************************************************
@@ -91,7 +91,7 @@ typedef struct leVariableHeap
  * @code
  * leVariableHeap* heap;
  * void* data;
- * uint32_t size;
+ * size_t size;
  * leResult res = leVariableHeap_Init(heap, data, size);
  * @endcode
  * @param heap the pointer to the heap object
@@ -101,7 +101,7 @@ typedef struct leVariableHeap
  */
 leResult leVariableHeap_Init(leVariableHeap* heap,
                              void* data,
-                             uint32_t size);
+                             size_t size);
 
 // *****************************************************************************
 /**
@@ -120,8 +120,8 @@ void leVariableHeap_Destroy(leVariableHeap* heap);
 // *****************************************************************************
 /* Function:
     void* leVariableHeap_Alloc(leVariableHeap* heap,
-                               uint32_t size,
-                               uint32_t lineNum,
+                               size_t size,
+                               size_t lineNum,
                                const char* funcName,
                                const char* fileName)
 
@@ -137,8 +137,8 @@ void leVariableHeap_Destroy(leVariableHeap* heap);
 
   Parameters:
     leVariableHeap* heap - pointer to the heap object
-    uint32_t size - the size
-    uint32_t lineNum - the file line number where this allocation occured
+    size_t size - the size
+    size_t lineNum - the file line number where this allocation occured
     const char* funcName - the function name where this allocation occured
     const char* fileName - the file name where this allocation occured
 
@@ -146,8 +146,8 @@ void leVariableHeap_Destroy(leVariableHeap* heap);
     leResult
 */
 void* leVariableHeap_Alloc(leVariableHeap* heap,
-                           uint32_t size,
-                           uint32_t lineNum,
+                           size_t size,
+                           size_t lineNum,
                            const char* funcName,
                            const char* fileName);
 #else
@@ -164,7 +164,7 @@ void* leVariableHeap_Alloc(leVariableHeap* heap,
  * @return void pointer.
  */
 void* leVariableHeap_Alloc(leVariableHeap* heap,
-                           uint32_t size);
+                           size_t size);
 #endif
 
 #if LE_USE_DEBUG_ALLOCATOR == 1
@@ -185,8 +185,8 @@ void* leVariableHeap_Alloc(leVariableHeap* heap,
  */
 void* leVariableHeap_Realloc(leVariableHeap* heap,
                              void* ptr,
-                             uint32_t size,
-                             uint32_t lineNum,
+                             size_t size,
+                             size_t lineNum,
                              const char* funcName,
                              const char* fileName);
 
@@ -205,7 +205,7 @@ void* leVariableHeap_Realloc(leVariableHeap* heap,
  */
 void* leVariableHeap_Realloc(leVariableHeap* heap,
                              void* ptr,
-                             uint32_t size);
+                             size_t size);
 #endif
 // *****************************************************************************
 /**
@@ -265,13 +265,13 @@ leResult leVariableHeap_Validate(leVariableHeap* heap);
  * @code
  * leVariableHeap* heap;
  * void* ptr;
- * uint32_t size = leVariableHeap_SizeOf(heap, ptr);
+ * size_t size = leVariableHeap_SizeOf(heap, ptr);
 
  * @endcode
  * @return the size of the pointer, otherwise zero if it wasn't found.
  */
-uint32_t leVariableHeap_SizeOf(leVariableHeap* heap,
-                               void* ptr);
+size_t leVariableHeap_SizeOf(leVariableHeap* heap,
+                             void* ptr);
 
 // *****************************************************************************
 

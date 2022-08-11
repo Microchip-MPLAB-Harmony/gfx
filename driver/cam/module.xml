@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="cam" id="45a86be9-431c-4e01-b761-dd9f284169f7" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>
+ 

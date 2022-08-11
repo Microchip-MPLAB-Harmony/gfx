@@ -29,8 +29,6 @@
 #include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/datastructure/legato_rectarray.h"
 
-extern leRenderState _rendererState;
-
 leResult leRenderer_HorzLine(int32_t x,
                              int32_t y,
                              int32_t w,
@@ -70,22 +68,13 @@ leResult leRenderer_HorzLine(int32_t x,
     {
         return LE_SUCCESS;
     }
-    else if(a < 255)
-    {
-        for(i = 0; i < clipRect.width; i++)
-        {
-            pnt.x = clipRect.x + i;
-
-            leRenderer_BlendPixel(pnt.x, pnt.y, clr, a);
-        }
-    }
     else
     {
         for(i = 0; i < clipRect.width; i++)
         {
             pnt.x = clipRect.x + i;
 
-            leRenderer_PutPixel(pnt.x, pnt.y, clr);
+            leRenderer_BlendPixel(pnt.x, pnt.y, clr, a);
         }
     }
 
@@ -131,7 +120,7 @@ leResult leRenderer_VertLine(int32_t x,
     {
         return LE_SUCCESS;
     }
-    else if(a < 255)
+    else
     {
         for(i = 0; i < clipRect.height; i++)
         {
@@ -140,37 +129,8 @@ leResult leRenderer_VertLine(int32_t x,
             leRenderer_BlendPixel(pnt.x, pnt.y, clr, a);
         }
     }
-    else
-    {
-        for(i = 0; i < clipRect.height; i++)
-        {
-            pnt.y = clipRect.y + i;
-
-            leRenderer_PutPixel(pnt.x, pnt.y, clr);
-        }
-    }
 
     return LE_SUCCESS;
-}
-
-typedef void (*LinePutPixelFn)(int32_t, int32_t, leColor, uint32_t);
-
-static void linePutPixel(int32_t x,
-                         int32_t y,
-                         leColor clr,
-                         uint32_t a)
-{
-    (void)a; // unused
-
-    leRenderer_PutPixel(x, y, clr);
-}
-
-static void lineBlendPixel(int32_t x,
-                           int32_t y,
-                           leColor clr,
-                           uint32_t a)
-{
-    leRenderer_BlendPixel(x, y, clr, a);
 }
 
 leResult leRenderer_DrawLine(int32_t x0,
@@ -182,10 +142,11 @@ leResult leRenderer_DrawLine(int32_t x0,
 {
     int32_t dx, sx, dy, sy, e2, err;
     lePoint lp1, lp2, drawPoint;
-
-    LinePutPixelFn putPixelFn;
+    leRect clipRect;
 
     a = leClampi(0, 255, a);
+
+    leRenderer_GetClipRect(&clipRect);
 
     if(a == 0)
     {
@@ -195,19 +156,11 @@ leResult leRenderer_DrawLine(int32_t x0,
                            y0,
                            x1,
                            y1,
-                           &_rendererState.drawRect,
+                           &clipRect,
                            clr,
                            a) == LE_SUCCESS)
     {
         return LE_SUCCESS;
-    }
-    else if(a < 255)
-    {
-        putPixelFn = lineBlendPixel;
-    }
-    else
-    {
-        putPixelFn = linePutPixel;
     }
 
     lp1.x = x0;
@@ -240,7 +193,7 @@ leResult leRenderer_DrawLine(int32_t x0,
 
         if(leRenderer_CullDrawPoint(&drawPoint) == LE_FALSE)
         {
-            putPixelFn(drawPoint.x, drawPoint.y, clr, a);
+            leRenderer_BlendPixel(drawPoint.x, drawPoint.y, clr, a);
         }
 
         if(lp1.x == lp2.x && lp1.y == lp2.y)

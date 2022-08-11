@@ -300,7 +300,6 @@ static void calculateBlending(leRadialMenuItemNode* item,
             item->widget->fn->setAlphaEnabled(item->widget, LE_TRUE);
 
             val = leLerp(min, max, item->percent);
-            val = lePercentOf(255, val);
 
             item->widget->fn->setAlphaAmount(item->widget, val);
 
@@ -464,8 +463,8 @@ void _leRadialMenu_RecalculateArrangement(leRadialMenuWidget* mn)
 #if LE_ALPHA_BLENDING_ENABLED == 1
         calculateBlending(item,
                           mn->blendMode,
-                          mn->minSizePercent,
-                          mn->maxSizePercent,
+                          mn->minAlphaAmount,
+                          mn->maxAlphaAmount,
                           mn->fn->isProminent(mn, item->widget));
 #endif
 

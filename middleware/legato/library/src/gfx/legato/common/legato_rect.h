@@ -49,6 +49,10 @@
 
 #include "gfx/legato/common/legato_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Routines
@@ -289,5 +293,9 @@ leBool leRectsAreSimilar(const leRect* l,
   * @endcond
   *
   */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LE_RECT_H */
