@@ -495,6 +495,7 @@ int32_t leAddLayer(void)
     root->flags |= LE_WIDGET_IGNOREPICK;
 
     layer->colorMode = LE_DEFAULT_COLOR_MODE;
+    layer->clearMode = LE_LAYERCLEARMODE_DEFAULT;
 
     return idx;
 }
@@ -582,6 +583,33 @@ leResult leSetLayerRenderHorizontal(uint32_t idx,
     layer = (leLayerState*)leList_Get(&_state.layerList, idx);
 
     layer->renderHorizontal = horz;
+
+    return LE_SUCCESS;
+}
+
+leLayerClearMode leGetLayerClearMode(uint32_t lyrIdx)
+{
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || lyrIdx >= _state.layerList.size)
+        return LE_FAILURE;
+
+    layer = (leLayerState*)leList_Get(&_state.layerList, lyrIdx);
+
+    return layer->clearMode;
+}
+
+leResult leSetLayerClearMode(uint32_t lyrIdx,
+                             leLayerClearMode mode)
+{
+    leLayerState* layer;
+
+    if(_initialized == LE_FALSE || lyrIdx >= _state.layerList.size)
+        return LE_FAILURE;
+
+    layer = (leLayerState*)leList_Get(&_state.layerList, lyrIdx);
+
+    layer->clearMode = mode;
 
     return LE_SUCCESS;
 }

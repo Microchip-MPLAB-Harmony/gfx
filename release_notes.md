@@ -8,6 +8,23 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.11.1
+
+### Issues Fixed
+
+
+* MH3-70249	Composer does not correctly show Global Palette enabled design
+* MH3-70248	leGetRenderState() is deprecated without replacement
+* MH3-63712	Legato PNG decoder doesn't work properly part 2
+* MH3-70533 Rendering issue with 270 degree code
+* MH3-70535 Graphics artifacts when using layers with transparent background (RGBA)
+* MH3-70860 Legato Composer - Screens not saving event enable states
+
+
+* Microchip Graphics Composer v1.3.0a 
+  * Legato Plugin Linux/Windows/Mac Build v2.3.1b 
+
+
 ## Graphics Release v3.11.0
 
 ### New Features
@@ -310,6 +327,7 @@ nav_order: 99
 
 * Applications running on SAM E70 in combination with LCC will observe visual rendering artifacts on display during SD card R/W access. There is no loss in SD Card data.
 * For applications on SAM E54 + CPRO with the 24-bit passthrough board, Pin 7 of the EXT1 connector should drive the backlight. However, on rev1.0 of the board, it is not connected to any pin on the MCU. As a workaround, it needs to be connected to a v3.3 pin.
+* MISRA 2012 Rule 9.1 Compliance Deviation at legato_error.c line 74
 
 For a list of post release issues that affect this release, refer to MPLAB Harmony [GFX Issues and Errata](https://github.com/Microchip-MPLAB-Harmony/gfx/wiki/Issues-and-Errata).
 

@@ -148,7 +148,6 @@ typedef enum leColorMask
 typedef enum leColorMode
 {
     LE_COLOR_MODE_GS_8       = 0,
-    LE_COLOR_MODE_PALETTE    = LE_COLOR_MODE_GS_8,
     LE_COLOR_MODE_RGB_332    = 1,
     LE_COLOR_MODE_RGB_565    = 2,
     LE_COLOR_MODE_RGBA_5551  = 3,
@@ -158,6 +157,7 @@ typedef enum leColorMode
     LE_COLOR_MODE_INDEX_1    = 7,
     LE_COLOR_MODE_INDEX_4    = 8,
     LE_COLOR_MODE_INDEX_8    = 9,
+    LE_COLOR_MODE_PALETTE    = LE_COLOR_MODE_INDEX_8,
     LE_COLOR_MODE_MONOCHROME = 10
 } leColorMode;
 

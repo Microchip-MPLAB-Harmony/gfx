@@ -50,3 +50,5 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
                                  const leRect* sourceRect,
                                  const leRect* destRect,
                                  uint32_t a);
+
+leResult leGPU_ClearBuffer(lePixelBuffer* buf);

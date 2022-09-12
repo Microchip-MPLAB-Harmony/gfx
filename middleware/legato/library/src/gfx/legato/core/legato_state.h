@@ -50,6 +50,13 @@ extern "C" {
  */
 typedef void (*leLanguageChangedCallback_FnPtr)(uint32_t);
 
+typedef enum leLayerClearMode
+{
+    LE_LAYERCLEARMODE_DEFAULT,
+    LE_LAYERCLEARMODE_DISABLE,
+    LE_LAYERCLEARMODE_FORCE,
+} leLayerClearMode;
+
 // *****************************************************************************
 /**
  * @brief This struct describes the layer state for a layer.
@@ -64,6 +71,7 @@ typedef struct leLayerState
     leColorMode colorMode;
     leBool renderHorizontal;
     lePoint driverPosition;
+    leLayerClearMode clearMode;
 
     void* rendererData;
 
@@ -179,6 +187,18 @@ leLayerState* leGetLayerState(uint32_t idx);
 leColorMode leGetLayerColorMode(uint32_t lyrIdx);
 
 /**
+ * @brief Set layer color mode.
+ * @details Sets the the layer color mode at index
+ * @code
+ * leResult res = leGetLayerColorMode(0, LE_RGB_565);
+ * @endcode
+ * @param lyrIdx is the index of the layer to query
+ * @param mode is the color mode to set
+ * @return result.
+ */
+leResult leSetLayerColorMode(uint32_t lyrIdx, leColorMode mode);
+
+/**
  * @brief Add root widget to layer.
  * @details Adds the root widget <span class="param">wgt</span>
  * to the layer <span class="param">layer</span>.
@@ -230,17 +250,7 @@ leResult leRemoveRootWidget(leWidget* wgt,
                             uint32_t layer);
 
 
-/**
- * @brief Set layer color mode.
- * @details Sets the the layer color mode at index
- * @code
- * leResult res = leGetLayerColorMode(0, LE_RGB_565);
- * @endcode
- * @param lyrIdx is the index of the layer to query
- * @param mode is the color mode to set
- * @return result.
- */
-leResult leSetLayerColorMode(uint32_t lyrIdx, leColorMode mode);
+
 
 /**
  * @brief Get layer render direction.
@@ -268,6 +278,30 @@ leBool leGetLayerRenderHorizontal(uint32_t lyrIdx);
  * @return result.
  */
 leResult leSetLayerRenderHorizontal(uint32_t lyrIdx, leBool horz);
+
+/**
+ * @brief Get layer clear mode.
+ * @details Gets the the layer clear mode
+ * @code
+ * leLayerClearMode mode = leGetLayerClearMode(0);
+ * @endcode
+ * @param lyrIdx is the index of the layer to query
+ * @return the clear mode of layer.
+ */
+leLayerClearMode leGetLayerClearMode(uint32_t lyrIdx);
+
+/**
+ * @brief Set layer clear mode.
+ * @details Sets the the layer clear mode at index
+ * @code
+ * leResult res = leSetLayerColorMode(0, LE_LAYERCLEARMODE_FORCE);
+ * @endcode
+ * @param lyrIdx is the index of the layer to modify
+ * @param mode is the clear mode to set
+ * @return result.
+ */
+leResult leSetLayerClearMode(uint32_t lyrIdx,
+                             leLayerClearMode mode);
 
 #if 0
 // *****************************************************************************

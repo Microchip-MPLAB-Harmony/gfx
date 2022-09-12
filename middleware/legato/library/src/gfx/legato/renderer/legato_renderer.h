@@ -148,6 +148,23 @@ leBool leRenderer_IsIdle(void);
 
 // *****************************************************************************
 /* Function:
+    size_t leRenderer_GetDrawCount(void);
+
+  Summary:
+    Returns the number of frames the renderer has drawn
+
+  Description:
+    Returns the number of frames the renderer has drawn
+
+  Parameters:
+
+  Returns:
+    size_t - the number of frames drawn
+*/
+size_t leRenderer_GetDrawCount(void);
+
+// *****************************************************************************
+/* Function:
     void leRenderer_GetDisplaySize(leSize* sz);
 
   Summary:

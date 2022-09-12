@@ -35,6 +35,7 @@
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/datastructure/legato_rectarray.h"
 #include "gfx/legato/memory/legato_memory.h"
+#include "gfx/legato/renderer/legato_gpu.h"
 #include "gfx/driver/gfx_driver.h"
 
 static leState* _state;
@@ -101,7 +102,7 @@ typedef struct leRenderState
 
     leFrameState frameState;      // the current frame render state
 
-    uint32_t drawCount;           // the number of times the screen has drawn
+    size_t drawCount;             // the number of times the screen has drawn
 
     uint32_t frameDrawCount;      // the number of widgets that have rendered
                                   // on the screen
@@ -175,6 +176,11 @@ static gfxColorMode _convertColorMode(leColorMode mode)
 leBool leRenderer_IsIdle(void)
 {
     return _rendererState.frameState == LE_FRAME_READY;
+}
+
+size_t leRenderer_GetDrawCount(void)
+{
+    return _rendererState.drawCount;
 }
 
 lePixelBuffer* leGetRenderBuffer(void)
@@ -586,6 +592,7 @@ static void preRect(void)
     uint32_t width, height;
     struct leScratchBuffer* buf = NULL;
     leLayerState* layerState;
+    leBool zeroize = LE_FALSE;
 
     if(_rendererState.frameRectIdx == _rendererState.currentRenderLayer->frameRectList.size)
     {
@@ -629,6 +636,37 @@ static void preRect(void)
                         leGetLayerColorMode(_rendererState.layerIdx),
                         &_dataBuffers[idx],
                         &buf->renderBuffer);
+
+    switch(layerState->clearMode)
+    {
+        case LE_LAYERCLEARMODE_FORCE:
+        {
+            zeroize = LE_TRUE;
+
+            break;
+        }
+        case LE_LAYERCLEARMODE_DEFAULT:
+        {
+            if(layerState->colorMode == LE_COLOR_MODE_RGBA_8888)
+            {
+                zeroize = LE_TRUE;
+            }
+
+            break;
+        }
+        default:
+        { }
+    }
+
+    if(zeroize == LE_TRUE)
+    {
+        if(leGPU_ClearBuffer(&buf->renderBuffer) == LE_FAILURE)
+        {
+            memset(buf->renderBuffer.pixels,
+                   0,
+                   buf->renderBuffer.buffer_length);
+        }
+    }
 
     _rendererState.frameState = LE_FRAME_PREWIDGET;
 }

@@ -580,7 +580,7 @@ void leUtils_PointLogicalToScratch(int16_t* x,
 #else
     lePixelBuffer* buf = leGetRenderBuffer();
 
-    rotY = buf->size.height - *x;
+    rotY = buf->size.height - 1 - *x;
     rotX = *y;
 #endif
 
