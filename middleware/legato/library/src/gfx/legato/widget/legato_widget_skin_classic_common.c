@@ -194,15 +194,15 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
     //Draw the center rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y + radius;
-    drawRect.width = rect->width - (radius * 2);
-    drawRect.height = rect->height - (radius * 2);
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
 
     leRenderer_RectFill(&drawRect, clr, a);
 
     //Draw the top rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y;
-    drawRect.width = rect->width - (radius * 2 + radius % 2);
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
     drawRect.height = radius;
 
     leRenderer_RectFill(&drawRect, clr, a);
@@ -210,7 +210,7 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
     //Draw the bottom rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y + rect->height - radius;
-    drawRect.width = rect->width - (radius * 2 + radius % 2);
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
     drawRect.height = radius;
 
     leRenderer_RectFill(&drawRect, clr, a);
@@ -219,7 +219,7 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
     drawRect.x = rect->x;
     drawRect.y = rect->y + radius;
     drawRect.width = radius;
-    drawRect.height = rect->height - (radius * 2 + radius % 2);
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
 
     leRenderer_RectFill(&drawRect, clr, a);
 
@@ -227,7 +227,7 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
     drawRect.x = rect->x + rect->width - radius;
     drawRect.y = rect->y + radius;
     drawRect.width = radius;
-    drawRect.height = rect->height - (radius * 2 + radius % 2);
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
 
     leRenderer_RectFill(&drawRect, clr, a);
 
@@ -248,7 +248,7 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
                        a);
 
     //Upper right
-    drawRect.x = rect->x + rect->width - (3 * radius / 2 + 3 * radius % 2);
+    drawRect.x = rect->x + rect->width - (3 * radius / 2);
     drawRect.y = rect->y + (radius / 2 + radius % 2);
     drawRect.width = radius;
     drawRect.height = radius;
@@ -264,7 +264,7 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
 
     //Lower left
     drawRect.x = rect->x + (radius / 2 + radius % 2);
-    drawRect.y = rect->y + rect->height - (3 * radius / 2 + 3 * radius % 2);
+    drawRect.y = rect->y + rect->height - (3 * radius / 2);
     drawRect.width = radius;
     drawRect.height = radius;
 
@@ -278,8 +278,8 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
                        a);
 
     //Lower right
-    drawRect.x = rect->x + rect->width - (3 * radius / 2 + 3 * radius % 2);
-    drawRect.y = rect->y + rect->height - (3 * radius / 2 + 3 * radius % 2);
+    drawRect.x = rect->x + rect->width - (3 * radius / 2 );
+    drawRect.y = rect->y + rect->height - (3 * radius / 2);
     drawRect.width = radius;
     drawRect.height = radius;
 
@@ -348,37 +348,38 @@ void leWidget_SkinClassic_DrawRoundCornerLineBorder(const leRect* rect,
                                                     uint32_t a)
 {
     leRect drawRect;
+    int fudge = radius / 12 + 1;
 
     //Draw the top line
-    leRenderer_HorzLine(rect->x + radius,
+    leRenderer_HorzLine(rect->x + radius - fudge,
                         rect->y,
-                        rect->width - (radius * 2 + radius % 2),
+                        rect->width - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
 
     //Draw the bottom line
-    leRenderer_HorzLine(rect->x + radius,
+    leRenderer_HorzLine(rect->x + radius - fudge,
                         rect->y + rect->height - 1,
-                        rect->width - (radius * 2 + radius % 2),
+                        rect->width - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
 
     //Draw the left line
     leRenderer_VertLine(rect->x,
-                        rect->y + radius,
-                        rect->height - (radius * 2 + radius % 2),
+                        rect->y + radius - fudge,
+                        rect->height - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
 
     //Draw the right line
     leRenderer_VertLine(rect->x + rect->width - 1,
-                        rect->y + radius,
-                        rect->height - (radius * 2 + radius % 2),
+                        rect->y + radius - fudge,
+                        rect->height - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
 
     /* Fudge the radius to match the > 1 thickness of the arch */
-    radius = 33 * radius / 14;
+    radius = 209 * radius / 100 + 4;
 
     //Upper left
     drawRect.x = rect->x;
@@ -396,10 +397,8 @@ void leWidget_SkinClassic_DrawRoundCornerLineBorder(const leRect* rect,
                        a);
 
     //Upper right
-    drawRect.x = rect->x + rect->width - radius;
+    drawRect.x = rect->x + rect->width - radius + radius % 2;
     drawRect.y = rect->y;
-    drawRect.width = radius;
-    drawRect.height = radius;
 
     leRenderer_ArcFill(&drawRect,
                        0,
@@ -412,9 +411,7 @@ void leWidget_SkinClassic_DrawRoundCornerLineBorder(const leRect* rect,
 
     //Lower left
     drawRect.x = rect->x;
-    drawRect.y = rect->y + rect->height - radius;
-    drawRect.width = radius;
-    drawRect.height = radius;
+    drawRect.y = rect->y + rect->height - radius + radius % 2;
 
     leRenderer_ArcFill(&drawRect,
                        180,
@@ -426,10 +423,8 @@ void leWidget_SkinClassic_DrawRoundCornerLineBorder(const leRect* rect,
                        a);
 
     //Lower right
-    drawRect.x = rect->x + rect->width - radius;
-    drawRect.y = rect->y + rect->height - radius;
-    drawRect.width = radius;
-    drawRect.height = radius;
+    drawRect.x = rect->x + rect->width - radius + radius % 2;
+    drawRect.y = rect->y + rect->height - radius + radius % 2;
 
     leRenderer_ArcFill(&drawRect,
                        270,
