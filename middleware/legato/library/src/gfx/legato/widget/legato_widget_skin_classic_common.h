@@ -143,6 +143,11 @@ void leWidget_SkinClassic_DrawStandardHybridBorder(leWidget* wgt,
 
 void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget*);
 
+void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
+                                              leColor clr,
+                                              uint32_t radius,
+                                              uint32_t a);
+
 // DOM-IGNORE-END
 
 #endif /* LEGATO_WIDGET_SKIN_CLASSIC_COMMON_H */
