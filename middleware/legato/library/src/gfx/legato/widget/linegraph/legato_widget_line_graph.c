@@ -640,7 +640,7 @@ static int32_t addCategory(leLineGraphWidget* _this)
     category->stackValue = 0;
     category->text = NULL;
 
-    id = _this->categories.size;
+    id = _this->categories.size - 1;
 
     leArray_PushBack(&_this->categories, category);
 
