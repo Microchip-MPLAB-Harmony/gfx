@@ -741,7 +741,7 @@ static int32_t addSeries(leLineGraphWidget* _this)
     series->fillPoints = LE_TRUE;
     series->pointSize = DEFAULT_POINT_SIZE;
 
-    id = _this->dataSeries.size;
+    id = _this->dataSeries.size - 1;
 
     leArray_PushBack(&_this->dataSeries, series);
 
