@@ -487,7 +487,7 @@ leResult leRectArray_PadRectangleHeight(leRectArray* arr,
             splitRect.y -= size - mod;
             splitRect.height += size - mod;
 
-            splitRect.y = arr->rects[rectItr].x + oldHeight - splitRect.height;
+            splitRect.y = arr->rects[rectItr].y + oldHeight - splitRect.height;
 
             leRectArray_PushBack(arr, &splitRect);
         }
