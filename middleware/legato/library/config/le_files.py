@@ -1310,6 +1310,13 @@ LEGATO_WIDGET_RADIAL_MENU_H.setProjectPath(projectPath + "/widget/radialmenu")
 LEGATO_WIDGET_RADIAL_MENU_H.setOutputName("legato_widget_radial_menu.h")
 LEGATO_WIDGET_RADIAL_MENU_H.setType("HEADER")
 
+LEGATO_WIDGET_RADIAL_MENU_STATE_C = component.createFileSymbol("LEGATO_WIDGET_RADIAL_MENU_STATE_C", None)
+LEGATO_WIDGET_RADIAL_MENU_STATE_C.setSourcePath("src/gfx/legato/widget/radialmenu/legato_widget_radial_menu_state.c")
+LEGATO_WIDGET_RADIAL_MENU_STATE_C.setDestPath("gfx/legato/widget/radialmenu/")
+LEGATO_WIDGET_RADIAL_MENU_STATE_C.setProjectPath(projectPath + "/widget/radialmenu")
+LEGATO_WIDGET_RADIAL_MENU_STATE_C.setOutputName("legato_widget_radial_menu_state.c")
+LEGATO_WIDGET_RADIAL_MENU_STATE_C.setType("SOURCE")
+
 LEGATO_WIDGET_RADIAL_MENU_SKIN_CLASSIC_C = component.createFileSymbol("LEGATO_WIDGET_RADIAL_MENU_SKIN_CLASSIC_C", None)
 LEGATO_WIDGET_RADIAL_MENU_SKIN_CLASSIC_C.setSourcePath("src/gfx/legato/widget/radialmenu/legato_widget_radial_menu_skin_classic.c")
 LEGATO_WIDGET_RADIAL_MENU_SKIN_CLASSIC_C.setDestPath("gfx/legato/widget/radialmenu/")

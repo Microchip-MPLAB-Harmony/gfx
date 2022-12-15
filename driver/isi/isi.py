@@ -300,37 +300,37 @@ def instantiateComponent(component):
     rgbC8.setMax(255)
     rgbC8.setDefaultValue(0)
     rgbC8.setDescription("C8 element default step is 1/128, ranges from 0 to 0.9921875")
-
-	RTOSMenu = component.createMenuSymbol("RTOSMenu", None)
-	RTOSMenu.setLabel("RTOS Settings")
-	RTOSMenu.setDescription("RTOS Settings")
-	RTOSMenu.setVisible(Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal")
-	RTOSMenu.setDependencies(showTouchRTOSMenu, ["HarmonyCore.SELECT_RTOS"])
-	
-	RTOSEnabled = component.createBooleanSymbol("RTOSEnabled", RTOSMenu)
-	RTOSEnabled.setLabel("RTOS Support Enabled")
-	RTOSEnabled.setDefaultValue(Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal")
-	RTOSEnabled.setDependencies(enableTouchRTOSymbol, ["HarmonyCore.SELECT_RTOS"])
-	RTOSEnabled.setVisible(False)
-
-	RTOSStackSize = component.createIntegerSymbol("RTOSStackSize", RTOSMenu)
-	RTOSStackSize.setLabel("Stack Size")
-	RTOSStackSize.setMin(0)
-	RTOSStackSize.setDefaultValue(1024)
-	
-	RTOSTaskPriority = component.createIntegerSymbol("RTOSTaskPriority", RTOSMenu)
-	RTOSTaskPriority.setLabel("Task Priority")
-	RTOSTaskPriority.setDefaultValue(1)
-	
-	RTOSUseDelay = component.createBooleanSymbol("RTOSUseDelay", RTOSMenu)
-	RTOSUseDelay.setLabel("Use Task Delay?")
-	RTOSUseDelay.setDefaultValue(True)
-	
-	RTOSTaskDelay = component.createIntegerSymbol("RTOSTaskDelay", RTOSMenu)
-	RTOSTaskDelay.setLabel("Task Delay")
-	RTOSTaskDelay.setDefaultValue(10)
-	RTOSTaskDelay.setMin(0)
-
+    
+    RTOSMenu = component.createMenuSymbol("RTOSMenu", None)
+    RTOSMenu.setLabel("RTOS Settings")
+    RTOSMenu.setDescription("RTOS Settings")
+    RTOSMenu.setVisible(Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal")
+    RTOSMenu.setDependencies(showRTOSMenu, ["HarmonyCore.SELECT_RTOS"])
+    
+    RTOSEnabled = component.createBooleanSymbol("RTOSEnabled", RTOSMenu)
+    RTOSEnabled.setLabel("RTOS Support Enabled")
+    RTOSEnabled.setDefaultValue(Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal")
+    RTOSEnabled.setDependencies(enableRTOSymbol, ["HarmonyCore.SELECT_RTOS"])
+    RTOSEnabled.setVisible(False)
+    
+    RTOSStackSize = component.createIntegerSymbol("RTOSStackSize", RTOSMenu)
+    RTOSStackSize.setLabel("Stack Size")
+    RTOSStackSize.setMin(0)
+    RTOSStackSize.setDefaultValue(1024)
+    
+    RTOSTaskPriority = component.createIntegerSymbol("RTOSTaskPriority", RTOSMenu)
+    RTOSTaskPriority.setLabel("Task Priority")
+    RTOSTaskPriority.setDefaultValue(1)
+    
+    RTOSUseDelay = component.createBooleanSymbol("RTOSUseDelay", RTOSMenu)
+    RTOSUseDelay.setLabel("Use Task Delay?")
+    RTOSUseDelay.setDefaultValue(True)
+    
+    RTOSTaskDelay = component.createIntegerSymbol("RTOSTaskDelay", RTOSMenu)
+    RTOSTaskDelay.setLabel("Task Delay")
+    RTOSTaskDelay.setDefaultValue(10)
+    RTOSTaskDelay.setMin(0)
+    
     PLIB_ISI_C = component.createFileSymbol("PLIB_ISI_C", None)
     PLIB_ISI_C.setDestPath("peripheral/isi/")
     PLIB_ISI_C.setOutputName("plib_isi.c")
@@ -452,12 +452,17 @@ def instantiateComponent(component):
     SYS_TASK_C.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_DRIVER_TASKS")
     SYS_TASK_C.setSourcePath("templates/tasks.c.ftl")
     SYS_TASK_C.setMarkup(True)
+    
+    SYS_RTOS_TASK_C = component.createFileSymbol("SYS_RTOS_TASK_C", None)
+    SYS_RTOS_TASK_C.setType("STRING")
+    SYS_RTOS_TASK_C.setOutputName("core.LIST_SYSTEM_RTOS_TASKS_C_DEFINITIONS")
+    SYS_RTOS_TASK_C.setSourcePath("templates/rtos_tasks.c.ftl")
+    SYS_RTOS_TASK_C.setMarkup(True)
+    SYS_RTOS_TASK_C.setEnabled((Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal"))
+    SYS_RTOS_TASK_C.setDependencies(enableRTOSymbol, ["HarmonyCore.SELECT_RTOS"])
+    
+def enableRTOSymbol(source, event):
+    source.getComponent().getSymbolByID("RTOSEnabled").setVisible(event['value'] != "BareMetal")
 
-	SYS_RTOS_TASK_C = component.createFileSymbol("SYS_RTOS_TASK_C", None)
-	SYS_RTOS_TASK_C.setType("STRING")
-	SYS_RTOS_TASK_C.setOutputName("core.LIST_SYSTEM_RTOS_TASKS_C_DEFINITIONS")
-	SYS_RTOS_TASK_C.setSourcePath("templates/rtos_tasks.c.ftl")
-	SYS_RTOS_TASK_C.setMarkup(True)
-	SYS_RTOS_TASK_C.setEnabled((Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal"))
-	SYS_RTOS_TASK_C.setDependencies(enableTouchRTOSymbol, ["HarmonyCore.SELECT_RTOS"])
-	
+def showRTOSMenu(source, event):
+    source.getComponent().getSymbolByID("RTOSMenu").setVisible(event['value'] != "BareMetal")

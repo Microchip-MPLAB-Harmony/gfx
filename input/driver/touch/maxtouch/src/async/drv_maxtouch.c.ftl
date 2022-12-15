@@ -655,6 +655,13 @@ void DRV_MAXTOUCH_I2CEventHandler ( DRV_I2C_TRANSFER_EVENT  event,
         return;
     }
     
+    if(event == DRV_I2C_TRANSFER_EVENT_ERROR)
+    {
+        /* Attempt to reestablish communication with device on ERROR */
+        obj->deviceState = DEVICE_STATE_OPEN;
+        return;
+    }    
+    
     if( transferHandle == obj->hInformationBlockRequest &&
         event == DRV_I2C_TRANSFER_EVENT_COMPLETE )
     {

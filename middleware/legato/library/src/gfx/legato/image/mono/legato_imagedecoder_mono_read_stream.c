@@ -26,7 +26,7 @@
 
 #include "gfx/legato/image/mono/legato_imagedecoder_mono.h"
 
-#if LE_ENABLE_RAW_DECODER == 1
+#if LE_ENABLE_MONO_DECODER == 1
 
 #if LE_STREAMING_ENABLED == 1
 

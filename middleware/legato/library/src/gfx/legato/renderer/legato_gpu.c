@@ -280,7 +280,7 @@ leResult leGPU_BlitBuffer(const lePixelBuffer* sourceBuffer,
     destBuf.pixels = (gfxBuffer)leBuf->pixels;
     destBuf.orientation = GPU_ORIENTATION;
 
-    leRenderer_GetClipRect(&frameRect);
+    leRenderer_GetFrameRect(&frameRect);
 
     gfxDestRect.x = destRect->x - frameRect.x;
     gfxDestRect.y = destRect->y - frameRect.y;
@@ -362,7 +362,7 @@ leResult leGPU_BlitStretchBuffer(const lePixelBuffer* sourceBuffer,
     destBuf.pixels = (gfxBuffer)leBuf->pixels;
     destBuf.orientation = GPU_ORIENTATION;
 
-    leRenderer_GetClipRect(&frameRect);
+    leRenderer_GetFrameRect(&frameRect);
 
     gfxDestRect.x = destRect->x - frameRect.x;
     gfxDestRect.y = destRect->y - frameRect.y;

@@ -682,6 +682,12 @@ void GFX_CANVAS_Task(void)
                             case GFXC_FX_START:
                             {
                                 canvas[i].effects.fade.status = GFXC_FX_RUN;
+								
+								//call callback for status change START -> RUN
+                                canvas[i].effects.cb(canvas[i].id,
+                                                     GFXC_FX_FADE,
+                                                     GFXC_FX_RUN,
+                                                     canvas[i].effects.parm);								
                                 //no break, start running effect;
                             }
                             case GFXC_FX_RUN:
@@ -702,6 +708,12 @@ void GFX_CANVAS_Task(void)
                             case GFXC_FX_START:
                             {
                                 canvas[i].effects.move.status = GFXC_FX_RUN;
+								
+								//call callback for status change START -> RUN
+                                canvas[i].effects.cb(canvas[i].id,
+                                                     GFXC_FX_MOVE,
+                                                     GFXC_FX_RUN,
+                                                     canvas[i].effects.parm);								
                                 //no break, start running effect;
                             }
                             case GFXC_FX_RUN:

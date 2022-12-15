@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_disp_clcdc" id="73b4c120-587c-4005-9f03-56e2dbeb811b" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

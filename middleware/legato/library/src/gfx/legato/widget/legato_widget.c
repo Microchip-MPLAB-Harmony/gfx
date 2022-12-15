@@ -126,7 +126,6 @@ void leWidget_Constructor(leWidget* _this)
 void _leWidget_Destructor(leWidget* _this)
 {
     leWidget* child;
-    uint32_t i;
 
     LE_ASSERT_THIS();
 
@@ -145,9 +144,9 @@ void _leWidget_Destructor(leWidget* _this)
         LE_PCALL(_this->parent, removeChild, _this);
     }
 
-    for(i = 0; i < _this->children.size; i++)
+    while(_this->children.size > 0)
     {
-        child = _this->children.values[i];
+        child = _this->children.values[0];
         child->fn->_destructor(child);
         
         LE_FREE(child);
@@ -984,6 +983,25 @@ void _leWidget_RemoveAllChildren(leWidget* _this)
     }
     
     leArray_Clear(&_this->children);
+
+    _this->fn->invalidate(_this);
+}
+
+leResult _leWidget_SetChildIndex(leWidget* _this,
+                                 leWidget* child,
+                                 uint32_t idx)
+{
+    LE_ASSERT_THIS();
+
+    if(child == NULL)
+        return LE_FAILURE;
+
+    if(leArray_Remove(&_this->children, child) == LE_FAILURE)
+        return LE_FAILURE;
+
+    return leArray_InsertAt(&_this->children,
+                            idx,
+                            child);
 }
 
 leWidget* _leWidget_GetRootWidget(const leWidget* _this)
@@ -1743,6 +1761,7 @@ void _leWidget_GenerateVTable(void)
     widgetVTable.removeChild = _leWidget_RemoveChild;
     widgetVTable.removeChildAt = _leWidget_RemoveChildAt;
     widgetVTable.removeAllChildren = _leWidget_RemoveAllChildren;
+    widgetVTable.setChildIndex = _leWidget_SetChildIndex;
     widgetVTable.getRootWidget = _leWidget_GetRootWidget;
     widgetVTable.setParent = _leWidget_SetParent;
     widgetVTable.getChildCount = _leWidget_GetChildCount;
@@ -1834,6 +1853,7 @@ static const leWidgetVTable widgetVTable =
     .removeChild = _leWidget_RemoveChild,
     .removeChildAt = _leWidget_RemoveChildAt,
     .removeAllChildren = _leWidget_RemoveAllChildren,
+    .setChildIndex = _leWidget_SetChildIndex,
     .getRootWidget = _leWidget_GetRootWidget,
     .setParent = _leWidget_SetParent,
     .getChildCount = _leWidget_GetChildCount,

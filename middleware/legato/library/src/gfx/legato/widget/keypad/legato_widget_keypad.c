@@ -283,6 +283,7 @@ void leKeyPadWidget_Constructor(leKeyPadWidget* _this,
     
     _this->rows = 0;
     _this->cols = 0;
+    _this->cells = 0;
     
     _this->trigger = LE_KEYPAD_TRIGGER_KEYRELEASED;
 

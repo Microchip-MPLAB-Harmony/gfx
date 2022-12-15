@@ -283,6 +283,8 @@ static void resized(leListWidget* _this, leWidget_ResizeEvent* evt)
 {
     (void)evt; // unused
 
+    _recalculateScrollBarValues(_this);
+
     _this->scrollbar->fn->setSize(_this->scrollbar,
                                   _this->scrollbar->widget.rect.width,
                                   _this->widget.rect.height);

@@ -34,6 +34,7 @@ execfile(Module.getPath() + "Support_BSP_SAM_E70_Xplained_Ultra.py")
 execfile(Module.getPath() + "Support_BSP_SAM_E54_Curiosity_Ultra.py")
 execfile(Module.getPath() + "Support_BSP_PIC32MZ_DA_Curiosity.py")
 execfile(Module.getPath() + "Support_BSP_SAM_9x60_Evaluation_Kit.py")
+execfile(Module.getPath() + "Support_BSP_SAM_9x60_Curiosity.py")
 execfile(Module.getPath() + "Support_BSP_SAM_A5D2_Xplained_Ultra.py")
 
 def enableConfigPins(bspID, configID, enable):

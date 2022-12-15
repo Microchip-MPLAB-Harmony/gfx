@@ -509,6 +509,7 @@ typedef struct leWidget leWidget;
     leResult           (*removeChild)(THIS_TYPE* _this, leWidget* chld); \
     leResult           (*removeChildAt)(THIS_TYPE* _this, uint32_t idx); \
     void               (*removeAllChildren)(THIS_TYPE* _this); \
+    leResult           (*setChildIndex)(THIS_TYPE* _this, leWidget* chld, uint32_t idx); \
     leWidget*          (*getRootWidget)(const THIS_TYPE* _this); \
     leResult           (*setParent)(THIS_TYPE* _this, leWidget* pnt); \
     uint32_t           (*getChildCount)(const THIS_TYPE* _this); \
@@ -1824,6 +1825,45 @@ leResult _leWidget_RemoveChildAt(leWidget* _this,
  * @return returns void.
  */
 void _leWidget_RemoveAllChildren(leWidget* _this);
+
+// *****************************************************************************
+/* Virtual Member Function:
+    void setChildIndex(leWidgetWidget* _this,
+                       leWidget* child,
+                       uint32_t idx)
+
+  Summary:
+     Sets a child's index
+
+  Description:
+     Sets a child's index
+
+  Parameters:
+    leWidgetWidget* _this - The widget to operate on
+    leWidget8 child - The child to manipulate
+    uint32_t idx - The new index for the child
+
+  Remarks:
+    Usage - _this->fn->setChildIndex(_this, chld, 5);
+
+  Returns:
+    leResult
+*/
+/**
+ * @brief Sets a child's index.
+ * @details Set's a child's index.
+ * @remark This is a Virtual Member Function
+ * @code
+ * wgt->fn->setChildIndex(wgt, child, 5);
+ * @endcode
+ * @param param1 wgt is the parent widget
+ * @param param2 child is the widget to move
+ * @param param3 idx is child's new position
+ * @return returns leResult
+ */
+void _leWidget_setChildIndex(leWidget* _this,
+                             leWidget* child,
+                             uint32_t idx);
 
 // *****************************************************************************
 /* Virtual Member Function:

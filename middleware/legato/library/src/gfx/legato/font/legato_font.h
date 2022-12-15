@@ -123,6 +123,22 @@ typedef enum leFontType
 } leFontType;
 
 // *****************************************************************************
+/* Enumeration:
+    enum leFontFlags
+
+  Summary:
+    Defines font attribute flags.
+*/
+/**
+ * @brief Defines font attribute flags.
+ */
+typedef enum leFontFlags
+{
+    LE_FONT_RIGHTTOLEFT = 0x1, // indicates that the font should be rendered right
+                               // to left
+} leFontFlags;
+
+// *****************************************************************************
 /* Structure:
     struct leFont
 
@@ -131,6 +147,7 @@ typedef enum leFontType
     
     leStreamDescriptor header - describes where the font data is located
     leFontType type - indicates the type of font
+    uint32_t flags - flags describing the font
 */
 /**
  * @brief This struct represents a font object.
@@ -140,6 +157,7 @@ typedef struct leFont
 {
     leStreamDescriptor header;
     leFontType type;
+    uint32_t flags;
 } leFont;
 
 // *****************************************************************************

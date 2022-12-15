@@ -34,6 +34,7 @@
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/string/legato_stringutils.h"
+#include "gfx/legato/string/legato_string_renderer.h"
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
@@ -493,6 +494,8 @@ static void drawString(leListWheelWidget* whl)
     leListWheelItem* item;
     leRect midLineRect;
     leRect itemRect;
+    leStringRenderRequest req;
+    leColor background;
  
     //if(whl->paintState.nextItem < whl->items.size)
     //    nextItem(whl);
@@ -544,12 +547,32 @@ static void drawString(leListWheelWidget* whl)
     
     if (leRectIntersects(&itemRect, &midLineRect) == LE_TRUE)
     {
-        item->string->fn->_draw(item->string,
-                                kerningRect.x,
-                                kerningRect.y,
-                                whl->widget.style.halign,
-                                leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT_HIGHLIGHTTEXT),
-                                paintState.alpha);
+        if (whl->indicatorFill == LE_LISTWHEEL_INDICATOR_FILL_NONE && 
+            whl->shaded == LE_FALSE)
+        {
+            background = leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_BACKGROUND);
+            
+            req.str = item->string;
+            req.x = kerningRect.x;
+            req.y = kerningRect.y;
+            req.align = whl->widget.style.halign;
+            req.color = leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT_HIGHLIGHTTEXT);
+            req.alpha = paintState.alpha;
+            req.lookupTable = leUtils_GetSchemeLookupTable(whl->widget.scheme,
+                                                           req.color,
+                                                           background);
+
+            leStringRenderer_DrawString(&req);
+        }
+        else
+        {
+            item->string->fn->_draw(item->string,
+                                    kerningRect.x,
+                                    kerningRect.y,
+                                    whl->widget.style.halign,
+                                    leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT_HIGHLIGHTTEXT),
+                                    paintState.alpha);
+        }
 
 #if LE_STREAMING_ENABLED == 1
         if(leGetActiveStream() != NULL)
@@ -567,12 +590,31 @@ static void drawString(leListWheelWidget* whl)
     {
         if (whl->zoomEffects == LE_LISTWHEEL_ZOOM_EFFECT_NONE)
         {
-            item->string->fn->_draw(item->string,
-                                    kerningRect.x,
-                                    kerningRect.y,
-                                    whl->widget.style.halign,
-                                    leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT),
-                                    paintState.alpha);
+            if (whl->indicatorFill == LE_LISTWHEEL_INDICATOR_FILL_NONE && 
+                whl->shaded == LE_FALSE)
+            {
+                background = leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_BACKGROUND);
+                req.str = item->string;
+                req.x = kerningRect.x;
+                req.y = kerningRect.y;
+                req.align = whl->widget.style.halign;
+                req.color = leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT);
+                req.alpha = paintState.alpha;
+                req.lookupTable = leUtils_GetSchemeLookupTable(whl->widget.scheme,
+                                                               req.color,
+                                                               background);
+
+                leStringRenderer_DrawString(&req);                
+            }
+            else
+            {
+                item->string->fn->_draw(item->string,
+                                        kerningRect.x,
+                                        kerningRect.y,
+                                        whl->widget.style.halign,
+                                        leScheme_GetRenderColor(whl->widget.scheme, LE_SCHM_TEXT),
+                                        paintState.alpha);
+            }
 
 #if LE_STREAMING_ENABLED == 1
             if(leGetActiveStream() != NULL)

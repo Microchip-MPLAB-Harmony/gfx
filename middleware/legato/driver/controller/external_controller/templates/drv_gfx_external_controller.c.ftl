@@ -346,7 +346,11 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
     uint16_t clr;
 </#if>
     uint16_t* ptr;
+<#if __PROCESSOR?matches("PIC32MZ.*") == true>
+    static __COHERENT uint8_t parm[4];
+<#else>
     uint8_t parm[4];
+</#if>
 
     GFX_Disp_Intf intf;
     

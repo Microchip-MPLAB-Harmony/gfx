@@ -67,9 +67,9 @@
 // the cache used for streaming image source data
 extern uint8_t leRawImageDecoderScratchBuffer[LE_ASSET_DECODER_PIXEL_CACHE_SIZE];
 // the cache used for streaming mask lookup data
-extern uint8_t leRawImageDecoderMaskScratchBuffer[LE_ASSET_DECODER_PALETTE_CACHE_SIZE];
+extern uint8_t leRawImageDecoderMaskScratchBuffer[LE_ASSET_DECODER_MASK_CACHE_SIZE];
 // the cache used for streaming palette lookup data
-extern uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_MASK_CACHE_SIZE];
+extern uint8_t leRawImageDecoderPaletteScratchBuffer[LE_ASSET_DECODER_PALETTE_CACHE_SIZE];
 // the cache used for streaming blend mask lookup data
 extern uint8_t leRawImageDecoderBlendBuffer[LE_ASSET_DECODER_BLEND_CACHE_SIZE];
 

@@ -57,7 +57,7 @@ void _leSliderWidget_GetSlideAreaRect(leSliderWidget* sld, leRect* rect)
     leRect widgetRect;
 
     sld->fn->localRect(sld, &widgetRect);
-    
+
     if(sld->alignment == LE_ORIENTATION_VERTICAL)
     {
         scrollRect.width = widgetRect.width / 4;
@@ -83,31 +83,49 @@ void _leSliderWidget_GetHandleRect(leSliderWidget* sld, leRect* rect)
     leRect widgetRect;
 
     sld->fn->localRect(sld, &widgetRect);
-    
+
     val = sld->value - sld->min;
     max = sld->max - sld->min;
-    
+
     percent = lePercentWholeRounded(val, max);
-    
+
     _leSliderWidget_GetSlideAreaRect(sld, &scrollRect);
-    
+
     if(sld->alignment == LE_ORIENTATION_VERTICAL)
     {
         percent = lePercentOf(scrollRect.height, percent);
-        
+
         rect->x = widgetRect.x;
         rect->y = ((scrollRect.y + scrollRect.height) - percent) - (sld->grip / 2);
-        rect->width = widgetRect.width;
         rect->height = sld->grip;
+        
+        if (sld->widget.style.cornerRadius > 0)
+        {
+            rect->x += (sld->widget.rect.width - sld->grip) / 2;
+            rect->width = sld->grip;
+        }
+        else
+        {
+            rect->width = widgetRect.width;
+        }
     }
     else
     {
         percent = lePercentOf(scrollRect.width, percent);
-        
+
         rect->x = (scrollRect.x + percent) - (sld->grip / 2);
         rect->y = widgetRect.y;
         rect->width = sld->grip;
-        rect->height = widgetRect.height;
+        
+        if (sld->widget.style.cornerRadius > 0)
+        {
+            rect->y += (sld->widget.rect.height - sld->grip) / 2;
+            rect->height = sld->grip;
+        }
+        else
+        {
+            rect->height = widgetRect.height;
+        }
     }
 }
 
@@ -135,7 +153,7 @@ static void nextState(leSliderWidget* sld)
                 paintState.alpha = sld->fn->getCumulativeAlphaAmount(sld);
             }
 #endif
-           
+
             if(sld->widget.style.backgroundType != LE_WIDGET_BACKGROUND_NONE)
             {
                 sld->widget.status.drawState = DRAW_BACKGROUND;
@@ -149,14 +167,14 @@ static void nextState(leSliderWidget* sld)
         {
             sld->widget.status.drawState = DRAW_BAR;
             sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBar;
-            
+
             return;
         }
         case DRAW_BAR:
         {
             sld->widget.status.drawState = DRAW_HANDLE;
             sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawHandle;
-            
+
             return;
         }
         case DRAW_HANDLE:
@@ -165,10 +183,10 @@ static void nextState(leSliderWidget* sld)
             {
                 sld->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawBorder;
                 sld->widget.status.drawState = DRAW_BORDER;
-                
+
                 return;
             }*/
-            
+
             sld->widget.status.drawState = DONE;
             sld->widget.drawFunc = NULL;
         }
@@ -192,15 +210,24 @@ static void drawBackground(leSliderWidget* sld)
 static void drawBar(leSliderWidget* sld)
 {
     leRect barRect;
-    
+
     _leSliderWidget_GetSlideAreaRect(sld, &barRect);
     leUtils_RectToScreenSpace((leWidget*)sld, &barRect);
 
     // fill bar area
-    leRenderer_RectFill(&barRect,
-                        leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BACKGROUND),
-                        paintState.alpha);
-                 
+    if (sld->widget.style.cornerRadius > 0)
+    {
+        leWidget_SkinClassic_FillRoundCornerRect(&barRect,
+                                                 leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BACKGROUND),
+                                                 sld->widget.style.cornerRadius, paintState.alpha);
+    }
+    else
+    {
+        leRenderer_RectFill(&barRect,
+                            leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BACKGROUND),
+                            paintState.alpha);
+    }
+
     // draw border
     if(sld->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
@@ -217,22 +244,33 @@ static void drawBar(leSliderWidget* sld)
                                                   leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_HIGHLIGHTLIGHT),
                                                   paintState.alpha);
     }
-    
+
     nextState(sld);
 }
 
 static void drawHandle(leSliderWidget* sld)
 {
     leRect handleRect;
-    
+
     _leSliderWidget_GetHandleRect(sld, &handleRect);
     leUtils_RectToScreenSpace((leWidget*)sld, &handleRect);
 
     // fill handle area
-    leRenderer_RectFill(&handleRect,
-                        leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BASE),
-                        paintState.alpha);
-    
+    if (sld->widget.style.cornerRadius > 0)
+    {
+        leRenderer_CircleFill(&handleRect,
+                              1,
+                              leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BASE),
+                              leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BASE),
+                              paintState.alpha);
+    }
+    else
+    {
+        leRenderer_RectFill(&handleRect,
+                            leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_BASE),
+                            paintState.alpha);
+    }
+
     // draw handle border
     if(sld->widget.style.borderType == LE_WIDGET_BORDER_LINE)
     {
@@ -248,14 +286,14 @@ static void drawHandle(leSliderWidget* sld)
                                                   leScheme_GetRenderColor(sld->widget.scheme, LE_SCHM_SHADOW),
                                                   paintState.alpha);
     }
-    
+
     nextState(sld);
 }
 
 /*static void drawBorder(leSliderWidget* sld)
 {
     leWidget_SkinClassic_DrawStandardRaisedBorder((leWidget*)sld);
-    
+
     nextState(sld);
 }*/
 
@@ -265,11 +303,11 @@ void _leSliderWidget_Paint(leSliderWidget* sld)
     {
         nextState(sld);
     }
-    
+
     while(sld->widget.status.drawState != DONE)
     {
         sld->widget.drawFunc((leWidget*)sld);
-        
+
 #if LE_PREEMPTION_LEVEL == 2
         break;
 #endif

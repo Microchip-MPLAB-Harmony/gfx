@@ -475,19 +475,11 @@ leResult leRectArray_PadRectangleHeight(leRectArray* arr,
             splitRect = arr->rects[rectItr];
 
             arr->rects[rectItr].height >>= 1;
-
             mod = arr->rects[rectItr].height % size;
-
             arr->rects[rectItr].height += size - mod;
 
-            splitRect.height = oldHeight >> 1;
-            splitRect.y += splitRect.height;
-
-            mod = splitRect.height % size;
-            splitRect.y -= size - mod;
-            splitRect.height += size - mod;
-
-            splitRect.y = arr->rects[rectItr].x + oldHeight - splitRect.height;
+            splitRect.height = arr->rects[rectItr].height;
+            splitRect.y = arr->rects[rectItr].y + oldHeight - splitRect.height;
 
             leRectArray_PushBack(arr, &splitRect);
         }
@@ -565,7 +557,7 @@ leResult leRectArray_CropToSizeY(leRectArray* arr,
             leRectArray_PushBack(arr, &split);
         }
     }
-    
+
     return LE_SUCCESS;
 }
 

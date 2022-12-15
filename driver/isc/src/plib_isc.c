@@ -558,9 +558,9 @@ void ISC_WB_Set_Bayer_Pattern ( uint8_t pattern )
 void ISC_WB_Adjust_Color_Offset ( uint32_t b_offset, uint32_t gb_offset,
                                  uint32_t r_offset, uint32_t gr_offset )
 {
-    ISC_REGS->ISC_WB_G_BGB = ISC_WB_O_BGB_BOFST(b_offset)  | 
+    ISC_REGS->ISC_WB_O_BGB = ISC_WB_O_BGB_BOFST(b_offset)  | 
                             ISC_WB_O_BGB_GBOFST(gb_offset);
-    ISC_REGS->ISC_WB_G_RGR = ISC_WB_O_RGR_ROFST (r_offset) |
+    ISC_REGS->ISC_WB_O_RGR = ISC_WB_O_RGR_ROFST (r_offset) |
                             ISC_WB_O_RGR_GROFST(gr_offset);
 }
 

@@ -8,6 +8,47 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.12.0
+
+### New Features
+
+* Added Right-To-Left Font support for languages such as Arabic, Hebrew, Cyrillic 
+* Added PIC32CX MT Family Segmented SLCDC driver support
+* Added SAM9x60 Curiosity Board template support
+* Added SAMA5D27-SOM1-EK1 Board template support
+* Added ATSAMA5D27-WLSOM1 Board template support
+* Added PIC32CZ CA Family driver and template support
+* MH3-71833 Add Scheme Accelerator support for list wheel widget
+
+### Issues Fixed
+
+* MH3-68743 GFX: Add conditional check for blending based on color mode
+* MH3-70582 bug in the drv_isc.c
+* MH3-70594 Button is not drawn properly on click
+* MH3-70843 List widget setSize is not forcing recalculation of the outer window height
+* DSCAPP-6321 PIC32MZ DA - Color LookUp Table (CLUT) -> RGB565
+* MH3-71537 Rounded Rectangle Fix from Github
+* MH3-71549 GFX: Mismatched widget label
+* MH3-71550 GFX: Widget border doesn't get updated when property change
+* MH3-71551 GFX: leGPU_BlitBuffer passes different destination rectangle for GPU interface blitBuffer
+* MH3-71628 Fixes to legato_widget_line_graph by apapillon on GitHub
+* MH3-71645 maXTouch driver does not support I2C NACK error handling
+* MH3-71655 GFX: Add API to change z-order of widget
+* MH3-71698 Radial Menu Widget file not being handled in python script
+* MH3-71742 Fixed heap memory leak during screen change
+* MH3-71793 Legato Composer - New project wizard is failing
+* MH3-71948 GFX: Composer Crashes when configuring Keypad Widget
+* MH3-71965 Pre-release SLCDC issues
+* MH3-72140 GFX Composer: Monochrome color mode is not supported in screen preview
+* MH3-72295 Generate multiple asset files and font files generates one single file for each only
+* MH3-72316 GFX: Composer Aria Project Import File filter does not work
+* MH3-72327 Composer crashes when importing a bad rgb as a palette
+
+
+* Microchip Graphics Composer v1.4.1b 
+  * Legato Plugin Linux/Windows/Mac Build v2.3.12b 
+
+
 ## Graphics Release v3.11.1
 
 ### Issues Fixed
@@ -334,10 +375,10 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 ### Development Tools
 
 
-* [MPLAB® X IDE v6.00 or above](https://www.microchip.com/mplab/mplab-x-ide)
-* [MPLAB® XC32 C/C++ Compiler v3.01 or above](https://www.microchip.com/mplab/compilers)
+* [MPLAB® X IDE v6.00](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v4.20](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
-    * [MPLAB® Code Configurator (MCC) v5.1.9](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+    * [MPLAB® Code Configurator (MCC) v5.1.17](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
 	
 	OR
     * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
@@ -347,8 +388,7 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 
 
 * [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
-* [Touch v3.12.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.12.1)
-* [IAR Embedded WorkBench ARM v8.40.1](https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm)
+* [Touch v3.13.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.0)
 
 
 

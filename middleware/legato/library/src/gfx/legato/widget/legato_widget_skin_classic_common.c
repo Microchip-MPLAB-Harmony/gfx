@@ -70,12 +70,12 @@ void leDraw_2x1BevelBorder(leRect* rect,
                         rect->width - 1,
                         bottomOuterColor,
                         a);
-    
+
     leRenderer_VertLine(rect->x + rect->width - 1,
                         rect->y + 1,
                         rect->height - 1,
                         bottomOuterColor,
-                        a);               
+                        a);
 }
 
 void leDraw_1x2BevelBorder(leRect* rect,
@@ -103,7 +103,7 @@ void leDraw_1x2BevelBorder(leRect* rect,
                         rect->width - 2,
                         bottomInnerColor,
                         a);
-    
+
     leRenderer_VertLine(rect->x + rect->width - 2,
                         rect->y + 1,
                         rect->height - 3,
@@ -116,12 +116,12 @@ void leDraw_1x2BevelBorder(leRect* rect,
                         rect->width - 1,
                         bottomOuterColor,
                         a);
-    
+
     leRenderer_VertLine(rect->x + rect->width - 1,
                         rect->y,
                         rect->height - 2,
                         bottomOuterColor,
-                        a);               
+                        a);
 }
 
 void leDraw_2x2BevelBorder(leRect* rect,
@@ -163,7 +163,7 @@ void leDraw_2x2BevelBorder(leRect* rect,
                         rect->width - 2,
                         bottomInnerColor,
                         a);
-    
+
     leRenderer_VertLine(rect->x + rect->width - 2,
                         rect->y + 1,
                         rect->y + rect->height - 3,
@@ -176,7 +176,7 @@ void leDraw_2x2BevelBorder(leRect* rect,
                         rect->width - 1,
                         bottomOuterColor,
                         a);
-    
+
     leRenderer_VertLine(rect->x + rect->width - 1,
                         rect->y,
                         rect->height - 2,
@@ -190,51 +190,51 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
                                               uint32_t a)
 {
     leRect drawRect;
-    
+
     //Draw the center rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y + radius;
-    drawRect.width = rect->width - (radius * 2);
-    drawRect.height = rect->height - (radius * 2);
-    
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
+
     leRenderer_RectFill(&drawRect, clr, a);
-    
+
     //Draw the top rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y;
-    drawRect.width = rect->width - (radius * 2);
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
     drawRect.height = radius;
-    
+
     leRenderer_RectFill(&drawRect, clr, a);
-    
+
     //Draw the bottom rectangle
     drawRect.x = rect->x + radius;
     drawRect.y = rect->y + rect->height - radius;
-    drawRect.width = rect->width - (radius * 2);
+    drawRect.width = rect->width - (radius * 2 - radius % 2);
     drawRect.height = radius;
-    
+
     leRenderer_RectFill(&drawRect, clr, a);
-    
+
     //Draw the left rectangle
     drawRect.x = rect->x;
     drawRect.y = rect->y + radius;
     drawRect.width = radius;
-    drawRect.height = rect->height - (radius * 2);
-    
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
+
     leRenderer_RectFill(&drawRect, clr, a);
-    
+
     //Draw the right rectangle
     drawRect.x = rect->x + rect->width - radius;
     drawRect.y = rect->y + radius;
     drawRect.width = radius;
-    drawRect.height = rect->height - (radius * 2);
-    
-    leRenderer_RectFill(&drawRect, clr, a);   
-    
+    drawRect.height = rect->height - (radius * 2 - radius % 2);
+
+    leRenderer_RectFill(&drawRect, clr, a);
+
     //Draw the corners
     //Upper left
-    drawRect.x = rect->x;
-    drawRect.y = rect->y;
+    drawRect.x = rect->x + (radius / 2 + radius % 2);
+    drawRect.y = rect->y + (radius / 2 + radius % 2);
     drawRect.width = radius;
     drawRect.height = radius;
 
@@ -242,60 +242,54 @@ void leWidget_SkinClassic_FillRoundCornerRect(const leRect* rect,
                        90,
                        90,
                        radius,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_ARC_SMOOTH_EDGE,
+                       LE_TRUE,
                        a);
-    
+
     //Upper right
-    drawRect.x = rect->x + rect->width - radius;
-    drawRect.y = rect->y;
+    drawRect.x = rect->x + rect->width - (3 * radius / 2);
+    drawRect.y = rect->y + (radius / 2 + radius % 2);
     drawRect.width = radius;
     drawRect.height = radius;
-    
+
     leRenderer_ArcFill(&drawRect,
                        0,
                        90,
                        radius,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_ARC_SMOOTH_EDGE,
+                       LE_TRUE,
                        a);
-    
+
     //Lower left
-    drawRect.x = rect->x;
-    drawRect.y = rect->y + rect->height - (radius * 2);
+    drawRect.x = rect->x + (radius / 2 + radius % 2);
+    drawRect.y = rect->y + rect->height - (3 * radius / 2);
     drawRect.width = radius;
     drawRect.height = radius;
-    
-    //pnt.x = drawRect.x + radius;
-    //pnt.y = drawRect.y + radius;
-    
+
     leRenderer_ArcFill(&drawRect,
                        180,
                        90,
                        radius,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_ARC_SMOOTH_EDGE,
+                       LE_TRUE,
                        a);
-    
+
     //Lower right
-    drawRect.x = rect->x + rect->width - radius;
-    drawRect.y = rect->y + rect->height - radius;
+    drawRect.x = rect->x + rect->width - (3 * radius / 2 );
+    drawRect.y = rect->y + rect->height - (3 * radius / 2);
     drawRect.width = radius;
     drawRect.height = radius;
-    
-    //pnt.x = drawRect.x + radius;
-    //pnt.y = drawRect.y + radius;
-    
+
     leRenderer_ArcFill(&drawRect,
                        270,
                        90,
                        radius,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_ARC_SMOOTH_EDGE,
+                       LE_TRUE,
                        a);
 }
 
@@ -312,26 +306,26 @@ void leWidget_SkinClassic_DrawBackground(leWidget* wgt,
         (wgt->style.borderType == LE_WIDGET_BORDER_NONE ||
          wgt->style.borderType == LE_WIDGET_BORDER_LINE))
     {
-        leWidget_SkinClassic_FillRoundCornerRect(&rect, 
+        leWidget_SkinClassic_FillRoundCornerRect(&rect,
                                                  clr,
                                                  wgt->style.cornerRadius,
                                                  alpha);
-    }    
+    }
     else
     {
         leRenderer_RectFill(&rect, clr, alpha);
     }
 }
 
-void leWidget_SkinClassic_DrawRoundCornerBackground(leWidget* wgt, 
+void leWidget_SkinClassic_DrawRoundCornerBackground(leWidget* wgt,
                                                     leColor clr,
                                                     uint32_t alpha)
 {
     leRect rect;
 
     wgt->fn->rectToScreen(wgt, &rect);
-    
-    leWidget_SkinClassic_FillRoundCornerRect(&rect, 
+
+    leWidget_SkinClassic_FillRoundCornerRect(&rect,
                                              clr,
                                              wgt->style.cornerRadius,
                                              alpha);
@@ -339,9 +333,9 @@ void leWidget_SkinClassic_DrawRoundCornerBackground(leWidget* wgt,
 
 void leWidget_SkinClassic_DrawStandardBackground(leWidget* wgt,
                                                  uint32_t alpha)
-{    
+{
     if(wgt->style.backgroundType == LE_WIDGET_BACKGROUND_FILL)
-    {    
+    {
         leWidget_SkinClassic_DrawBackground(wgt,
                                             leScheme_GetRenderColor(wgt->scheme, LE_SCHM_BASE),
                                             alpha);
@@ -354,93 +348,91 @@ void leWidget_SkinClassic_DrawRoundCornerLineBorder(const leRect* rect,
                                                     uint32_t a)
 {
     leRect drawRect;
-    
+    int fudge = radius / 12 + 1;
+
     //Draw the top line
-    leRenderer_HorzLine(rect->x + radius,
+    leRenderer_HorzLine(rect->x + radius - fudge,
                         rect->y,
-                        rect->width - (radius * 2),
+                        rect->width - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
-    
+
     //Draw the bottom line
-    leRenderer_HorzLine(rect->x + radius,
+    leRenderer_HorzLine(rect->x + radius - fudge,
                         rect->y + rect->height - 1,
-                        rect->width - (radius * 2),
+                        rect->width - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
-    
+
     //Draw the left line
     leRenderer_VertLine(rect->x,
-                        rect->y + radius,
-                        rect->height - (radius * 2),
+                        rect->y + radius - fudge,
+                        rect->height - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
-    
+
     //Draw the right line
     leRenderer_VertLine(rect->x + rect->width - 1,
-                        rect->y + radius,
-                        rect->height - (radius * 2),
+                        rect->y + radius - fudge,
+                        rect->height - (radius * 2 - radius % 2) + fudge * 2,
                         clr,
                         a);
-    
+
+    /* Fudge the radius to match the > 1 thickness of the arch */
+    radius = 209 * radius / 100 + 4;
+
     //Upper left
     drawRect.x = rect->x;
     drawRect.y = rect->y;
     drawRect.width = radius;
     drawRect.height = radius;
-    
+
     leRenderer_ArcFill(&drawRect,
                        90,
                        90,
                        1,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_FALSE,
+                       LE_TRUE,
                        a);
-    
+
     //Upper right
-    drawRect.x = rect->x + rect->width - radius;
+    drawRect.x = rect->x + rect->width - radius + radius % 2;
     drawRect.y = rect->y;
-    drawRect.width = radius;
-    drawRect.height = radius;
-    
+
     leRenderer_ArcFill(&drawRect,
                        0,
                        90,
                        1,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_FALSE,
+                       LE_TRUE,
                        a);
-    
+
     //Lower left
     drawRect.x = rect->x;
-    drawRect.y = rect->y + rect->height - (radius * 2);
-    drawRect.width = radius;
-    drawRect.height = radius;
-    
+    drawRect.y = rect->y + rect->height - radius + radius % 2;
+
     leRenderer_ArcFill(&drawRect,
                        180,
                        90,
                        1,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_FALSE,
+                       LE_TRUE,
                        a);
-    
+
     //Lower right
-    drawRect.x = rect->x + rect->width - radius;
-    drawRect.y = rect->y + rect->height - radius;
-    drawRect.width = radius;
-    drawRect.height = radius;
-    
+    drawRect.x = rect->x + rect->width - radius + radius % 2;
+    drawRect.y = rect->y + rect->height - radius + radius % 2;
+
     leRenderer_ArcFill(&drawRect,
                        270,
                        90,
                        1,
-                       LE_FALSE,
+                       LE_TRUE,
                        clr,
-                       LE_FALSE,
+                       LE_TRUE,
                        a);
 }
 
@@ -454,7 +446,7 @@ void leWidget_SkinClassic_DrawLineBorder(const leRect* rect,
                         rect->height - 1,
                         clr,
                         a);
-                        
+
     // right line
     leRenderer_VertLine(rect->x + rect->width - 1,
                         rect->y + 1,
@@ -462,19 +454,19 @@ void leWidget_SkinClassic_DrawLineBorder(const leRect* rect,
                         clr,
                         a);
 
-    // top line                        
+    // top line
     leRenderer_HorzLine(rect->x,
                         rect->y,
                         rect->width,
                         clr,
-                        a);  
-                        
-    // bottom line                        
+                        a);
+
+    // bottom line
     leRenderer_HorzLine(rect->x,
                         rect->y + rect->height - 1,
                         rect->width,
                         clr,
-                        a);                
+                        a);
 }
 
 void leWidget_SkinClassic_Draw2x2BeveledBorder(const leRect* rect,
@@ -485,49 +477,49 @@ void leWidget_SkinClassic_Draw2x2BeveledBorder(const leRect* rect,
                                                uint32_t a)
 {
 
-    
+
     // left outer
     leRenderer_VertLine(rect->x,
                         rect->y + 1,
                         rect->height - 2,
                         leftUpOuter,
                         a);
-                        
+
     // left inner
     leRenderer_VertLine(rect->x + 1,
                         rect->y + 1,
                         rect->height - 2,
                         leftUpInner,
                         a);
-    
+
     // top outer
     leRenderer_HorzLine(rect->x,
                         rect->y,
                         rect->width - 1,
                         leftUpOuter,
                         a);
-                        
+
     // top inner
     leRenderer_HorzLine(rect->x + 1,
                         rect->y + 1,
                         rect->width - 2,
                         leftUpInner,
                         a);
-                        
+
     // right outer
     leRenderer_VertLine(rect->x + rect->width - 1,
                         rect->y + 1,
                         rect->height - 2,
                         bottomRightOuter,
                         a);
-                        
+
     // right inner
     leRenderer_VertLine(rect->x + rect->width - 2,
                         rect->y + 1,
                         rect->height - 2,
                         bottomRightInner,
                         a);
-    
+
     // bottom outer
     leRenderer_HorzLine(rect->x,
                         rect->y + rect->height - 1,
@@ -540,12 +532,12 @@ void leWidget_SkinClassic_Draw2x2BeveledBorder(const leRect* rect,
                         rect->width - 2,
                         bottomRightInner,
                         a);
-}                                           
-                                            
+}
+
 void leWidget_SkinClassic_Draw1x2BeveledBorder(const leRect* rect,
                                                leColor leftUp,
                                                leColor bottomRightOuter,
-                                               leColor bototmRightInner,
+                                               leColor bottomRightInner,
                                                uint32_t a)
 {
     // left line
@@ -554,13 +546,13 @@ void leWidget_SkinClassic_Draw1x2BeveledBorder(const leRect* rect,
                         rect->height - 1,
                         leftUp,
                         a);
-                        
-    // top line                        
+
+    // top line
     leRenderer_HorzLine(rect->x,
                         rect->y,
                         rect->width - 1,
                         leftUp,
-                        a);  
+                        a);
 
     // right outer line
     leRenderer_VertLine(rect->x + rect->width - 1,
@@ -568,26 +560,26 @@ void leWidget_SkinClassic_Draw1x2BeveledBorder(const leRect* rect,
                         rect->height - 1,
                         bottomRightOuter,
                         a);
-                            
+
     // right inner line
     leRenderer_VertLine(rect->x + rect->width - 2,
                         rect->y + 1,
                         rect->height - 2,
-                        bototmRightInner,
+                        bottomRightInner,
                         a);
-    
+
     // bottom outer
     leRenderer_HorzLine(rect->x,
                         rect->y + rect->height - 1,
                         rect->width,
                         bottomRightOuter,
                         a);
-    
+
     // bottom inner
     leRenderer_HorzLine(rect->x + 1,
                         rect->y + rect->height - 2,
                         rect->width - 2,
-                        bototmRightInner,
+                        bottomRightInner,
                         a);
 }
 
@@ -674,12 +666,16 @@ void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget* wgt)
 {
 	leRect rect, dmgRect;
 	int32_t width, height;
-	
+
 	if(wgt->style.borderType == LE_WIDGET_BORDER_NONE)
-	    return;
-	
+    {
+        LE_PCALL(wgt, invalidate);
+
+        return;
+    }
+
 	wgt->fn->rectToScreen(wgt, &rect);
-	
+
 	if(wgt->style.borderType == LE_WIDGET_BORDER_LINE)
 	{
 	    if(rect.width == 0 || rect.height == 0)
@@ -691,7 +687,7 @@ void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget* wgt)
 
 			return;
 		}
-	
+
 	    width = 1;
 	    height = 1;
 	}
@@ -703,14 +699,14 @@ void leWidget_SkinClassic_InvalidateBorderAreas(const leWidget* wgt)
 		if(rect.width <= 3 || rect.height <= 3)
 		{
 			wgt->fn->_damageArea(wgt, &rect);
-			
+
 			return;
         }
-        
+
         width = 2;
 	    height = 2;
 	}
-	
+
 	// left line
 	dmgRect.x = rect.x;
 	dmgRect.y = rect.y;

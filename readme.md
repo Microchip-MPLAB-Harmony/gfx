@@ -62,8 +62,8 @@ The performance-improved graphics for MPLAB® Harmony Graphics Suite. Supports M
 | drivers|  glcd | Driver for the GLCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   2dgpu | Driver for the 2DGPU graphics processor |![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   lcc |  Driver for the LCC software display controller| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   gfx2d | Driver for the GFX2D graphics processor| ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   lcdc | Driver for the LCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   gfx2d | Driver for the GFX2D graphics processor| ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   lcdc | Driver for the LCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   external controller |  Driver generator for external display controllers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   ssd1963 | Driver for the ssd1963 display controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |
 |      |   ili9488  | Display Driver for the ili9488 controller | ![app-beta](https://img.shields.io/badge/driver-deprecated-red?style=plastic) |
@@ -98,6 +98,7 @@ Controller Drivers for Segemented LCDs for SAM microcontrollers
 | --- | --- | ---- |---- |
 | drivers|  slcc | Low-Cost Controllerless Driver for the Segmented LCD displays | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   slcd | Driver for the SAM L22 Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   slcdc | Driver for the PIC32CX MT Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 ***
 ## Aria Graphics
 
@@ -109,8 +110,8 @@ As of Graphics release v3.8.0, Aria Graphics has been deprecated and removed fro
 ____
 
 [![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/mplab_harmony_license.md)
-[![Latest release](https://img.shields.io/github/release/Microchip-MPLAB-Harmony/gfx.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/releases/latest)
-[![Latest release date](https://img.shields.io/github/release-date/Microchip-MPLAB-Harmony/gfx.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/releases/latest)
+[![Latest release](https://img.shields.io/github/release/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.12.0)
+[![Latest release date](https://img.shields.io/github/release-date/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.12.0)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/gfx.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/graphs/commit-activity)
 [![Contributors](https://img.shields.io/github/contributors-anon/Microchip-MPLAB-Harmony/gfx.svg)]()
 

@@ -611,6 +611,13 @@ void leResolveAngles(int32_t startAngle,
     {
         startAngle %= 360;
     }
+    else if(startAngle < -360)
+    {
+        while(startAngle < -360)
+        {
+            startAngle += 360;
+        }
+    }
 
     if(spanAngle > 360)
     {

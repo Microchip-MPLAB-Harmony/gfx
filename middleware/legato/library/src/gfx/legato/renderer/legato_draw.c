@@ -33,6 +33,11 @@
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/renderer/legato_gpu.h"
 
+static leColorMode _currentMode;
+
+#if LE_ALPHA_BLENDING_ENABLED == 1
+static leBool _alphaColorMode;
+#endif
 
 static struct DrawFunctionState
 {
@@ -71,8 +76,24 @@ static leResult _RGBBlendPixel(int32_t x,
     leColor rgbaSource;
     leColor rgbaDest;
     leColor resultClr;
-    uint32_t currentAlpha;
+    uint32_t currentAlpha = 0xFF;
     uint32_t alphaPercent;
+
+    if(a == 0)
+        return LE_SUCCESS;
+
+    if(_alphaColorMode == LE_TRUE)
+    {
+        currentAlpha = leColorChannelAlpha(clr, _currentMode);
+    }
+
+    if(currentAlpha == 0)
+        return LE_SUCCESS;
+
+    if(a == 0xFF && currentAlpha == 0xFF)
+    {
+        return _RGBPutPixel(x, y, clr, 0);
+    }
 
 #if LE_RENDER_ORIENTATION != 0
     leUtils_PointLogicalToScratch((int16_t*)&x, (int16_t*)&y);
@@ -210,15 +231,26 @@ static leResult _RGBBlendFill(int32_t x,
                               uint32_t a)
 {
     uint32_t w, h;
+    uint32_t alphaChannel = 0xFF;
 
     lePoint pnt;
     leRect fillRect, frameRect;
 
-    //if(a == 0)
-    //    return LE_SUCCESS;
+    if(a == 0)
+        return LE_SUCCESS;
 
-    //if(a == 255)
-    //    return _RGBFill(x, y, width, height, clr, 0);
+    if(_alphaColorMode == LE_TRUE)
+    {
+        alphaChannel = leColorChannelAlpha(clr, _currentMode);
+    }
+
+    if(alphaChannel == 0)
+        return LE_SUCCESS;
+
+    if(a == 0xFF && alphaChannel == 0xFF)
+    {
+        return _RGBFill(x, y, width, height, clr, 0);
+    }
 
     // adjust for rectangle position
     leRenderer_GetFrameRect(&frameRect);
@@ -419,6 +451,8 @@ leResult leRenderer_FillArea(int32_t x,
 
 void _leRenderer_InitDrawForMode(leColorMode mode)
 {
+    _currentMode = mode;
+
     switch(mode)
     {
         case LE_COLOR_MODE_GS_8:
@@ -437,6 +471,8 @@ void _leRenderer_InitDrawForMode(leColorMode mode)
             _drawFunction.blendPixel = _RGBBlendPixel;
             _drawFunction.fill = _RGBFill;
             _drawFunction.blendFill = _RGBBlendFill;
+
+            _alphaColorMode = LE_COLOR_MODE_IS_ALPHA(mode);
 #else
             _drawFunction.putPixel = _RGBPutPixel;
             _drawFunction.blendPixel = _RGBPutPixel;

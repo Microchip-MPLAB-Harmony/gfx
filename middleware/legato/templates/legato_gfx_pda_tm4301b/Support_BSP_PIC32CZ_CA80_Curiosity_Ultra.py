@@ -32,13 +32,15 @@ lccAutoConnectList = [["le_gfx_driver_lcc", "EBI_CS", "ebi", "ebi_cs0"],
 						["sys_time", "sys_time_TMR_dependency", "rtc", "RTC_TMR"]]
 
 lccPinConfig = [{"pin": 19,  "name": "GFX_DISP_INTF_PIN_RESET", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #PC13
+				{"pin": 69,  "name": "PHY_TRISTATE_PULLDOWN", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #PB23
 				{"pin": 72,  "name": "BSP_MAXTOUCH_CHG", "type": "GPIO", "direction": "In", "latch": "", "abcd": ""}, #PD28
 				{"pin": 105, "name": "GFX_DISP_INTF_PIN_VSYNC", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #PD19
 				{"pin": 106, "name": "TOUCH_SDA", "type": "SERCOM0_PAD0", "direction": "", "latch": "", "abcd": ""}, #PA4
 				{"pin": 107, "name": "TOUCH_SCL", "type": "SERCOM0_PAD1", "direction": "", "latch": "In", "abcd": ""}, #PA8
-				{"pin": 110, "name": "LCD_PCLK", "type": "EBI_NWE_NWR0", "direction": "Out", "latch": "", "abcd": ""}, #PC8
+				{"pin": 110, "name": "EBI_NWE_NWR0", "type": "EBI_NWE_NWR0", "direction": "Out", "latch": "", "abcd": ""}, #PC6
 				{"pin": 113, "name": "GFX_DISP_INTF_PIN_DE", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #PC11
-				{"pin": 129, "name": "LCD_PWM", "type": "TCC9_WO0", "direction": "Out", "latch": "", "abcd": ""}, #PC9, backlight via TCC9
+				{"pin": 114, "name": "EBI_NBS1_NWR1", "type": "EBI_NBS1_NWR1", "direction": "Out", "latch": "", "abcd": ""}, #PC6
+				{"pin": 129, "name": "GFX_DISP_INTF_PIN_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #PC9, Backlight
 				{"pin": 142, "name": "GFX_DISP_INTF_PIN_HSYNC", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #PC30
 				{"pin": 179, "name": "EBI_D0", "type": "EBI_D0", "direction": "", "latch": "", "abcd": ""}, #PC0
 				{"pin": 180, "name": "EBI_D1", "type": "EBI_D1", "direction": "", "latch": "", "abcd": ""}, #PC1
@@ -74,6 +76,7 @@ def eventHandlerLCC(event):
 			Database.setSymbolValue("le_gfx_driver_lcc", "TCInstance", 9, 1)
 			Database.setSymbolValue("le_gfx_driver_lcc", "TCChannel", 1, 1)
 			Database.setSymbolValue("le_gfx_driver_lcc", "TCChannelCompare", "B", 1)
+			Database.setSymbolValue("ebi", "EBI_SMC_READ_ENABLE_MODE_CS0", 0, 1)
 			print("Done confguring backlight")
 		except:
 			print("Failed to configure backlight")
@@ -81,7 +84,7 @@ def eventHandlerLCC(event):
 
 bspDisplayInterfaceList = ["LCC"]
 
-pic32cz_ca90_curiosity_ultra_lcc = bspSupportObj(lccPinConfig, lccActivateList, None, lccAutoConnectList, eventHandlerLCC)
+pic32cz_ca80_curiosity_ultra_lcc = bspSupportObj(lccPinConfig, lccActivateList, None, lccAutoConnectList, eventHandlerLCC)
 
-addBSPSupport("BSP_PIC32Z_CA90_Curiosity_Ultra", "LCC", pic32cz_ca90_curiosity_ultra_lcc)
-addDisplayIntfSupport("BSP_PIC32Z_CA90_Curiosity_Ultra", bspDisplayInterfaceList)
+addBSPSupport("BSP_PIC32Z_CA80_Curiosity_Ultra", "LCC", pic32cz_ca80_curiosity_ultra_lcc)
+addDisplayIntfSupport("BSP_PIC32Z_CA80_Curiosity_Ultra", bspDisplayInterfaceList)
