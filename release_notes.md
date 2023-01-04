@@ -8,6 +8,17 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.12.1
+
+### Issues Fixed
+
+* MH3-73631 Composer crashes when deleting a layer
+* MH3-73702	Composer Crash when opening Image Manager Import Color Map
+
+* Microchip Graphics Composer v1.5.0b 
+  * Legato Plugin Linux/Windows/Mac Build v2.3.14b 
+
+
 ## Graphics Release v3.12.0
 
 ### New Features
