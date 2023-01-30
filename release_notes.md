@@ -8,6 +8,19 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.12.2
+
+### Issues Fixed
+
+* MH3-73806 LCDC driver not using LCDC_SetPixelClockPolarity PLIB call to set Pixel Clock Signal Polarity
+* MH3-73811 The MCC plugin for MGC is still called Legato Graphics Composer as shown in the screenshot
+* MH3-74027 Add callback mechanism for SB blit status or completion
+* MH3-74169	Composer crash when adding new screen and adding widgets
+
+* Microchip Graphics Composer v1.5.0b 
+  * Legato Plugin Linux/Windows/Mac Build v2.3.15b 
+
+
 ## Graphics Release v3.12.1
 
 ### Issues Fixed
@@ -399,7 +412,7 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 
 
 * [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
-* [Touch v3.13.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.0)
+* [Touch v3.13.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.1)
 
 
 

@@ -547,6 +547,9 @@ gfxResult DRV_LCDC_Initialize()
     LCDC_WaitForSyncInProgress();
     LCDC_SetPWMClockSourceSelection(LCDC_PWM_CLOCK_SOURCE);
     LCDC_SetClockDivider(PIXEL_CLOCK_DIV);
+<#if PixelClockPol == "Negative">
+    LCDC_SetPixelClockPolarity(LCDC_POLARITY_NEGATIVE);
+</#if>
 
     //Disable all layers for now
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_BASE, false); 

@@ -116,6 +116,15 @@ def instantiateComponent(comp):
 	PixelClock.setMin(1)
 	PixelClock.setReadOnly(True)
 
+	PixelClockPol = comp.createKeyValueSetSymbol("PixelClockPol", ClockSettingsMenu)
+	PixelClockPol.setLabel("Pixel Clock Polarity")
+	PixelClockPol.setDescription("Polarity of LCDC Data/control signals.")
+	PixelClockPol.addKey("Positive" , "0", "Signals launched on rising edge of pixel clock.")
+	PixelClockPol.addKey("Negative" , "1", "Signals launched on falling edge of pixel clock.")
+	PixelClockPol.setDisplayMode("Key")
+	PixelClockPol.setOutputMode("Key")
+	PixelClockPol.setDefaultValue(0)
+
 	### Layer Configuration Menu
 	LayerConfigurationMenu = comp.createMenuSymbol("LayerConfigurationMenu", None)
 	LayerConfigurationMenu.setLabel("Layer Configuration")

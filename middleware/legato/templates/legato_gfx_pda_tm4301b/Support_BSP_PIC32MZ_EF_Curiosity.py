@@ -35,7 +35,8 @@ bsp_pic32mzef_cu_PinConfig_LCC = [{"pin": 104, "name": "BSP_MAXTOUCH_CHG", "type
 				{"pin": 51, "name": "GFX_DISP_INTF_PIN_HSYNC", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #RK1
 				{"pin": 52, "name": "GFX_DISP_INTF_PIN_VSYNC", "type": "GPIO", "direction": "Out", "latch": "Low", "abcd": ""}, #RK2
 				{"pin": 37, "name": "GFX_DISP_INTF_PIN_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RB6
-				{"pin": 29, "name": "GFX_DISP_INTF_PIN_RESET", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RJ14
+				{"pin": 29, "name": "GFX_DISP_INTF_PIN_RESET", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RJ14
+				{"pin": 87, "name": "GFX_DISP_INTF_PIN_LCDDISP", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RA4
 ##################################################################################
 
 ############ SSD1963 + TOUCH I2C CONFIG ######################################################
