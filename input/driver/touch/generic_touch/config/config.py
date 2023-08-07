@@ -47,6 +47,17 @@ TouchHeight.setDescription("The height of the touch area in pixels.")
 TouchHeight.setMin(1)
 TouchHeight.setDefaultValue(272)
 
+TouchOrient = comp.createKeyValueSetSymbol("TouchOrient", TouchPanelSettingsMenu)
+TouchOrient.setLabel("Orientation")
+TouchOrient.setOutputMode("Value")
+TouchOrient.setDisplayMode("Description")
+TouchOrient.setDescription("Transforms coordinates in software.")
+TouchOrient.addKey("0", str(0), "0 Deg")
+TouchOrient.addKey("90", str(90), "90 Deg")
+TouchOrient.addKey("180", str(180), "180 Deg")
+TouchOrient.addKey("270", str(270), "270 Deg")
+TouchOrient.setDefaultValue(0)
+
 InterfaceSettingsMenu = comp.createMenuSymbol("InterfaceSettingsMenu", None)
 InterfaceSettingsMenu.setLabel("Interface Settings")
 

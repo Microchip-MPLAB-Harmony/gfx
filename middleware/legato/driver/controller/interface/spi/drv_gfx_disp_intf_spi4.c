@@ -156,13 +156,39 @@ static void GFX_Disp_Intf_CallBack(DRV_SPI_TRANSFER_EVENT event,
 
 GFX_Disp_Intf GFX_Disp_Intf_Open(void)
 {   
+    DRV_SPI_TRANSFER_SETUP setup;
+    
+    setup.baudRateInHz = ${BaudRate};
+<#if ClockPhase == "Valid Leading Edge">
+    setup.clockPhase = DRV_SPI_CLOCK_PHASE_VALID_LEADING_EDGE;
+<#else>
+    setup.clockPhase = DRV_SPI_CLOCK_PHASE_VALID_TRAILING_EDGE;
+</#if>
+<#if ClockPolarity == "Idle Low">
+    setup.clockPolarity = DRV_SPI_CLOCK_POLARITY_IDLE_LOW;
+<#else>
+    setup.clockPolarity = DRV_SPI_CLOCK_POLARITY_IDLE_HIGH;
+</#if>
+    setup.dataBits = DRV_SPI_DATA_BITS_${DataBits};
+    setup.chipSelect = GFX_DISP_INTF_PIN_CS_PIN;
+<#if CSPolarity == "Active Low">
+    setup.csPolarity = DRV_SPI_CS_POLARITY_ACTIVE_LOW;
+<#else>
+    setup.csPolarity = DRV_SPI_CS_POLARITY_ACTIVE_HIGH;
+</#if>
+
     spiIntf.drvSPIHandle = DRV_SPI_Open(${DRV_INTERFACE_SPI_INDEX}, DRV_IO_INTENT_READWRITE);
     
     if (DRV_HANDLE_INVALID == spiIntf.drvSPIHandle)
     {
-        return -1;
+        return 0;
     }
 
+    if (DRV_SPI_TransferSetup(spiIntf.drvSPIHandle, &setup) != true)
+    {
+        return 0;
+    }
+    
     DRV_SPI_TransferEventHandlerSet(spiIntf.drvSPIHandle,
                                     GFX_Disp_Intf_CallBack,
                                     (uintptr_t)&spiIntf.drvSPITransStatus );

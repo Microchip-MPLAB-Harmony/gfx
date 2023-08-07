@@ -536,7 +536,7 @@ gfxResult DRV_2DGPU_Blit(const gfxPixelBuffer* source,
 
     if(IS_KVA1(source->pixels) == GFX_FALSE ||    //not coherent
        (source->size.width) % 8 > 0 ||            //not width aligned
-       (((uint32_t) src_buffer.memory) & 0x3))    //not 32-bit address aligned
+       (((uint32_t) src_buffer.memory) & 0xf))    //not 16-byte address aligned
     {
         return GFX_FAILURE;
     }

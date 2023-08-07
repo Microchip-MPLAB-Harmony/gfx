@@ -204,7 +204,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_CLOCK_GATING_ACTIVATED = 0,
     GFX2D_CLOCK_GATING_DISABLED
@@ -222,12 +222,37 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_MEMORY_TILE_ACCESS = 0,
     GFX2D_MEMORY_LINEAR_ACCESS
 } GFX2D_MEMORY_ACCESS;
 
+/* GFX2D QOS Cycles
+
+   Summary:
+    Defines the QOS Cycles for REGQOSx
+
+   Description:
+    This defines valid REGQOSx values.
+
+   Remarks:
+    None.
+*/
+typedef enum
+{
+    GFX2D_QOS_0_CYCLES = 0,
+    GFX2D_QOS_1_CYCLES,
+    GFX2D_QOS_3_CYCLES,
+    GFX2D_QOS_7_CYCLES,
+    GFX2D_QOS_15_CYCLES,
+    GFX2D_QOS_31_CYCLES,
+    GFX2D_QOS_63_CYCLES,
+    GFX2D_QOS_127_CYCLES,
+    GFX2D_QOS_255_CYCLES,
+    GFX2D_QOS_511_CYCLES,
+    GFX2D_QOS_1023_CYCLES,
+} GFX2D_QOS_CYCLES;
 
 /* GFX2D Performance Filter Configuration
 
@@ -240,7 +265,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_FILTER_DISABLED = 0,
     GFX2D_FILTER_QOS0,
@@ -260,7 +285,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_METRICS_DISABLED = 0,
     GFX2D_METRICS_INCREMENT_ON_READ,
@@ -279,12 +304,12 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_PERFORMANCE_REG0 = 0,
     GFX2D_PERFORMANCE_REG1
 } GFX2D_PERFORMANCE_REGISTER;
-      
+
 /* GFX2D Surface
 
    Summary:
@@ -296,7 +321,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_SURFACE_ZERO = 0,
     GFX2D_SURFACE_ONE,
@@ -316,7 +341,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_COLOR_LOOKUP_TABLE_ZERO = 0,
     GFX2D_COLOR_LOOKUP_TABLE_ONE,
@@ -333,7 +358,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_A4IDX4 = 0,
     GFX2D_A8,
@@ -362,7 +387,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_XY00 = 0,
     GFX2D_XY01,
@@ -381,7 +406,7 @@ typedef enum
    Remarks:
     None.
 */
-typedef enum 
+typedef enum
 {
     GFX2D_SPE_LIGHTEN = 0,
     GFX2D_SPE_DARKEN,
@@ -395,11 +420,11 @@ typedef enum
     GFX2D_SPE_OVERLAY,
     GFX2D_SPE_DODGE,
     GFX2D_SPE_BURN,
-    GFX2D_SPE_REFLECT,    
+    GFX2D_SPE_REFLECT,
     GFX2D_SPE_GLOW
 } GFX2D_BLEND_SPE;
 
-typedef enum 
+typedef enum
 {
     GFX2D_FUNCTION_ADD = 0,
     GFX2D_FUNCTION_SUBTRACT,
@@ -409,7 +434,7 @@ typedef enum
     GFX2D_FUNCTION_SPE
 } GFX2D_BLEND_FUNCTION;
 
-typedef enum 
+typedef enum
 {
     GFX2D_FACTOR_ZERO = 0,
     GFX2D_FACTOR_ONE,
@@ -428,7 +453,7 @@ typedef enum
     GFX2D_FACTOR_SRC_ALPHA_SATURATE,
 } GFX2D_BLEND_FACTOR;
 
-typedef enum 
+typedef enum
 {
     GFX2D_ROP2 = 0,
     GFX2D_ROP3,
@@ -515,13 +540,13 @@ typedef struct gpu_rop {
 // Global Configuration, Enable, Disable, Status
 // *****************************************************************************
 // *****************************************************************************
-          
+
 // *****************************************************************************
 /* Function:
     void PLIB_GFX2D_SetClockGatingCore(GFX2D_CLOCK_GATING gating)
 
    Summary:
-    Enables/disables the clock gating core 
+    Enables/disables the clock gating core
 
    Description:
     None
@@ -539,13 +564,13 @@ typedef struct gpu_rop {
     None
 */
 void PLIB_GFX2D_SetClockGatingCore(GFX2D_CLOCK_GATING gating);
-          
+
 // *****************************************************************************
 /* Function:
     void PLIB_GFX2D_SetClockGatingAXI(GFX2D_CLOCK_GATING gating)
 
    Summary:
-    Enables/disables the clock gating AXI core 
+    Enables/disables the clock gating AXI core
 
    Description:
     None
@@ -569,7 +594,7 @@ void PLIB_GFX2D_SetClockGatingAXI(GFX2D_CLOCK_GATING gating);
     void PLIB_GFX2D_SetClockGatingFIFO(GFX2D_CLOCK_GATING gating)
 
    Summary:
-    Enables/disables the clock gating FIFO core 
+    Enables/disables the clock gating FIFO core
 
    Description:
     None
@@ -593,7 +618,7 @@ void PLIB_GFX2D_SetClockGatingFIFO(GFX2D_CLOCK_GATING gating);
     void PLIB_GFX2D_SetOutstandingRegulationEnable(bool enable)
 
    Summary:
-    Enables/disables the outstanding regulation 
+    Enables/disables the outstanding regulation
 
    Description:
     None
@@ -611,6 +636,35 @@ void PLIB_GFX2D_SetClockGatingFIFO(GFX2D_CLOCK_GATING gating);
     None
 */
 void PLIB_GFX2D_SetOutstandingRegulationEnable(bool enable);
+
+// *****************************************************************************
+/* Function:
+    void PLIB_GFX2D_SetQOSLatency(GFX2D_QOS_CYCLES QOS1, GFX2D_QOS_CYCLES QOS2, GFX2D_QOS_CYCLES QOS3)
+
+   Summary:
+    Sets latency cycles to be inserted if outstanding regulation is enabled.
+
+   Description:
+    The LCDC FIFO health can be verified by GFX2D before initiating
+    transactions on the bus. This allows the latency critical LCDC
+    FIFO data reads from being interrupted by GFX2D transactions during
+    peak bus load conditions. This is done by inserting delay cycles.
+
+   Precondition:
+    Outstanding regulation must be enabled.
+
+   Parameters:
+    QOS1 - Cycles inserted to mitigate moderate LCDC FIFO health.
+    QOS2 - Cycles inserted to mitigate low LCDC FIFO health.
+    QOS3 - Cycles inserted to mitigate very low LCDC FIFO health.
+
+   Returns:
+    None
+
+   Remarks:
+    Ideally, values must be as shown: QOS3 > QOS2 > QOS1
+*/
+void PLIB_GFX2D_SetQOSLatency(GFX2D_QOS_CYCLES QOS1, GFX2D_QOS_CYCLES QOS2, GFX2D_QOS_CYCLES QOS3);
 
 // *****************************************************************************
 /* Function:
@@ -741,7 +795,7 @@ bool PLIB_GFX2D_GetGlobalStatusBusy( void );
     Returns true if graphics engine is waiting for an event
 
    Description:
-    The graphics is either running or waiting for an event after the engine 
+    The graphics is either running or waiting for an event after the engine
     is enabled.
 
    Precondition:
@@ -769,7 +823,7 @@ bool PLIB_GFX2D_GetGlobalStatusWaitForEvent( void );
     void PLIB_GFX2D_SetPerformanceFilter(GFX2D_PERFORMANCE_REGISTER reg, GFX2D_PERFORMANCE_FILTER_CONFIG filter)
 
    Summary:
-    Sets the performance filter for the specified register 
+    Sets the performance filter for the specified register
 
    Description:
     None
@@ -794,7 +848,7 @@ void PLIB_GFX2D_SetPerformanceFilter(GFX2D_PERFORMANCE_REGISTER reg, GFX2D_PERFO
     void PLIB_GFX2D_SetPerformanceMetric(GFX2D_PERFORMANCE_REGISTER reg, GFX2D_PERFORMANCE_METRIC metric)
 
    Summary:
-    Sets the performance metric for the specified register 
+    Sets the performance metric for the specified register
 
    Description:
     None
@@ -945,7 +999,7 @@ void PLIB_GFX2D_SetSurfacePixelFormat(GFX2D_SURFACE surface, GFX2D_PIXEL_FORMAT 
 
 // *****************************************************************************
 // *****************************************************************************
-// Interrupt 
+// Interrupt
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -1183,7 +1237,7 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Copy(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *dst
                          GFX2D_BLEND blend)
 
    Summary:
-    Performs a blending of background pixels with foreground pixels onto destination specified 
+    Performs a blending of background pixels with foreground pixels onto destination specified
     by the given blend type.
 
    Description:
@@ -1195,7 +1249,7 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Copy(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *dst
    Parameters:
     dst - the destination surface
     dst_rect - the bounding area of the destination
-    fg - the source surface to get pixels 
+    fg - the source surface to get pixels
     fg_rect - the top, left position of the foreground
     bg - the background surface
     bg_rect - the top, left position of the background

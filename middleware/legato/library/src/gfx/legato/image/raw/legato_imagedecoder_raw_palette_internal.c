@@ -58,7 +58,7 @@ static leResult stage_lookup(struct InternalPaletteStage* stage)
     return LE_SUCCESS;
 }
 
-void _leRawImageDecoder_LookupStage_Internal(leRawDecodeState* state)
+leResult _leRawImageDecoder_LookupStage_Internal(leRawDecodeState* state)
 {
     memset(&paletteStage, 0, sizeof(paletteStage));
 
@@ -68,6 +68,8 @@ void _leRawImageDecoder_LookupStage_Internal(leRawDecodeState* state)
     paletteStage.paletteSize = leColorInfoTable[state->source->palette->buffer.mode].size;
 
     _leRawImageDecoder_InjectStage(state, (void*)&paletteStage);
+
+    return LE_SUCCESS;
 }
 
 static struct ImageRenderPostLookupStage

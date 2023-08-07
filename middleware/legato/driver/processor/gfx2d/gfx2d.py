@@ -22,14 +22,16 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+
 def setCommonMode(symbol, event):
     rtos_mode = event["value"]
 
     if rtos_mode != None:
         if rtos_mode == "BareMetal":
-            symbol.setValue("Asynchronous", 1)
+            symbol.setValue("Synchronous", 1)
         else:
             symbol.setValue("Synchronous", 1)
+
 
 def instantiateComponent(comp):
     print("Instantiated GFX2D driver component")
@@ -41,16 +43,19 @@ def instantiateComponent(comp):
     DriverInitName.setLabel("Driver Name")
     DriverInitName.setDefaultValue("_gfx2dGraphicsProcessor")
     DriverInitName.setReadOnly(True)
+    DriverInitName.setVisible(False)
 
     gfx2dSymPLIB = comp.createStringSymbol("DRV_GFX2D_PLIB", None)
     gfx2dSymPLIB.setLabel("PLIB Used")
     gfx2dSymPLIB.setReadOnly(True)
     gfx2dSymPLIB.setDefaultValue("")
+    gfx2dSymPLIB.setVisible(False)
 
     gfx2dMode = comp.createComboSymbol("DRV_GFX2D_MODE", None, ["Asynchronous", "Synchronous"])
     gfx2dMode.setLabel("Driver Mode")
     gfx2dMode.setDefaultValue(gfx2d_default_mode)
     gfx2dMode.setDependencies(setCommonMode, ["HarmonyCore.SELECT_RTOS"])
+    gfx2dMode.setVisible(False)
 
     gfx2dSymQueueSize = comp.createIntegerSymbol("DRV_GFX2D_QUEUE_SIZE", None)
     gfx2dSymQueueSize.setLabel("Transfer Queue Size")
@@ -63,6 +68,54 @@ def instantiateComponent(comp):
     gfx2dScratchBufferSize.setLabel("Scratch Buffer Size")
     gfx2dScratchBufferSize.setMin(1)
     gfx2dScratchBufferSize.setDefaultValue(4096)
+    gfx2dScratchBufferSize.setVisible(False)
+
+    gfx2d_regen_default = True
+
+    gfx2dOutstandingRegulation = comp.createBooleanSymbol("DRV_GFX2D_REG_EN", None)
+    gfx2dOutstandingRegulation.setLabel("Enable Outstanding Regulation")
+    gfx2dOutstandingRegulation.setDescription("GFX2D delays transtactions if LCDC FIFO health is suboptimal.")
+    gfx2dOutstandingRegulation.setDefaultValue(gfx2d_regen_default)
+    gfx2dOutstandingRegulation.setVisible(True)
+
+    gfx2dREGQOS1 = comp.createKeyValueSetSymbol("DRV_GFX2D_REG_QOS_1", None)
+    gfx2dREGQOS1.setLabel("QOS1 Cycles")
+    gfx2dREGQOS1.setOutputMode("Value")
+    gfx2dREGQOS1.setDisplayMode("Description")
+    gfx2dREGQOS1.setDescription("Cycles inserted to mitigate moderate LCDC FIFO health.")
+    for x in range(11):
+        id_val = "GFX2D_QOS_" + str(2**x - 1) + "_CYCLES"
+        id_desc = str(2**x - 1)
+        gfx2dREGQOS1.addKey(str(x), id_val, id_desc)
+    gfx2dREGQOS1.setDefaultValue(4)
+    gfx2dREGQOS1.setVisible(gfx2d_regen_default)
+    gfx2dREGQOS1.setDependencies(show_qos_settings, ["DRV_GFX2D_REG_EN"])
+
+    gfx2dREGQOS2 = comp.createKeyValueSetSymbol("DRV_GFX2D_REG_QOS_2", None)
+    gfx2dREGQOS2.setLabel("QOS2 Cycles")
+    gfx2dREGQOS2.setOutputMode("Value")
+    gfx2dREGQOS2.setDisplayMode("Description")
+    gfx2dREGQOS2.setDescription("Cycles inserted to mitigate low LCDC FIFO health.")
+    for x in range(11):
+        id_val = "GFX2D_QOS_" + str(2**x - 1) + "_CYCLES"
+        id_desc = str(2**x - 1)
+        gfx2dREGQOS2.addKey(str(x), id_val, id_desc)
+    gfx2dREGQOS2.setDefaultValue(5)
+    gfx2dREGQOS2.setVisible(gfx2d_regen_default)
+    gfx2dREGQOS2.setDependencies(show_qos_settings, ["DRV_GFX2D_REG_EN"])
+
+    gfx2dREGQOS3 = comp.createKeyValueSetSymbol("DRV_GFX2D_REG_QOS_3", None)
+    gfx2dREGQOS3.setLabel("QOS3 Cycles")
+    gfx2dREGQOS3.setOutputMode("Value")
+    gfx2dREGQOS3.setDisplayMode("Description")
+    gfx2dREGQOS3.setDescription("Cycles inserted to mitigate very low LCDC FIFO health.")
+    for x in range(11):
+        id_val = "GFX2D_QOS_" + str(2**x - 1) + "_CYCLES"
+        id_desc = str(2**x - 1)
+        gfx2dREGQOS3.addKey(str(x), id_val, id_desc)
+    gfx2dREGQOS3.setDefaultValue(6)
+    gfx2dREGQOS3.setVisible(gfx2d_regen_default)
+    gfx2dREGQOS3.setDependencies(show_qos_settings, ["DRV_GFX2D_REG_EN"])
 
     # Add Interface
     GFX_GFX2D_H = comp.createFileSymbol("GFX_GFX2D_H", None)
@@ -92,7 +145,7 @@ def instantiateComponent(comp):
     ProcInfoFunction.setReadOnly(True)
     ProcInfoFunction.setVisible(False)
 
-	# System level 
+    # System level
     ProcSysDefinitions = comp.createFileSymbol("SYS_DEFINITIONS_H", None)
     ProcSysDefinitions.setType("STRING")
     ProcSysDefinitions.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
@@ -105,22 +158,30 @@ def instantiateComponent(comp):
     ProcSysInit.setSourcePath("templates/init.c.ftl")
     ProcSysInit.setMarkup(True)
 
+
 def asyncModeOptions(symbol, event):
-    if (event["value"] == "Asynchronous"):
+    if event["value"] == "Asynchronous":
         symbol.setVisible(True)
     else:
         symbol.setVisible(False)
 
+
 def configureGFX2DComponent(gpuComponent, comp):
-	print("GFX2D Driver: Connecting GFX2D")
-	
+    print("GFX2D Driver: Connecting GFX2D")
+
+
 def resetGFX2DComponent(gpuComponent, comp):
-	print("GFX2D Driver: Disconnecting GFX2D")
+    print("GFX2D Driver: Disconnecting GFX2D")
+
 
 def onAttachmentConnected(source, target):
-	print("plib dependency Connected = " + str(target['id']))
-	#### test for GFX2D dependency
+    print("plib dependency Connected = " + str(target["id"]))
+    #### test for GFX2D dependency
+
 
 def onAttachmentDisconnected(source, target):
-	print("plib dependency Disconnected = " + str(target['id']))
+    print("plib dependency Disconnected = " + str(target["id"]))
 
+
+def show_qos_settings(symbol, event):
+    symbol.setVisible(event["value"])

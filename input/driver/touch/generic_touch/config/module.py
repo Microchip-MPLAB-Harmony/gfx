@@ -26,5 +26,6 @@ def loadModule():
 	component = Module.CreateComponent("gfx_generic_touch_controller", "Generic Touch Controller", "/Input/Touch", "config/controller.py")
 	component.setDisplayType("Generic Touch Controller")
 	component.addDependency("touch_panel", "Touch Panel", False)
-	component.addDependency("i2c", "DRV_I2C", False)
-	component.addDependency("sys_input", "Input System Service", True)
+	component.addDependency("i2c", "DRV_I2C", False, True)
+	component.addDependency("sys_input", "Input System Service", True, True)
+	component.addDependency("sys_time", "SYS_TIME", True, True)

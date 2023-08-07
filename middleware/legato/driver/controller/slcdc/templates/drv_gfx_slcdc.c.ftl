@@ -181,9 +181,19 @@ status_code_t slcdc_init(slcdc_registers_t *p_slcdc, struct slcdc_config *slcdc_
 
 status_code_t slcdc_set_frame_rate(slcdc_registers_t *p_slcdc, uint32_t frame_rate)
 {
-	uint32_t ul_divisors[SLCDC_CLOCK_PRE_MAX] = {8, 16, 32, 64, 128, 256, 512, 1024};
+	uint32_t ul_divisors[SLCDC_CLOCK_PRE_MAX] = {0, 0, 0, 0, 0, 0, 0, 0};
 	uint32_t ul_pre = 0;
 	uint32_t ul_div;
+
+	/* Unique initialization to pass MISRA 2012 Rule 9.1 */
+	ul_divisors[0] = 8;
+	ul_divisors[1] = 16;
+	ul_divisors[2] = 32;
+	ul_divisors[3] = 64;
+	ul_divisors[4] = 128;
+	ul_divisors[5] = 256;
+	ul_divisors[6] = 512;
+	ul_divisors[7] = 1024;
 
 	/* Find prescaler and divisor values */
 	ul_div = (BOARD_FREQ_SLCK_XTAL / ul_divisors[ul_pre])

@@ -23,7 +23,7 @@
 ##############################################################################
 
 def loadModule():
-    if ("A5D2" in str(Variables.get("__PROCESSOR"))):
+    if ("A5D2" in str(Variables.get("__PROCESSOR")) or "A7G5" in str(Variables.get("__PROCESSOR"))):
         print("Camera module loaded to support " + str(Variables.get("__PROCESSOR")))
         component = Module.CreateComponent("cam", "Camera", "/Harmony/Drivers", "cam.py")
         component.setDisplayType("Camera Sensor Abstract Driver")

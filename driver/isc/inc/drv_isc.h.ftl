@@ -50,7 +50,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "driver/isc/drv_isc.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -74,6 +74,7 @@
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
+<#if ContinuousCapture == true>
 /* Function:
     void DRV_ISC_Capture(void)
     
@@ -124,7 +125,83 @@ void DRV_ISC_Capture( void );
  */
 
 void DRV_ISC_Configure( uint32_t cam_bufferp );
+<#else>
+/* Function:
+    void DRV_ISC_Capture(uint32_t cam_bufferp)
+    
 
+  Description:
+    Send Capture Input Stream Command to start a capture.
+
+  Precondition:
+    DRV_ISC_Configure() must be called before calling DRV_ISC_Capture().
+
+  Parameters:
+    Image buffer.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    DRV_ISC_Capture((uint32_t)&canvasfb0[0]);
+    </code>
+
+ */
+
+void DRV_ISC_Capture( uint32_t cam_bufferp );
+
+// *****************************************************************************
+/* Function:
+    void DRV_ISC_Configure(void)
+    
+
+  Description:
+    Configures ISC.
+
+  Precondition:
+    DRV_ISC_Initialize() must be called before calling DRV_ISC_Configure().
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    DRV_ISC_Configure();
+    </code>
+
+ */
+
+void DRV_ISC_Configure( void );
+
+// *****************************************************************************
+/* Function:
+    void DRV_ISC_Initialize(void)
+    
+
+  Description:
+    Configures Image system blocks (MIPI CSI2, DPHY, CSI2DC) before configuring ISC.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    DRV_ISC_Initialize();
+    </code>
+
+ */
+void DRV_ISC_Initialize( void );
+</#if>
 
        
 //DOM-IGNORE-BEGIN

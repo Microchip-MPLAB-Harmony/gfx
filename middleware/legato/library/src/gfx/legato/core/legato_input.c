@@ -400,7 +400,7 @@ leEventResult handleTouchDown(leWidgetEvent_TouchDown* evt)
     return LE_EVENT_HANDLED;
 }
 
-leBool handleTouchUp(leWidgetEvent_TouchUp* evt)
+leEventResult handleTouchUp(leWidgetEvent_TouchUp* evt)
 {
     leWidget* wgt = leGetFocusWidget();
     
@@ -426,7 +426,7 @@ leBool handleTouchUp(leWidgetEvent_TouchUp* evt)
     return LE_EVENT_DEFERRED;
 }
 
-leBool handleTouchMoved(leWidgetEvent_TouchMove* evt)
+leEventResult handleTouchMoved(leWidgetEvent_TouchMove* evt)
 {
     leWidget* wgt = leGetFocusWidget();
 
@@ -478,7 +478,6 @@ leEventResult _leInput_HandleInputEvent(leEvent* evt)
         case LE_EVENT_TOUCH_MOVE:
         {
             return handleTouchMoved((leWidgetEvent_TouchMove*)evt);
-                return LE_FAILURE;
 
 #ifdef INPUT_EVENT_DEBUG                
             printf("handled touch move\n");
@@ -490,5 +489,5 @@ leEventResult _leInput_HandleInputEvent(leEvent* evt)
             break;
     }
 
-    return LE_SUCCESS;
+    return LE_EVENT_HANDLED;
 }

@@ -9,13 +9,17 @@ Microchip MPLAB® Harmony Graphics Suite provides various application examples f
 
 | Repository | Product family |
 | ---------- | -------------- |
-| [gfx_apps_pic32mz_da](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_da) | Graphics Application examples for: <br> PIC32MZ Graphics (DA) Family <br> PIC32MZ Graphics (DAK/DAL/DAR/DAS) Family |
-| [gfx_apps_pic32mz_ef](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_ef) | Graphics Application examples for PIC32MZ Embedded Connectivity with Floating Point Unit (EF) Family |
-| [gfx_apps_sam_9x60](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60) | Graphics and Image Sensor Application examples for SAM9X60 family |
-| [gfx_apps_sam_a5d2](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_a5d2) | Graphics and Image Sensor Application examples for SAMA5D2 family |
-| [gfx_apps_sam_c20_c21](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_c20_c21) | Graphics Application examples for SAM C20/C21 Family |
+| [gfx_apps_pic32cm_le_ls](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32cm_le_ls) | Graphics Application examples for: PIC32CM LE/LS family |
+| [gfx_apps_pic32ck_sg_gc](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32ck_sg_gc) | Graphics Application examples for: PIC32CK SG/GC family |
+| [gfx_apps_pic32cz_ca](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32cz_ca) | Graphics Application examples for: PIC32CZ CA family |
+| [gfx_apps_pic32mz_da](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_da) | Graphics Application examples for: <br> PIC32MZ Graphics (DA) family <br> PIC32MZ Graphics (DAK/DAL/DAR/DAS) family |
+| [gfx_apps_pic32mz_ef](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_ef) | Graphics Application examples for PIC32MZ Embedded Connectivity with Floating Point Unit (EF) family |
+| [gfx_apps_sam_9x60](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60) | Graphics Application examples for SAM9X60 family |
+| [gfx_apps_sam_9x7](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7) | Graphics Application examples for SAM9X7 family |
+| [gfx_apps_sam_a5d2](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_a5d2) | Graphics Application examples for SAMA5D2 family |
+| [gfx_apps_sam_c20_c21](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_c20_c21) | Graphics Application examples for SAM C20/C21 family |
 | [gfx_apps_sam_d5x_e5x](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_d5x_e5x) | Graphics Application examples for SAM D5x/E5x family|
-| [gfx_apps_sam_e70_s70_v70_v71](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_e70_s70_v70_v71) | Graphics Application examples for SAM E70/S70/V70/V71 Family |
-| [gfx_apps_sam_l22](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_l22) | Segemented LCD Application examples for SAM L22 Family |
+| [gfx_apps_sam_e70_s70_v70_v71](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_e70_s70_v70_v71) | Graphics Application examples for SAM E70/S70/V70/V71 family |
+| [gfx_apps_sam_l22](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_l22) | Segemented LCD Application examples for SAM L22 family |
 
 ***

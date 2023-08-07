@@ -22,6 +22,11 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+polarityModeList = ["Idle Low","Idle High"]
+csModeList = ["Active Low","Active High"]
+edgeModeList = ["Valid Leading Edge", "Valid Trailing Edge"]
+dataBitModeList = ["8","9","10","11","12","13","14","15","16","32"]
+
 def instantiateComponent(comp):
 	GFX_INTF_SPI_H = comp.createFileSymbol("GFX_INTF_SPI_H", None)
 	GFX_INTF_SPI_H.setDestPath("gfx/interface/")
@@ -47,18 +52,39 @@ def instantiateComponent(comp):
 	InterfaceType.setDefaultValue("SPI 4-line")
 	InterfaceType.setVisible(False)
 
-        InterfaceSpiIndex = comp.createIntegerSymbol("DRV_INTERFACE_SPI_INDEX", None)
+	InterfaceSpiIndex = comp.createIntegerSymbol("DRV_INTERFACE_SPI_INDEX", None)
 	InterfaceSpiIndex.setLabel("SPI Index")
 	InterfaceSpiIndex.setDefaultValue(0)
 	InterfaceSpiIndex.setMin(0)
 
 	TransferModeSettingsMenu = comp.createMenuSymbol("TransferModeSettingsMenu", None)
 	TransferModeSettingsMenu.setLabel("Transfer Mode Settings")
-	
+
 	BlockingTransfers = comp.createBooleanSymbol("BlockingTransfers", TransferModeSettingsMenu)
 	BlockingTransfers.setLabel("Blocking")
 	BlockingTransfers.setDefaultValue(True)
-	
+
+	BaudRate = comp.createIntegerSymbol("BaudRate", TransferModeSettingsMenu)
+	BaudRate.setLabel("SPI Speed in Hz")
+	BaudRate.setDefaultValue(1000000)
+	BaudRate.setMin(1)
+
+	ClockPhase = comp.createComboSymbol("ClockPhase", TransferModeSettingsMenu, edgeModeList)
+	ClockPhase.setLabel("SPI Clock Phase Valid Edge Detect")
+	ClockPhase.setDefaultValue(edgeModeList[0])
+
+	ClockPolarity = comp.createComboSymbol("ClockPolarity", TransferModeSettingsMenu, polarityModeList)
+	ClockPolarity.setLabel("SPI Clock Polarity")
+	ClockPolarity.setDefaultValue(polarityModeList[0])
+
+	DataBits = comp.createComboSymbol("DataBits", TransferModeSettingsMenu, dataBitModeList)
+	DataBits.setLabel("Data Bits")
+	DataBits.setDefaultValue(dataBitModeList[0])
+
+	CSPolarity = comp.createComboSymbol("CSPolarity", TransferModeSettingsMenu, csModeList)
+	CSPolarity.setLabel("Chip Select Polarity")
+	CSPolarity.setDefaultValue(csModeList[0])
+
 def onAttachmentConnected(source, target):
 	#print(source["component"].getID() + ": " + dependencyID + " dependent component added ")
 	if source["id"] == "DRV_SPI":

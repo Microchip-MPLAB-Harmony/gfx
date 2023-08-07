@@ -50,7 +50,7 @@ static leResult stage_rejectMaskedColor(leRawDecodeStage* stage)
     return LE_SUCCESS;
 }
 
-void _leRawImageDecoder_MaskStage_Internal(leRawDecodeState* state)
+leResult _leRawImageDecoder_MaskStage_Internal(leRawDecodeState* state)
 {
     memset(&maskStage, 0, sizeof(maskStage));
 
@@ -58,6 +58,8 @@ void _leRawImageDecoder_MaskStage_Internal(leRawDecodeState* state)
     maskStage.base.exec = stage_rejectMaskedColor;
 
     _leRawImageDecoder_InjectStage(state, (void*)&maskStage);
+
+    return LE_SUCCESS;
 }
 
 #endif /* LE_ENABLE_RAW_DECODER */

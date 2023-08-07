@@ -8,6 +8,57 @@ nav_order: 99
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Graphics Release v3.13.0
+
+### New Features
+
+* Added SAM9x7 MIPI-DSI display interface driver support
+* Added SAM9x7 LVDSC display interface driver support
+* Added SAM9x7 GFX2D graphics processor support
+* Added SAM9x7 Evaluator Board + Raspberry Pi 7" 800x480 Touch Display support
+* Added SAM9x7 Evaluator Board + AC69T88A LVDS 800x480 Touch Display support
+* Added SAM9x7 Evaluator Board + Waveshare 7.9" 400x1280 Touch Display support
+* Added SAM9x7 Evaluator Board + Waveshare 2.8" 480x640 Touch Display support
+* Added PIC32CK SG GC Family LCC driver and template support
+
+### Issues Fixed
+
+* MH3-81984	UsageFault_Handler occurs while calculating the baudValue due to divide by zero error
+* MH3-53726	MZ DA Curiosity apps documentation talks about 24-bit pass through, but does not talk about jumper position
+* MH3-69618	LCDDISP/DISP signal from PIC32MZ development boards must be driven high
+* MH3-73607	Add LCC support for PIC32CK SG Unicorn Curiosity Board
+* MH3-73608	Add Graphics Template support for PIC32CK SG Unicorn Curiosity Board
+* MH3-74247	SLCDC driver has MISRA violations
+* MH3-74730	Add LVDS support for SAM 9x7 Early Adopter board
+* MH3-74765	Need to revert to SW blits if source buffer address is not 16-byte aligned for PIC32MZ DA GPU
+* MH3-74767	Fix build warnings/errors while building legato on emcc/clang
+* MH3-75441	GFX: Align all asset data
+* MH3-75665	Glyph table access is causing unaligned memory access
+* MH3-75738	Percentage math fixes for slider widget
+* MH3-80697	Legato library - Memory leakage when using LegatoBarGraph widget
+* MH3-81738	gfx canvas effects crash if no callback is defined
+* MH3-81739	SPI 4 Wire Driver dereferencing a -1 Pointer
+
+
+* Microchip Graphics Composer v1.4.1b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.15b
+
+### Development Tools
+
+
+* [MPLAB® X IDE v6.10](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v4.30](https://www.microchip.com/mplab/compilers)
+* MPLAB® X IDE plug-ins:
+    * [MPLAB® Code Configurator Plug-In v5.3.7](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+    * [MPLAB® Code Configurator Core v5.5.7](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+### Dependent Components
+
+* [Core v3.13.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.13.0)
+* [Touch v3.13.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.1)
+
+
+
 ## Graphics Release v3.12.2
 
 ### Issues Fixed
@@ -17,9 +68,27 @@ nav_order: 99
 * MH3-74027 Add callback mechanism for SB blit status or completion
 * MH3-74169	Composer crash when adding new screen and adding widgets
 
-* Microchip Graphics Composer v1.5.0b 
-  * Legato Plugin Linux/Windows/Mac Build v2.3.15b 
+* Microchip Graphics Composer v1.5.0b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.15b
 
+
+### Development Tools
+
+
+* [MPLAB® X IDE v6.00](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v4.20](https://www.microchip.com/mplab/compilers)
+* MPLAB® X IDE plug-ins:
+    * [MPLAB® Code Configurator (MCC) v5.1.17](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+	OR
+    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+
+### Dependent Components
+
+
+* [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
+* [Touch v3.13.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.1)
 
 ## Graphics Release v3.12.1
 
@@ -28,15 +97,33 @@ nav_order: 99
 * MH3-73631 Composer crashes when deleting a layer
 * MH3-73702	Composer Crash when opening Image Manager Import Color Map
 
-* Microchip Graphics Composer v1.5.0b 
-  * Legato Plugin Linux/Windows/Mac Build v2.3.14b 
+* Microchip Graphics Composer v1.5.0b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.14b
+
+### Development Tools
+
+
+* [MPLAB® X IDE v6.00](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v4.20](https://www.microchip.com/mplab/compilers)
+* MPLAB® X IDE plug-ins:
+    * [MPLAB® Code Configurator (MCC) v5.1.17](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+	OR
+    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+
+### Dependent Components
+
+
+* [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
+* [Touch v3.13.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.1)
 
 
 ## Graphics Release v3.12.0
 
 ### New Features
 
-* Added Right-To-Left Font support for languages such as Arabic, Hebrew, Cyrillic 
+* Added Right-To-Left Font support for languages such as Arabic, Hebrew, Cyrillic
 * Added PIC32CX MT Family Segmented SLCDC driver support
 * Added SAM9x60 Curiosity Board template support
 * Added SAMA5D27-SOM1-EK1 Board template support
@@ -69,9 +156,27 @@ nav_order: 99
 * MH3-72327 Composer crashes when importing a bad rgb as a palette
 
 
-* Microchip Graphics Composer v1.4.1b 
-  * Legato Plugin Linux/Windows/Mac Build v2.3.12b 
+* Microchip Graphics Composer v1.4.1b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.12b
 
+
+### Development Tools
+
+
+* [MPLAB® X IDE v6.00](https://www.microchip.com/mplab/mplab-x-ide)
+* [MPLAB® XC32 C/C++ Compiler v4.20](https://www.microchip.com/mplab/compilers)
+* MPLAB® X IDE plug-ins:
+    * [MPLAB® Code Configurator (MCC) v5.1.17](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+	OR
+    * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
+
+
+### Dependent Components
+
+
+* [Core v3.11.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.11.1)
+* [Touch v3.13.1 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.13.1)
 
 ## Graphics Release v3.11.1
 
@@ -86,8 +191,8 @@ nav_order: 99
 * MH3-70860 Legato Composer - Screens not saving event enable states
 
 
-* Microchip Graphics Composer v1.3.0a 
-  * Legato Plugin Linux/Windows/Mac Build v2.3.1b 
+* Microchip Graphics Composer v1.3.0a
+  * Legato Plugin Linux/Windows/Mac Build v2.3.1b
 
 
 ## Graphics Release v3.11.0
@@ -119,12 +224,12 @@ nav_order: 99
 * MH3-69638 Point Rotation Is Incorrect in 270 mode
 * MH3-69769 Bug in the keypad widget in harmony graphics
 * MH3-69853 Direct Blit causes exception
-* MH3-69854 Unable to delete multiple selected images in Composer 
-* MH3-69925 Add support for Global alpha for LCDC driver 
+* MH3-69854 Unable to delete multiple selected images in Composer
+* MH3-69925 Add support for Global alpha for LCDC driver
 
 
-* Microchip Graphics Composer v1.3.0a 
-  * Legato Plugin Linux/Windows/Mac Build v2.2.4b 
+* Microchip Graphics Composer v1.3.0a
+  * Legato Plugin Linux/Windows/Mac Build v2.2.4b
 
 
 ## Graphics Release v3.10.0
@@ -178,7 +283,7 @@ nav_order: 99
 * MH3-59974 MZ DA GPU incorrect in blit-ing images with semi-transparent pixels
 * MH3-50911	MZ DA GPU blit preprocessed images has artifacts with width not multiple of 4
 * MH3-51057	Composer Project Wizard: Automatically enable scratch buffer padding when MZ DA profile is selected
-* MH3-51060	MZDA image pre-processing with GPU blit does not work for non x4 wide images 
+* MH3-51060	MZDA image pre-processing with GPU blit does not work for non x4 wide images
 * MH3-51454	Add an option to byte-swap generated assets to support external controller with opposite endianness
 * MH3-51464	Unable to set pre-process for multiple image assets
 * MH3-51546	GFX: Legato: Buttons may not paint when orientation is set at 90 and 270
@@ -214,7 +319,7 @@ nav_order: 99
 * MH3-54996	Legato leWidget* root variables issue
 * Fixed LCDC driver double buffer issue
 
- 
+
 * Legato Composer Linux/PC Build v1.16.6b
 * Legato Composer Mac Build v1.16.6b
 
@@ -240,7 +345,7 @@ nav_order: 99
 * MH3-52004	Add Layer IRQ Callback in LCDC driver
 * MH3-52089	Double buffering feature appears broken for LCDC (SAM 9x60/A5D2)
 
- 
+
 * Legato Composer Linux/PC Build v1.14.4b
 * Legato Composer Mac Build v1.14.4b
 
@@ -403,7 +508,7 @@ For a list of post release issues that affect this release, refer to MPLAB Harmo
 * [MPLAB® XC32 C/C++ Compiler v4.20](https://www.microchip.com/mplab/compilers)
 * MPLAB® X IDE plug-ins:
     * [MPLAB® Code Configurator (MCC) v5.1.17](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
-	
+
 	OR
     * [MPLAB® Harmony Configurator (MHC) v3.8.3](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin)
 

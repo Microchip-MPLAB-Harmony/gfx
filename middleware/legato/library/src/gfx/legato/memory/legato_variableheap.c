@@ -1301,16 +1301,16 @@ void leVariableHeap_Dump(leVariableHeap* heap,
 {
     Block* blk;
 
-    printf("Variable Heap Data:\n");
-	printf("  Size           %u\n", (unsigned int)heap->size);
-	printf("  Max Usage:     %u\n", (unsigned int)heap->maxUsage);
-	printf("  Current Usage: %u\n", (unsigned int)heap->used);
-	printf("  Available:     %u\n", (unsigned int)(heap->size - heap->used));
+    printf("Variable Heap Data:\r\n");
+	printf("  Size           %u\r\n", (unsigned int)heap->size);
+	printf("  Max Usage:     %u\r\n", (unsigned int)heap->maxUsage);
+	printf("  Current Usage: %u\r\n", (unsigned int)heap->used);
+	printf("  Available:     %u\r\n", (unsigned int)(heap->size - heap->used));
     printf("\n");
 
     if(dumpRecords == LE_TRUE)
     {
-        printf("  Map:\n");
+        printf("  Map:\r\n");
 
         blk = heap->data;
 
@@ -1318,11 +1318,11 @@ void leVariableHeap_Dump(leVariableHeap* heap,
         {
             if(blk->free == LE_TRUE)
             {
-                printf("    Block (free): %p, %u\n", blk, (unsigned int)BLOCK_PHYSICAL_SIZE(blk));
+                printf("    Block (free): %p, %u\r\n", blk, (unsigned int)BLOCK_PHYSICAL_SIZE(blk));
             }
             else
             {
-                printf("    Block (used): %p, %u\n", blk, (unsigned int)BLOCK_PHYSICAL_SIZE(blk));
+                printf("    Block (used): %p, %u\r\n", blk, (unsigned int)BLOCK_PHYSICAL_SIZE(blk));
             }
 
             //printf("      Address: %p\n", blk);

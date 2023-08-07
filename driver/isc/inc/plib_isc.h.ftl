@@ -51,7 +51,23 @@
 #include <stdbool.h>
 #include <device.h>
 
-        
+<#if __PROCESSOR?matches(".*A7G5.*") == true>  
+#define GAMMA_ENTRIES	64
+
+static const uint32_t isc_sama7g5_gamma_table[GAMMA_ENTRIES] = {
+    0x980,  0x4c0320,  0x650260,  0x7801e0,  0x8701a0,  0x940180,
+	0xa00160,  0xab0120,  0xb40120,  0xbd0120,  0xc60100,  0xce0100,
+	0xd600e0,  0xdd00e0,  0xe400e0,  0xeb00c0,  0xf100c0,  0xf700c0,
+	0xfd00c0, 0x10300a0, 0x10800c0, 0x10e00a0, 0x11300a0, 0x11800a0,
+	0x11d00a0, 0x12200a0, 0x12700a0, 0x12c0080, 0x13000a0, 0x1350080,
+	0x13900a0, 0x13e0080, 0x1420076, 0x17d0062, 0x1ae0054, 0x1d8004a,
+	0x1fd0044, 0x21f003e, 0x23e003a, 0x25b0036, 0x2760032, 0x28f0030,
+	0x2a7002e, 0x2be002c, 0x2d4002c, 0x2ea0028, 0x2fe0028, 0x3120026,
+	0x3250024, 0x3370024, 0x3490022, 0x35a0022, 0x36b0020, 0x37b0020,
+	0x38b0020, 0x39b001e, 0x3aa001e, 0x3b9001c, 0x3c7001c, 0x3d5001c,
+	0x3e3001c, 0x3f1001c, 0x3ff001a, 0x40c001a 
+}; 
+</#if>      
         
 typedef void (*ISC_IRQ_CALLBACK) (uintptr_t context);
 
@@ -202,6 +218,36 @@ struct ISC_DMA_View{
     /* Stride */
     uint32_t stride;
 };
+
+// *****************************************************************************
+/* Function:
+    ISC_CallBackRegister ( const ISC_IRQ_CALLBACK eventHandler , const uintptr_t contextHandle )
+
+  Summary:
+    ISR Callback.
+
+  Description:
+    Allows driver to register a ISR callback .
+
+  Precondition:
+    None.
+
+  Parameters:
+    eventHandler - Callback function
+    contextHandle - return parameter
+ 
+  Returns:
+    None.
+
+  Example:
+    <code>
+    ISC_CallBackRegister(ISC_capture_done, NULL);
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_CallBackRegister ( const ISC_IRQ_CALLBACK eventHandler , const uintptr_t contextHandle );
 
 // *****************************************************************************
 /* Function:
@@ -613,6 +659,90 @@ void ISC_PFE_Set_Continuous_Mode( bool enable );
 
 // *****************************************************************************
 /* Function:
+    void ISC_PFE_Set_Cropping_Enable( uint32_t row, uint32_t column )
+
+  Description:
+   Set PFE(Parallel Front End) row/cropping enable.
+
+  Precondition:
+    None.
+
+  Parameters:
+    row - Row cropping enable.
+    column - Column cropping Polarity.
+ 
+    
+  Returns:
+    None.
+
+  Example:
+    <code>
+    ISC_PFE_Set_Cropping_Enable(ISC_PFE_CFG0_ROWEN_Msk, ISC_PFE_CFG0_COLEN_Msk);
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_PFE_Set_Cropping_Enable( uint32_t row, uint32_t column );
+
+// *****************************************************************************
+/* Function:
+    void ISC_PFE_Set_MIPI_Mode( bool enable )
+
+  Description:
+  Configure PFE(Parallel Front End) to accept input for MIPI interface.
+
+  Precondition:
+    None.
+
+  Parameters:
+    enable/disable flag.
+ 
+    
+  Returns:
+    None.
+
+  Example:
+    <code>
+    ISC_PFE_Set_MIPI_Mode(true);
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_PFE_Set_MIPI_Mode( bool enable );
+// *****************************************************************************
+/* Function:
+    void ISC_PFE_Set_Cropping_Area(uint32_t hstart, uint32_t hend,
+                               uint32_t vstart, uint32_t vend)
+
+  Description:
+   Set PFE(Parallel Front End) cropping aread.
+
+  Precondition:
+    None.
+
+  Parameters:
+    hstart: Horizontal starting position of the cropping area
+    hend: Horizontal ending position of the cropping area
+    vstart: Vertical starting position of the cropping area
+    vend: Vertical ending position of the cropping area
+     
+  Returns:
+    None.
+
+  Example:
+    <code>
+       ISC_PFE_Set_Cropping_Area(0, 0x667, 0, 0x4cf);
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_PFE_Set_Cropping_Area(uint32_t hstart, uint32_t hend,
+                               uint32_t vstart, uint32_t vend);
+// *****************************************************************************
+/* Function:
     void ISC_SUB422_Enable( bool enable )
 
   Description:
@@ -809,6 +939,58 @@ void ISC_CBC_Enable( bool enable );
     None.
 */
 void ISC_Gamma_Enable( bool enable ,uint8_t renable, uint8_t genable, uint8_t benable );
+
+// *****************************************************************************
+/* Function:
+    void ISC_Gamma_BipartEnable( bool enable )
+
+  Description:
+   Enables/disable Bipartite table.
+
+  Precondition:
+    None.
+
+  Parameters:
+    enable - enable/disable flag.
+       
+  Returns:
+    None.
+
+  Example:
+    <code>
+    ISC_Gamma_BipartEnable(true);
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_Gamma_BipartEnable( bool enable );
+
+// *****************************************************************************
+/* Function:
+    void ISC_Gamma_Correction_Apply( void )
+
+  Description:
+   Applies Gamma Correction.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+       
+  Returns:
+    None.
+
+  Example:
+    <code>
+    ISC_Gamma_Correction_Apply( );
+    </code>
+
+  Remarks:
+    None.
+*/
+void ISC_Gamma_Correction_Apply( void );
 
 // *****************************************************************************
 /* Function:

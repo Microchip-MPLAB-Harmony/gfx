@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_bridge_lvdsc" id="AF1965FC-E7B1-4F4B-928B-AFA005DE926C" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

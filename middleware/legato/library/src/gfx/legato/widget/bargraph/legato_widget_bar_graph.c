@@ -1120,7 +1120,7 @@ static leResult clearData(leBarGraphWidget* _this)
     leBarGraphCategory* cat;
     leBarGraphDataSeries* seriesArray;
 
-    uint32_t i;
+    uint32_t i,j;
     
     LE_ASSERT_THIS();
     
@@ -1141,6 +1141,11 @@ static leResult clearData(leBarGraphWidget* _this)
     for (i = 0; i < _this->dataSeriesArray.size; i++)
     {
         seriesArray = leArray_Get(&_this->dataSeriesArray, i);
+        
+        for(j = 0; j < seriesArray->data.size; j++)
+        {
+          LE_FREE(seriesArray->data.values[j]);
+        }
         
         if(seriesArray != NULL)
         {

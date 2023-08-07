@@ -519,23 +519,27 @@ void leMemoryGetUsageReport(leMemoryStatusReport* rpt)
 void leMemoryPrintReport(void)
 {
     leVariableHeap_Dump(&variableHeap, LE_TRUE);
-#if 0
+#if 1
 #if LE_FIXEDHEAP_ENABLE == 1
     size_t idx;
 #endif
 
-    printf("Variable Heap Status:\n");
-    printf("    Total Size:    %u\n", variableHeap.size);
-    printf("    Max Usage:     %u\n", variableHeap.maxUsage);
-    printf("    Current Usage: %u\n\n", variableHeap.used);
+    printf("\r\nVariable Heap Status:\r\n");
+    printf("    Total Size:    %u\r\n", (unsigned int)variableHeap.size);
+    printf("    Max Usage:     %u\r\n", (unsigned int)variableHeap.maxUsage);
+    printf("    Current Usage: %u\r\n\n", (unsigned int)variableHeap.used);
 
 #if LE_FIXEDHEAP_ENABLE == 1
     for(idx = 0; idx < LE_FIXED_HEAP_COUNT - 1; idx++)
     {
-        printf("Fixed Heap (%u) Status:\n", fixedHeaps[idx].logicalBlockSize);
-        printf("    Number of Elements:  %u\n", fixedHeaps[idx].numElements);
-        printf("    Max Usage:           %u\n", fixedHeaps[idx].maxUsage);
-        printf("    Current Usage:       %u\n\n", fixedHeaps[idx].capacity);
+        printf("Fixed Heap (%u) Status:\r\n", 
+                (unsigned int)fixedHeaps[idx].logicalBlockSize);
+        printf("    Number of Elements:  %u\r\n", 
+                (unsigned int)fixedHeaps[idx].numElements);
+        printf("    Max Usage:           %u\r\n", 
+                (unsigned int)fixedHeaps[idx].maxUsage);
+        printf("    Current Capacity:       %u\r\n\n", 
+                (unsigned int)fixedHeaps[idx].capacity);
     }
 #endif
 #endif

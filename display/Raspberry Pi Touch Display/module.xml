@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_display_module_rpi" id="3765D684-FB3E-4E4C-BCA8-0DCBB7D52D7E" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

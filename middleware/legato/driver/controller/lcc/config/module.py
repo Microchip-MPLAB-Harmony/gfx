@@ -45,6 +45,15 @@ def loadModule():
 		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
 		### TMR dependency for DMA control
 		cntlComponent.addDependency("TMR", "TMR", False, True)
+	elif ("PIC32CK" in str(Variables.get("__PROCESSOR"))):
+		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_pic32ck.py")
+		cntlComponent.setDisplayType("LE LCC Display Driver")
+		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
+		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+		cntlComponent.addDependency("EBI_CS", "EBI_CS", False, True)
+		### TMR dependency for PWM backlight control
+		cntlComponent.addDependency("TCC", "PWM", False, True)
+		cntlComponent.addDependency("Backlight", "PWM", False)
 	elif ("PIC32CZ" in str(Variables.get("__PROCESSOR"))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_pic32cz.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")

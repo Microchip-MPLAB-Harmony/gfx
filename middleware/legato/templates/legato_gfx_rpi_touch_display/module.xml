@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="legato_gfx_rpi_template" id="49BE0B0B-A1E0-4962-ABF6-3BD5F075AB9D" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

@@ -23,7 +23,7 @@
 ##############################################################################
 
 def loadModule():
-    if ("A5D2" in str(Variables.get("__PROCESSOR"))):
+    if ("A5D2" in str(Variables.get("__PROCESSOR")) or "A7G5" in str(Variables.get("__PROCESSOR"))):
         print("ISC module loaded to support " + str(Variables.get("__PROCESSOR")))
         component = Module.CreateComponent("isc", "Image Sensor Controller", "/Harmony/Drivers", "isc.py")
         component.setDisplayType("Image Sensor Support")

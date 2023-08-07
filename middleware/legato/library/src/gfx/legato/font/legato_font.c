@@ -179,7 +179,7 @@ leResult leFont_GetGlyphInfo(const leFont* fnt,
     leFontGlyph* glyphTable;
     leRasterFont* rasFont = (leRasterFont*)fnt;
     
-    LE_ASSERT(fnt != NULL && rasFont->glyphTable != NULL);
+    LE_ASSERT(glyph != NULL && fnt != NULL && rasFont->glyphTable != NULL);
         
     glyphCount = ((uint32_t*)rasFont->glyphTable)[0];
     glyphTable = (leFontGlyph*)(rasFont->glyphTable + sizeof(uint32_t));
@@ -192,8 +192,8 @@ leResult leFont_GetGlyphInfo(const leFont* fnt,
            memory */
         if(codepoint == glyphTable[idx].codePoint)
         {
-            *glyph = glyphTable[idx];
-            
+            memcpy(glyph, &glyphTable[idx], sizeof(leFontGlyph));
+
             return LE_SUCCESS;
         }
     }

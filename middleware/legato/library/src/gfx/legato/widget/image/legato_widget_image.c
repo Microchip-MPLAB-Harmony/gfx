@@ -51,14 +51,13 @@ leImageWidgetVTable imageWidgetVTable;
 #define DEFAULT_HEIGHT          100
 
 void _leImageWidget_GetImageRect(const leImageWidget* img,
-                                 leRect* imgRect,
-                                 leRect* imgSrcRect);
+                                 leRect* imgRect);
 
 static void invalidateImageRect(const leImageWidget* _this)
 {
     leRect rect, imgRect, clipRect;
     
-    _leImageWidget_GetImageRect(_this, &imgRect, &clipRect);
+    _leImageWidget_GetImageRect(_this, &imgRect);
     
     _this->fn->localRect(_this, &rect);
     

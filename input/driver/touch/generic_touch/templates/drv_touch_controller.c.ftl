@@ -44,8 +44,8 @@
 <#assign Val_Width = gfx_hal_le.DisplayWidth>
 <#assign Val_Height = gfx_hal_le.DisplayHeight>
 <#else>
-<#assign Val_Width = DisplayWidth>
-<#assign Val_Height = DisplayHeight>
+<#assign Val_Width = TouchWidth>
+<#assign Val_Height = TouchHeight>
 </#if>
 
 #define DRV_TOUCH_I2C_INDEX ${I2CIndex}
@@ -131,7 +131,7 @@ typedef enum
 
 typedef enum
 {
-    DRV_TOUCH_ERROR_NONE,    
+    DRV_TOUCH_ERROR_NONE,
     DRV_TOUCH_ERROR_I2C,
     DRV_TOUCH_ERROR_I2C_WRITE,
     DRV_TOUCH_ERROR_I2C_INVALID_STATE,
@@ -142,7 +142,7 @@ typedef struct
 {
     DRV_TOUCH_STATE state;
     DRV_TOUCH_STATE prev_state;
-    DRV_TOUCH_PRESS_STATE press_state;	
+    DRV_TOUCH_PRESS_STATE press_state;
     DRV_TOUCH_STATE tx_count;
     DRV_HANDLE i2c_handle;
     DRV_I2C_TRANSFER_HANDLE i2c_tx_handle;
@@ -152,7 +152,7 @@ typedef struct
     uint8_t read_buffer[DRV_TOUCH_READ_BUFF_SIZE_BYTES];
 } DRV_TOUCH_OBJ;
 
-typedef struct 
+typedef struct
 {
     int num_parms;
     int delay_ms;
@@ -160,7 +160,7 @@ typedef struct
 } DRV_TOUCH_CONFIG;
 
 <#if InitCommandsCount != 0>
-const DRV_TOUCH_CONFIG drv_touch_config[DRV_TOUCH_CONFIG_NUM] = 
+const DRV_TOUCH_CONFIG drv_touch_config[DRV_TOUCH_CONFIG_NUM] =
 {
 <#list 0.. (InitCommandsCount - 1) as i>
     <#assign COMMAND = "Command" + i>
@@ -176,11 +176,11 @@ const DRV_TOUCH_CONFIG drv_touch_config[DRV_TOUCH_CONFIG_NUM] =
 };
 </#if>
 
-DRV_TOUCH_OBJ drv_touch = 
+DRV_TOUCH_OBJ drv_touch =
 {
     .state = DRV_TOUCH_STATE_INIT,
     .prev_state = DRV_TOUCH_STATE_INIT,
-    .press_state = TOUCH_RELEASED,	
+    .press_state = TOUCH_RELEASED,
     .tx_count = 0,
 };
 
@@ -203,9 +203,9 @@ void drv_touch_delayms(int ms)
 
     if (SYS_TIME_DelayMS(ms, &timer) != SYS_TIME_SUCCESS)
     return;
-    
+
     while (SYS_TIME_DelayIsComplete(timer) == false);
-} 
+}
 
 static void drv_touch_timer_callback (uintptr_t context)
 {
@@ -235,7 +235,7 @@ static void drv_touch_reset(void)
 </#if>
 
 void drv_touch_i2c_callback (DRV_I2C_TRANSFER_EVENT  event,
-                             DRV_I2C_TRANSFER_HANDLE transferHandle, 
+                             DRV_I2C_TRANSFER_HANDLE transferHandle,
                              uintptr_t context)
 {
     if (transferHandle != drv_touch.i2c_tx_handle)
@@ -243,10 +243,10 @@ void drv_touch_i2c_callback (DRV_I2C_TRANSFER_EVENT  event,
         //Invalid handle, throw error
         drv_touch.state = DRV_TOUCH_STATE_ERROR;
         drv_touch.error = DRV_TOUCH_ERROR_I2C_INVALID_HANDLE;
-        
+
         return;
     }
-        
+
     switch(event)
     {
         case DRV_I2C_TRANSFER_EVENT_COMPLETE:
@@ -290,10 +290,10 @@ void drv_touch_process_data(void)
     uint32_t pos_x, pos_y, event;
 <#if TouchPointPosSize == "2">
     uint32_t pos_xh, pos_xl, pos_yh, pos_yl;
-</#if>	
+</#if>
 
 <#if TouchGestureSettings == true>
-    switch ((drv_touch.read_buffer[DRV_TOUCH_DATA_GESTURE_INDEX] & 
+    switch ((drv_touch.read_buffer[DRV_TOUCH_DATA_GESTURE_INDEX] &
             DRV_TOUCH_DATA_GESTURE_MASK) >> DRV_TOUCH_DATA_GESTURE_SHIFT)
     {
         case DRV_TOUCH_DATA_GESTURE_SWIPE_UP_VALUE:
@@ -312,51 +312,46 @@ void drv_touch_process_data(void)
             break;
     }
 </#if>
-    event = (drv_touch.read_buffer[DRV_TOUCH_DATA_EVENT_INDEX] & 
+    event = (drv_touch.read_buffer[DRV_TOUCH_DATA_EVENT_INDEX] &
             DRV_TOUCH_DATA_EVENT_MASK) >> DRV_TOUCH_DATA_EVENT_SHIFT;
 
 <#if TouchPointPosSize == "2">
     pos_xh = drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE1_INDEX] & DRV_TOUCH_DATA_POSX_BYTE1_MASK;
     pos_xh >>= DRV_TOUCH_DATA_POSX_BYTE1_SHIFT;
-    
+
     pos_xl = drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE0_INDEX] & DRV_TOUCH_DATA_POSX_BYTE0_MASK;
     pos_xh >>= DRV_TOUCH_DATA_POSX_BYTE0_SHIFT;
 
     pos_x = ((pos_xh << 8) | pos_xl);
-    
+
     pos_yh = drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE1_INDEX] & DRV_TOUCH_DATA_POSY_BYTE1_MASK;
     pos_yh >>= DRV_TOUCH_DATA_POSY_BYTE1_SHIFT;
-    
+
     pos_yl = drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE0_INDEX] & DRV_TOUCH_DATA_POSY_BYTE0_MASK;
     pos_yh >>= DRV_TOUCH_DATA_POSY_BYTE0_SHIFT;
-    
+
     pos_y = ((pos_yh << 8) | pos_yl);
 <#else>
     pos_x = ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSX_BYTE0_INDEX] &
              DRV_TOUCH_DATA_POSX_BYTE0_MASK) >> DRV_TOUCH_DATA_POSX_BYTE0_SHIFT);
-    
+
     pos_y = ((drv_touch.read_buffer[DRV_TOUCH_DATA_POSY_BYTE0_INDEX] &
              DRV_TOUCH_DATA_POSY_BYTE0_MASK) >> DRV_TOUCH_DATA_POSY_BYTE0_SHIFT);
-
-    pos_x = ${Val_Width} - pos_y;
-    pos_y = ${Val_Height} - pos_x;
-
 </#if>
 
-#if LE_TOUCH_ORIENTATION == 0
-    pos_x = pos_x;
-    pos_y = pos_y;
-#elif LE_TOUCH_ORIENTATION == 90 // 90 degrees
+<#if TouchOrient == "90">
     pos_y = ${Val_Width} - 1 - pos_x;
     pos_x = pos_y;
-#elif LE_TOUCH_ORIENTATION == 180 // 180 degrees
+
+<#elseif TouchOrient == "180">
     pos_x = ${Val_Width} - 1 - pos_x;
     pos_y = ${Val_Height} - 1 - pos_y;
-#else // 270 degrees
-    pnt.y = pos_x;
-    pnt.x = ${Val_Height} - 1 - pos_y;
-#endif
-            
+
+<#elseif TouchOrient == "270">
+    pos_y = pos_x;
+    pos_x = ${Val_Height} - 1 - pos_y;
+
+</#if>
     switch (drv_touch.press_state)
     {
         case TOUCH_RELEASED:
@@ -388,7 +383,7 @@ void drv_touch_process_data(void)
 
 <#else>
 //Process touch data here
-//Call SYS_INP_InjectTouchUp() or SYS_INP_InjectTouchDown() to 
+//Call SYS_INP_InjectTouchUp() or SYS_INP_InjectTouchDown() to
 //send touch events to input system service
 </#if>
 }
@@ -411,15 +406,15 @@ void drv_touch_controller_task(void)
                 break;
             }
 
-            DRV_I2C_TransferEventHandlerSet(drv_touch.i2c_handle, 
-                                     drv_touch_i2c_callback, 
+            DRV_I2C_TransferEventHandlerSet(drv_touch.i2c_handle,
+                                     drv_touch_i2c_callback,
                                      (uintptr_t) &drv_touch);
 
             drv_touch.prev_state = DRV_TOUCH_STATE_INIT;
-<#if ResetEnable == true>			
+<#if ResetEnable == true>
             drv_touch.state = DRV_TOUCH_STATE_WAIT;
 
-            drv_touch.timer_handle = SYS_TIME_CallbackRegisterMS(drv_touch_timer_callback, 
+            drv_touch.timer_handle = SYS_TIME_CallbackRegisterMS(drv_touch_timer_callback,
                         (uintptr_t) &drv_touch,
                         DRV_TOUCH_POST_RESET_DELAY_MS,
                         SYS_TIME_SINGLE);
@@ -434,7 +429,7 @@ void drv_touch_controller_task(void)
             if (drv_touch.tx_count < DRV_TOUCH_CONFIG_NUM)
             {
                 drv_touch.prev_state = DRV_TOUCH_STATE_CONFIGURE;
-                drv_touch.state = DRV_TOUCH_STATE_WAIT;          
+                drv_touch.state = DRV_TOUCH_STATE_WAIT;
 
                 DRV_I2C_WriteTransferAdd((const DRV_HANDLE) drv_touch.i2c_handle,
                                         DRV_TOUCH_I2C_SLAVE_ADDRESS,
@@ -446,11 +441,11 @@ void drv_touch_controller_task(void)
             }
             else
             {
-                drv_touch.state = DRV_TOUCH_STATE_IDLE; 
+                drv_touch.state = DRV_TOUCH_STATE_IDLE;
             }
 <#else>
             //Nothing to configure
-            drv_touch.state = DRV_TOUCH_STATE_IDLE; 
+            drv_touch.state = DRV_TOUCH_STATE_IDLE;
 </#if>
             break;
         }
@@ -463,13 +458,13 @@ void drv_touch_controller_task(void)
         {
 <#if EventNotifEnabled == true>
             static int touch_int_processed_count = 0;
-			
+
             if (touch_int_processed_count != touch_int_count)
             {
                 touch_int_processed_count++;
                 drv_touch.state = DRV_TOUCH_STATE_GET_TOUCH_DATA;
             }
-<#else>		
+<#else>
             //Poll notification pin
             if (DRV_TOUCH_PIN_INT_Get() == DRV_TOUCH_INT_VALUE)
             {
@@ -482,7 +477,7 @@ void drv_touch_controller_task(void)
         {
             drv_touch.prev_state = DRV_TOUCH_STATE_GET_TOUCH_DATA;
             drv_touch.state = DRV_TOUCH_STATE_WAIT;
-            
+
             drv_touch.cmd_buffer = DRV_TOUCH_READ_TOUCH_DATA_ADDR;
             DRV_I2C_WriteReadTransferAdd(drv_touch.i2c_handle,
                                          DRV_TOUCH_I2C_SLAVE_ADDRESS,

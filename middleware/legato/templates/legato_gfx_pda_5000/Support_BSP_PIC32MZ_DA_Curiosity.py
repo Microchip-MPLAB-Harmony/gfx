@@ -31,10 +31,37 @@ mzda_cu_connectList = [["gfx_legato", "gfx_driver", "le_gfx_driver_glcd", "gfx_d
 					["sys_time", "sys_time_TMR_dependency", "core_timer", "CORE_TIMER_TMR"],
 					["gfx_legato", "gpu_driver", "le_gfx_driver_2dgpu", "gfx_driver_2dgpu"]]
 mzda_cu_pinConfig = [{"pin": 42, "name": "BSP_MAXTOUCH_CHG", "type": "GPIO", "direction": "In", "latch": "", "abcd": ""}, #RH14
-				{"pin": 79, "name": "TM5000_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RD0
+				{"pin": 79, "name": "TM4301B_BACKLIGHT", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}, #RD0
+				{"pin": 149, "name": "GLCD_HSYNC", "type": "HSYNC", "direction": "", "latch": "", "abcd": "A"}, #RJ5
+				{"pin": 150, "name": "GLCD_VSYNC", "type": "VSYNC", "direction": "", "latch": "", "abcd": "A"}, #RJ4
+				{"pin": 148, "name": "GLCD_PCK", "type": "GCLK", "direction": "", "latch": "", "abcd": "A"}, #RJ6
+				{"pin": 144, "name": "GLCD_D0", "type": "GD0", "direction": "", "latch": "", "abcd": "A"}, #RJ13
+				{"pin": 127, "name": "GLCD_D1", "type": "GD1", "direction": "", "latch": "", "abcd": "A"}, #RA4
+				{"pin": 76, "name": "GLCD_D2", "type": "GD2", "direction": "", "latch": "", "abcd": "A"}, #RD9
+				{"pin": 96, "name": "GLCD_D3", "type": "GD3", "direction": "", "latch": "", "abcd": "A"}, #RG0
+				{"pin": 95, "name": "GLCD_D4", "type": "GD4", "direction": "", "latch": "", "abcd": "A"}, #RG1
+				{"pin": 90, "name": "GLCD_D5", "type": "GD5", "direction": "", "latch": "", "abcd": "A"}, #RF1
+				{"pin": 91, "name": "GLCD_D6", "type": "GD6", "direction": "", "latch": "", "abcd": "A"}, #RF0
+				{"pin": 80, "name": "GLCD_D7", "type": "GD7", "direction": "", "latch": "", "abcd": "A"}, #RD12
+				{"pin": 143, "name": "GLCD_D8", "type": "GD8", "direction": "", "latch": "", "abcd": "A"}, #RJ14
+				{"pin": 145, "name": "GLCD_D9", "type": "GD9", "direction": "", "latch": "", "abcd": "A"}, #RJ12
+				{"pin": 74, "name": "GLCD_D10", "type": "GD10", "direction": "", "latch": "", "abcd": "A"}, #RD2
+				{"pin": 75, "name": "GLCD_D11", "type": "GD11", "direction": "", "latch": "", "abcd": "A"}, #RD3
+				{"pin": 134, "name": "GLCD_D12", "type": "GD12", "direction": "", "latch": "", "abcd": "A"}, #RK3
+				{"pin": 133, "name": "GLCD_D13", "type": "GD13", "direction": "", "latch": "", "abcd": "A"}, #RK4
+				{"pin": 132, "name": "GLCD_D14", "type": "GD14", "direction": "", "latch": "", "abcd": "A"}, #RK5
+				{"pin": 131, "name": "GLCD_D15", "type": "GD15", "direction": "", "latch": "", "abcd": "A"}, #RK6
+				{"pin": 89, "name": "GLCD_D16", "type": "GD16", "direction": "", "latch": "", "abcd": "A"}, #RF5
+				{"pin": 97, "name": "GLCD_D17", "type": "GD17", "direction": "", "latch": "", "abcd": "A"}, #RF4
+				{"pin": 146, "name": "GLCD_D18", "type": "GD18", "direction": "", "latch": "", "abcd": "A"}, #RJ10
+				{"pin": 130, "name": "GLCD_D19", "type": "GD19", "direction": "", "latch": "", "abcd": "A"}, #RK7
+				{"pin": 151, "name": "GLCD_D20", "type": "GD20", "direction": "", "latch": "", "abcd": "A"}, #RJ3
+				{"pin": 92, "name": "GLCD_D21", "type": "GD21", "direction": "", "latch": "", "abcd": "A"}, #RH15
+				{"pin": 81, "name": "GLCD_D22", "type": "GD22", "direction": "", "latch": "", "abcd": "A"}, #RD13
+				{"pin": 137, "name": "GLCD_D23", "type": "GD23", "direction": "", "latch": "", "abcd": "A"}, #RK0				
 				{"pin": 129, "name": "SCL2", "type": "SCL2", "direction": "", "latch": "", "abcd": ""}, #RA2
 				{"pin": 128, "name": "SDA2", "type": "SDA2", "direction": "", "latch": "", "abcd": ""}, #RA3
-				{"pin": 106, "name": "LCDDISP", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RH10
+				{"pin": 106, "name": "GLCD_DISP", "type": "GPIO", "direction": "Out", "latch": "High", "abcd": ""}] #RH10
 
 ##################################################################################
 

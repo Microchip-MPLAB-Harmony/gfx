@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="le_gfx_drv_xlcdc" id="AD028396-100D-499B-9416-67A477F24204" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -114,7 +114,7 @@ GFX_Disp_Intf GFX_Disp_Intf_Open(void)
     GFX_DISP_INTF_EBI * intf = &ebiIntf;
     
     if (intf->locked == 1)
-        return -1;
+        return 0;
     
     intf->dataAddr = (DBUS_WIDTH_T *) GFX_DISP_INTF_SMC_DATA_ADDR;
     intf->cmdAddr = (DBUS_WIDTH_T *) GFX_DISP_INTF_SMC_CMD_ADDR;

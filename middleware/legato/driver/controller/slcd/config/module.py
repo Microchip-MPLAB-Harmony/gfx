@@ -22,11 +22,13 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
-def loadModule():	
-    if ("L22" in str(Variables.get("__PROCESSOR"))):
+
+def loadModule():
+    if "L22" in str(Variables.get("__PROCESSOR")):
         print("SLCD module loaded to support " + str(Variables.get("__PROCESSOR")))
         cntlComponent = Module.CreateComponent("le_gfx_slcd", "SLCD Driver", "/Graphics/Driver", "config/slcd.py")
         cntlComponent.setDisplayType("SLCD Display Driver")
+        cntlComponent.addDependency("Core Service", "Core Service", True, True)
         cntlComponent.addDependency("Segmented Display", "Segmented Display", False)
     else:
         print("SLCD module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

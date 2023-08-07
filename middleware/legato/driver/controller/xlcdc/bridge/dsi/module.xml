@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_bridge_dsi" id="F293C7E0-0BAF-49DF-95CE-442385604EF1" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

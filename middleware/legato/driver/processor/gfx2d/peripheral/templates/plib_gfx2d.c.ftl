@@ -45,125 +45,17 @@
 
 *******************************************************************************/
 
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-/* This section lists the other files that are included in this file.
-*/
+
 #include "device.h"
 #include "plib_gfx2d.h"
 #include "component/gfx2d.h"
 
-#ifndef CONF_GFX2D_PC1_REG
-#define CONF_GFX2D_PC1_REG ((CONF_GFX2D_PC1_SEL << GFX2D_PC1_SEL_Pos) | (CONF_GFX2D_PC1_FILT << GFX2D_PC1_FILT_Pos))
-#endif
-
-// <o> Memory Tile Access
-// <0x0=> tile
-// <0x1=> linear
-// <id> gc_mty
-#ifndef CONF_GFX2D_GC_MTY
-#define CONF_GFX2D_GC_MTY 0
-#endif
-// </h>
-
-// <e> Traffic Balancing Using Outstanding Regulation
-// <i> Enable Traffic Balancing by using Outstanding Regulation
-// <id> gc_regen
-#ifndef CONF_GFX2D_GC_REGEN
-#define CONF_GFX2D_GC_REGEN 0
-#endif
-
-// <o> Regulation for QoS Level 1 <0-10>
-// <i> Indicates the number of clock cycles inserted between outstanding transactions.
-// <i> The number of clock cycles added is calculated as follows. latency = (2^qos) - 1.
-// <i> The maximum number of clock cycles is 1023.
-// <id> gc_regqos1
-#ifndef CONF_GFX2D_GC_REGQOS1
-#define CONF_GFX2D_GC_REGQOS1 0
-#endif
-
-// <o> Regulation for QoS Level 2 <0-10>
-// <i> Indicates the number of clock cycles inserted between outstanding transactions.
-// <i> The number of clock cycles added is calculated as follows. latency = (2^qos) - 1.
-// <i> The maximum number of clock cycles is 1023.
-// <id> gc_regqos2
-#ifndef CONF_GFX2D_GC_REGQOS2
-#define CONF_GFX2D_GC_REGQOS2 0
-#endif
-
-// <o> Regulation for QoS Level 3 <0-10>
-// <i> Indicates the number of clock cycles inserted between outstanding transactions.
-// <i> The number of clock cycles added is calculated as follows. latency = (2^qos) - 1.
-// <i> The maximum number of clock cycles is 1023.
-// <id> gc_regqos3
-#ifndef CONF_GFX2D_GC_REGQOS3
-#define CONF_GFX2D_GC_REGQOS3 0
-#endif
-
-// <o> Metrics Selection 0
-// <0x0=> disable
-// <0x1=> read
-// <0x2=> write
-// <0x2=> cycle
-// <id> pc0_sel
-#ifndef CONF_GFX2D_PC0_SEL
-#define CONF_GFX2D_PC0_SEL 0
-#endif
-
-// <o> Filter Selection 0
-// <0x0=> disable
-// <0x1=> qos0
-// <0x2=> qos1
-// <0x2=> qos2
-// <id> pc0_filt
-#ifndef CONF_GFX2D_PC0_FILT
-#define CONF_GFX2D_PC0_FILT 0
-#endif
-
-// <o> Metrics Selection 1
-// <0x0=> disable
-// <0x1=> read
-// <0x2=> write
-// <0x2=> cycle
-// <id> pc1_sel
-#ifndef CONF_GFX2D_PC1_SEL
-#define CONF_GFX2D_PC1_SEL 0
-#endif
-
-// <o> Filter Selection 1
-// <0x0=> disable
-// <0x1=> qos0
-// <0x2=> qos1
-// <0x2=> qos2
-// <id> pc1_filt
-#ifndef CONF_GFX2D_PC1_FILT
-#define CONF_GFX2D_PC1_FILT 0
-#endif
-// </e>
-
-#ifndef CONF_GFX2D_GC_REG
-#define CONF_GFX2D_GC_REG                                                                                              \
-        ((CONF_GFX2D_GC_REGEN << GFX2D_GC_REGEN_Pos) | (CONF_GFX2D_GC_MTY << GFX2D_GC_MTY_Pos)                             \
-         | (CONF_GFX2D_GC_REGQOS1 << GFX2D_GC_REGQOS1_Pos)                                                                 \
-         | (CONF_GFX2D_GC_REGQOS2 << GFX2D_GC_REGQOS2_Pos)                                                                 \
-         | (CONF_GFX2D_GC_REGQOS3 << GFX2D_GC_REGQOS3_Pos))
-#endif
-
-#ifndef CONF_GFX2D_PC0_REG
-#define CONF_GFX2D_PC0_REG ((CONF_GFX2D_PC0_SEL << GFX2D_PC0_SEL_Pos) | (CONF_GFX2D_PC0_FILT << GFX2D_PC0_FILT_Pos))
-#endif
-
-#ifndef CONF_GFX2D_PC1_REG
-#define CONF_GFX2D_PC1_REG ((CONF_GFX2D_PC1_SEL << GFX2D_PC1_SEL_Pos) | (CONF_GFX2D_PC1_FILT << GFX2D_PC1_FILT_Pos))
-#endif
-
-#ifndef CONF_GFX2D_LEN_REG
 #define CONF_GFX2D_LEN_REG 0x1
-#endif
 
 struct gpu_instruction_ldr {
         uint32_t wd0;
@@ -271,6 +163,7 @@ struct gpu_instruction_rop {
 // Section: GFX2D temporary
 // *****************************************************************************
 // *****************************************************************************
+
 #define GPU_BUFFER_FORMAT_SIZE      400
 
 // *****************************************************************************
@@ -278,44 +171,38 @@ struct gpu_instruction_rop {
 // Global Configuration, Enable, Disable, Status
 // *****************************************************************************
 // *****************************************************************************
-          
-void ${GFX2D_INSTANCE_NAME}_SetClockGatingCore(GFX2D_CLOCK_GATING gating)
-{
-    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_CGDISCORE_Msk) | 
-                                GFX2D_GC_CGDISCORE(gating == true);
-}
-          
-void ${GFX2D_INSTANCE_NAME}_SetClockGatingAXI(GFX2D_CLOCK_GATING gating)
-{
-    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_CGDISAXI_Msk) | 
-                                GFX2D_GC_CGDISAXI(gating == true);
-}
-
-void ${GFX2D_INSTANCE_NAME}_SetClockGatingFIFO(GFX2D_CLOCK_GATING gating)
-{
-    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_CGDISFIFO_Msk) | 
-                                GFX2D_GC_CGDISFIFO(gating == true);
-}
 
 void ${GFX2D_INSTANCE_NAME}_SetOutstandingRegulationEnable(bool enable)
 {
-    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_REGEN_Msk) | 
+    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_REGEN_Msk) |
                                   GFX2D_GC_REGEN(enable == true);
+}
+
+void PLIB_GFX2D_SetQOSLatency(GFX2D_QOS_CYCLES QOS1, GFX2D_QOS_CYCLES QOS2, GFX2D_QOS_CYCLES QOS3)
+{
+    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_REGQOS1_Msk) |
+                                  GFX2D_GC_REGQOS1(QOS1);
+
+    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_REGQOS2_Msk) |
+                                  GFX2D_GC_REGQOS2(QOS2);
+
+    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_REGQOS3_Msk) |
+                                  GFX2D_GC_REGQOS3(QOS3);
 }
 
 void ${GFX2D_INSTANCE_NAME}_SetMemoryAccess(GFX2D_MEMORY_ACCESS access)
 {
-    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_MTY_Msk) | 
+    GFX2D_REGS->GFX2D_GC = (GFX2D_REGS->GFX2D_GC & ~GFX2D_GC_MTY_Msk) |
                                   GFX2D_GC_MTY(access == GFX2D_MEMORY_LINEAR_ACCESS);
 }
 
 void ${GFX2D_INSTANCE_NAME}_SetGlobalStatusEnabled(bool enable)
 {
     if (enable == true)
-        GFX2D_REGS->GFX2D_GE = (GFX2D_REGS->GFX2D_GE & ~GFX2D_GE_ENABLE_Msk) | 
+        GFX2D_REGS->GFX2D_GE = (GFX2D_REGS->GFX2D_GE & ~GFX2D_GE_ENABLE_Msk) |
                                       GFX2D_GE_ENABLE(1);
     else
-        GFX2D_REGS->GFX2D_GD = (GFX2D_REGS->GFX2D_GD & ~GFX2D_GD_DISABLE_Msk) | 
+        GFX2D_REGS->GFX2D_GD = (GFX2D_REGS->GFX2D_GD & ~GFX2D_GD_DISABLE_Msk) |
                                       GFX2D_GD_DISABLE(1);
 }
 
@@ -392,6 +279,7 @@ uint32_t ${GFX2D_INSTANCE_NAME}_GetPerformanceMetric(GFX2D_PERFORMANCE_REGISTER 
 // Fill Instruction
 // *****************************************************************************
 // *****************************************************************************
+
 void ${GFX2D_INSTANCE_NAME}_SetSurfaceAddress(GFX2D_SURFACE surface, uint32_t addr)
 {
     GFX2D_REGS->GFX2D_CHID[surface].GFX2D_PA = GFX2D_PA_PA(addr);
@@ -414,9 +302,10 @@ void ${GFX2D_INSTANCE_NAME}_SetSurfacePixelFormat(GFX2D_SURFACE surface, GFX2D_P
 
 // *****************************************************************************
 // *****************************************************************************
-// Interrupt 
+// Interrupt
 // *****************************************************************************
 // *****************************************************************************
+
 void ${GFX2D_INSTANCE_NAME}_IRQ_Enable(GFX2D_INTERRUPT interrupt)
 {
     switch(interrupt)
@@ -439,7 +328,7 @@ void ${GFX2D_INSTANCE_NAME}_IRQ_Enable(GFX2D_INTERRUPT interrupt)
             break;
         case GFX2D_INTERRUPT_IERR:
             GFX2D_REGS->GFX2D_IE = (GFX2D_REGS->GFX2D_IE & ~GFX2D_IE_IERR_Msk) |
-                                      GFX2D_IE_IERR(1);          
+                                      GFX2D_IE_IERR(1);
             break;
         default:
           break;
@@ -468,7 +357,7 @@ void ${GFX2D_INSTANCE_NAME}_IRQ_Disable(GFX2D_INTERRUPT interrupt)
             break;
         case GFX2D_INTERRUPT_IERR:
             GFX2D_REGS->GFX2D_ID = (GFX2D_REGS->GFX2D_ID & ~GFX2D_ID_IERR_Msk) |
-                                      GFX2D_ID_IERR(1);          
+                                      GFX2D_ID_IERR(1);
             break;
         default:
           break;
@@ -540,7 +429,7 @@ int32_t _gpu_instruction(uint32_t *i, uint8_t len)
     {
         return 1;
     }
-    
+
     rbase  = GFX2D_REGS->GFX2D_BASE;
     head  = GFX2D_REGS->GFX2D_HEAD;
     rblen = GFX2D_REGS->GFX2D_LEN;
@@ -575,8 +464,6 @@ int32_t _gpu_instruction(uint32_t *i, uint8_t len)
 // *****************************************************************************
 // *****************************************************************************
 
-
-/* Register callback for period interrupt */
 void ${GFX2D_INSTANCE_NAME}_IRQ_CallbackRegister(${GFX2D_INSTANCE_NAME}_IRQ_CALLBACK callback, uintptr_t context)
 {
     if (callback == NULL)
@@ -593,21 +480,13 @@ void ${GFX2D_INSTANCE_NAME}_IRQ_CallbackRegister(${GFX2D_INSTANCE_NAME}_IRQ_CALL
 
 void ${GFX2D_INSTANCE_NAME}_Initialize( void )
 {
-    ${GFX2D_INSTANCE_NAME}_SetClockGatingCore(GFX2D_CLOCK_GATING_ACTIVATED);
-    ${GFX2D_INSTANCE_NAME}_SetClockGatingAXI(GFX2D_CLOCK_GATING_ACTIVATED);
-    ${GFX2D_INSTANCE_NAME}_SetClockGatingFIFO(GFX2D_CLOCK_GATING_ACTIVATED);
     ${GFX2D_INSTANCE_NAME}_SetOutstandingRegulationEnable(false);
+    ${GFX2D_INSTANCE_NAME}_SetQOSLatency(GFX2D_QOS_0_CYCLES, GFX2D_QOS_0_CYCLES, GFX2D_QOS_0_CYCLES);
     ${GFX2D_INSTANCE_NAME}_SetMemoryAccess(GFX2D_MEMORY_TILE_ACCESS);
-
-    ${GFX2D_INSTANCE_NAME}_SetPerformanceFilter(GFX2D_PERFORMANCE_REG0, GFX2D_METRICS_DISABLED);
-    ${GFX2D_INSTANCE_NAME}_SetPerformanceFilter(GFX2D_PERFORMANCE_REG1, GFX2D_METRICS_DISABLED);
+    ${GFX2D_INSTANCE_NAME}_SetPerformanceFilter(GFX2D_PERFORMANCE_REG0, GFX2D_FILTER_DISABLED);
+    ${GFX2D_INSTANCE_NAME}_SetPerformanceFilter(GFX2D_PERFORMANCE_REG1, GFX2D_FILTER_DISABLED);
     ${GFX2D_INSTANCE_NAME}_SetPerformanceMetric(GFX2D_PERFORMANCE_REG0, GFX2D_METRICS_DISABLED);
     ${GFX2D_INSTANCE_NAME}_SetPerformanceMetric(GFX2D_PERFORMANCE_REG1, GFX2D_METRICS_DISABLED);
-
-    //#if CONF_GFX2D_GC_REGEN == 1
-    //GFX2D_REGS->GFX2D_SUB0[0].GFX2D_PC = CONF_GFX2D_PC0_REG;
-    //GFX2D_REGS->GFX2D_SUB0[1].GFX2D_PC = CONF_GFX2D_PC1_REG;
-    //#endif
 }
 
 void ${GFX2D_INSTANCE_NAME}_DeInitialize( void )
@@ -716,7 +595,7 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Blend(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *ds
     GFX2D_REGS->GFX2D_CHID[1].GFX2D_PA = bg->addr;
     GFX2D_REGS->GFX2D_CHID[1].GFX2D_PITCH = bg->width * _gfx2d_pixel_size[bg->format];
     GFX2D_REGS->GFX2D_CHID[1].GFX2D_CFG = bg->format;
-    
+
     GFX2D_REGS->GFX2D_CHID[2].GFX2D_PA = fg->addr;
     GFX2D_REGS->GFX2D_CHID[2].GFX2D_PITCH = fg->width * _gfx2d_pixel_size[fg->format];
     GFX2D_REGS->GFX2D_CHID[2].GFX2D_CFG = fg->format;
@@ -752,7 +631,7 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Rop(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *dst_
     GFX2D_REGS->GFX2D_CHID[3].GFX2D_PA = pmask->addr;
     GFX2D_REGS->GFX2D_CHID[3].GFX2D_PITCH = pmask->width * _gfx2d_pixel_size[pmask->format];
     GFX2D_REGS->GFX2D_CHID[3].GFX2D_CFG = pmask->format;
-    
+
     instr.wd0 = GFX2D_INST_ROP_WD0(0, 1);
     instr.wd1 = GFX2D_INST_ROP_WD1((dst_rect->width - 1), (dst_rect->height - 1));
     instr.wd2 = GFX2D_INST_ROP_WD2(dst_rect->x, dst_rect->y);
@@ -760,9 +639,10 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Rop(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *dst_
     instr.wd4 = GFX2D_INST_ROP_WD4(pattern_rect->x, pattern_rect->y);
     instr.wd5 = GFX2D_INST_ROP_WD5(pmask->addr);
     instr.wd6 = GFX2D_INST_ROP_WD6(rop.high, rop.low, rop.mode);
-    
+
     return _gpu_instruction((uint32_t *)(&instr), 7);
 }
+
 // *****************************************************************************
 /* Function:
     bool ${GFX2D_INSTANCE_NAME}_IsBusy(void)
