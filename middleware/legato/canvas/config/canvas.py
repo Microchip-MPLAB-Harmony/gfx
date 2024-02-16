@@ -22,7 +22,7 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
-maxNumCanvas = 20
+maxNumCanvas = 40
 defaultNumCanvas = 3
 
 import re
@@ -45,13 +45,13 @@ def instantiateComponent(comp):
 	SYS_TASK_C.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_DRIVER_TASKS")
 	SYS_TASK_C.setSourcePath("templates/tasks.c.ftl")
 	SYS_TASK_C.setMarkup(True)
-	
+
 	SYS_RTOS_TASK_C = comp.createFileSymbol("SYS_RTOS_TASK_C", None)
 	SYS_RTOS_TASK_C.setType("STRING")
 	SYS_RTOS_TASK_C.setOutputName("core.LIST_SYSTEM_RTOS_TASKS_C_DEFINITIONS")
 	SYS_RTOS_TASK_C.setSourcePath("templates/rtos_tasks.c.ftl")
 	SYS_RTOS_TASK_C.setMarkup(True)
-	
+
 	DriverInitName = comp.createStringSymbol("DriverInitName", None)
 	DriverInitName.setVisible(False)
 	DriverInitName.setReadOnly(True)
@@ -59,7 +59,7 @@ def instantiateComponent(comp):
 
 	CanvasSettings = comp.createMenuSymbol("CanvasSettings", None)
 	CanvasSettings.setLabel("Canvas Settings")
-	
+
 	WindowClippingEnabled = comp.createBooleanSymbol("WindowClippingEnabled", CanvasSettings)
 	WindowClippingEnabled.setLabel("Enable Window Clipping")
 	WindowClippingEnabled.setDefaultValue(True)
@@ -94,30 +94,31 @@ def instantiateComponent(comp):
 	for x in range(maxNumCanvas):
 		Canvas = comp.createMenuSymbol("Canvas" + str(x), NumCanvasObjects)
 		Canvas.setLabel("Canvas[" + str(x) + "]")
-		
+
 		Width = comp.createIntegerSymbol("Canvas" + str(x) + "Width" , Canvas)
 		Width.setLabel("Width")
 		Width.setDefaultValue(480)
 		Width.setDescription("<html> The horizontal resolution (width) of the canvas in pixels. </html>")
-		
+
 		Height = comp.createIntegerSymbol("Canvas" + str(x) + "Height" , Canvas)
 		Height.setLabel("Height")
 		Height.setDefaultValue(272)
 		Height.setDescription("<html> The vertical resolution (height) of the canvas in pixels. </html>")
-		
+
 		Mode = comp.createComboSymbol("Canvas" + str(x) + "Mode" , Canvas, ["GS_8", "RGB_565", "RGBA_8888"])
 		Mode.setLabel("Color Mode")
 		Mode.setDescription("<html> The color mode of the canvas. </html>")
 		Mode.setDefaultValue("RGBA_8888")
-		
-		FrameBufferAlloc = comp.createComboSymbol("Canvas" + str(x) + "FrameBufferAlloc", Canvas, ["None", "Manual", "Auto"])
+
+		FrameBufferAlloc = comp.createComboSymbol("Canvas" + str(x) + "FrameBufferAlloc", Canvas, ["None", "Manual", "Auto", "Dynamic"])
 		FrameBufferAlloc.setLabel("Frame Buffer Allocation")
 		FrameBufferAlloc.setDescription("<html> The allocation type for the canvas frame/pixel buffer."
 			"<br> 'None' will assign a NULL value. Application code will need to call gfxcSetPixelBuffer() to set the pixel buffer properties."
 			"<br> 'Manual' will let you specify the address. Use this if using memory that is not managed by the linker."
-			"<br> 'Auto' will statically declare the buffer array and will be allocated in memory that is managed by the linker (e.g., internal SRAM).</html>")
+			"<br> 'Auto' will statically declare the buffer array and will be allocated in memory that is managed by the linker (e.g., internal SRAM)."
+			"<br> 'Dynamic' will allocate memory from the heap using malloc.</html>")
 		FrameBufferAlloc.setDependencies(onFrameBufferAllocChanged, ["Canvas" + str(x) + "FrameBufferAlloc"])
-		
+
 		Address = comp.createHexSymbol("Canvas" + str(x) + "Address", FrameBufferAlloc)
 		Address.setLabel("Address")
 		Address.setDescription("<html> Frame buffer address in memory. </html>")
@@ -159,7 +160,7 @@ def instantiateComponent(comp):
 	DisplayDriverName.setReadOnly(True)
 	DisplayDriverName.setDefaultValue("NULL")
 	DisplayDriverName.setDescription("<html> The display controller driver that is used to display the canvas objects on the screen. </html>")
-	
+
 	GraphicsProcessorSettings = comp.createMenuSymbol("GraphicsProcessorSettings", None)
 	GraphicsProcessorSettings.setLabel("Graphics Processor Driver Settings")
 
@@ -185,8 +186,8 @@ def onAttachmentConnected(source, target):
 	if source["id"] == "gfx_display_driver":
 		driverName = target["component"].getSymbolValue("DriverInitName")
 		numLayers = target["component"].getSymbolValue("TotalNumLayers")
-		source["component"].setSymbolValue("DisplayDriverName", driverName)		
-		source["component"].setSymbolValue("DefaultNumLayers", numLayers)		       
+		source["component"].setSymbolValue("DisplayDriverName", driverName)
+		source["component"].setSymbolValue("DefaultNumLayers", numLayers)
 
 def showRTOSMenu(symbol, event):
 	symbol.setVisible(event["value"] != "BareMetal")
@@ -204,7 +205,7 @@ def onFrameBufferAllocChanged(source, event):
 	sub = re.search('Canvas(.*)FrameBufferAlloc', str(event["id"]))
 	if (sub and sub.group(1)):
 		source.getComponent().getSymbolByID("Canvas" + str(sub.group(1)) + "Address").setVisible(event["value"] == "Manual")
-		
+
 def onEffectsEnabled(source, event):
 	source.getComponent().getSymbolByID("EffectsInterval").setVisible(event["value"])
 	source.getComponent().getSymbolByID("FadeEffectsEnabled").setVisible(event["value"])

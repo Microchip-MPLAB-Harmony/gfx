@@ -384,48 +384,70 @@ void DISP_RPi_Update(void)
             if (!DISP_TransferBusy(DISP_CLIENT_ID_TOUCH))
             {
                 /* Process Touch Data */
-                uint8_t xh, xl, yh, yl, type;
+                uint8_t xh, xl, yh, yl;
                 uint16_t x, y;
+                uint32_t touch_id = 0, temp_status = 0;
+                uint32_t TouchPts = 0;
 
+                TouchPts = DISP_GetRxDataByte((DISP_CLIENT_ID_TOUCH), 0x2);
+
+                
                 /* Resolve all points */
-                for (int idx = 0; idx < MAX_TOUCH_POINTS; idx++)
+                if(TouchPts > 0)
                 {
-                    xh = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x3 + (6 * idx));
-                    xl = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x4 + (6 * idx));
-                    yh = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x5 + (6 * idx));
-                    yl = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x6 + (6 * idx));
+                    if(TouchPts > 5) TouchPts = 5;
 
-                    type = xh >> 6;
-                    x = (xh & 0xF) << 8 | xl;
-                    y = (yh & 0xF) << 8 | yl;
-                    <#if HorFlip>
-
-                    /* Handle Horizontal Flip */
-                    x = 800 - x;
-                    y = 480 - y;
-                    </#if>
-
-                    switch(type)
+                    for ( int idx = 0; idx < TouchPts; idx++)
                     {
-                        case 0x0:
-                        {
-                            SYS_INP_InjectTouchDown(idx, x , y);
+                        xh = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x3 + (6 * idx));
+                        xl = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x4 + (6 * idx));
+                        yh = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x5 + (6 * idx));
+                        yl = DISP_GetRxDataByte(DISP_CLIENT_ID_TOUCH, 0x6 + (6 * idx));
+                        
+                        touch_id = yh >> 4;
+                    
+                        temp_status |= 1 << touch_id;
+                    
+                        x = (xh & 0xF) << 8 | xl;
+                        y = (yh & 0xF) << 8 | yl;
 
-                            break;
+                        <#if HorFlip>
+                        /* Handle Horizontal Flip */
+                        disp_data.touchX[idx] = 800 - x;
+                        disp_data.touchY[idx] = 480 - y;
+                        </#if>
+                                        
+                    }
+                }
+                
+                for(int idx = 0; idx < MAX_TOUCH_POINTS; idx++)
+                {
+                    if(temp_status & (1<<idx))
+                    {
+                        if (disp_data.touchID[idx] == 0)
+                        {
+                            SYS_INP_InjectTouchDown(idx,
+                                                    disp_data.touchX[idx],
+                                                    disp_data.touchY[idx]);
+
+                            disp_data.touchID[idx] = 1;
                         }
-                        case 0x1:
+                        else
                         {
-                            SYS_INP_InjectTouchUp(idx, x, y);
-
-                            break;
-                        }
-                        case 0x2:
-                        {
-                            SYS_INP_InjectTouchMove(idx, x, y);
-
-                            break;
+                            SYS_INP_InjectTouchMove(idx,
+                                                    disp_data.touchX[idx],
+                                                    disp_data.touchY[idx]);
                         }
                     }
+                    else if (disp_data.touchID[idx] != 0)
+                    {
+                        SYS_INP_InjectTouchUp(idx,
+                                              disp_data.touchX[idx],
+                                              disp_data.touchY[idx]);
+
+                        disp_data.touchID[idx] = 0;
+                    }
+
                 }
 
                 disp_data.state = DISP_STATE_IDLE;

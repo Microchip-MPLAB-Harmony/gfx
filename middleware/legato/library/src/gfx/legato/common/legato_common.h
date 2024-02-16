@@ -415,8 +415,13 @@ typedef uint16_t leChar;
 
 #define LE_UNKNOWN_GLYPH  0xFFFF
 
+#ifndef _MSC_VER
 #define LE_PCALL(var, func, args...) var->fn->func(var, ## args)
 #define LE_OCALL(var, func, args...) var.fn->func(&var, ## args)
+#else
+#define LE_PCALL(var, func, ...) var->fn->func(var, __VA_ARGS__)
+#define LE_OCALL(var, func, ...) var.fn->func(&var, __VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
     }

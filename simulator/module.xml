@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="mgs_web_simulator" id="07cee103-5e29-4581-b924-94506bf35f3c" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

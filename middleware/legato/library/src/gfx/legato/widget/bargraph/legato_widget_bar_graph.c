@@ -237,9 +237,12 @@ void _leBarGraphWidget_GetGraphRect(const leBarGraphWidget* _this,
 {
     leRect categoryLabelMaxRect;
     leRect valueLabelMaxRect;
+    leRect globalRect;
 
-    graphRect->x = _this->widget.rect.x;
-    graphRect->y = _this->widget.rect.y;
+    _this->fn->rectToScreen(_this, &globalRect);
+
+    graphRect->x = globalRect.x;
+    graphRect->y = globalRect.y;
     graphRect->width = _this->widget.rect.width;
     graphRect->height = _this->widget.rect.height;
 

@@ -188,7 +188,7 @@ def instantiateComponent(comp):
 	FrameBufferSettingsMenu = comp.createMenuSymbol("FrameBufferSettingsMenu", None)
 	FrameBufferSettingsMenu.setLabel("Frame Buffer Settings")
 
-	ColorMode = comp.createComboSymbol("ColorMode", FrameBufferSettingsMenu, ["RGB565"])
+	ColorMode = comp.createComboSymbol("ColorMode", FrameBufferSettingsMenu, ["RGB565","RGB332"])
 	ColorMode.setLabel("Color Mode")
 	ColorMode.setDescription("Frame Buffer and Interface Color Mode")
 	ColorMode.setDefaultValue("RGB565")

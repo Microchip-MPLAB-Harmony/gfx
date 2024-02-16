@@ -74,7 +74,7 @@ typedef enum leImageFormat
     LE_IMAGE_FORMAT_MONO
 } leImageFormat;
 
-#define LE_IMAGE_FORMAT_COUNT (LE_IMAGE_FORMAT_RLE + 1)
+#define LE_IMAGE_FORMAT_COUNT (LE_IMAGE_FORMAT_MONO + 1)
 
 // *****************************************************************************
 /* Enumeration:

@@ -3,12 +3,13 @@ title: Graphics Applications
 nav_order: 2
 ---
 
-# ![Microchip Technology](../docs/legato/images/mhgs.png) MPLAB® Harmony 3 Graphics Application Support
+# ![Microchip Technology](../images/mhgs.png) MPLAB® Harmony 3 Graphics Application Support
 
 Microchip MPLAB® Harmony Graphics Suite provides various application examples for a number of device families. See the following repositories under [Microchip-MPLAB-Harmony](https://github.com/Microchip-MPLAB-Harmony) Github project for specific applications examples:
 
 | Repository | Product family |
 | ---------- | -------------- |
+| [gfx_apps_pic32cx_sg](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32cx_sg) | Graphics Application examples for: PIC32CX SG40 family |
 | [gfx_apps_pic32cm_le_ls](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32cm_le_ls) | Graphics Application examples for: PIC32CM LE/LS family |
 | [gfx_apps_pic32ck_sg_gc](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32ck_sg_gc) | Graphics Application examples for: PIC32CK SG/GC family |
 | [gfx_apps_pic32cz_ca](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32cz_ca) | Graphics Application examples for: PIC32CZ CA family |

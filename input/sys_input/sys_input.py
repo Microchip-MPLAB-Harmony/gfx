@@ -38,6 +38,79 @@ def instantiateComponent(component):
 	MaxEvents.setMax(256)
 	MaxEvents.setDefaultValue(32)
 
+	TransformTouchCoords = component.createBooleanSymbol("TransformTouchCoords", None)
+	TransformTouchCoords.setLabel("Transform Touch Panel coordinates")
+	ttcDesc = """Enables transformation of touch panel input coordinates. 
+	Use in case the touch panel has an origin or dimensions that differ from the display panel."""
+	TransformTouchCoords.setDescription(ttcDesc)
+	TransformTouchCoords.setDefaultValue(False)
+	TransformTouchCoords.setVisible(True)
+	
+	TransformTouchCoords_DisplayW = component.createIntegerSymbol("TransformTouchCoords_DisplayW", TransformTouchCoords)
+	TransformTouchCoords_DisplayW.setLabel("Display Width")
+	TransformTouchCoords_DisplayW.setDescription("Display width in pixels")
+	TransformTouchCoords_DisplayW.setMin(0)
+	TransformTouchCoords_DisplayW.setMax(4096)
+	TransformTouchCoords_DisplayW.setDefaultValue(0)
+	TransformTouchCoords_DisplayW.setVisible(False)
+	TransformTouchCoords_DisplayW.setDependencies(transformEnabled, ["TransformTouchCoords"])
+	
+	TransformTouchCoords_DisplayH = component.createIntegerSymbol("TransformTouchCoords_DisplayH", TransformTouchCoords)
+	TransformTouchCoords_DisplayH.setLabel("Display Height")
+	TransformTouchCoords_DisplayH.setDescription("Display height in pixels")
+	TransformTouchCoords_DisplayH.setMin(0)
+	TransformTouchCoords_DisplayH.setMax(4096)
+	TransformTouchCoords_DisplayH.setDefaultValue(0)
+	TransformTouchCoords_DisplayH.setVisible(False)
+	TransformTouchCoords_DisplayH.setDependencies(transformEnabled, ["TransformTouchCoords"])
+	
+	TransformTouchCoords_TouchW = component.createIntegerSymbol("TransformTouchCoords_TouchW", TransformTouchCoords)
+	TransformTouchCoords_TouchW.setLabel("Touch Width")
+	TransformTouchCoords_TouchW.setDescription("Touch panel width in pixels")
+	TransformTouchCoords_TouchW.setMin(0)
+	TransformTouchCoords_TouchW.setMax(4096)
+	TransformTouchCoords_TouchW.setDefaultValue(0)
+	TransformTouchCoords_TouchW.setVisible(False)
+	TransformTouchCoords_TouchW.setDependencies(transformEnabled, ["TransformTouchCoords"])
+	
+	TransformTouchCoords_TouchH = component.createIntegerSymbol("TransformTouchCoords_TouchH", TransformTouchCoords)
+	TransformTouchCoords_TouchH.setLabel("Touch Height")
+	TransformTouchCoords_TouchH.setDescription("Touch panel height in pixels")
+	TransformTouchCoords_TouchH.setMin(0)
+	TransformTouchCoords_TouchH.setMax(4096)
+	TransformTouchCoords_TouchH.setDefaultValue(0)
+	TransformTouchCoords_TouchH.setVisible(False)
+	TransformTouchCoords_TouchH.setDependencies(transformEnabled, ["TransformTouchCoords"])
+	
+	TransformTouchCoords_InvertX = component.createBooleanSymbol("TransformTouchCoords_InvertX", TransformTouchCoords)
+	TransformTouchCoords_InvertX.setLabel("Invert X Coordinate")
+	TransformTouchCoords_InvertX.setDescription("Invert X coordinate, so that a value of \"TouchWidth-1\" is interpreted as \"0\" and vice-versa")
+	TransformTouchCoords_InvertX.setDefaultValue(False)
+	TransformTouchCoords_InvertX.setVisible(False)
+	TransformTouchCoords_InvertX.setDependencies(transformEnabled, ["TransformTouchCoords"])
+	
+	TransformTouchCoords_InvertY = component.createBooleanSymbol("TransformTouchCoords_InvertY", TransformTouchCoords)
+	TransformTouchCoords_InvertY.setLabel("Invert Y Coordinate")
+	TransformTouchCoords_InvertY.setDescription("Invert Y coordinate, so that a value of \"TouchHeight-1\" is interpreted as \"0\" and vice-versa")
+	TransformTouchCoords_InvertY.setDefaultValue(False)
+	TransformTouchCoords_InvertY.setVisible(False)
+	TransformTouchCoords_InvertY.setDependencies(transformEnabled, ["TransformTouchCoords"])
+
+	TransformTouchCoords_SwapXY = component.createBooleanSymbol("TransformTouchCoords_SwapXY", TransformTouchCoords)
+	TransformTouchCoords_SwapXY.setLabel("Swap touch panel X & Y coordinates")
+	TransformTouchCoords_SwapXY.setDescription("Swap touch panel coordinates, so that X is interpreted as Y and vice-versa")
+	TransformTouchCoords_SwapXY.setDefaultValue(False)
+	TransformTouchCoords_SwapXY.setVisible(False)
+	TransformTouchCoords_SwapXY.setDependencies(transformEnabled, ["TransformTouchCoords"])
+
+	TransformTouchCoords_Orientation = component.createComboSymbol("TransformTouchCoords_Orientation", TransformTouchCoords, ["0", "90", "180", "270"])
+	TransformTouchCoords_Orientation.setLabel("Touch Origin Orientation")
+	TransformTouchCoords_Orientation.setDescription("Orientation of touch panel origin relative to display panel origin, in 90-degree clockwise multiples")
+	TransformTouchCoords_Orientation.setDefaultValue("0")
+	TransformTouchCoords_Orientation.setVisible(False)
+	TransformTouchCoords_Orientation.setDependencies(transformEnabled, ["TransformTouchCoords"])
+
+
 	RTOSMenu = component.createMenuSymbol("RTOSMenu", None)
 	RTOSMenu.setLabel("RTOS Settings")
 	RTOSMenu.setDescription("RTOS Settings")
@@ -184,6 +257,12 @@ def instantiateComponent(component):
 	INPUT_SYS_RTOS_TASK_C.setMarkup(True)
 	INPUT_SYS_RTOS_TASK_C.setEnabled((Database.getSymbolValue("HarmonyCore", "SELECT_RTOS") != "BareMetal"))
 	INPUT_SYS_RTOS_TASK_C.setDependencies(enableInputRTOSTask, ["HarmonyCore.SELECT_RTOS"])
+
+def transformEnabled(symbol, event):
+	if (event["value"] == True):
+		symbol.setVisible(True)
+	else:
+		symbol.setVisible(False)
 
 def enableInputRTOS(symbol, event):
 	if (event["value"] != "BareMetal"):

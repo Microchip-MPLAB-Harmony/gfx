@@ -294,8 +294,22 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
 {
     switch(hdr->longPacket.dataType)
     {
+        /* Generic Short Write */
+        case 0x03: // No parameter
+        case 0x13: // 1 parameter
+        case 0x23: // 2 parameters
+        /* DCS Short Write */
+        case 0x05: // No parameter
+        case 0x15: // 1 parameter
+        {
+            DSI_REGS->DSI_GEN_HDR = hdr->headerU32;
+            
+            return false;
+        }
         /* Generic Long Write */
         case 0x29:
+        /* DCS Long Write */
+        case 0x39: 
         {
             uint32_t pld_size  = 0;
 
@@ -306,11 +320,15 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
             }
             else if (hdr->longPacket.size < 4)
             {
-                pld_size = (hdr->longPacket.size + 4) / 4;
+                pld_size = 1;
             }
             else if (hdr->longPacket.size % 4)
             {
-                pld_size = hdr->longPacket.size + (hdr->longPacket.size % 4);
+                pld_size = hdr->longPacket.size + 4 - (hdr->longPacket.size % 4);
+                pld_size /= 4;
+            }
+            else
+            {
                 pld_size /= 4;
             }
 

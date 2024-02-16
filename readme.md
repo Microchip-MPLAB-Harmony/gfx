@@ -3,7 +3,7 @@ title: Harmony 3 Graphics Package
 nav_order: 1
 ---
 
-# ![Microchip Technology](./docs/legato/images/mhgs.png) MPLAB® Harmony 3 Graphics Support Package
+# ![Microchip Technology](./images/mhgs.png) MPLAB® Harmony 3 Graphics Support Package
 
 MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating
 embedded firmware solutions for Microchip 32-bit SAM and PIC® microcontroller
@@ -47,6 +47,8 @@ The key features of the MPLAB® Harmony Graphics Suite are the following:
 - Fully functional demonstrations and quick-starts to enable new development
 - Low memory and low power configurable
 - Segmented LCD support
+- LVDS-interface display support
+- MIPI-DSI display support
 - Image Sensor support
 
 
@@ -57,7 +59,7 @@ The key features of the MPLAB® Harmony Graphics Suite are the following:
 ***
 The performance-improved graphics for MPLAB® Harmony Graphics Suite. Supports Microchip PIC32 and SAM microcontrollers and microprocessors
 
-| Category | Item | Description | Release Type |
+| Category | Item | Description | Release Status |
 | --- | --- | ---- |---- |
 | drivers|  glcd | Driver for the GLCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   2dgpu | Driver for the 2DGPU graphics processor |![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
@@ -77,6 +79,8 @@ The performance-improved graphics for MPLAB® Harmony Graphics Suite. Supports M
 | library    | legato | Graphics library | ![app-beta](https://img.shields.io/badge/library-beta-orange?style=plastic) |
 | designer | MGC Legato | Microchip Graphics Composer with Legato| ![app-beta](https://img.shields.io/badge/tool-beta-orange?style=plastic) |
 
+**NOTE:** ssd1963 and the ili9488 drivers are deprecated. There functionality are replaced by external controller. All applications using these drivers must transition to external controller.
+
 ***
 ## Blank Library Interface
 ***
@@ -86,22 +90,27 @@ The performance-improved graphics for MPLAB® Harmony Graphics Suite. Supports M
 ***
 Image Sensor Controller Drivers for SAM microprocessors and Image Sensor Drivers
 
-| Category | Item | Description | Release Type |
-| --- | --- | ---- |---- |
-| drivers|  isi | Driver for the Image Sensor Interface peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   isc | Driver for the Image Sensor Controller peripheral |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   cam | Driver for the OV5640 image sensor module |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+**NOTE:** Starting from Harmony 3 Graphics release v3.14.0 and over the next several releases, image sensor support will be gradually removed from the Graphics release and repositioned in releases of [Harmony 3 Vision Package](https://github.com/Microchip-MPLAB-Harmony/vision).
+
+This chart shows which drivers are located in which repository.
+
+| Category | Item | Description | Release Status | Repository 
+| --- | --- | ---- |---- |---- |
+| drivers|  isi | Driver for the Image Sensor Interface peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-gfx-green?style=plastic) |
+|      |   isc | Driver for the Image Sensor Controller peripheral | ![app-beta](https://img.shields.io/badge/drive-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-vision-blue?style=plastic) |
+|      |   cam | Driver for the OV5640 image sensor module |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-gfx-green?style=plastic) |
 ***
 ***
 ## Segmented LCD Support
 ***
 Controller Drivers for Segemented LCDs for SAM microcontrollers
 
-| Category | Item | Description | Release Type |
+| Category | Item | Description | Release Status |
 | --- | --- | ---- |---- |
-| drivers|  slcc | Low-Cost Controllerless Driver for the Segmented LCD displays | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+| drivers|  slcc | Low-Cost Controllerless Driver for the Segmented LCD displays | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   slcd | Driver for the SAM L22 Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
-|      |   slcdc | Driver for the PIC32CX MT Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   slcdc | Driver for the PIC32CX MT Segmented LCD display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+
 ***
 ## Aria Graphics
 
@@ -113,8 +122,8 @@ As of Graphics release v3.8.0, Aria Graphics has been deprecated and removed fro
 ____
 
 [![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/mplab_harmony_license.md)
-[![Latest release](https://img.shields.io/github/release/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.13.0)
-[![Latest release date](https://img.shields.io/github/release-date/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.13.0)
+[![Latest release](https://img.shields.io/github/release/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.14.0)
+[![Latest release date](https://img.shields.io/github/release-date/mchpgfx/legato.docs.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/v3.14.0)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/gfx.svg)](https://github.com/Microchip-MPLAB-Harmony/gfx/graphs/commit-activity)
 [![Contributors](https://img.shields.io/github/contributors-anon/Microchip-MPLAB-Harmony/gfx.svg)]()
 

@@ -37,6 +37,18 @@
 #define SYS_INP_MAX_LISTENERS        ${MaxListeners}  // max number of listeners
 #define SYS_INP_MAX_GENERAL_EVENTS   ${MaxEvents} // max number of pending events
 
+<#if TransformTouchCoords == true>
+
+#define SYS_INP_DISP_WIDTH           ${TransformTouchCoords_DisplayW} // display width in pixels
+#define SYS_INP_DISP_HEIGHT          ${TransformTouchCoords_DisplayH} // display height in pixels
+#define SYS_INP_TOUCH_WIDTH          ${TransformTouchCoords_TouchW} // touch panel width in pixels
+#define SYS_INP_TOUCH_HEIGHT         ${TransformTouchCoords_TouchH} // touch panel height in pixels
+
+static const float touchInvWidth  = 1.0f/(float)(SYS_INP_TOUCH_WIDTH-1);
+static const float touchInvHeight = 1.0f/(float)(SYS_INP_TOUCH_HEIGHT-1);
+
+</#if>
+
 // event type values
 enum
 {
@@ -429,6 +441,61 @@ int32_t SYS_INP_InjectMouseMove(uint16_t x, uint16_t y)
     return 0;
 }
 
+<#if TransformTouchCoords == true>
+// Transform touch inputs based on Input System Service configuration
+static void SYS_INP_Transform2DTouchPoint(uint16_t* x, uint16_t* y)
+{    
+<#if TransformTouchCoords_InvertX == true>
+    // X input is inverted
+    *x = (SYS_INP_TOUCH_WIDTH-1) - *x;
+
+</#if>
+<#if TransformTouchCoords_InvertY == true>
+    // Y input is inverted
+    *y = (SYS_INP_TOUCH_HEIGHT-1) - *y;
+
+</#if>
+<#if TransformTouchCoords_SwapXY == false>
+    float fracX = (float)(*x) * touchInvWidth;
+    float fracY = (float)(*y) * touchInvHeight;
+<#else>
+    // X and Y inputs are swapped
+    float fracX = (float)(*y) * touchInvHeight;
+    float fracY = (float)(*x) * touchInvWidth;
+</#if>
+    
+<#switch TransformTouchCoords_Orientation>
+<#case "0">
+    // touch panel origin is the same as display origin
+    float newX = (SYS_INP_DISP_WIDTH-1)  * fracX;
+    float newY = (SYS_INP_DISP_HEIGHT-1) * fracY;
+<#break>
+<#case "90">
+    // touch panel origin is rotated 90 degrees clockwise from display origin
+    float newX = (SYS_INP_DISP_WIDTH-1)  * (1.0f - fracY);
+    float newY = (SYS_INP_DISP_HEIGHT-1) * fracX;
+<#break>
+<#case "180">
+    // touch panel origin is rotated 180 degrees clockwise from display origin
+    float newX = (SYS_INP_DISP_WIDTH-1)  * (1.0f - fracX);
+    float newY = (SYS_INP_DISP_HEIGHT-1) * (1.0f - fracY);
+<#break>
+<#case "270">
+    // touch panel origin is rotated 270 degrees clockwise from display origin
+    float newX = (SYS_INP_DISP_WIDTH-1)  * fracY;
+    float newY = (SYS_INP_DISP_HEIGHT-1) * (1.0f - fracX);
+<#break>
+<#default>
+    // touch panel origin is the same as display origin
+    float newX = (SYS_INP_DISP_WIDTH-1)  * fracX;
+    float newY = (SYS_INP_DISP_HEIGHT-1) * fracY;
+</#switch>
+    
+    *x = (uint16_t)(newX + 0.5f); // round X to nearest integer
+    *y = (uint16_t)(newY + 0.5f); // round Y to nearest integer
+}
+</#if>
+
 int32_t SYS_INP_InjectTouchDown(uint16_t idx, uint16_t x, uint16_t y)
 {
 <#if RTOSEnabled == true>
@@ -444,6 +511,9 @@ int32_t SYS_INP_InjectTouchDown(uint16_t idx, uint16_t x, uint16_t y)
         return -1;
     }
     
+<#if TransformTouchCoords == true>
+    SYS_INP_Transform2DTouchPoint(&x, &y);
+</#if>
     generalEvents[eventCount].type = TOUCH_DOWN_EVENT;
     generalEvents[eventCount].event.touchState.index = idx;
     generalEvents[eventCount].event.touchState.x = x;
@@ -473,6 +543,9 @@ int32_t SYS_INP_InjectTouchUp(uint16_t idx, uint16_t x, uint16_t y)
         return -1;
     }
     
+<#if TransformTouchCoords == true>
+    SYS_INP_Transform2DTouchPoint(&x, &y);
+</#if>
     generalEvents[eventCount].type = TOUCH_UP_EVENT;
     generalEvents[eventCount].event.touchState.index = idx;
     generalEvents[eventCount].event.touchState.x = x;
@@ -502,6 +575,9 @@ int32_t SYS_INP_InjectTouchMove(uint16_t idx, uint16_t x, uint16_t y)
         return -1;
     }
     
+<#if TransformTouchCoords == true>
+    SYS_INP_Transform2DTouchPoint(&x, &y);
+</#if>
     generalEvents[eventCount].type = TOUCH_MOVE_EVENT;
     generalEvents[eventCount].event.touchMove.index = idx;
     generalEvents[eventCount].event.touchMove.x = x;

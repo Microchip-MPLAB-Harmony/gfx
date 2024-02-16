@@ -35,6 +35,10 @@
 
 static leInputState _state; // the global input state
 
+#if LE_TOUCH_ORIENTATION != 0
+#pragma message("Warning: Legato touch orientation feature has been deprecated and will be removed in a future release")
+#endif
+
 leInputState* _leGetInputState()
 {
     return &_state;

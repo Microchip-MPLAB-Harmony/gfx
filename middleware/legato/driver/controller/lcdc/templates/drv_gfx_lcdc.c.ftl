@@ -880,7 +880,7 @@ void _IntHandlerLayerReadComplete(uintptr_t context)
     }
 </#if>
 
-    if (state[i] == SWAP)
+    if (i < SYNC && state[i] == SWAP)
     {
 <#if UseGPU == true && le_gfx_gfx2d?? && VblankBlit == true>
         LCDC_LAYER_IRQ_Enable(drvLayer[i].hwLayerID, LCDC_LAYER_INTERRUPT_DMA);

@@ -85,29 +85,42 @@ extern volatile uint8_t measurement_done_touch;
 
 //Wrapper function that returns true if there is an active touch input
 static inline bool drv_touch_itd_get_surface_active_status(unsigned int id)
-{
-<#if GestureSupport == true>   
-    return qtm_surface_cs_control1.qtm_surface_cs2t_data->qt_surface_cs2t_status & TOUCH_ACTIVE;
-<#else>
-    return qtm_surface_cs_control1.qtm_surface_contact_data[id].qt_surface_status & TOUCH_ACTIVE;
-</#if>
+{ 
+    return (get_surface_status() & TOUCH_ACTIVE);
 }
 
 static inline uint8_t drv_touch_itd_get_surface_data_x_value(unsigned int id)
 {
 <#if HorzTouchDataFlip == true>
-    return (MAX_POS_VALUE - qtm_surface_cs_control1.qtm_surface_contact_data[id].h_position);
+    <#if TouchPoints == 1>
+        return (MAX_POS_VALUE - get_surface_position(HOR_POS));
+    <#else>
+        return (MAX_POS_VALUE - get_surface_position(HOR_POS , id));
+    </#if>
+
 <#else>
-    return qtm_surface_cs_control1.qtm_surface_contact_data[id].h_position;
+    <#if TouchPoints == 1>
+        return get_surface_position(HOR_POS);
+    <#else>
+        return get_surface_position(HOR_POS , id);
+    </#if>
 </#if>
 }
 
 static inline uint8_t drv_touch_itd_get_surface_data_y_value(unsigned int id)
 {
 <#if VertTouchDataFlip == true>
-    return (MAX_POS_VALUE - qtm_surface_cs_control1.qtm_surface_contact_data[id].v_position);
+    <#if TouchPoints == 1>
+        return (MAX_POS_VALUE - get_surface_position(VER_POS));
+    <#else>
+        return (MAX_POS_VALUE - get_surface_position(VER_POS , id));
+    </#if>
 <#else>
-    return qtm_surface_cs_control1.qtm_surface_contact_data[id].v_position;
+    <#if TouchPoints == 1>
+        return get_surface_position(VER_POS);
+    <#else>
+        return get_surface_position(VER_POS , id);
+    </#if>
 </#if>
 }
 
@@ -115,19 +128,19 @@ static inline uint8_t drv_touch_itd_get_surface_data_y_value(unsigned int id)
 //Wrapper function that returns true if a gesture is detected
 static inline uint8_t drv_touch_itd_get_gesture_active_status(void)
 {
-   return qtm_gestures_2d_control1.qtm_gestures_2d_data->gestures_status;
+   return qtm_gestures_2d_control1.qtm_gestures_data->gestures_status;
 }
 
 //Wrapper function that returns the current detected gesture
 static inline uint8_t drv_touch_itd_get_which_gesture(void)
 {
-    return qtm_gestures_2d_control1.qtm_gestures_2d_data->gestures_which_gesture;
+    return qtm_gestures_2d_control1.qtm_gestures_data->gestures_which_gesture;
 }
 
 //Wrapper function that returns additional info about the current detected gesture
 static inline uint8_t drv_touch_itd_get_gesture_info(void)
 {
-    return qtm_gestures_2d_control1.qtm_gestures_2d_data->gestures_info;
+    return qtm_gestures_2d_control1.qtm_gestures_data->gestures_info;
 }
 
 //returns true if a valid gesture is processed, false if not

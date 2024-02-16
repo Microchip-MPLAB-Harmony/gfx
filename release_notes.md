@@ -4,9 +4,67 @@ nav_order: 99
 ---
 
 ![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
-![Harmony logo small](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_mplab_harmony_logo_small.png)
+![Harmony logo small](./images/mhgs.png)
 
 # Microchip MPLAB® Harmony 3 Release Notes
+
+## Graphics Release v3.14.0
+
+### New Features
+
+* Added Cut, Copy, & Paste to Microchip Graphics Composer
+	* There are hotkeys for each, as well as new buttons under the Edit menu
+* Added Undo & Redo to Microchip Graphics Composer
+	* There are hotkeys for both, as well as new buttons under the Edit menu
+* Added PIC32CX SG41 Family SPI display driver and template support
+* Added 4-inch 720x720 Waveshare MIPI round display driver support 
+* Added RGB332 color mode support for LCC display driver
+
+* Added Harmony components to support the **Microchip Graphics Suite Web Simulator**
+	* **Note:** The MGS Web Simulator is in closed-beta testing until release v3.15.0. Please contact your local Microchip Sales Office or submit a question with [Microchip Client Support and Services](https://www.microchip.com/en-us/support/design-help/client-support-services) if you wish to particapte in the closed-beta testing.
+
+
+### Issues Fixed
+
+* Fixed a bug where editing Keypad Widget cells would cause a crash.
+* Keypad Widgets are now limited to a maximum of 100x100 cells.
+* Fixed a bug where duplicating a screen would not add it to the Screens window.
+* Improved the feel of how Widgets are selected in the Design Window.
+* Added a User Preference to make the design auto-save when clicking the Generate Code button.
+* StringTable bug fixes:
+	* Fixed a bug where importing a StringTable ‘.csv’ file would make the strings in the design disappear.
+	* Fixed various issues with double-quotes and non-ASCII characters.
+	* Fixed a crash that would happen after importing and then attempting to export a StringTable.
+* Fixed a bug where pressing Enter after editing an integer property would close the Property Window, rather than commit the value.
+* Updating the Display Size now updates the Design Window checkerboard pattern.
+* Pressing the Up/Down arrows in the Screen Tree no longer deselects the selection each time.
+* Input Orientation is now deprecated. Instead, use MCC’s Input System Service to configure touch-input orientation.
+* When selecting multiple images in the Image Manager, the Data Location property is now available for the selected images.
+* Composer will now ensure that there is exactly one assigned Startup Screen at any time.
+* Fixed a bug where deleting a selection of multiple Widgets would cause a crash.
+* The Slider Widget’s ‘Value’ property now uses the same units as its Min & Max properties, rather than a percentage.
+* The “Don’t show this again” checkbox on the Startup Window will now honor the user’s choice.
+* Fixed a code-generation error when using the PNG Scratch Address feature.
+* “Ctrl + S” is now a hotkey to Save the design.
+
+* Microchip Graphics Composer v1.4.1b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.15b
+
+### Development Tools
+
+
+- [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - [MPLAB® Code Configurator (MCC) Plugin v5.4.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    - [MPLAB® Code Configurator (MCC) Core v5.6.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+
+### Dependent Components
+
+* [Core v3.13.3 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.13.3)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+
 
 ## Graphics Release v3.13.0
 
@@ -499,7 +557,7 @@ nav_order: 99
 * For applications on SAM E54 + CPRO with the 24-bit passthrough board, Pin 7 of the EXT1 connector should drive the backlight. However, on rev1.0 of the board, it is not connected to any pin on the MCU. As a workaround, it needs to be connected to a v3.3 pin.
 * MISRA 2012 Rule 9.1 Compliance Deviation at legato_error.c line 74
 
-For a list of post release issues that affect this release, refer to MPLAB Harmony [GFX Issues and Errata](https://github.com/Microchip-MPLAB-Harmony/gfx/wiki/Issues-and-Errata).
+For a list of post release issues that affect this release, refer to MPLAB Harmony [GFX Issues and Errata](https://github.com/mchpgfx/legato.docs/wiki/Issues-and-Errata).
 
 ### Development Tools
 

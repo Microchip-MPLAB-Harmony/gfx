@@ -207,6 +207,11 @@ def instantiateComponent(comp):
 	#DoubleBuffer.setLabel("Use Double Buffering?")
 	#DoubleBuffer.setDescription("<html>Uses an additional buffer for off-screen drawing.<br>Eliminates screen tearing but doubles the required memory.</html>")
 
+	ColorMode = comp.createComboSymbol("ColorMode", FrameBufferSettingsMenu, ["RGB565","RGB332"])
+	ColorMode.setLabel("Color Mode")
+	ColorMode.setDescription("Frame Buffer and Interface Color Mode")
+	ColorMode.setDefaultValue("RGB565")
+
 	PaletteMode = comp.createBooleanSymbol("PaletteMode", FrameBufferSettingsMenu)
 	PaletteMode.setLabel("Use 8-bit Palette?")
 	PaletteMode.setDescription("<html>Enables frame buffer compression.<br>Uses an 8-bit color lookup table to reduce the required<br>frame buffer memory size.  This also reduces the<br>maximum avilable color count to 256 and significantly<br>slows down display refresh speed.</html>")

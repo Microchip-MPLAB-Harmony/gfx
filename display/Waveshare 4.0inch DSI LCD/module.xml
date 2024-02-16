@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_display_mod_waveshare_4in_dsi" id="681FD976-8481-47A6-B355-E5F9DD68357E" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

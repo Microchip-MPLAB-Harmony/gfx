@@ -95,7 +95,11 @@ extern "C" {
  * @param param1 val is not used.
  * @return void.
  */
-void leAssert(void) __attribute__ ((noreturn));;
+#ifndef _MSC_VER
+    void leAssert(void) __attribute__((noreturn));;
+#else
+    __declspec(noreturn) void leAssert(void);
+#endif
 
 // *****************************************************************************
 /* Function:
@@ -188,7 +192,11 @@ void leSetErrorMessage(const char* msg);
  * @param param1 msg is the message to print.
  * @return void.
  */
-void leSprintfErrorMessage(const char* fmt, ...) __attribute__ ((noreturn));;
+#ifndef _MSC_VER
+void leSprintfErrorMessage(const char* fmt, ...) __attribute__((noreturn));;
+#else
+__declspec(noreturn) void leSprintfErrorMessage(const char* fmt, ...);
+#endif
 
 #endif
 

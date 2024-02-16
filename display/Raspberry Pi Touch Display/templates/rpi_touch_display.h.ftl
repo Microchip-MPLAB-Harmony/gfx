@@ -148,6 +148,16 @@ typedef struct
 
     /* Set transfer NACK state */
     volatile bool transferNack[DISP_MAX_CLIENTS];
+
+    /* Touch X coordinates */
+    uint32_t touchX[5];
+
+    /* Touch Y coordinates */
+    uint32_t touchY[5];
+    
+    /* Touch point ID */
+    uint32_t touchID[5];
+
 } DISP_DATA;
 
 /*******************************************************************************

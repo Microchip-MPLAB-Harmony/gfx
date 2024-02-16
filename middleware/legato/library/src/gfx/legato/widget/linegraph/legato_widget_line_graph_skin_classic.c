@@ -353,9 +353,12 @@ void _leLineGraphWidget_GetGraphRect(const leLineGraphWidget* graph,
 {
     leRect categoryLabelMaxRect;
     leRect valueLabelMaxRect;
+    leRect globalRect;
 
-    graphRect->x = graph->widget.rect.x;
-    graphRect->y = graph->widget.rect.y;
+    graph->fn->rectToScreen(graph, &globalRect);
+
+    graphRect->x = globalRect.x;
+    graphRect->y = globalRect.y;
     graphRect->width = graph->widget.rect.width;
     graphRect->height = graph->widget.rect.height;
 
@@ -739,8 +742,14 @@ static void drawStackedFills(leLineGraphWidget* graph)
             
             category = leArray_Get(&graph->categories, categoryIndex);
 
-            valuePoint.x = paintState.originPoint.x + 
-                          ((categoryIndex * paintState.graphRect.width) / (graph->categories.size - 1));
+            if ((int32_t)graph->categories.size > 1)
+            {
+                valuePoint.x = paintState.originPoint.x + ((categoryIndex * paintState.graphRect.width) / (graph->categories.size - 1));
+            }
+            else
+            {
+                valuePoint.x = paintState.originPoint.x + (((categoryIndex + 1) * paintState.graphRect.width) / (graph->categories.size + 1));
+            }
 
             topValue = category->stackValue;
             topValue += value;
@@ -1145,7 +1154,7 @@ static void drawUnstackedLines(leLineGraphWidget* graph)
         {
             int32_t value = (int32_t)(size_t)series->data.values[catIdx];
 
-            if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
+            if(graph->categories.size > 1)
             {
                 valuePoint.x = paintState.originPoint.x + ((catIdx * paintState.graphRect.width) / (graph->categories.size - 1));
             }
@@ -1268,7 +1277,7 @@ static void drawStackedLines(leLineGraphWidget* graph)
 
             size_t value = (size_t)series->data.values[catIdx];
 
-            if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
+            if(graph->categories.size > 1)
             {
                 valuePoint.x = paintState.originPoint.x + ((catIdx * paintState.graphRect.width) / (graph->categories.size - 1));
             }
@@ -1287,7 +1296,7 @@ static void drawStackedLines(leLineGraphWidget* graph)
                 {
                     prevCat = graph->categories.values[catIdx - 1];
 
-                    if(graph->fillGraphArea == LE_TRUE && graph->categories.size > 1)
+                    if(graph->categories.size > 1)
                     {
                         start.x = paintState.originPoint.x + ((catIdx - 1) * paintState.graphRect.width) / (graph->categories.size - 1);
                     }
