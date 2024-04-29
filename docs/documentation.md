@@ -1,15 +1,17 @@
 ﻿---
-title: Documentation
-nav_order: 90
+title: User Guides
+nav_order: 3
 ---
 
-# ![Microchip Technology](./images/mhgs.png) MPLAB® Harmony 3 Graphics Documentation
+![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
+![MHGS logo small](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png)
 
+# Microchip Graphics Suite (MGS) Harmony Documentation
 
-Below are resources to assist with software development using MPLAB® Harmony 3 Graphics
+Below are resources to assist with software development using Microchip Graphics Suite (MGS) Harmony
 
-* [Legato API Reference (Online)](https://github.com/mchpgfx/legato.docs/html/index.html) -  Provides Legato API references and development topics.  Click [here](https://github.com/mchpgfx/legato.docs/archive/master.zip) to download an offline supported version.
+[MGS Harmony User Guides](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/) - Provides dynamic solution driven documentation and feedback in a release-independent manner. It contains how-to guides and step-by-step tutorials.
 
-* [Graphics User Guides](https://github.com/mchpgfx/legato.docs/wiki) - Provides dynamic solution driven documentation and feedback in a release-independent manner. It contains how-to guides and step-by-step tutorials.
+[MGS Harmony Graphics Demonstration Documentation via MPLAB® Discover](https://mplab-discover.microchip.com/v2?dsl=Microchip+AND+Graphics+AND+Suite) - Graphics demonstrations featuring a wide variety display technology permuations using Micrcohip microcontroller and microprocessor products.
 
 ***

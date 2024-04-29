@@ -94,6 +94,7 @@ void _leLabelWidget_GetTextRects(const leLabelWidget* lbl,
     boundingRect->y = kerningRect->y;
 
     leRectClip(kerningRect, &bounds, kerningRect);
+	leRectClip(boundingRect, &bounds, boundingRect);
 
 	// move the draw rect to screen space
     leUtils_RectToScreenSpace((leWidget*)lbl, kerningRect);

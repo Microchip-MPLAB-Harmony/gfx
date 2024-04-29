@@ -88,7 +88,7 @@
 #define DRV_${ControllerName}_NCSDeassert(intf) GFX_Disp_Intf_PinControl(intf, \
                                     GFX_DISP_INTF_PIN_CS, \
                                     GFX_DISP_INTF_PIN_SET)
-									
+
 
 <#if BaseDriverType == "SSD1309">
 #define PIXELS_PER_BYTE 8
@@ -96,7 +96,7 @@
 
 static uint8_t framebuffer[LCD_FRAMEBUFFER_SIZE] = {0};
 </#if>
-									
+
 <#if PassiveDriver == false>
 <#if DataWriteSize == "8">
     <#if PixelDataTxSize8Bit == "2 (Little-Endian)">
@@ -128,11 +128,11 @@ typedef enum
     ERROR,
 } DRV_STATE;
 
-typedef struct ${ControllerName}_DRV 
-{   
+typedef struct ${ControllerName}_DRV
+{
     /* Driver state */
     DRV_STATE state;
-        
+
     /* Port-specific private data */
     void *port_priv;
 
@@ -144,20 +144,20 @@ typedef struct ${ControllerName}_DRV
     } blitParms;
 } ${ControllerName}_DRV;
 
-typedef struct 
+typedef struct
 {
     /* Command */
     uint8_t cmd;
-    
+
     /* Number of command parameters */
     uint8_t parmCount;
-    
+
     /* Command parameters, max of 16 */
     uint8_t parms[16];
-    
+
     /* delay */
     unsigned int delayms;
-    
+
 } ${ControllerName}_CMD_PARAM;
 
 ${ControllerName}_DRV drv;
@@ -253,34 +253,34 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr,
     unsigned int i, returnValue;
 
     DRV_${ControllerName}_NCSAssert(intf);
-    
+
     for (i = 0; i < numVals; i++, initVals++)
     {
         returnValue = GFX_Disp_Intf_WriteCommand(intf, initVals->cmd);
         if (0 != returnValue)
             break;
-        
+
         while (GFX_Disp_Intf_Ready(intf) == false);
-        
+
         if (initVals->parms != NULL &&
             initVals->parmCount > 0)
         {
 
 <#if UseDCPinForParms == true>
-            returnValue = GFX_Disp_Intf_WriteData(intf, 
+            returnValue = GFX_Disp_Intf_WriteData(intf,
                                                  (uint8_t *) initVals->parms,
                                                  initVals->parmCount);
 <#else>
-			returnValue = GFX_Disp_Intf_Write(intf, 
+			returnValue = GFX_Disp_Intf_Write(intf,
                                                  (uint8_t *) initVals->parms,
                                                  initVals->parmCount);
 </#if>
             if (0 != returnValue)
                 break;
-        
+
             while (GFX_Disp_Intf_Ready(intf) == false);
         }
-        
+
         if (initVals->delayms > 0)
         {
             DRV_${ControllerName}_DelayMS(initVals->delayms);
@@ -301,7 +301,7 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
 </#if>
     uint16_t* ptr;
     uint8_t parm[4];
-    
+
     switch (drv.state)
     {
         case BLIT_COLUMN_CMD:
@@ -310,13 +310,13 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-            
+
             DRV_${ControllerName}_NCSAssert(intf);
-                    
+
             drv.state = BLIT_COLUMN_DATA;
-            
+
             GFX_Disp_Intf_WriteCommand(intf, 0x${SetXAddressCommand});
-                   
+
             break;
         }
         case BLIT_COLUMN_DATA:
@@ -357,11 +357,11 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-                        
+
             drv.state = BLIT_PAGE_DATA;
-            
+
             GFX_Disp_Intf_WriteCommand(intf, 0x${SetYAddressCommand});
-                   
+
             break;
         }
         case BLIT_PAGE_DATA:
@@ -402,9 +402,9 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-            
+
             drv.state = BLIT_WRITE_DATA;
-            
+
             //Start Memory Write
             GFX_Disp_Intf_WriteCommand(intf, 0x${MemoryWriteCommand});
 
@@ -462,12 +462,12 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
                                         drv.blitParms.buf->size.width);
                 row++;
             }
-           
+
             if (row >= drv.blitParms.buf->size.height)
             {
                 drv.state = BLIT_DONE;
             }
-            
+
             break;
 </#if>
 </#if>
@@ -478,10 +478,10 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-            DRV_${ControllerName}_NCSDeassert(intf); 
+            DRV_${ControllerName}_NCSDeassert(intf);
             gfxPixelBuffer_SetLocked(drv.blitParms.buf, GFX_FALSE);
             drv.state = IDLE;
-            if (drvBlitCallBack != NULL) 
+            if (drvBlitCallBack != NULL)
             {
                 drvBlitCallBack();
             }
@@ -492,7 +492,7 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
         default:
         {
             break;
-        }        
+        }
     }
 <#else>
 <#if BaseDriverType == "SSD1309">
@@ -505,16 +505,16 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
 <#if BlitType == "Driver Asynchronous">
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
-</#if>		
+</#if>
 			DRV_${ControllerName}_NCSAssert(intf);
 			GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
-			
+
 			//Set Column Address
 			cmd[0] = 0x21;
 			cmd[1] = 0;
 			cmd[2] = DISPLAY_WIDTH - 1;
 			GFX_Disp_Intf_Write(intf, cmd, 3);
-	
+
 			drv.state = BLIT_PAGE_CMD;
 			break;
 		}
@@ -531,7 +531,7 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
 			cmd[1] = 0;
 			cmd[2] = (DISPLAY_HEIGHT / 8) - 1;
 			GFX_Disp_Intf_Write(intf, cmd, 3);
-			
+
 			drv.state = BLIT_WRITE_DATA;
 			break;
 		}
@@ -540,8 +540,8 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
 <#if BlitType == "Driver Asynchronous">
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
-</#if>		
-			
+</#if>
+
 			GFX_Disp_Intf_WriteData(intf, framebuffer, DISPLAY_WIDTH * DISPLAY_HEIGHT / 8);
 
 			drv.state = BLIT_DONE;
@@ -553,17 +553,17 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-            DRV_${ControllerName}_NCSDeassert(intf); 		
+            DRV_${ControllerName}_NCSDeassert(intf);
 			drv.state = IDLE;
 			break;
 		}
 		default:
 			break;
 	}
-		
+
 <#elseif StubGenerateBuildErrorDisable != true>
 #error "Blit buffer procedure is not complete. Please complete definition of blit function."
-</#if>	
+</#if>
 </#if>
 }
 
@@ -598,13 +598,13 @@ void DRV_${ControllerName}_Intf_Callback(GFX_Disp_Intf intf, GFX_DISP_INTF_STATU
 void DRV_${ControllerName}_Update(void)
 {
     uint32_t openVal;
-	
+
     if(drv.state == INIT)
     {
 		openVal = GFX_Disp_Intf_Open();
-        
+
         drv.port_priv = (void *)openVal;
-        
+
         if (drv.port_priv == 0)
         {
             drv.state = ERROR;
@@ -660,7 +660,7 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
 
 <#if BaseDriverType == "SSD1309">
     uint8_t page, pixel_mask, pixel_value, lx, ly;
-	
+
 	if (drv.state != IDLE)
         return GFX_FAILURE;
 
@@ -704,7 +704,7 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
     drv.blitParms.y = y;
     drv.blitParms.buf = buf;
     drv.state = BLIT_COLUMN_CMD;
-    
+
     gfxPixelBuffer_SetLocked(buf, GFX_TRUE);
 
 <#if BlitType == "Interface Asynchronous">
@@ -721,7 +721,7 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
     gfxIOCTLArg_Value* val;
     gfxIOCTLArg_DisplaySize* disp;
     gfxIOCTLArg_LayerRect* rect;
-    
+
     switch(request)
     {
         case GFX_IOCTL_FRAME_END:
@@ -731,77 +731,77 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
             DRV_${ControllerName}_Transfer((GFX_Disp_Intf) drv.port_priv);
 </#if>
             return GFX_IOCTL_OK;
-        }	
+        }
         case GFX_IOCTL_GET_COLOR_MODE:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             val->value.v_colormode = PIXEL_BUFFER_COLOR_MODE;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_BUFFER_COUNT:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             val->value.v_uint = 1;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_DISPLAY_SIZE:
         {
-            disp = (gfxIOCTLArg_DisplaySize*)arg;            
-            
+            disp = (gfxIOCTLArg_DisplaySize*)arg;
+
             disp->width = DISPLAY_WIDTH;
             disp->height = DISPLAY_HEIGHT;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_LAYER_COUNT:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             val->value.v_uint = 1;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_ACTIVE_LAYER:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             val->value.v_uint = 0;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_LAYER_RECT:
         {
             rect = (gfxIOCTLArg_LayerRect*)arg;
-            
-            rect->base.id = 0;
+
+            rect->layer.id = 0;
             rect->x = 0;
             rect->y = 0;
             rect->width = DISPLAY_WIDTH;
             rect->height = DISPLAY_HEIGHT;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_VSYNC_COUNT:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             val->value.v_uint = swapCount;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_GET_STATUS:
         {
             val = (gfxIOCTLArg_Value*)arg;
-            
+
             if (drv.state == IDLE)
                 val->value.v_uint = 0;
             else
                 val->value.v_uint = 1;
-            
+
             return GFX_IOCTL_OK;
         }
         case GFX_IOCTL_SET_BLIT_CALLBACK:
@@ -810,13 +810,13 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
             drvBlitCallBack = (gfxBlitCallBack)val->value.v_pointer;
 
             return GFX_IOCTL_OK;
-        }		
+        }
         default:
         {
 		    break;
 		}
     }
-    
+
     return GFX_IOCTL_UNSUPPORTED;
 }
 </#if>

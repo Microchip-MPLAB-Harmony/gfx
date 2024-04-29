@@ -112,7 +112,7 @@ typedef uint32_t               gfxColor;
 #ifdef __cplusplus
     extern "C" {
 #endif
-        
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types and Constants
@@ -219,7 +219,7 @@ static const gfxSize gfxSize_Zero = {0, 0};
     gfxRect
 
   Summary:
-    A rectangle definition.  
+    A rectangle definition.
 */
 /**
  * @brief This struct represents a rectangle.
@@ -245,7 +245,7 @@ static const gfxRect gfxRect_Zero = {0, 0, 0, 0};
     gfxLayerState
 
   Summary:
-    A layer state structure definition.  
+    A layer state structure definition.
 */
 /**
  * @brief This struct represents a layer state.
@@ -290,7 +290,7 @@ typedef enum gfxColorMask
                         GFX_COLOR_MASK_RGB_332   |
                         GFX_COLOR_MASK_RGB_565   |
                         GFX_COLOR_MASK_RGBA_5551 |
-                        GFX_COLOR_MASK_RGB_888   | 
+                        GFX_COLOR_MASK_RGB_888   |
                         GFX_COLOR_MASK_RGBA_8888 |
                         GFX_COLOR_MASK_ARGB_8888
 } gfxColorMask;
@@ -337,7 +337,7 @@ typedef enum gfxColorMode
     gfxBitsPerPixel
 
   Summary:
-    List of available bits-per-pixel sizes.    
+    List of available bits-per-pixel sizes.
 */
 /**
  * @brief This enum represents bits per pixel (BPP).
@@ -387,7 +387,7 @@ typedef struct gfxColorModeInfo
         uint32_t blue;
         uint32_t alpha;
     } mask;
-    
+
     struct
     {
         uint8_t red;
@@ -395,7 +395,7 @@ typedef struct gfxColorModeInfo
         uint8_t blue;
         uint8_t alpha;
     } shift;
-    
+
 } gfxColorModeInfo;
 
 // *****************************************************************************
@@ -521,10 +521,10 @@ enum gfxBufferFlags
 typedef struct gfxPixelBuffer
 {
     gfxColorMode mode;
-    
+
     gfxSize size;
     uint32_t pixel_count;
-    
+
     uint32_t buffer_length;
     gfxBuffer pixels;
     gfxOrientation orientation;
@@ -550,17 +550,17 @@ typedef void (*gfxIRQCallBack) (uintptr_t layerID);
     Used for getting the red color channel of a given color value.
 
   Description:
-    
+
 
   Parameters:
     gfxColor - the source color value
     gfxColorMode - the source color mode
-    
+
   Returns:
     uint32_t - the red color channel
-    
+
   Remarks:
-    
+
 */
 /**
  * @brief Get red channel.
@@ -585,17 +585,17 @@ uint32_t gfxColorChannelRed(gfxColor clr, gfxColorMode mode);
     Used for getting the green color channel of a given color value.
 
   Description:
-    
+
 
   Parameters:
     gfxColor - the source color value
     gfxColorMode - the source color mode
-    
+
   Returns:
     uint32_t - the green color channel
-    
+
   Remarks:
-    
+
 */
 /**
  * @brief Get green channel.
@@ -620,17 +620,17 @@ uint32_t gfxColorChannelGreen(gfxColor clr, gfxColorMode mode);
     Used for getting the blue color channel of a given color value.
 
   Description:
-    
+
 
   Parameters:
     gfxColor - the source color value
     gfxColorMode - the source color mode
-    
+
   Returns:
     uint32_t - the blue color channel
-    
+
   Remarks:
-    
+
 */
 /**
  * @brief Get blue channel.
@@ -655,17 +655,17 @@ uint32_t gfxColorChannelBlue(gfxColor clr, gfxColorMode mode);
     Used for getting the alpha color channel of a given color value.
 
   Description:
-    
+
 
   Parameters:
     gfxColor - the source color value
     gfxColorMode - the source color mode
-    
+
   Returns:
     uint32_t - the alpha color channel
-    
+
   Remarks:
-    
+
 */
 /**
  * @brief Get alpha channel.
@@ -680,7 +680,7 @@ uint32_t gfxColorChannelBlue(gfxColor clr, gfxColorMode mode);
  * @param mode is an rgb colormode.
  * @return Returns the alpha color component
  */
-uint32_t gfxColorChannelAlpha(gfxColor clr, gfxColorMode mode); 
+uint32_t gfxColorChannelAlpha(gfxColor clr, gfxColorMode mode);
 
 // *****************************************************************************
 /* Function:
@@ -696,16 +696,16 @@ uint32_t gfxColorChannelAlpha(gfxColor clr, gfxColorMode mode);
     gfxColorMode - the input color mode
     gfxColorMode - the output color mode
     gfxColor - the source color
-    
+
   Returns:
     gfxColor - the result color
-    
+
   Remarks:
-    
+
 */
 gfxColor gfxColorConvert(gfxColorMode mode_in,
                          gfxColorMode mode_out,
-                         gfxColor color);                             
+                         gfxColor color);
 
 // *****************************************************************************
 /* Function:
@@ -724,12 +724,12 @@ gfxColor gfxColorConvert(gfxColorMode mode_in,
     const gfxColorMode - the color mode of the buffer
     const void* - the data addres of the buffer (may be NULL)
     gfxPixelBuffer* - pointer of the pixel buffer buffer to initialize
-    
+
   Returns:
     gfxResult
-    
+
   Remarks:
-    
+
 */
 /**
  * @brief Create pixel buffer.
@@ -768,7 +768,7 @@ gfxResult gfxPixelBufferCreate(const int32_t width,
   Parameters:
     const gfxPixelBuffer* - the source buffer
     const gfxPoint* - the point for which the offset should be calculated
-    
+
   Returns:
     gfxBuffer - the pointer to the offset point in the source buffer
 */
@@ -803,7 +803,7 @@ gfxBuffer gfxPixelBufferOffsetGet(const gfxPixelBuffer* const buffer,
   Parameters:
     const gfxPixelBuffer* - the source buffer
     const gfxPoint* - the point for which the offset should be calculated
-    
+
   Returns:
     gfxBuffer - the pointer to the offset point in the source buffer
 */
@@ -823,7 +823,7 @@ gfxBuffer gfxPixelBufferOffsetGet(const gfxPixelBuffer* const buffer,
  */
 gfxBuffer gfxPixelBufferOffsetGet_Unsafe(const gfxPixelBuffer* const buffer,
                                          uint32_t x,
-                                         uint32_t y);                                                  
+                                         uint32_t y);
 
 // *****************************************************************************
 /* Function:
@@ -837,7 +837,7 @@ gfxBuffer gfxPixelBufferOffsetGet_Unsafe(const gfxPixelBuffer* const buffer,
   Parameters:
     const gfxPixelBuffer* - the source buffer
     const gfxPoint* - the point for which the offset should be calculated
-    
+
   Returns:
     gfxColor - the value of the pixel at the point in the source buffer
 */
@@ -871,7 +871,7 @@ gfxColor gfxPixelBufferGet(const gfxPixelBuffer* const buffer,
   Parameters:
     const gfxPixelBuffer* - the source buffer
     const gfxPoint* - the point for which the offset should be calculated
-    
+
   Returns:
     gfxColor - the value of the pixel at the point in the source buffer
 */
@@ -893,7 +893,7 @@ gfxColor gfxPixelBufferGet(const gfxPixelBuffer* const buffer,
 gfxColor gfxPixelBufferGet_Unsafe(const gfxPixelBuffer* const buffer,
                                   uint32_t x,
                                   uint32_t y);
-                                               
+
 // *****************************************************************************
 /* Function:
     gfxColor gfxPixelBufferGetIndex(const gfxPixelBuffer* const buffer,
@@ -907,7 +907,7 @@ gfxColor gfxPixelBufferGet_Unsafe(const gfxPixelBuffer* const buffer,
   Parameters:
     const gfxPixelBuffer* const - the input buffer
     const int32_t - the index to retrieve
-    
+
   Returns:
     gfxColor - the resultant value that was retrieved
 */
@@ -963,7 +963,7 @@ gfxColor gfxPixelBufferGetIndex(const gfxPixelBuffer* const buffer,
  * @return Returns color.
  */
 gfxColor gfxPixelBufferGetIndex_Unsafe(const gfxPixelBuffer* const buffer,
-                                       const uint32_t idx); 
+                                       const uint32_t idx);
 
 // *****************************************************************************
 /* Function:
@@ -1033,19 +1033,19 @@ typedef enum gfxDriverIOCTLRequest
     GFX_IOCTL_GET_DISPLAY_SIZE, // returns the driver buffer count, arg = gfxIOCTLArg_DisplaySize
     GFX_IOCTL_GET_STATUS, // returns the driver status. 0 = idle/ready, arg = gfxIOCTLArg_Value
     GFX_IOCTL_ENABLE_GPU, // tells the driver to utilize a GPU if possible, arg = gfxIOCTLArg_Value
-    
+
     GFX_IOCTL_LAYER_SWAP, // indicates that the driver should swap the current layer, arg = NULL
     GFX_IOCTL_FRAME_START, // indicates that the driver should begin a new frame, arg = gfxIOCTLArg_Value
     GFX_IOCTL_FRAME_END, // indicates that the driver should end the current frame, arg = NULL
     GFX_IOCTL_GET_VSYNC_COUNT, // gets the current driver vsync count, arg = gfxIOCTLArg_Value
     GFX_IOCTL_GET_FRAMEBUFFER, // gets a pointer to the internal driver frame buffer, arg = gfxIOCTLArg_Value
     GFX_IOCTL_SET_PALETTE, // sets the current driver palette, arg = gfxIOCTLArg_Palette
-    GFX_IOCTL_SET_VBLANK_SYNC, // sets the driver to sync update w/ vblank or not, arg = gfxIOCTLArg_Value	
-    
+    GFX_IOCTL_SET_VBLANK_SYNC, // sets the driver to sync update w/ vblank or not, arg = gfxIOCTLArg_Value
+
     GFX_IOCTL_GET_LAYER_COUNT, // gets the driver layer count, arg = gfxIOCTLArg_Value
     GFX_IOCTL_GET_ACTIVE_LAYER, // gets the active driver layer, arg = gfxIOCTLArg_Value
     GFX_IOCTL_SET_ACTIVE_LAYER, // sets the active driver layer, arg = gfxIOCTLArg_Value
-	
+
     GFX_IOCTL_SET_BRIGHTNESS, // sets the screen backlight brightness, arg = gfxIOCTLArg_Value
 
     GFX_IOCTL_SET_LAYER_LOCK, // locks a layer, arg = gfxIOCTLArg_LayerValue
@@ -1132,7 +1132,7 @@ typedef struct
  */
 typedef struct
 {
-    gfxIOCTLArg_LayerArg base;
+    gfxIOCTLArg_LayerArg layer;
 
     gfxIRQCallBack callback;
 } gfxIOCTLArg_LayerIRQCallback;
@@ -1143,8 +1143,8 @@ typedef struct
  */
 typedef struct
 {
-    gfxIOCTLArg_LayerArg base;
-    
+    gfxIOCTLArg_LayerArg layer;
+
     int32_t x;
     int32_t y;
 } gfxIOCTLArg_LayerPosition;
@@ -1155,8 +1155,8 @@ typedef struct
  */
 typedef struct
 {
-    gfxIOCTLArg_LayerArg base;
-    
+    gfxIOCTLArg_LayerArg layer;
+
     uint32_t width;
     uint32_t height;
 } gfxIOCTLArg_LayerSize;
@@ -1167,8 +1167,8 @@ typedef struct
  */
 typedef struct
 {
-    gfxIOCTLArg_LayerArg base;
-    
+    gfxIOCTLArg_LayerArg layer;
+
     int32_t x;
     int32_t y;
     uint32_t width;
@@ -1181,8 +1181,8 @@ typedef struct
  */
 typedef struct
 {
-    gfxIOCTLArg_LayerArg base;
-    
+    gfxIOCTLArg_LayerArg layer;
+
     union
     {
         uint32_t v_uint;
@@ -1275,7 +1275,7 @@ static const gfxGraphicsProcessor gfxGPUInterface =
 #ifdef __cplusplus
     }
 #endif
-     
+
 #endif // GFX_DRIVER_H
 
 /*******************************************************************************

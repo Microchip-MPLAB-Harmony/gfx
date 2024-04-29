@@ -171,7 +171,7 @@ int16_t line = 0;
 uint32_t offset = 0;
 uint16_t pixels = 0;
 uint32_t hSyncs = 0;
-    
+
 uint32_t vsyncPeriod = 0;
 uint32_t vsyncPulseDown = 0;
 uint32_t vsyncPulseUp = 0;
@@ -192,16 +192,16 @@ gfxResult DRV_LCC_Initialize(void)
                         FRAMEBUFFER_COLOR_MODE,
                         frameBuffer,
                         &pixelBuffer);
-    
-    // driver specific initialization tasks    
+
+    // driver specific initialization tasks
     VER_BLANK = DISP_VER_PULSE_WIDTH +
                 DISP_VER_BACK_PORCH +
                 DISP_VER_FRONT_PORCH - 1;
-    
+
     HBackPorch = DISP_HOR_PULSE_WIDTH +
                  DISP_HOR_BACK_PORCH;
-    
-    vsyncPeriod = DISP_VER_FRONT_PORCH + DISP_VER_RESOLUTION + DISP_VER_BACK_PORCH;  
+
+    vsyncPeriod = DISP_VER_FRONT_PORCH + DISP_VER_RESOLUTION + DISP_VER_BACK_PORCH;
 
     GFX_DISP_INTF_PIN_RESET_Set();
 
@@ -218,9 +218,9 @@ void DRV_LCC_Update(void)
     {
         if(DRV_GFX_LCC_Start() != 0)
             return;
-        
+
         memset(frameBuffer, 0x55, DISPLAY_WIDTH * DISPLAY_HEIGHT * FRAMEBUFFER_PIXEL_BYTES);
-        
+
         state = RUN;
     }
 }
@@ -236,14 +236,14 @@ gfxResult DRV_LCC_BlitBuffer(int32_t x,
         void* srcPtr;
         void* destPtr;
         uint32_t row, rowSize;
-    
+
         rowSize = buf->size.width * gfxColorInfoTable[buf->mode].size;
-        
+
         for(row = 0; row < buf->size.height; row++)
         {
             srcPtr = gfxPixelBufferOffsetGet(buf, 0, row);
             destPtr = gfxPixelBufferOffsetGet(&pixelBuffer, x, y + row);
-            
+
             memcpy(destPtr, srcPtr, rowSize);
         }
 
@@ -258,15 +258,15 @@ gfxDriverIOCTLResponse DRV_LCC_SetPalette(gfxIOCTLArg_Palette* pal)
 {
     uint32_t colorIndex = 0;
     gfxPixelBuffer buffer;
-    
+
     if (pal->palette == NULL)
         return GFX_IOCTL_ERROR_UNKNOWN;
-    
+
     if (pal->colorCount > GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT)
         pal->colorCount = GFX_LCC_GLOBAL_PALETTE_COLOR_COUNT;
 
     gfxPixelBufferCreate(pal->colorCount, 1, pal->mode, pal->palette, &buffer);
-    
+
     for( colorIndex = 0;
          colorIndex < pal->colorCount;
          colorIndex++ )
@@ -275,7 +275,7 @@ gfxDriverIOCTLResponse DRV_LCC_SetPalette(gfxIOCTLArg_Palette* pal)
                                           GFX_COLOR_MODE_RGB_565,
                                           gfxPixelBufferGetIndex(&buffer, colorIndex));
     }
-    
+
     return GFX_IOCTL_OK;
 }
 </#if>
@@ -286,76 +286,76 @@ gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest request,
 	gfxIOCTLArg_Value* val;
 	gfxIOCTLArg_DisplaySize* disp;
 	gfxIOCTLArg_LayerRect* rect;
-	
+
 	switch(request)
 	{
 		case GFX_IOCTL_GET_COLOR_MODE:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_colormode = FRAMEBUFFER_COLOR_MODE;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_BUFFER_COUNT:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_uint = 1;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_DISPLAY_SIZE:
 		{
-			disp = (gfxIOCTLArg_DisplaySize*)arg;			
-			
+			disp = (gfxIOCTLArg_DisplaySize*)arg;
+
 			disp->width = DISP_HOR_RESOLUTION;
 			disp->height = DISP_VER_RESOLUTION;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_LAYER_COUNT:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_uint = 1;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_ACTIVE_LAYER:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_uint = 0;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_LAYER_RECT:
 		{
 			rect = (gfxIOCTLArg_LayerRect*)arg;
-			
-			rect->base.id = 0;
+
+			rect->layer.id = 0;
 			rect->x = 0;
 			rect->y = 0;
 			rect->width = DISPLAY_WIDTH;
 			rect->height = DISPLAY_HEIGHT;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_VSYNC_COUNT:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_uint = vsyncCount;
-			
+
 			return GFX_IOCTL_OK;
 		}
 		case GFX_IOCTL_GET_FRAMEBUFFER:
 		{
 			val = (gfxIOCTLArg_Value*)arg;
-			
+
 			val->value.v_pbuffer = &pixelBuffer;
-			
+
 			return GFX_IOCTL_OK;
 		}
 <#if (PaletteMode??) && (PaletteMode == true)>
@@ -367,7 +367,7 @@ gfxDriverIOCTLResponse DRV_LCC_IOCTL(gfxDriverIOCTLRequest request,
 		default:
 		{ }
 	}
-	
+
 	return GFX_IOCTL_UNSUPPORTED;
 }
 
@@ -392,7 +392,7 @@ static gfxResult lccBacklightBrightnessSet(uint32_t brightness)
 static void lccDMAStartTransfer(const void *srcAddr, size_t srcSize,
                                        const void *destAddr)
 {
-    DMAC_ChannelTransfer(DRV_GFX_LCC_DMA_CHANNEL_INDEX, 
+    DMAC_ChannelTransfer(DRV_GFX_LCC_DMA_CHANNEL_INDEX,
                          srcAddr,
                          (void*) destAddr,
 						 srcSize);
@@ -405,14 +405,14 @@ static int DRV_GFX_LCC_Start(void)
 								 0);
 
     TC${DMATimerTriggerIndex}_CompareStart();
-	
+
 <#if (PaletteMode??) && (PaletteMode == true)>
-    lccDMAStartTransfer(lineBuffer, 
-                        LINEBUFFER_PIXEL_BYTES, 
+    lccDMAStartTransfer(lineBuffer,
+                        LINEBUFFER_PIXEL_BYTES,
                         (const void*) DATABUS_PTR);
-<#else>   
-    lccDMAStartTransfer(frameBuffer, 
-                        FRAMEBUFFER_PIXEL_BYTES, 
+<#else>
+    lccDMAStartTransfer(frameBuffer,
+                        FRAMEBUFFER_PIXEL_BYTES,
                         (const void*) DATABUS_PTR);
 </#if>
 
@@ -435,7 +435,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
         HSYNC_PULSE,
         HSYNC_BACK_PORCH,
         HSYNC_DATA_ENABLE,
-        HSYNC_DATA_ENABLE_OVERFLOW        
+        HSYNC_DATA_ENABLE_OVERFLOW
     } HSYNC_STATES;
 
     typedef enum
@@ -443,7 +443,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
         VSYNC_FRONT_PORCH,
         VSYNC_PULSE,
         VSYNC_BACK_PORCH,
-        VSYNC_BLANK        
+        VSYNC_BLANK
     } VSYNC_STATES;
 
     static HSYNC_STATES hsyncState = HSYNC_FRONT_PORCH;
@@ -466,7 +466,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
 
                 line = 0;
             }
-            
+
             break;
         }
         case VSYNC_PULSE:
@@ -481,16 +481,16 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
                 vsyncEnd = hSyncs + DISP_VER_BACK_PORCH;
                 vsyncState = VSYNC_BACK_PORCH;
 
-                vsyncCount++;                
+                vsyncCount++;
             }
-            
+
             break;
         }
         case VSYNC_BACK_PORCH:
         {
             if (hSyncs >= vsyncEnd)
                 vsyncState = VSYNC_BLANK;
-            
+
             break;
         }
         case VSYNC_BLANK:
@@ -534,10 +534,10 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
                 vsyncState = VSYNC_FRONT_PORCH;
             }
 
-            hSyncs++; 
+            hSyncs++;
 
             pixels = DISP_HOR_PULSE_WIDTH;
-            hsyncState = HSYNC_BACK_PORCH;  
+            hsyncState = HSYNC_BACK_PORCH;
 
             break;
         }
@@ -549,7 +549,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
             GFX_DISP_INTF_PIN_HSYNC_Set();
 </#if>
 
-            hsyncState = HSYNC_DATA_ENABLE; 
+            hsyncState = HSYNC_DATA_ENABLE;
 
             if (DISP_HOR_BACK_PORCH > 0)
             {
@@ -559,10 +559,10 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
         }
         case HSYNC_DATA_ENABLE:
         {
-		
+
             pixels = DISP_HOR_RESOLUTION;
             hsyncState = HSYNC_FRONT_PORCH;
-			
+
             if (vsyncState == VSYNC_BLANK)
             {
 <#if DisplayDataEnable == true>
@@ -578,7 +578,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
 				//Double line buffers, start transfer then build the next line buffer
                 lccDMAStartTransfer(lineBuffer[line % 2],
                         (pixels * LINEBUFFER_PIXEL_BYTES), //2 bytes per pixel
-                        (uint32_t*) DATABUS_PTR);                
+                        (uint32_t*) DATABUS_PTR);
 
                 drawPoint.x = 0;
                 drawPoint.y = line++;
@@ -589,7 +589,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
                 {
                     lineBuffer[line % 2][lutPoint.x] = lut[destPtr[lutPoint.x]];
                 }
-				
+
 				return;
 <#else>
                 drawPoint.x = 0;
@@ -601,7 +601,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
                 {
                     lineBuffer[0][lutPoint.x] = lut[destPtr[lutPoint.x]];
                 }
-</#if>				
+</#if>
 <#else>
                 drawPoint.x = 0;
                 drawPoint.y = line++;
@@ -615,7 +615,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
         case HSYNC_DATA_ENABLE_OVERFLOW:
         {
             hsyncState = HSYNC_FRONT_PORCH;
-            
+
             break;
         }
     }
@@ -629,7 +629,7 @@ static void DRV_GFX_LCC_DisplayRefresh(void)
     lccDMAStartTransfer(lineBuffer[0],
                         (pixels * LINEBUFFER_PIXEL_BYTES),
                         (uint32_t*) DATABUS_PTR);
-</#if>						
+</#if>
 <#else>
     lccDMAStartTransfer(buffer_to_tx,
                         (pixels * FRAMEBUFFER_PIXEL_BYTES),

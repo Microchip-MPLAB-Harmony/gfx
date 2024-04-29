@@ -510,15 +510,15 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
         {
             rect = (gfxIOCTLArg_LayerRect *)arg;
 
-            if (rect->base.id >= XLCDC_TOT_LAYERS)
+            if (rect->layer.id >= XLCDC_TOT_LAYERS)
             {
                 return GFX_IOCTL_ERROR_UNKNOWN;
             }
 
-            rect->x = drvLayer[rect->base.id].startx;
-            rect->y = drvLayer[rect->base.id].starty;
-            rect->width = drvLayer[rect->base.id].sizex;
-            rect->height = drvLayer[rect->base.id].sizey;
+            rect->x = drvLayer[rect->layer.id].startx;
+            rect->y = drvLayer[rect->layer.id].starty;
+            rect->width = drvLayer[rect->layer.id].sizex;
+            rect->height = drvLayer[rect->layer.id].sizey;
 
             return GFX_IOCTL_OK;
         }

@@ -159,7 +159,21 @@ def instantiateComponent(comp):
 	LayerConfigurationMenu = comp.createMenuSymbol("LayerConfigurationMenu", None)
 	LayerConfigurationMenu.setLabel("Layer Configuration")
 	
-	EnableLayersMenu = comp.createMenuSymbol("EnableLayersMenu", LayerConfigurationMenu)
+	TotalNumLayers = comp.createIntegerSymbol("TotalNumLayers", LayerConfigurationMenu)
+	TotalNumLayers.setLabel("Number of Layers Enabled")
+	TotalNumLayers.setDescription("Number of layers enabled")
+	TotalNumLayers.setMin(0)
+	TotalNumLayers.setReadOnly(True)
+	TotalNumLayers.setVisible(True)
+	
+	AdvancedLayerSettings = comp.createBooleanSymbol("AdvancedLayerSettings", LayerConfigurationMenu)
+	AdvancedLayerSettings.setLabel("Enable Advanced Layer Configuration")
+	AdvancedLayerSettings.setDescription("Enable Advanced Layer Configuration")
+	AdvancedLayerSettings.setDefaultValue(False)
+	AdvancedLayerSettings.setVisible(True)
+	AdvancedLayerSettings.setDependencies(OnAdvancedLayerEnabled, ["AdvancedLayerSettings"])
+	
+	EnableLayersMenu = comp.createMenuSymbol("EnableLayersMenu", AdvancedLayerSettings)
 	EnableLayersMenu.setLabel("Enable Layers")
 	
 	Layer0Enable = comp.createBooleanSymbol("Layer0Enable", EnableLayersMenu)
@@ -168,57 +182,177 @@ def instantiateComponent(comp):
 	Layer0Enable.setDefaultValue(True)
 	Layer0Enable.setDependencies(OnLayersEnabled, ["Layer0Enable"])
 	
+	Layer0Width = comp.createIntegerSymbol("Layer0Width", Layer0Enable)
+	Layer0Width.setLabel("Layer 0 Width")
+	Layer0Width.setDescription("Width of Layer 0 in pixels")
+	Layer0Width.setDefaultValue(480)
+	Layer0Width.setMin(0)
+	Layer0Width.setVisible(False)
+
+	Layer0Height = comp.createIntegerSymbol("Layer0Height", Layer0Enable)
+	Layer0Height.setLabel("Layer 0 Height")
+	Layer0Height.setDescription("Height of Layer 0 in pixels")
+	Layer0Height.setDefaultValue(272)
+	Layer0Height.setMin(0)
+	Layer0Height.setVisible(False)
+
+	Layer0StartX = comp.createIntegerSymbol("Layer0StartX", Layer0Enable)
+	Layer0StartX.setLabel("Layer 0 Start X")
+	Layer0StartX.setDescription("Upper Left X Coordinate of Layer 0 (Relative to full display resolution)")
+	Layer0StartX.setDefaultValue(480)
+	Layer0StartX.setMin(0)
+	Layer0StartX.setVisible(False)
+
+	Layer0StartY = comp.createIntegerSymbol("Layer0StartY", Layer0Enable)
+	Layer0StartY.setLabel("Layer 0 Start Y")
+	Layer0StartY.setDescription("Upper Left Y Coordinate of Layer 0 (Relative to full display resolution)")
+	Layer0StartY.setDefaultValue(272)
+	Layer0StartY.setMin(0)
+	Layer0StartY.setVisible(False)
+
+	Layer0ColorMode = comp.createKeyValueSetSymbol("Layer0ColorMode", Layer0Enable)
+	Layer0ColorMode.setLabel("Layer 0 Frame Buffer Color Mode")
+	Layer0ColorMode.setOutputMode("Value")
+	Layer0ColorMode.setDescription("Layer 0 Frame Buffer Color Mode")
+	Layer0ColorMode.addKey("LUT_8", "GLCD_LAYER_COLOR_MODE_LUT8", "LUT Palette 8bpp")
+	Layer0ColorMode.addKey("RGB_565", "GLCD_LAYER_COLOR_MODE_RGB565", "RGB565 16bpp")
+	Layer0ColorMode.addKey("RGBA_8888", "GLCD_LAYER_COLOR_MODE_RGBA8888", "RGBA8888 32bpp")
+	Layer0ColorMode.addKey("YUYV", "GLCD_LAYER_COLOR_MODE_YUYV", "YCbCr")
+	Layer0ColorMode.setDefaultValue(2)
+	Layer0ColorMode.setVisible(False)
+
+	Layer0Buffer0 = comp.createStringSymbol("Layer0Buffer0", Layer0Enable)
+	Layer0Buffer0.setLabel("Layer 0 Frame Buffer 0 Address")
+	Layer0Buffer0.setDefaultValue("0xA8000000")
+	Layer0Buffer0.setVisible(False)
+
+	Layer0Buffer1 = comp.createStringSymbol("Layer0Buffer1", Layer0Enable)
+	Layer0Buffer1.setLabel("Layer 0 Frame Buffer 1 Address")
+	Layer0Buffer1.setDefaultValue("0xA8465000")
+	Layer0Buffer1.setVisible(False)
+
 	Layer1Enable = comp.createBooleanSymbol("Layer1Enable", EnableLayersMenu)
 	Layer1Enable.setLabel("Layer 1")
 	Layer1Enable.setDescription("Enables Layer 1")
 	Layer1Enable.setDefaultValue(True)
 	Layer1Enable.setDependencies(OnLayersEnabled, ["Layer1Enable"])
-	
+
+	Layer1Width = comp.createIntegerSymbol("Layer1Width", Layer1Enable)
+	Layer1Width.setLabel("Layer 1 Width")
+	Layer1Width.setDescription("Width of Layer 1 in pixels")
+	Layer1Width.setDefaultValue(480)
+	Layer1Width.setMin(0)
+	Layer1Width.setVisible(False)
+
+	Layer1Height = comp.createIntegerSymbol("Layer1Height", Layer1Enable)
+	Layer1Height.setLabel("Layer 1 Height")
+	Layer1Height.setDescription("Height of Layer 1 in pixels")
+	Layer1Height.setDefaultValue(272)
+	Layer1Height.setMin(0)
+	Layer1Height.setVisible(False)
+
+	Layer1StartX = comp.createIntegerSymbol("Layer1StartX", Layer1Enable)
+	Layer1StartX.setLabel("Layer 1 Start X")
+	Layer1StartX.setDescription("Upper Left X Coordinate of Layer 1 (Relative to full display resolution)")
+	Layer1StartX.setDefaultValue(480)
+	Layer1StartX.setMin(0)
+	Layer1StartX.setVisible(False)
+
+	Layer1StartY = comp.createIntegerSymbol("Layer1StartY", Layer1Enable)
+	Layer1StartY.setLabel("Layer 1 Start Y")
+	Layer1StartY.setDescription("Upper Left Y Coordinate of Layer 1 (Relative to full display resolution)")
+	Layer1StartY.setDefaultValue(272)
+	Layer1StartY.setMin(0)
+	Layer1StartY.setVisible(False)
+
+	Layer1ColorMode = comp.createKeyValueSetSymbol("Layer1ColorMode", Layer1Enable)
+	Layer1ColorMode.setLabel("Layer 1 Frame Buffer Color Mode")
+	Layer1ColorMode.setOutputMode("Value")
+	Layer1ColorMode.setDescription("Layer 1 Frame Buffer Color Mode")
+	Layer1ColorMode.addKey("LUT_8", "GLCD_LAYER_COLOR_MODE_LUT8", "LUT Palette 8bpp")
+	Layer1ColorMode.addKey("RGB_565", "GLCD_LAYER_COLOR_MODE_RGB565", "RGB565 16bpp")
+	Layer1ColorMode.addKey("RGBA_8888", "GLCD_LAYER_COLOR_MODE_RGBA8888", "RGBA8888 32bpp")
+	Layer1ColorMode.addKey("YUYV", "GLCD_LAYER_COLOR_MODE_YUYV", "YCbCr")
+	Layer1ColorMode.setDefaultValue(2)
+	Layer1ColorMode.setVisible(False)
+
+	Layer1Buffer0 = comp.createStringSymbol("Layer1Buffer0", Layer1Enable)
+	Layer1Buffer0.setLabel("Layer 1 Frame Buffer 0 Address")
+	Layer1Buffer0.setDefaultValue("0xA8177000")
+	Layer1Buffer0.setVisible(False)
+
+	Layer1Buffer1 = comp.createStringSymbol("Layer1Buffer1", Layer1Enable)
+	Layer1Buffer1.setLabel("Layer 1 Frame Buffer 1 Address")
+	Layer1Buffer1.setDefaultValue("0xA85DC000")
+	Layer1Buffer1.setVisible(False)
+
 	Layer2Enable = comp.createBooleanSymbol("Layer2Enable", EnableLayersMenu)
 	Layer2Enable.setLabel("Layer 2")
 	Layer2Enable.setDescription("Enables Layer 2")
 	Layer2Enable.setDefaultValue(True)
 	Layer2Enable.setDependencies(OnLayersEnabled, ["Layer2Enable"])
 
-	Layer0Buffer0 = comp.createStringSymbol("Layer0Buffer0", None)
-	Layer0Buffer0.setDefaultValue("0xA8000000")
-	Layer0Buffer0.setVisible(False)
-	Layer0Buffer1 = comp.createStringSymbol("Layer0Buffer1", None)
-	Layer0Buffer1.setDefaultValue("0xA8465000")
-	Layer0Buffer1.setVisible(False)
+	Layer2Width = comp.createIntegerSymbol("Layer2Width", Layer2Enable)
+	Layer2Width.setLabel("Layer 2 Width")
+	Layer2Width.setDescription("Width of Layer 2 in pixels")
+	Layer2Width.setDefaultValue(480)
+	Layer2Width.setMin(0)
+	Layer2Width.setVisible(False)
 
-	Layer1Buffer0 = comp.createStringSymbol("Layer1Buffer0", None)
-	Layer1Buffer0.setDefaultValue("0xA8177000")
-	Layer1Buffer0.setVisible(False)
-	Layer1Buffer1 = comp.createStringSymbol("Layer1Buffer1", None)
-	Layer1Buffer1.setDefaultValue("0xA85DC000")
-	Layer1Buffer1.setVisible(False)
+	Layer2Height = comp.createIntegerSymbol("Layer2Height", Layer2Enable)
+	Layer2Height.setLabel("Layer 2 Height")
+	Layer2Height.setDescription("Height of Layer 2 in pixels")
+	Layer2Height.setDefaultValue(272)
+	Layer2Height.setMin(0)
+	Layer2Height.setVisible(False)
 
-	Layer2Buffer0 = comp.createStringSymbol("Layer2Buffer0", None)
+	Layer2StartX = comp.createIntegerSymbol("Layer2StartX", Layer2Enable)
+	Layer2StartX.setLabel("Layer 2 Start X")
+	Layer2StartX.setDescription("Upper Left X Coordinate of Layer 2 (Relative to full display resolution)")
+	Layer2StartX.setDefaultValue(480)
+	Layer2StartX.setMin(0)
+	Layer2StartX.setVisible(False)
+
+	Layer2StartY = comp.createIntegerSymbol("Layer2StartY", Layer2Enable)
+	Layer2StartY.setLabel("Layer 2 Start Y")
+	Layer2StartY.setDescription("Upper Left Y Coordinate of Layer 2 (Relative to full display resolution)")
+	Layer2StartY.setDefaultValue(272)
+	Layer2StartY.setMin(0)
+	Layer2StartY.setVisible(False)
+
+	Layer2ColorMode = comp.createKeyValueSetSymbol("Layer2ColorMode", Layer2Enable)
+	Layer2ColorMode.setLabel("Layer 2 Frame Buffer Color Mode")
+	Layer2ColorMode.setOutputMode("Value")
+	Layer2ColorMode.setDescription("Layer 2 Frame Buffer Color Mode")
+	Layer2ColorMode.addKey("LUT_8", "GLCD_LAYER_COLOR_MODE_LUT8", "LUT Palette 8bpp")
+	Layer2ColorMode.addKey("RGB_565", "GLCD_LAYER_COLOR_MODE_RGB565", "RGB565 16bpp")
+	Layer2ColorMode.addKey("RGBA_8888", "GLCD_LAYER_COLOR_MODE_RGBA8888", "RGBA8888 32bpp")
+	Layer2ColorMode.addKey("YUYV", "GLCD_LAYER_COLOR_MODE_YUYV", "YCbCr")
+	Layer2ColorMode.setDefaultValue(2)
+	Layer2ColorMode.setVisible(False)
+
+	Layer2Buffer0 = comp.createStringSymbol("Layer2Buffer0", Layer2Enable)
+	Layer2Buffer0.setLabel("Layer 2 Frame Buffer 0 Address")
 	Layer2Buffer0.setDefaultValue("0xA82EE000")
 	Layer2Buffer0.setVisible(False)
-	Layer2Buffer1 = comp.createStringSymbol("Layer2Buffer1", None)
+
+	Layer2Buffer1 = comp.createStringSymbol("Layer2Buffer1", Layer2Enable)
+	Layer2Buffer1.setLabel("Layer 2 Frame Buffer 1 Address")
 	Layer2Buffer1.setDefaultValue("0xA8753000")
 	Layer2Buffer1.setVisible(False)
 
-	#Shadow symbol counter for number of layers used - not user modifiable (hidden)
-	TotalNumLayers = comp.createIntegerSymbol("TotalNumLayers", LayerConfigurationMenu)
-	TotalNumLayers.setLabel("Number of Layers")
-	TotalNumLayers.setDescription("Number of layers enabled")
-	TotalNumLayers.setVisible(False)
-	
 	### Display Timing Settings
 	DisplaySettingsMenu = comp.createMenuSymbol("DisplaySettingsMenu", None)
 	DisplaySettingsMenu.setLabel("Display Settings")
 
 	DisplayWidth = comp.createIntegerSymbol("DisplayWidth", DisplaySettingsMenu)
-	DisplayWidth.setLabel("Width")
+	DisplayWidth.setLabel("Display Width")
 	DisplayWidth.setDescription("The width of the frame buffer in pixels.")
 	DisplayWidth.setDefaultValue(480)
 	DisplayWidth.setMin(1)
 
 	DisplayHeight = comp.createIntegerSymbol("DisplayHeight", DisplaySettingsMenu)
-	DisplayHeight.setLabel("Height")
+	DisplayHeight.setLabel("Display Height")
 	DisplayHeight.setDescription("The height of the frame buffer in pixels.")
 	DisplayHeight.setDefaultValue(272)
 	DisplayHeight.setMin(1)
@@ -326,9 +460,10 @@ def instantiateComponent(comp):
 	FrameBufferColorMode.setLabel("Frame Buffer Color Mode")
 	FrameBufferColorMode.setOutputMode("Value")
 	FrameBufferColorMode.setDescription("FrameBuffer Color Mode")
-	FrameBufferColorMode.addKey("GS_8", "GS_8", "LUT Palette 8bpp")
+	FrameBufferColorMode.addKey("LUT_8", "GS_8", "LUT Palette 8bpp")
 	FrameBufferColorMode.addKey("RGB_565", "RGB_565", "RGB565 16bpp")
 	FrameBufferColorMode.addKey("RGBA_8888", "RGBA_8888", "RGBA8888 32bpp")
+	FrameBufferColorMode.addKey("YUYV", "YUYV", "YCbCr")
 	FrameBufferColorMode.setDefaultValue(2)
 
 	DoubleBuffer = comp.createBooleanSymbol("DoubleBuffer", FrameBufferSettingsMenu)
@@ -421,24 +556,21 @@ def instantiateComponent(comp):
 	numLayers = 0
 	if (Layer0Enable.getValue() == True):
 		numLayers += 1
+		Layer0Width = DisplayWidth.getValue();
+		Layer0Height = DisplayHeight.getValue();
 	if (Layer1Enable.getValue() == True):
 		numLayers += 1
+		Layer1Width = DisplayWidth.getValue();
+		Layer1Height = DisplayHeight.getValue();
 	if (Layer2Enable.getValue() == True):
 		numLayers += 1
+		Layer1Width = DisplayWidth.getValue();
+		Layer1Height = DisplayHeight.getValue();
 	TotalNumLayers.setValue(numLayers, 1)
-
-###def onHALConnected(halConnected, event):
-###	halConnected.getComponent().getSymbolByID("HALComment").setVisible(event["value"] == True)
-###	halConnected.getComponent().getSymbolByID("DisplayWidth").setVisible(event["value"] == False)
-###	halConnected.getComponent().getSymbolByID("DisplayHeight").setVisible(event["value"] == False)
-###	halConnected.getComponent().getSymbolByID("DoubleBuffer").setVisible(event["value"] == False)
-###	halConnected.getComponent().getSymbolByID("PaletteMode").setVisible(event["value"] == False)
-###	halConnected.getComponent().getSymbolByID("DisplaySettingsMenu").setVisible(event["value"] == False)
-###	halConnected.getComponent().getSymbolByID("FrameBufferColorMode").setVisible(event["value"] == False)
-
-	### Update the layer count hint in GFX HAL
-###	numLayers = halConnected.getComponent().getSymbolValue("TotalNumLayers")
-###	Database.setSymbolValue("gfx_hal", "HardwareLayerCountHint", numLayers, 1)
+	
+	if (Database.getComponentByID("gfx_hal_le") is not None):
+		DisplayWidth.setValue(Database.getSymbolValue("gfx_hal_le", "DisplayWidth"))
+		DisplayHeight.setValue(Database.getSymbolValue("gfx_hal_le", "DisplayHeight"))
 	
 def onAttachmentConnected(source, target):
 	print("dependency Connected = " + target["component"].getDisplayName())
@@ -450,15 +582,60 @@ def onAttachmentConnected(source, target):
 def OnCacheEnabled(cacheEnabled, event):
 	cacheEnabled.getComponent().setSymbolValue("UseCachedFrameBuffer", event["value"] == True, 1)
 	
+def OnAdvancedLayerEnabled(layerEnabled, event):
+	layerEnabled.getComponent().getSymbolByID("FrameBufferColorMode").setVisible(event["value"] == False)
+	layerEnabled.getComponent().getSymbolByID("Layer0Width").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0Height").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0Buffer0").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0Buffer1").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0StartX").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0StartY").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer0ColorMode").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1Width").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1Height").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1Buffer0").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1Buffer1").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1StartX").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1StartY").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer1ColorMode").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2Width").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2Height").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2Buffer0").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2Buffer1").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2StartX").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2StartY").setVisible(event["value"] == True)
+	layerEnabled.getComponent().getSymbolByID("Layer2ColorMode").setVisible(event["value"] == True)
+	
 def OnLayersEnabled(layerEnabled, event):
-	numLayers = 0
-	if (layerEnabled.getComponent().getSymbolValue("Layer0Enable") == True):
-		numLayers += 1
-	if (layerEnabled.getComponent().getSymbolValue("Layer1Enable") == True):
-		numLayers += 1
-	if (layerEnabled.getComponent().getSymbolValue("Layer2Enable") == True):
-		numLayers += 1
-	layerEnabled.getComponent().setSymbolValue("TotalNumLayers", numLayers, 1)
+	if event["id"] == "Layer0Enable":
+		if event["value"] == True and Database.getComponentByID("gfx_hal_le") is not None:
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer0Width", Database.getSymbolValue("gfx_hal_le", "DisplayWidth"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer0Height", Database.getSymbolValue("gfx_hal_le", "DisplayHeight"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer0StartX", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer0StartY", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer0ColorMode", Database.getSymbolValue("le_gfx_driver_glcd", "FrameBufferColorMode"))
+	if event["id"] == "Layer1Enable":
+		if event["value"] == True and Database.getComponentByID("gfx_hal_le") is not None:
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer1Width", Database.getSymbolValue("gfx_hal_le", "DisplayWidth"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer1Height", Database.getSymbolValue("gfx_hal_le", "DisplayHeight"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer1StartX", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer1StartY", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer1ColorMode", Database.getSymbolValue("le_gfx_driver_glcd", "FrameBufferColorMode"))
+	if event["id"] == "Layer2Enable":
+		if event["value"] == True and Database.getComponentByID("gfx_hal_le") is not None:
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer2Width", Database.getSymbolValue("gfx_hal_le", "DisplayWidth"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer2Height", Database.getSymbolValue("gfx_hal_le", "DisplayHeight"))
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer2StartX", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer2StartY", 0)
+			Database.setSymbolValue("le_gfx_driver_glcd", "Layer2ColorMode", Database.getSymbolValue("le_gfx_driver_glcd", "FrameBufferColorMode"))
+	numLayers = 0;
+	if layerEnabled.getComponent().getSymbolValue("Layer0Enable") == True:
+		numLayers += 1;
+	if layerEnabled.getComponent().getSymbolValue("Layer1Enable") == True:
+		numLayers += 1;
+	if layerEnabled.getComponent().getSymbolValue("Layer2Enable") == True:
+		numLayers += 1;
+	Database.setSymbolValue("le_gfx_driver_glcd", "TotalNumLayers", numLayers, 1)
 	if (Database.getComponentByID("gfx_hal_le") is not None):
 		Database.setSymbolValue("gfx_hal_le", "HardwareLayerCountHint", numLayers, 1)
 

@@ -25,4 +25,3 @@
 def loadModule():
 	component = Module.CreateComponent("gfx_hal_le", "GFX Core LE", "/Graphics/", "displaymanager.py")
 	component.setDisplayType("Display Management")
-	component.addPlugin("../plugins/displaymanager.jar")

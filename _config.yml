@@ -97,4 +97,4 @@ aux_links:
 logo: "/assets/images/vendor/mhgs_logo_transparent.png"
 
 # Footer content appears at the bottom of every page's main content
-footer_content: "<img src='https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png' /><br />Copyright &copy; 2023 Microchip Technology."
+footer_content: "<img src='https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png' /><br />Copyright &copy; 2024 Microchip Technology."

@@ -43,7 +43,7 @@ static leState _state;
 
 leState* leGetState()
 {
-    return &_state; 
+    return &_state;
 }
 
 #if LE_DYNAMIC_VTABLES == 1
@@ -232,10 +232,10 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
     //leLayerState* layerState;
     //leWidget* root;
     //leSize disp;
-    
+
     if(_initialized == LE_TRUE)
         return LE_FAILURE;
-        
+
     memset(&_state, 0, sizeof(leState));
 
 #if LE_MEMORY_MANAGER_ENABLE == 1
@@ -253,15 +253,15 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
 #if LE_DYNAMIC_VTABLES == 1
     /* initialize virtual function tables */
     idx = 0;
-    
+
     while(vtableFnTable[idx] != NULL)
     {
         vtableFnTable[idx]();
-        
+
         idx += 1;
     }
 #endif
-    
+
     leImage_InitDecoders();
 
     leList_Create(&_state.layerList);
@@ -277,7 +277,7 @@ leResult leInitialize(const gfxDisplayDriver* dispDriver,
                         layerState);
 
         root = &layerState->root;
-        
+
         leWidget_Constructor(root);
 
         leRenderer_DisplaySize(&disp);
@@ -335,7 +335,7 @@ void leShutdown()
     leRenderer_Shutdown();
     leInput_Shutdown();
     leEvent_Shutdown();
-    
+
     memset(&_state, 0, sizeof(leState));
 
     _initialized = LE_FALSE;
@@ -389,7 +389,7 @@ leResult leUpdate(uint32_t dt)
 
     for(itr = 0; itr < state->layerList.size; ++itr)
     {
-        layerRect.base.id = itr;
+        layerRect.layer.id = itr;
         layerRect.x = 0;
         layerRect.y = 0;
         layerRect.width = 0;
@@ -626,13 +626,13 @@ leStringTable* leGetStringTable()
 
 void leSetStringTable(const leStringTable* table)
 {
-    _state.stringTable = table;    
-    
+    _state.stringTable = table;
+
     leRedrawAll();
 }
 
 uint32_t leGetStringLanguage()
-{        
+{
     return _state.languageID;
 }
 
@@ -684,26 +684,26 @@ leWidget* leGetFocusWidget()
 leResult leSetFocusWidget(leWidget* widget)
 {
     leEvent evt;
-    
+
     if(_state.focus == widget)
         return LE_SUCCESS;
 
     if(_state.focus != NULL)
     {
         evt.id = LE_WIDGET_EVENT_FOCUS_LOST;
-        
+
         _state.focus->fn->_handleEvent(_state.focus, &evt);
-    } 
+    }
 
     _state.focus = widget;
 
     if(_state.focus != NULL)
     {
         evt.id = LE_WIDGET_EVENT_FOCUS_GAINED;
-        
+
         _state.focus->fn->_handleEvent(_state.focus, &evt);
     }
-    
+
     return LE_SUCCESS;
 }
 
@@ -727,7 +727,7 @@ leResult leSetEditWidget(leEditWidget* widget)
     if(_state.edit != NULL && _state.edit->fn->editStart(_state.edit) == LE_FAILURE)
     {
         _state.edit = NULL;
-        
+
         return LE_FAILURE;
     }
 
@@ -763,7 +763,7 @@ leResult leAddRootWidget(leWidget* wgt,
     layer = (leLayerState*)leList_Get(&_state.layerList, layerIdx);
 
     leRenderer_DamageArea(&wgt->rect, layerIdx);
-        
+
     return LE_OCALL(layer->root, addChild, wgt);
 }
 
@@ -771,10 +771,10 @@ leResult leRemoveRootWidget(leWidget* wgt, uint32_t layerIdx)
 {
     leRect rect;
     leLayerState* layer;
-    
+
     if(wgt == NULL)
         return LE_FAILURE;
-        
+
     rect = wgt->rect;
 
     layer = (leLayerState*)leList_Get(&_state.layerList, layerIdx);
@@ -782,10 +782,10 @@ leResult leRemoveRootWidget(leWidget* wgt, uint32_t layerIdx)
     if(LE_OCALL(layer->root, removeChild, wgt) == LE_SUCCESS)
     {
         leRenderer_DamageArea(&rect, layerIdx);
-        
+
         return LE_SUCCESS;
     }
-    
+
     return LE_FAILURE;
 }
 
@@ -874,69 +874,69 @@ void leAbortActiveStream()
 leResult leEdit_StartEdit()
 {
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return LE_FAILURE;
-        
+
     return edit->fn->editStart(edit);
 }
 
 void leEdit_EndEdit()
-{ 
+{
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editEnd(edit);
 }
 
 void leEdit_Clear()
-{ 
+{
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editClear(edit);
 }
 
 void leEdit_Accept()
 {
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editAccept(edit);
 }
 
 void leEdit_Set(leString* str)
 {
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editSet(edit, str);
 }
 
 void leEdit_Append(leString* str)
 {
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editAppend(edit, str);
 }
 
 void leEdit_Backspace()
 {
     leEditWidget* edit = leGetEditWidget();
-    
+
     if(edit == NULL)
         return;
-        
+
     edit->fn->editBackspace(edit);
 }

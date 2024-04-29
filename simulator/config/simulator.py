@@ -350,12 +350,23 @@ def instantiateComponent(component):
     common_driver_template_path = framework_path + os.path.normpath(common_driver_template_path)
     print(comp_id_str + "Common driver path set to: " + common_driver_template_path)
 
+    # File Generation Toggle
+    global file_gen_toggle
+    file_gen_toggle = component.createBooleanSymbol("fileGenToggle", None)
+    file_gen_toggle.setLabel("Generate Source Code")
+    file_gen_toggle.setDescription("Enables source code generation.")
+    file_gen_toggle.setDefaultValue(False)
+    file_gen_toggle.setReadOnly(True)
+    file_gen_toggle.setVisible(False)
+
     # Core System Files
     core_sys_def_h = component.createFileSymbol("CORE_SYS_DEF_H", None)
     core_sys_def_h.setType("STRING")
     core_sys_def_h.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     core_sys_def_h.setSourcePath("templates/definitions.h.ftl")
     core_sys_def_h.setMarkup(True)
+    core_sys_def_h.setEnabled(False)
+    core_sys_def_h.setDependencies(toggleFileGen, ["fileGenToggle"])
 
     # Common GFX Driver Files
     gfx_drv_h = component.createFileSymbol("GFX_DRIVER_H", None)
@@ -366,6 +377,8 @@ def instantiateComponent(component):
     gfx_drv_h.setProjectPath(common_driver_project_path)  # MPLAB X Logical Folder
     gfx_drv_h.setType("HEADER")
     gfx_drv_h.setMarkup(True)
+    gfx_drv_h.setEnabled(False)
+    gfx_drv_h.setDependencies(toggleFileGen, ["fileGenToggle"])
 
     gfx_drv_c = component.createFileSymbol("GFX_DRIVER_C", None)
     gfx_drv_c.setRelative(False)
@@ -375,6 +388,8 @@ def instantiateComponent(component):
     gfx_drv_c.setProjectPath(common_driver_project_path)
     gfx_drv_c.setType("SOURCE")
     gfx_drv_c.setMarkup(True)
+    gfx_drv_c.setEnabled(False)
+    gfx_drv_c.setDependencies(toggleFileGen, ["fileGenToggle"])
 
     # GFX Simulator Files
     gfx_sim_h = component.createFileSymbol("GFX_SIM_H", None)
@@ -384,6 +399,8 @@ def instantiateComponent(component):
     gfx_sim_h.setProjectPath(project_path)
     gfx_sim_h.setType("HEADER")
     gfx_sim_h.setMarkup(True)
+    gfx_sim_h.setEnabled(False)
+    gfx_sim_h.setDependencies(toggleFileGen, ["fileGenToggle"])
 
     gfx_sim_c = component.createFileSymbol("GFX_SIM_C", None)
     gfx_sim_c.setSourcePath("templates/gfx_simulator.c.ftl")
@@ -392,6 +409,8 @@ def instantiateComponent(component):
     gfx_sim_c.setProjectPath(project_path)
     gfx_sim_c.setType("SOURCE")
     gfx_sim_c.setMarkup(True)
+    gfx_sim_c.setEnabled(False)
+    gfx_sim_c.setDependencies(toggleFileGen, ["fileGenToggle"])
 
     gfx_sim_proj_name = config_name + ".mgsws"
     gfx_sim_proj_path = "config/" + config_name + "/"
@@ -402,6 +421,8 @@ def instantiateComponent(component):
     gfx_sim_proj.setProjectPath(gfx_sim_proj_path)
     gfx_sim_proj.setType("IMPORTANT")
     gfx_sim_proj.setMarkup(True)
+    gfx_sim_proj.setEnabled(False)
+    gfx_sim_proj.setDependencies(toggleFileGen, ["fileGenToggle"])
 
 
 # Callbacks
@@ -411,8 +432,10 @@ def onAttachmentConnected(source, target):
         # Remove Timer Help Comment
         tmr_subsys_help_comment.setVisible(False)
         tmr_subsys_tick_res.setReadOnly(False)
-    if target["component"].getID() == "gfx_canvas":
-        if target["id"] == "gfx_display_driver":
+    if target["id"] in ["gfx_driver", "gfx_display_driver"]:
+        print(comp_id_str + "File Generation Enabled")
+        file_gen_toggle.setValue(True)
+        if target["component"].getID() == "gfx_canvas":
             print(comp_id_str + "Canvas Mode Enabled")
             ctrl_subsys_canvas_mode.setValue(listCtrlCanvasMode[1])
             ctrl_subsys_help_comment.setVisible(False)
@@ -426,11 +449,21 @@ def onAttachmentDisconnected(source, target):
         # Restore Timer Help Comment
         tmr_subsys_help_comment.setVisible(True)
         tmr_subsys_tick_res.setReadOnly(True)
-    if target["component"].getID() == "gfx_canvas":
-        if target["id"] == "gfx_display_driver":
+    if target["id"] in ["gfx_driver", "gfx_display_driver"]:
+        print(comp_id_str + "File Generation Disabled")
+        file_gen_toggle.setValue(False)
+        if target["component"].getID() == "gfx_canvas":
             print(comp_id_str + "Canvas Mode Disabled")
             ctrl_subsys_canvas_mode.setValue(listCtrlCanvasMode[0])
             ctrl_subsys_help_comment.setVisible(True)
+
+
+# Toggle File Generation
+def toggleFileGen(symbol, event):
+    if event["value"]:
+        symbol.setEnabled(True)
+    else:
+        symbol.setEnabled(False)
 
 
 # Update CtrlNumLayers Callback

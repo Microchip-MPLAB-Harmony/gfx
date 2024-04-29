@@ -3,9 +3,12 @@ title: Graphics Applications
 nav_order: 2
 ---
 
-# ![Microchip Technology](../images/mhgs.png) MPLAB® Harmony 3 Graphics Application Support
+![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
+![MHGS logo small](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png)
 
-Microchip MPLAB® Harmony Graphics Suite provides various application examples for a number of device families. See the following repositories under [Microchip-MPLAB-Harmony](https://github.com/Microchip-MPLAB-Harmony) Github project for specific applications examples:
+# Microchip Graphics Suite (MGS) Harmony Application Support
+
+Microchip Graphics Suite (MGS) Harmony provides various application examples for a number of device families. See the following repositories for specific applications examples:
 
 | Repository | Product family |
 | ---------- | -------------- |

@@ -4,22 +4,59 @@ nav_order: 99
 ---
 
 ![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
-![Harmony logo small](./images/mhgs.png)
+![MHGS logo small](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png)
 
-# Microchip MPLAB® Harmony 3 Release Notes
+# Microchip MPLAB® Harmony 3 Microchip Graphics Suite Release Notes
+
+## Graphics Release v3.14.1
+
+### Issues Fixed
+
+* Fixed incorrect clipping of label widget damage area
+* GLCD: Make sure layer settings are configurable
+* Graphics Canvas: fixed segfault using Simulator on x64 platforms
+* Fixes MCC lock-up during shutdown
+* Fixes new MGS Harmony project generation with MPLABX 6.20+
+
+### MGS Harmony Composer
+
+* Microchip Graphics Composer v1.4.1b
+  * Legato Plugin Linux/Windows/Mac Build v2.3.15b
+
+### MGS Simulator Beta Release
+
+* Updated Harmony components to support the Native mode for **MGS Simulator**
+	* For information on how to download and use the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+### Development Tools
+
+- [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - [MPLAB® Code Configurator (MCC) Plugin v5.4.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    - [MPLAB® Code Configurator (MCC) Core v5.6.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+
+### Dependent Components
+
+* [Core v3.13.3 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.13.3)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
 
 ## Graphics Release v3.14.0
 
 ### New Features
 
-* Added Microchip Graphics Suite Web Simulator support
 * Added Cut, Copy, & Paste to Microchip Graphics Composer
 	* There are hotkeys for each, as well as new buttons under the Edit menu
 * Added Undo & Redo to Microchip Graphics Composer
 	* There are hotkeys for both, as well as new buttons under the Edit menu
 * Added PIC32CX SG41 Family SPI display driver and template support
-* Added 4-inch 720x720 Waveshare round display driver support 
+* Added 4-inch 720x720 Waveshare MIPI round display driver support 
 * Added RGB332 color mode support for LCC display driver
+
+* Added Harmony components to support the **Microchip Graphics Suite Web Simulator**
+	* **Note:** The MGS Web Simulator is in closed-beta testing until release v3.15.0. Please contact your local Microchip Sales Office or submit a question with [Microchip Client Support and Services](https://www.microchip.com/en-us/support/design-help/client-support-services) if you wish to particapte in the closed-beta testing.
+
 
 ### Issues Fixed
 

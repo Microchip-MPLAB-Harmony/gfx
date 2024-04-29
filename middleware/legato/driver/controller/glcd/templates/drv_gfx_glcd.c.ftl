@@ -122,26 +122,6 @@
 
 #define SYNC_RECT_COUNT 200
 
-<#if CanvasModeOnly == false>
-<#if FrameBufferMemoryMode == "DDR">
-<#if Layer0Enable == true>
-/*** GLCD Layer 0 Configuration ***/
-#define  GFX_GLCD_LAYER0_BASEADDR                      ${Layer0Buffer0}
-#define  GFX_GLCD_LAYER0_DBL_BASEADDR                  ${Layer0Buffer1}
-</#if>
-<#if Layer1Enable == true>
-/*** GLCD Layer 1 Configuration ***/
-#define  GFX_GLCD_LAYER1_BASEADDR                      ${Layer1Buffer0}
-#define  GFX_GLCD_LAYER1_DBL_BASEADDR                  ${Layer1Buffer1}
-</#if>
-<#if Layer2Enable == true>
-/*** GLCD Layer 2 Configuration ***/
-#define  GFX_GLCD_LAYER2_BASEADDR                      ${Layer2Buffer0}
-#define  GFX_GLCD_LAYER2_DBL_BASEADDR                  ${Layer2Buffer1}
-</#if>
-</#if>
-</#if>
-
 <#if FrameBufferColorMode == "GS_8">
 #define LCDC_DEFAULT_GFX_COLOR_MODE GLCD_LAYER_COLOR_MODE_LUT8
 #define FRAMEBUFFER_PTR_TYPE    uint8_t*
@@ -154,11 +134,80 @@
 #define LCDC_DEFAULT_GFX_COLOR_MODE GLCD_LAYER_COLOR_MODE_RGBA8888
 #define FRAMEBUFFER_PTR_TYPE    uint32_t*
 #define FRAMEBUFFER_PIXEL_TYPE    uint32_t
+<#elseif FrameBufferColorMode == "YUYV">
+#define LCDC_DEFAULT_GFX_COLOR_MODE GLCD_LAYER_COLOR_MODE_YUYV
+#define FRAMEBUFFER_PTR_TYPE    uint32_t*
+#define FRAMEBUFFER_PIXEL_TYPE    uint32_t
 <#else>
 //Unsupported  framebuffer type specified, default to RGBA8888
 #define LCDC_DEFAULT_GFX_COLOR_MODE GLCD_LAYER_COLOR_MODE_RGBA8888
 #define FRAMEBUFFER_PTR_TYPE      uint32_t*
 #define FRAMEBUFFER_PIXEL_TYPE    uint32_t
+</#if>
+
+<#if CanvasModeOnly == false>
+<#if FrameBufferMemoryMode == "DDR">
+<#if Layer0Enable == true>
+/*** GLCD Layer 0 Configuration ***/
+<#if AdvancedLayerSettings == true>
+#define  GFX_GLCD_LAYER0_STARTX                        ${Layer0StartX}
+#define  GFX_GLCD_LAYER0_STARTY                        ${Layer0StartY}
+#define  GFX_GLCD_LAYER0_WIDTH                         ${Layer0Width}
+#define  GFX_GLCD_LAYER0_HEIGHT                        ${Layer0Height}
+#define  GFX_GLCD_LAYER0_BASEADDR                      ${Layer0Buffer0}
+#define  GFX_GLCD_LAYER0_DBL_BASEADDR                  ${Layer0Buffer1}
+#define  GFX_GLCD_LAYER0_COLOR_MODE                    ${Layer0ColorMode}
+<#else>
+#define  GFX_GLCD_LAYER0_STARTX                        0
+#define  GFX_GLCD_LAYER0_STARTY                        0
+#define  GFX_GLCD_LAYER0_WIDTH                         ${Val_Width}
+#define  GFX_GLCD_LAYER0_HEIGHT                        ${Val_Height}
+#define  GFX_GLCD_LAYER0_BASEADDR                      0xA8000000
+#define  GFX_GLCD_LAYER0_DBL_BASEADDR                  0xA8465000
+#define  GFX_GLCD_LAYER0_COLOR_MODE                    LCDC_DEFAULT_GFX_COLOR_MODE
+</#if>
+</#if>
+<#if Layer1Enable == true>
+/*** GLCD Layer 1 Configuration ***/
+<#if AdvancedLayerSettings == true>
+#define  GFX_GLCD_LAYER1_STARTX                        ${Layer1StartX}
+#define  GFX_GLCD_LAYER1_STARTY                        ${Layer1StartY}
+#define  GFX_GLCD_LAYER1_WIDTH                         ${Layer1Width}
+#define  GFX_GLCD_LAYER1_HEIGHT                        ${Layer1Height}
+#define  GFX_GLCD_LAYER1_BASEADDR                      ${Layer1Buffer0}
+#define  GFX_GLCD_LAYER1_DBL_BASEADDR                  ${Layer1Buffer1}
+#define  GFX_GLCD_LAYER1_COLOR_MODE                    ${Layer1ColorMode}
+<#else>
+#define  GFX_GLCD_LAYER1_STARTX                        0
+#define  GFX_GLCD_LAYER1_STARTY                        0
+#define  GFX_GLCD_LAYER1_WIDTH                         ${Val_Width}
+#define  GFX_GLCD_LAYER1_HEIGHT                        ${Val_Height}
+#define  GFX_GLCD_LAYER1_BASEADDR                      0xA8177000
+#define  GFX_GLCD_LAYER1_DBL_BASEADDR                  0xA85DC000
+#define  GFX_GLCD_LAYER1_COLOR_MODE                    LCDC_DEFAULT_GFX_COLOR_MODE
+</#if>
+</#if>
+<#if Layer2Enable == true>
+/*** GLCD Layer 2 Configuration ***/
+<#if AdvancedLayerSettings == true>
+#define  GFX_GLCD_LAYER2_STARTX                        ${Layer2StartX}
+#define  GFX_GLCD_LAYER2_STARTY                        ${Layer2StartY}
+#define  GFX_GLCD_LAYER2_WIDTH                         ${Layer2Width}
+#define  GFX_GLCD_LAYER2_HEIGHT                        ${Layer2Height}
+#define  GFX_GLCD_LAYER2_BASEADDR                      ${Layer2Buffer0}
+#define  GFX_GLCD_LAYER2_DBL_BASEADDR                  ${Layer2Buffer1}
+#define  GFX_GLCD_LAYER2_COLOR_MODE                    ${Layer2ColorMode}
+<#else>
+#define  GFX_GLCD_LAYER2_STARTX                        0
+#define  GFX_GLCD_LAYER2_STARTY                        0
+#define  GFX_GLCD_LAYER2_WIDTH                         ${Val_Width}
+#define  GFX_GLCD_LAYER2_HEIGHT                        ${Val_Height}
+#define  GFX_GLCD_LAYER2_BASEADDR                      0xA82EE000
+#define  GFX_GLCD_LAYER2_DBL_BASEADDR                  0xA8753000
+#define  GFX_GLCD_LAYER2_COLOR_MODE                    LCDC_DEFAULT_GFX_COLOR_MODE
+</#if>
+</#if>
+</#if>
 </#if>
 
 typedef enum
@@ -185,12 +234,12 @@ const char* DRIVER_NAME = "GLCD";
 <#if CanvasModeOnly == false>
 <#if FrameBufferMemoryMode == "INT_SRAM">
 <#list 0..(TotalNumLayers-1) as i>
-FRAMEBUFFER_PIXEL_TYPE  __attribute__ ((coherent, aligned (32))) framebuffer_${i}[DISPLAY_WIDTH * DISPLAY_HEIGHT];
+FRAMEBUFFER_PIXEL_TYPE  __attribute__ ((coherent, aligned (32))) framebuffer_${i}[GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT];
 </#list>
 
 <#if DoubleBuffer == true>
 <#list 0..(TotalNumLayers-1) as i>
-FRAMEBUFFER_PIXEL_TYPE  __attribute__ ((coherent, aligned (32))) framebuffer1_${i}[DISPLAY_WIDTH * DISPLAY_HEIGHT];
+FRAMEBUFFER_PIXEL_TYPE  __attribute__ ((coherent, aligned (32))) framebuffer1_${i}[GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT];
 </#list>
 </#if>
 </#if>
@@ -366,6 +415,9 @@ static uint32_t getColorModeStrideSize(GLCD_LAYER_COLOR_MODE mode)
 {
     switch(mode)
     {
+        case GLCD_LAYER_COLOR_MODE_YUYV:
+            return sizeof(uint32_t);
+            break;
         case GLCD_LAYER_COLOR_MODE_LUT8:
             return sizeof(uint8_t);
             break;
@@ -466,9 +518,6 @@ void DRV_GLCD_Initialize()
     uint32_t      upperMargin;
     uint32_t      stride;
     uint32_t      layerCount;
-<#if CanvasModeOnly == false>
-    uint32_t      bufferCount;
-</#if>
 
     /* set temporary information */
     xResolution     = ${Val_Width};
@@ -535,31 +584,40 @@ void DRV_GLCD_Initialize()
 </#if>
 </#if>
 
+<#list 0..(TotalNumLayers-1) as i>
+    drvLayer[${i}].startx      = GFX_GLCD_LAYER${i}_STARTX;
+    drvLayer[${i}].starty      = GFX_GLCD_LAYER${i}_STARTY;
+    drvLayer[${i}].resx        = GFX_GLCD_LAYER${i}_WIDTH;
+    drvLayer[${i}].resy        = GFX_GLCD_LAYER${i}_HEIGHT;
+    drvLayer[${i}].sizex       = GFX_GLCD_LAYER${i}_WIDTH;
+    drvLayer[${i}].sizey       = GFX_GLCD_LAYER${i}_HEIGHT;
+    drvLayer[${i}].colorspace  = GFX_GLCD_LAYER${i}_COLOR_MODE;
+</#list>
+
+<#if CanvasModeOnly == false>
+<#list 0..(TotalNumLayers-1) as i>
+    //Clear frame buffer
+<#if DoubleBuffer == true>
+    memset(drvLayer[${i}].baseaddr[0], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
+    memset(drvLayer[${i}].baseaddr[1], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
+<#else>
+    memset(drvLayer[${i}].baseaddr[0], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
+</#if>
+</#list>
+</#if>
+
     for (layerCount = 0; layerCount < GFX_GLCD_LAYERS; layerCount++)
     {
-        drvLayer[layerCount].resx       = xResolution;
-        drvLayer[layerCount].resy       = yResolution;
-        drvLayer[layerCount].startx     = 0;
-        drvLayer[layerCount].starty     = 0;
-        drvLayer[layerCount].sizex      = drvLayer[layerCount].resx;
-        drvLayer[layerCount].sizey      = drvLayer[layerCount].resy;
         drvLayer[layerCount].alpha      = 255;
         drvLayer[layerCount].dblend     = GLCD_LAYER_DEST_BLEND_INV_SRCGBL;
         drvLayer[layerCount].sblend     = GLCD_LAYER_SRC_BLEND_ALPHA_SRCGBL;
-        drvLayer[layerCount].colorspace = LCDC_DEFAULT_GFX_COLOR_MODE;
         drvLayer[layerCount].enabled    = true;
         drvLayer[layerCount].updateLock = LAYER_LOCKED;
-<#if CanvasModeOnly == false>
-        //Clear frame buffer
-        for(bufferCount = 0; bufferCount < BUFFER_PER_LAYER; ++bufferCount)
-        {
-            memset(drvLayer[layerCount].baseaddr[bufferCount], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * DISPLAY_WIDTH * DISPLAY_HEIGHT);
-        }
-</#if>
+
         stride = getColorModeStrideSize(drvLayer[layerCount].colorspace);
 
         PLIB_GLCD_LayerBaseAddressSet(layerCount, (uint32_t)drvLayer[layerCount].baseaddr[0]);
-        PLIB_GLCD_LayerStrideSet(layerCount, drvLayer[layerCount].resx * stride );
+        PLIB_GLCD_LayerStrideSet(layerCount, xResolution * stride );
         PLIB_GLCD_LayerResXYSet(layerCount, drvLayer[layerCount].resx, drvLayer[layerCount].resy );
         PLIB_GLCD_LayerStartXYSet(layerCount, drvLayer[layerCount].startx, drvLayer[layerCount].starty );
         PLIB_GLCD_LayerSizeXYSet(layerCount, drvLayer[layerCount].sizex, drvLayer[layerCount].sizey);
@@ -1024,13 +1082,13 @@ gfxDriverIOCTLResponse DRV_GLCD_IOCTL(gfxDriverIOCTLRequest request,
         {
             rect = (gfxIOCTLArg_LayerRect*)arg;
             
-            if(rect->base.id >= GFX_GLCD_LAYERS)        
+            if(rect->layer.id >= GFX_GLCD_LAYERS)
                 return GFX_IOCTL_ERROR_UNKNOWN;
             
-            rect->x = drvLayer[rect->base.id].startx;
-            rect->y = drvLayer[rect->base.id].starty;
-            rect->width = drvLayer[rect->base.id].sizex;
-            rect->height = drvLayer[rect->base.id].sizey;
+            rect->x = drvLayer[rect->layer.id].startx;
+            rect->y = drvLayer[rect->layer.id].starty;
+            rect->width = drvLayer[rect->layer.id].sizex;
+            rect->height = drvLayer[rect->layer.id].sizey;
             
             return GFX_IOCTL_OK;
         }

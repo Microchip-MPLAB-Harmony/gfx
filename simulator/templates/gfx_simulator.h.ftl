@@ -35,6 +35,11 @@
 #include "system/time/sys_time.h"
 </#if>
 
+// You may exclude hardware specific code using any of these macros.
+#define MGSWS true
+#define GFX_SIM_ONLY true
+#define GFX_SIMULATOR_ENABLED true
+
 // Display and Controller Subsystem
 void GFX_SIM_Initialize(void);
 void GFX_SIM_Update(void);

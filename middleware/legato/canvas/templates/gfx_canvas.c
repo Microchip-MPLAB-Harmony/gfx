@@ -358,35 +358,35 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
         gfxDispCtrlr != NULL &&
         gfxDispCtrlr->ioctl != NULL)
     {
-        setBaseAddressParm.base.id = canvas[canvasID].layer.id;
+        setBaseAddressParm.layer.id = canvas[canvasID].layer.id;
         if (canvas[canvasID].pixelBuffer.pixels != NULL)
-            setBaseAddressParm.value.v_uint = (unsigned int) canvas[canvasID].pixelBuffer.pixels;
+            setBaseAddressParm.value.v_pointer = canvas[canvasID].pixelBuffer.pixels;
         else
         {
             argValue.value.v_int = canvas[canvasID].layer.id;
             gfxDispCtrlr->ioctl(GFX_IOCTL_SET_ACTIVE_LAYER, (gfxIOCTLArg_Value*) &argValue);
 
             gfxDispCtrlr->ioctl(GFX_IOCTL_GET_FRAMEBUFFER, (gfxIOCTLArg_Value*) &argValue);
-            setBaseAddressParm.value.v_uint = argValue.value.v_uint;
+            setBaseAddressParm.value.v_pointer = argValue.value.v_pbuffer->pixels;
         }
 
-        setColorModeParm.base.id = canvas[canvasID].layer.id;
+        setColorModeParm.layer.id = canvas[canvasID].layer.id;
         setColorModeParm.value.v_uint = (unsigned int) canvas[canvasID].pixelBuffer.mode;
 
 		//This is the physical resolution of the layer pixel buffer
-        setResParm.base.id = canvas[canvasID].layer.id;
+        setResParm.layer.id = canvas[canvasID].layer.id;
         setResParm.width = canvas[canvasID].pixelBuffer.size.width;
         setResParm.height = canvas[canvasID].pixelBuffer.size.height;
 
-        setSizeParm.base.id = canvas[canvasID].layer.id;
+        setSizeParm.layer.id = canvas[canvasID].layer.id;
         setSizeParm.width = canvas[canvasID].layer.size.width;
         setSizeParm.height = canvas[canvasID].layer.size.height;
 
-        setPositionParm.base.id = canvas[canvasID].layer.id;
+        setPositionParm.layer.id = canvas[canvasID].layer.id;
         setPositionParm.x = canvas[canvasID].layer.pos.xpos;
         setPositionParm.y = canvas[canvasID].layer.pos.ypos;
 
-        setAlphaParm.base.id = canvas[canvasID].layer.id;
+        setAlphaParm.layer.id = canvas[canvasID].layer.id;
         setAlphaParm.value.v_uint = canvas[canvasID].layer.alpha;
 
 <#if WindowClippingEnabled == true>
@@ -396,7 +396,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
 
         if (setPositionParm.x < 0)
         {
-            setBaseAddressParm.value.v_uint += abs(setPositionParm.x) *
+            setBaseAddressParm.value.v_pointer += abs(setPositionParm.x) *
                     gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size;
 
             setSizeParm.width += setPositionParm.x;
@@ -405,7 +405,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
 
         if (setPositionParm.y < 0)
         {
-            setBaseAddressParm.value.v_uint += abs(setPositionParm.y) *
+            setBaseAddressParm.value.v_pointer += abs(setPositionParm.y) *
                     setResParm.width *
                     gfxColorInfoTable[canvas[canvasID].pixelBuffer.mode].size;
 
@@ -423,7 +423,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
         //Lock layer and apply layer properties
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_LOCK, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
 
-        if (setBaseAddressParm.value.v_uint != 0)
+        if (setBaseAddressParm.value.v_pointer != NULL)
             gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_BASE_ADDRESS, (gfxIOCTLArg_LayerValue *) &setBaseAddressParm);
 
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_COLOR_MODE, (gfxIOCTLArg_LayerValue *) &setColorModeParm);
@@ -433,7 +433,7 @@ GFXC_RESULT _gfxcCanvasUpdate(unsigned int canvasID)
 
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_ALPHA, (void *) &setAlphaParm);
 
-        setLayerEnabledParm.base.id = canvas[canvasID].layer.id;
+        setLayerEnabledParm.layer.id = canvas[canvasID].layer.id;
         setLayerEnabledParm.value.v_bool = canvas[canvasID].active;
         gfxDispCtrlr->ioctl(GFX_IOCTL_SET_LAYER_ENABLED, (gfxIOCTLArg_LayerValue *) &setLayerEnabledParm);
 
@@ -815,13 +815,13 @@ gfxDriverIOCTLResponse GFX_CANVAS_IOCTL(gfxDriverIOCTLRequest request,
         {
             rect = (gfxIOCTLArg_LayerRect*)arg;
 
-            if(rect->base.id >= baseCanvasID + CONFIG_NUM_CANVAS_OBJ)
+            if(rect->layer.id >= baseCanvasID + CONFIG_NUM_CANVAS_OBJ)
                 return GFX_IOCTL_ERROR_UNKNOWN;
 
-            rect->x = canvas[baseCanvasID + rect->base.id].layer.pos.xpos;
-            rect->y = canvas[baseCanvasID + rect->base.id].layer.pos.ypos;
-            rect->width = canvas[baseCanvasID + rect->base.id].layer.size.width;
-            rect->height = canvas[baseCanvasID + rect->base.id].layer.size.height;
+            rect->x = canvas[baseCanvasID + rect->layer.id].layer.pos.xpos;
+            rect->y = canvas[baseCanvasID + rect->layer.id].layer.pos.ypos;
+            rect->width = canvas[baseCanvasID + rect->layer.id].layer.size.width;
+            rect->height = canvas[baseCanvasID + rect->layer.id].layer.size.height;
 
             return GFX_IOCTL_OK;
         }
