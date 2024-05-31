@@ -140,6 +140,7 @@ typedef struct leImageSequenceEntry
     leResult      (*play)(THIS_TYPE* _this); \
     leResult      (*rewind)(THIS_TYPE* _this); \
     leBool        (*isPlaying)(const THIS_TYPE* _this); \
+    int32_t       (*getActiveIndex)(const THIS_TYPE* _this); \
     leBool        (*getRepeat)(const THIS_TYPE* _this); \
     leResult      (*setRepeat)(THIS_TYPE* _this, leBool rpt); \
     leResult      (*showImage)(THIS_TYPE* _this, uint32_t idx); \
@@ -730,6 +731,37 @@ leResult play(leImageSequenceWidget* _this);
  * @returns LE_TRUE if set, otherwise LE_FALSE;
  */
 virtual leBool isPlaying(const leImageSequenceWidget* _this);
+
+// *****************************************************************************
+/* Virtual Member Function:
+    int32_t getActiveIndex(const leImageSequenceWidget* _this)
+
+  Summary:
+     Gets the index of the active image
+
+  Description:
+     Gets the index of the active image
+
+  Parameters:
+    const leImageSequenceWidget* _this - The image sequence widget to operate on
+
+  Remarks:
+    Usage - _this->fn->getActiveIndex(_this);
+
+  Returns:
+    int32_t - the active index
+*/
+/**
+ * @brief Get active index
+ * @details Gets the index of the active image for <span class="param">_this</span>.
+ * @code
+ * const leImageSequenceWidget* _this;
+ * int32_t index = _this->fn->getActiveIndex(_this);
+ * @endcode
+ * @param _this is the widget pointer to query.
+ * @returns the active index
+ */
+virtual int32_t getActiveIndex(const leImageSequenceWidget* _this);
 
 // *****************************************************************************
 /* Virtual Member Function:

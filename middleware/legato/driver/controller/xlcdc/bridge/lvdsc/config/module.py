@@ -22,8 +22,8 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
-def loadModule():	
-    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75"]):
+def loadModule():
+    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75", "SAMA7D"]):
         print("LVDSC module loaded to support " + str(Variables.get("__PROCESSOR")))
         component = Module.CreateComponent("gfx_bridge_lvdsc_plib", "LVDSC", "/Graphics/Driver/Bridge", "config/lvdsc.py")
         component.setDisplayType("DPI to LVDS Bridge")

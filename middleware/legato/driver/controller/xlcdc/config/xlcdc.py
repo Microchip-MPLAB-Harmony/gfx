@@ -22,6 +22,39 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75"]):
+    resgister_base_address = "XLCDC"
+    symbol_clk_en = "XLCDC_CLOCK_ENABLE"
+    symbol_gclk_en = "CLK_XLCDC_GCLKEN"
+    symbol_mck_freq = "MCK_FREQUENCY"
+    symbol_gck_freq = "XLCDC_GCLK_FREQUENCY"
+    symbol_gck_src_0_freq = "MCK_FREQUENCY"
+    symbol_gck_src_1_freq = "PLLADIV2CLK_FREQUENCY"
+    gck_src_0 = "MCK"
+    gck_src_1 = "PLLADIV2CLK"
+    gck_src_0_label = "MCK"
+    gck_src_1_label = "PLLA/2"
+    gck_src_0_reg = "PMC_PCR_GCLKCSS_MCK_Val"
+    gck_src_1_reg = "PMC_PCR_GCLKCSS_PLLADIV2CLK_Val"
+    gck_max_freq = 75000000
+    ovr2_available = True
+
+else:
+    resgister_base_address = "LCDC"
+    symbol_clk_en = "LCDC_CLOCK_ENABLE"
+    symbol_gclk_en = "CLK_LCDC_GCLKEN"
+    symbol_mck_freq = "MCK3_FREQUENCY"
+    symbol_gck_freq = "LCDC_GCLK_FREQUENCY"
+    symbol_gck_src_0_freq = "MCK1_FREQUENCY"
+    symbol_gck_src_1_freq = "MAINCK_FREQUENCY"
+    gck_src_0 = "MCK1"
+    gck_src_1 = "MAINCK"
+    gck_src_0_label = gck_src_0
+    gck_src_1_label = gck_src_1
+    gck_src_0_reg = "PMC_PCR_GCLKCSS_MCK1_Val"
+    gck_src_1_reg = "PMC_PCR_GCLKCSS_MAINCK_Val"
+    gck_max_freq = 90000000
+    ovr2_available = False
 
 def instantiateComponent(component):
     project_path = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/xlcdc"
@@ -36,6 +69,11 @@ def instantiateComponent(component):
     show_clk_help = clk_help_test_sym()
 
     # Utility Symbols (hidden)
+    # Driver IP name
+    driver_ip_name = component.createStringSymbol("IP", None)
+    driver_ip_name.setVisible(False)
+    driver_ip_name.setReadOnly(True)
+    driver_ip_name.setDefaultValue(resgister_base_address)
     # Typically name of gfxDisplayDriver structure used by Canvas/Legato
     driver_init_name = component.createStringSymbol("DriverInitName", None)
     driver_init_name.setVisible(False)
@@ -51,7 +89,7 @@ def instantiateComponent(component):
     total_num_layers = component.createIntegerSymbol("TotalNumLayers", None)
     total_num_layers.setLabel("Total Layers")
     total_num_layers.setDescription("Number of hardware layers enabled")
-    total_num_layers.setDefaultValue(4)
+    total_num_layers.setDefaultValue(4 if ovr2_available else 3)
     total_num_layers.setVisible(False)
     # Initialize GCLK inside XLCDC PLIB
     plib_clk_en = component.createBooleanSymbol("XLCDCGCLKEnable", None)
@@ -59,7 +97,12 @@ def instantiateComponent(component):
     plib_clk_en.setDescription("Enable GCLK in PLIB")
     plib_clk_en.setDefaultValue(show_clk_help)
     plib_clk_en.setVisible(False)
-    plib_clk_en.setDependencies(clk_help_cb, ["core.XLCDC_CLOCK_ENABLE", "core.CLK_XLCDC_GCLKEN"])
+    plib_clk_en.setDependencies(clk_help_cb, ["core." + symbol_clk_en, "core." + symbol_gclk_en])
+    # Overlay 2 Availability
+    ovr2_support = component.createBooleanSymbol("SupportOVR2", None)
+    ovr2_support.setVisible(False)
+    ovr2_support.setReadOnly(True)
+    ovr2_support.setDefaultValue(ovr2_available)
 
     # RTOS Menu
     rtos_menu = component.createMenuSymbol("RTOSMenu", None)
@@ -108,8 +151,8 @@ def instantiateComponent(component):
     gclk_source = component.createKeyValueSetSymbol("XClockGCLKSource", clock_gclk_menu)
     gclk_source.setLabel("Source")
     gclk_source.setDescription("Generic Clock Source.")
-    gclk_source.addKey("MCK", "PMC_PCR_GCLKCSS_MCK_Val", "MCK")
-    gclk_source.addKey("PLLADIV2CLK", "PMC_PCR_GCLKCSS_PLLADIV2CLK_Val", "PLLA/2")
+    gclk_source.addKey(gck_src_0, gck_src_0_reg, gck_src_0_label)
+    gclk_source.addKey(gck_src_1, gck_src_1_reg, gck_src_1_label)
     gclk_source.setOutputMode("Value")
     gclk_source.setDisplayMode("Description")
     gclk_source.setDefaultValue(0)
@@ -118,9 +161,9 @@ def instantiateComponent(component):
     gclk_src_hint = component.createIntegerSymbol("XClockGCLKSrcHint", clock_gclk_menu)
     gclk_src_hint.setLabel("Input Clock (Hz)")
     gclk_src_hint.setDescription("GCLK Input Clock.")
-    gclk_src_hint.setDefaultValue(Database.getSymbolValue("core", "MCK_FREQUENCY"))
+    gclk_src_hint.setDefaultValue(Database.getSymbolValue("core", symbol_gck_src_0_freq))
     gclk_src_hint.setReadOnly(True)
-    gclk_src_hint.setDependencies(update_gclk_clock, ["XClockGCLKSource", "core.MCK_FREQUENCY", "core.PLLADIV2CLK_FREQUENCY"])
+    gclk_src_hint.setDependencies(update_gclk_clock, ["XClockGCLKSource", "core." + symbol_gck_src_0_freq, "core." + symbol_gck_src_1_freq])
 
     # GCLK Divider
     gclk_div = component.createIntegerSymbol("XClockGCLKDiv", clock_gclk_menu)
@@ -132,7 +175,7 @@ def instantiateComponent(component):
 
     # GCLK Output Value Hint
     if not show_clk_help:
-        gclk_out_hint_hz = Database.getSymbolValue("core", "XLCDC_GCLK_FREQUENCY")
+        gclk_out_hint_hz = Database.getSymbolValue("core", symbol_gck_freq)
     else:
         gclk_out_hint_hz = gclk_src_hint.getValue() / gclk_div.getValue()
     gclk_out_hint = component.createIntegerSymbol("XClockGCLKOutHint", clock_gclk_menu)
@@ -140,7 +183,7 @@ def instantiateComponent(component):
     gclk_out_hint.setDescription("GCLK Output Clock, i.e. Input Clock to XLCDC.")
     gclk_out_hint.setDefaultValue(gclk_out_hint_hz)
     gclk_out_hint.setReadOnly(True)
-    gclk_out_hint.setDependencies(update_gclk_clock, ["XClockGCLKSrcHint", "XClockGCLKDiv", "core.XLCDC_CLOCK_ENABLE", "core.XLCDC_GCLK_FREQUENCY"])
+    gclk_out_hint.setDependencies(update_gclk_clock, ["XClockGCLKSrcHint", "XClockGCLKDiv", "core." + symbol_clk_en, "core." + symbol_gck_freq])
 
     # GCLK Clock Validity Hint
     gclk_valid_hint = component.createCommentSymbol("XClockGCLKValidHint", clock_gclk_menu)
@@ -181,7 +224,7 @@ def instantiateComponent(component):
     pwm_freq_hint.setDescription("PWM Output Frequnecy.")
     pwm_freq_hint.setDefaultValue(32768)
     pwm_freq_hint.setReadOnly(True)
-    pwm_freq_hint.setDependencies(update_pwm_clock, ["XPWMClockSrc", "XPWMClockPres", "core.MCK_FREQUENCY"])
+    pwm_freq_hint.setDependencies(update_pwm_clock, ["XPWMClockSrc", "XPWMClockPres", "core." + symbol_mck_freq])
 
     pwm_enable = component.createBooleanSymbol("XPWMEnable", clock_pwm_menu)
     pwm_enable.setLabel("Enable Backlight PWM")
@@ -345,7 +388,8 @@ def instantiateComponent(component):
     lm_enable_ovr2 = component.createBooleanSymbol("XLMEnableOVR2", layer_menu_enable)
     lm_enable_ovr2.setLabel("Overlay 2")
     lm_enable_ovr2.setDescription("XLCDC Overlay 2 Layer.")
-    lm_enable_ovr2.setDefaultValue(True)
+    lm_enable_ovr2.setDefaultValue(ovr2_available)
+    lm_enable_ovr2.setVisible(ovr2_available)
     lm_enable_ovr2.setDependencies(on_layer_enable, ["XLMEnableOVR2"])
 
     # Driver Options
@@ -581,27 +625,27 @@ def rtos_dep_changed(symbol, event):
 def update_gclk_clock(symbol, event):
     clkmgr_xlcdc_gclk_hz = 0
     gclk_src_sel = event["source"].getSymbolValue("XClockGCLKSource")
-    # MCK_FREQUENCY
-    if event["id"] == "MCK_FREQUENCY":
+    # GCLK Source 0
+    if event["id"] == symbol_gck_src_0_freq:
         if gclk_src_sel == 0:
             symbol.setValue(event["value"])
-    # PLLADIV2CLK_FREQUENCY
-    elif event["id"] == "PLLADIV2CLK_FREQUENCY":
+    # GCLK Source 1
+    elif event["id"] == symbol_gck_src_1_freq:
         if gclk_src_sel == 1:
             symbol.setValue(event["value"])
-    # XLCDC_CLOCK_ENABLE
-    elif event["id"] == "XLCDC_CLOCK_ENABLE":
-        clkmgr_xlcdc_gclk_hz = Database.getSymbolValue("core", "XLCDC_GCLK_FREQUENCY")
-    # XLCDC_GCLK_FREQUENCY
-    elif event["id"] == "XLCDC_GCLK_FREQUENCY":
+    # Peripheral Clock Enable
+    elif event["id"] == symbol_clk_en:
+        clkmgr_xlcdc_gclk_hz = Database.getSymbolValue("core", symbol_gck_freq)
+    # GCLK Frequency
+    elif event["id"] == symbol_gck_freq:
         clkmgr_xlcdc_gclk_hz = event["value"]
     # XClockGCLKSource
     elif event["id"] == "XClockGCLKSource":
         gclk_src_sel = event["value"]
         if gclk_src_sel == 0:
-            symbol.setValue(Database.getSymbolValue("core", "MCK_FREQUENCY"))
+            symbol.setValue(Database.getSymbolValue("core", symbol_gck_src_0_freq))
         elif gclk_src_sel == 1:
-            symbol.setValue(Database.getSymbolValue("core", "PLLADIV2CLK_FREQUENCY"))
+            symbol.setValue(Database.getSymbolValue("core", symbol_gck_src_1_freq))
     # XClockGCLKOutHint
     out_clk = event["source"].getSymbolValue("XClockGCLKSrcHint") / event["source"].getSymbolValue("XClockGCLKDiv")
     if clk_help_test_sym():
@@ -617,14 +661,14 @@ def update_pwm_clock(symbol, event):
     if pwm_src == 0:
         clk = 32768
     elif pwm_src == 1:
-        clk = Database.getSymbolValue("core", "MCK_FREQUENCY")
+        clk = Database.getSymbolValue("core", symbol_mck_freq)
     symbol.setValue(clk / 2**pwm_prec)
 
 
 # Clock Validity
 def show_gclk_valid_hint(symbol, event):
-    if event["value"] > 75000000:
-        symbol.setLabel("[Warning! Must not exceed 75 MHz]")
+    if event["value"] > gck_max_freq:
+        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq/1000000)) + " MHz]")
         symbol.setVisible(True)
     elif event["value"] <= 0:
         symbol.setLabel("[Warning! 0Hz?]")
@@ -713,8 +757,8 @@ def clk_show_sym_inv(symbol, event):
 def clk_help_test_sym():
     is_set = False
     test_symbols = [
-        ["core", "XLCDC_CLOCK_ENABLE"],
-        ["core", "CLK_XLCDC_GCLKEN"],
+        ["core", symbol_clk_en],
+        ["core", symbol_gclk_en],
     ]
 
     for item in test_symbols:

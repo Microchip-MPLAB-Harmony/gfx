@@ -23,7 +23,7 @@
 ##############################################################################
 
 def loadModule():
-    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X75"]):
+    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X75", "SAMA7D"]):
         print("DSI module loaded to support " + str(Variables.get("__PROCESSOR")))
         component = Module.CreateComponent("gfx_bridge_dsi_plib", "DSI", "/Graphics/Driver/Bridge", "config/dsi.py")
         component.setDisplayType("DPI to MIPI DSI Bridge")

@@ -4,9 +4,79 @@ nav_order: 99
 ---
 
 ![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
-![MHGS logo small](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png)
+![MGS Logo](https://mchpgfx.github.io/legato.docs/docs/legato/images/mgs.svg)
 
-# Microchip MPLAB® Harmony 3 Microchip Graphics Suite Release Notes
+# Microchip Graphics Suite Harmony Release Notes
+
+## Graphics Release v3.15.0
+
+### New Features
+
+* MGS Harmony Graphics Composer
+  * Updated with modernized user interface
+  * Updated new project creation wizard
+  * Added screen tree filter and search capability
+
+* MGS Simulator
+  * Added Native Mode to allow debugging of MGS Harmony GUI design on desktop using Visual Studio Code
+
+* Added support of the HSMC peripheral to LCC Driver for SAMRHx Family
+* Added PIC32CZ CA70 Curiosity driver and template support
+* Added SAM A5D29 Curiosity driver and template support
+* Added SAM A7D65 Curiosity driver and template support
+
+### Issues Fixed
+
+* LE_IMAGE_FORMAT_COUNT has a wrong definition into legato_image.h
+* MIPI Raspberry Pi 7" Does Not Work with FreeRTOS
+* Jenkins build warning treated as error for XLCDC driver
+* Composer: Autosave Backups every N minutes
+* Composer: Stringtable isn't cleared when starting a new design.
+* Composer: New project doesn't set screen visible
+* Composer: Screen Tabs can't be closed
+* Composer Crashes when configuring keypad widget
+* EGT compilation problems & Crash
+* Composer with a project loaded crashes when requesting a create a new project
+* Composer loads project with Global Palette support in gray scale
+* Composer missing icons
+* Image Widget Alpha Blending malfunctioning
+* Composer: Update Graphics Wiki link in About Screen
+* Composer: When open after minimized, the Composer always reopens to the main monitor
+* Composer: Disabled properties don't look disabled
+* GLCD defines not being generated when Canvas mode is enabled
+* Alpha blended fills with GPU doesn't work on MZDA
+* Composer: Qt Rendering is constantly repainting design
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.0.0 (Windows/Linux)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE:** MGS Harmony Composer UI/UX modernized for Windows and Linux builds only
+  * MacOS Build version remains at:
+     * Microchip Graphics Composer v1.4.1b
+        * Legato Plugin v2.3.15b
+
+### MGS Simulator
+
+* MGS Simulator v1.0.0
+
+* For information on how to download and use the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+
+### Development Tools
+
+- [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.5.1
+
+### Dependent Components
+
+* [Core v3.13.4 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.13.4)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
 
 ## Graphics Release v3.14.1
 
@@ -33,8 +103,7 @@ nav_order: 99
 - [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
 - [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
 - MPLAB® X IDE plug-ins:
-    - [MPLAB® Code Configurator (MCC) Plugin v5.4.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
-    - [MPLAB® Code Configurator (MCC) Core v5.6.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    - MPLAB® Code Configurator (MCC) Plugin v5.4.1
 
 ### Dependent Components
 
@@ -54,8 +123,8 @@ nav_order: 99
 * Added 4-inch 720x720 Waveshare MIPI round display driver support 
 * Added RGB332 color mode support for LCC display driver
 
-* Added Harmony components to support the **Microchip Graphics Suite Web Simulator**
-	* **Note:** The MGS Web Simulator is in closed-beta testing until release v3.15.0. Please contact your local Microchip Sales Office or submit a question with [Microchip Client Support and Services](https://www.microchip.com/en-us/support/design-help/client-support-services) if you wish to particapte in the closed-beta testing.
+* Added Harmony components to support the **Microchip Graphics Suite Simulator**
+	* **Note:** The MGS Simulator is in closed-beta testing until release v3.15.0. Please contact your local Microchip Sales Office or submit a question with [Microchip Client Support and Services](https://www.microchip.com/en-us/support/design-help/client-support-services) if you wish to particapte in the closed-beta testing.
 
 
 ### Issues Fixed
@@ -90,8 +159,8 @@ nav_order: 99
 - [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
 - [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
 - MPLAB® X IDE plug-ins:
-    - [MPLAB® Code Configurator (MCC) Plugin v5.4.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
-    - [MPLAB® Code Configurator (MCC) Core v5.6.1](https://github.com/Microchip-MPLAB-Harmony/mplabx-plugin).
+    - MPLAB® Code Configurator (MCC) Plugin v5.4.1
+
 
 ### Dependent Components
 

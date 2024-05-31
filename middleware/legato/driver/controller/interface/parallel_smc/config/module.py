@@ -23,7 +23,12 @@
 ##############################################################################
 
 def loadModule():	
-	if ("SAM" in str(Variables.get("__PROCESSOR")) and "7" in str(Variables.get("__PROCESSOR"))):
+	if ("SAMRH" in str(Variables.get("__PROCESSOR")) and "7" in str(Variables.get("__PROCESSOR"))):
+		component = Module.CreateComponent("le_gfx_intf_parallel_smc", "LE Parallel (SMC)", "/Graphics/Interface", "config/parallel_smc.py")
+		component.setDisplayType("Parallel Display Interface via SMC")
+		component.addCapability("le_gfx_intf_parallel_smc", "Parallel Display Interface", False)
+		component.addDependency("HEMC_CS", "HEMC_CS", False, True)
+	elif ("SAM" in str(Variables.get("__PROCESSOR")) and "7" in str(Variables.get("__PROCESSOR"))):
 		component = Module.CreateComponent("le_gfx_intf_parallel_smc", "LE Parallel (SMC)", "/Graphics/Interface", "config/parallel_smc.py")
 		component.setDisplayType("Parallel Display Interface via SMC")
 		component.addCapability("le_gfx_intf_parallel_smc", "Parallel Display Interface", False)

@@ -24,7 +24,7 @@
 
 
 def loadModule():
-    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X75"]):
+    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X75", "SAMA7D"]):
         component = Module.CreateComponent(
             "gfx_display_comp_waveshare_2_8in_dsi",
             "Waveshare 2.8inch DSI LCD",

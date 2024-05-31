@@ -21,6 +21,14 @@
 # ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
+
+if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75"]):
+    lvdspll_updt_id = 3
+    lvdspll_isr0_mask = "PMC_PLL_ISR0_LVDSLOCK_Msk"
+else:
+    lvdspll_updt_id = 7
+    lvdspll_isr0_mask = "PMC_PLL_ISR0_LOCK7_Msk"
+
 def instantiateComponent(component):
     project_path = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/xlcdc/bridge"
 
@@ -34,6 +42,14 @@ def instantiateComponent(component):
     show_clock_menu = clk_help_test_sym()
 
     # Utility Symbols (hidden)
+    # LVDSPLL Index value for PLL control
+    lvdspll_index = component.createIntegerSymbol("LVDSPLLIndex", None)
+    lvdspll_index.setDefaultValue(lvdspll_updt_id)
+    lvdspll_index.setVisible(False)
+    # LVDSPLL Lock Mask
+    lvdspll_mask = component.createStringSymbol("LVDSPLLISRMask", None)
+    lvdspll_mask.setDefaultValue(lvdspll_isr0_mask)
+    lvdspll_mask.setVisible(False)
     # Initialize LVDSPLL and LVDSC Peripheral Clock inside LVDSC PLIB
     lvds_clk_en = component.createBooleanSymbol("LVDSClocksEn", None)
     lvds_clk_en.setLabel("LVDS PLL Enable")

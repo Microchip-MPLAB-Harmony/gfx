@@ -44,6 +44,7 @@
 
 #include "device.h"
 #include "gfx/driver/controller/xlcdc/bridge/dsi/plib_dsi.h"
+<#if SupportCSI>
 
 /* Utility Macros */
 /* PMC */
@@ -60,6 +61,7 @@
 #define DSI_PCKHDL_CFG_EOTP_TX_LP_EN_Pos          _UINT32_(5)
 #define DSI_PCKHDL_CFG_EOTP_TX_LP_EN_Msk          (_UINT32_(0x1) << DSI_PCKHDL_CFG_EOTP_TX_LP_EN_Pos)
 #define DSI_PCKHDL_CFG_EOTP_TX_LP_EN(value)       (DSI_PCKHDL_CFG_EOTP_TX_LP_EN_Msk & (_UINT32_(value) << DSI_PCKHDL_CFG_EOTP_TX_LP_EN_Pos))
+</#if>
 
 /* Configuration Macros */
 /* LCD Parameters */
@@ -144,23 +146,27 @@ void DSI_Initialize(void)
 {
 <#if DSIClocksEn>
     /* Enable clocks */
-    /* Enable MIPIPHY */
+    /* Enable ${SupportCSI?then('MIPIPHY', 'DSI')} */
     PMC_REGS->PMC_PCR = PMC_PCR_CMD_Msk |
-                        PMC_PCR_PID(ID_MIPIPHY) |
+                        PMC_PCR_PID(${SupportCSI?then('ID_MIPIPHY', 'ID_DSI')}) |
                         PMC_PCR_EN_Msk |
                         PMC_PCR_GCLKEN_Msk |
                         PMC_PCR_GCLKDIV(${MIPIPhyGCLKDiv} - 1) |
                         PMC_PCR_GCLKCSS(${MIPIPhyGCLKSource});
 
+<#if SupportCSI>
     /* Enable DSI */
     PMC_REGS->PMC_PCR = PMC_PCR_CMD_Msk |
                         PMC_PCR_PID(ID_DSI) |
                         PMC_PCR_EN_Msk;
 
 </#if>
+</#if>
+<#if SupportCSI>
     /* Configure and Initialize DSI Mode */
     SFR_REGS->SFR_ISS_CFG = SFR_ISS_CFG_MODE_DSI;
 
+</#if>
     /* Reset DSI */
     DSI_REGS->DSI_PWR_UP = DSI_PWR_UP_SHUTDOWNZ(0);
 
@@ -303,13 +309,13 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
         case 0x15: // 1 parameter
         {
             DSI_REGS->DSI_GEN_HDR = hdr->headerU32;
-            
+
             return false;
         }
         /* Generic Long Write */
         case 0x29:
         /* DCS Long Write */
-        case 0x39: 
+        case 0x39:
         {
             uint32_t pld_size  = 0;
 

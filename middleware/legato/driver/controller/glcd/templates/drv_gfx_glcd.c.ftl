@@ -295,7 +295,8 @@ typedef struct __display_layer {
     volatile bool swapPending;
 </#if>
 } DISPLAY_LAYER;
-static DISPLAY_LAYER drvLayer[GFX_GLCD_LAYERS];
+
+static DISPLAY_LAYER drvLayer[GFX_GLCD_LAYERS] = {{{0}}};
 
 static gfxResult DRV_GLCD_UpdateLayer(unsigned int layer);
 
@@ -571,7 +572,7 @@ void DRV_GLCD_Initialize()
     <#list 0..(TotalNumLayers-1) as i>
     drvLayer[${i}].baseaddr[1] = framebuffer1_${i};
     </#list>
-</#if>
+    </#if>
 <#else>
     <#list 0..(TotalNumLayers-1) as i>
     <#if DoubleBuffer == true>
@@ -582,9 +583,7 @@ void DRV_GLCD_Initialize()
     </#if>
     </#list>
 </#if>
-</#if>
-
-<#list 0..(TotalNumLayers-1) as i>
+    <#list 0..(TotalNumLayers-1) as i>
     drvLayer[${i}].startx      = GFX_GLCD_LAYER${i}_STARTX;
     drvLayer[${i}].starty      = GFX_GLCD_LAYER${i}_STARTY;
     drvLayer[${i}].resx        = GFX_GLCD_LAYER${i}_WIDTH;
@@ -592,18 +591,16 @@ void DRV_GLCD_Initialize()
     drvLayer[${i}].sizex       = GFX_GLCD_LAYER${i}_WIDTH;
     drvLayer[${i}].sizey       = GFX_GLCD_LAYER${i}_HEIGHT;
     drvLayer[${i}].colorspace  = GFX_GLCD_LAYER${i}_COLOR_MODE;
-</#list>
-
-<#if CanvasModeOnly == false>
-<#list 0..(TotalNumLayers-1) as i>
+    </#list>
+    <#list 0..(TotalNumLayers-1) as i>
     //Clear frame buffer
-<#if DoubleBuffer == true>
+    <#if DoubleBuffer == true>
     memset(drvLayer[${i}].baseaddr[0], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
     memset(drvLayer[${i}].baseaddr[1], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
-<#else>
+    <#else>
     memset(drvLayer[${i}].baseaddr[0], 0, sizeof(FRAMEBUFFER_PIXEL_TYPE) * GFX_GLCD_LAYER${i}_WIDTH * GFX_GLCD_LAYER${i}_HEIGHT);
-</#if>
-</#list>
+    </#if>
+    </#list>
 </#if>
 
     for (layerCount = 0; layerCount < GFX_GLCD_LAYERS; layerCount++)

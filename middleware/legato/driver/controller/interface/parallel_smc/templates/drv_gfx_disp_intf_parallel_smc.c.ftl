@@ -48,6 +48,9 @@
 
 #define EBI_CS_INDEX  ${EBIChipSelectIndex}
 
+<#if EBIChipSelectIsDynamic == true>
+#define EBI_BASE_ADDR  ${EBIChipSelectBaseAddress}
+<#else>
 <#if EBIChipSelectIndex == 0>
 #define EBI_BASE_ADDR  EBI_CS0_ADDR
 <#elseif EBIChipSelectIndex == 1>
@@ -56,6 +59,11 @@
 #define EBI_BASE_ADDR  EBI_CS2_ADDR
 <#elseif EBIChipSelectIndex == 3>
 #define EBI_BASE_ADDR  EBI_CS3_ADDR
+<#elseif EBIChipSelectIndex == 4>
+#define EBI_BASE_ADDR  EBI_CS4_ADDR
+<#elseif EBIChipSelectIndex == 5>
+#define EBI_BASE_ADDR  EBI_CS5_ADDR
+</#if>
 </#if> 
 
 // Use Address bit ${DCXAddressBit} as DCX

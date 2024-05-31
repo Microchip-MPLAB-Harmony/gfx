@@ -71,6 +71,35 @@ table_hsbrc = [
     {"min": 950, "max": 1000, "hsbrc": "0b0110100", "clk": {"lp_hs": 130, "hs_lp": 49}, "dat": {"lp_hs": 107, "hs_lp": 35}},
 ]
 
+if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X75"]):
+    symbol_clk_en = "DSI_CLOCK_ENABLE"
+    symbol_gclk_en = "CLK_MIPIPHY_GCLKEN"
+    symbol_gck_freq = "MIPIPHY_GCLK_FREQUENCY"
+    symbol_gck_src_0_freq = "MCK_FREQUENCY"
+    symbol_gck_src_1_freq = "PLLADIV2CLK_FREQUENCY"
+    gck_src_0 = "MCK"
+    gck_src_1 = "PLLADIV2CLK"
+    gck_src_0_label = "MCK"
+    gck_src_1_label = "PLLA/2"
+    gck_src_0_reg = "PMC_PCR_GCLKCSS_MCK_Val"
+    gck_src_1_reg = "PMC_PCR_GCLKCSS_PLLADIV2CLK_Val"
+    gck_max_freq = 27000000
+    mipi_csi_support = True
+
+else:
+    symbol_clk_en = "DSI_CLOCK_ENABLE"
+    symbol_gclk_en = "CLK_DSI_GCLKEN"
+    symbol_gck_freq = "DSI_GCLK_FREQUENCY"
+    symbol_gck_src_0_freq = "MAINCK_FREQUENCY"
+    symbol_gck_src_1_freq = "SYSPLL_FREQUENCY"
+    gck_src_0 = "MAINCK"
+    gck_src_1 = "SYSPLL"
+    gck_src_0_label = gck_src_0
+    gck_src_1_label = gck_src_1
+    gck_src_0_reg = "PMC_PCR_GCLKCSS_MAINCK_Val"
+    gck_src_1_reg = "PMC_PCR_GCLKCSS_SYSPLL_Val"
+    gck_max_freq = 27000000
+    mipi_csi_support = False
 
 # Run on Module Load
 def instantiateComponent(component):
@@ -94,13 +123,18 @@ def instantiateComponent(component):
     plib_clk_en.setLabel("DSI Clocks Enable")
     plib_clk_en.setDefaultValue(show_clock_menu)
     plib_clk_en.setVisible(False)
-    plib_clk_en.setDependencies(clk_help_cb, ["core.DSI_CLOCK_ENABLE", "core.CLK_MIPIPHY_GCLKEN"])
+    plib_clk_en.setDependencies(clk_help_cb, ["core." + symbol_clk_en, "core." + symbol_gclk_en])
     # Dependency check for selecting timing data source in FTL
     global xlcdc_connected
     xlcdc_connected = component.createBooleanSymbol("XLCDCConnected", None)
     xlcdc_connected.setLabel("XLCDC Connected")
     xlcdc_connected.setDefaultValue(False)
     xlcdc_connected.setVisible(False)
+    # IP supports both CSI and DSI
+    apply_workarounds = component.createBooleanSymbol("SupportCSI", None)
+    apply_workarounds.setVisible(False)
+    apply_workarounds.setReadOnly(True)
+    apply_workarounds.setDefaultValue(mipi_csi_support)
 
     # Clock Config Menu
     # Only availabe if clock values were never configured by the user since symbols cannot have more than one source
@@ -125,8 +159,8 @@ def instantiateComponent(component):
     mipi_gclk_source = component.createKeyValueSetSymbol("MIPIPhyGCLKSource", mipiphy_gclk_menu)
     mipi_gclk_source.setLabel("Source")
     mipi_gclk_source.setDescription("Generic Clock Source.")
-    mipi_gclk_source.addKey("MCK", "PMC_PCR_GCLKCSS_MCK_Val", "MCK")
-    mipi_gclk_source.addKey("PLLADIV2CLK", "PMC_PCR_GCLKCSS_PLLADIV2CLK_Val", "PLLA/2")
+    mipi_gclk_source.addKey(gck_src_0, gck_src_0_reg, gck_src_0_label)
+    mipi_gclk_source.addKey(gck_src_1, gck_src_1_reg, gck_src_1_label)
     mipi_gclk_source.setOutputMode("Value")
     mipi_gclk_source.setDisplayMode("Description")
     mipi_gclk_source.setDefaultValue(1)
@@ -135,9 +169,9 @@ def instantiateComponent(component):
     mipi_gclk_src_hint = component.createIntegerSymbol("MIPIPhyGCLKSrcHint", mipiphy_gclk_menu)
     mipi_gclk_src_hint.setLabel("Input Clock (Hz)")
     mipi_gclk_src_hint.setDescription("GCLK Input Clock.")
-    mipi_gclk_src_hint.setDefaultValue(Database.getSymbolValue("core", "PLLADIV2CLK_FREQUENCY"))
+    mipi_gclk_src_hint.setDefaultValue(Database.getSymbolValue("core", symbol_gck_src_1_freq))
     mipi_gclk_src_hint.setReadOnly(True)
-    mipi_gclk_src_hint.setDependencies(update_mipi_gclk_clock, ["MIPIPhyGCLKSource", "core.MCK_FREQUENCY", "core.PLLADIV2CLK_FREQUENCY"])
+    mipi_gclk_src_hint.setDependencies(update_mipi_gclk_clock, ["MIPIPhyGCLKSource", "core." + symbol_gck_src_0_freq, "core." + symbol_gck_src_1_freq])
 
     # MIPI GCLK Divider
     mipi_gclk_div = component.createIntegerSymbol("MIPIPhyGCLKDiv", mipiphy_gclk_menu)
@@ -149,7 +183,7 @@ def instantiateComponent(component):
 
     # MIPI GCLK Output Value Hint
     if not show_clock_menu:
-        mipi_gclk_out_hint_hz = Database.getSymbolValue("core", "MIPIPHY_GCLK_FREQUENCY")
+        mipi_gclk_out_hint_hz = Database.getSymbolValue("core", symbol_gck_freq)
     else:
         mipi_gclk_out_hint_hz = mipi_gclk_src_hint.getValue() / mipi_gclk_div.getValue()
     mipi_gclk_out_hint = component.createIntegerSymbol("MIPIPhyGCLKOutHint", mipiphy_gclk_menu)
@@ -157,7 +191,7 @@ def instantiateComponent(component):
     mipi_gclk_out_hint.setDescription("GCLK Output Clock, i.e. Input Clock to MIPIPHY.")
     mipi_gclk_out_hint.setDefaultValue(mipi_gclk_out_hint_hz)
     mipi_gclk_out_hint.setReadOnly(True)
-    mipi_gclk_out_hint.setDependencies(update_mipi_gclk_clock, ["MIPIPhyGCLKSrcHint", "MIPIPhyGCLKDiv", "core.DSI_CLOCK_ENABLE", "core.MIPIPHY_GCLK_FREQUENCY"])
+    mipi_gclk_out_hint.setDependencies(update_mipi_gclk_clock, ["MIPIPhyGCLKSrcHint", "MIPIPhyGCLKDiv", "core." + symbol_clk_en, "core." + symbol_gck_freq])
 
     # MIPI GCLK Clock Validity Hint
     mipi_gclk_valid_hint = component.createCommentSymbol("MIPIPhyGCLKValidHint", mipiphy_gclk_menu)
@@ -593,27 +627,27 @@ def update_display_config(component, display_id):
 def update_mipi_gclk_clock(symbol, event):
     clkmgr_mipiphy_gclk_hz = 0
     gclk_src_sel = event["source"].getSymbolValue("MIPIPhyGCLKSource")
-    # MCK_FREQUENCY
-    if event["id"] == "MCK_FREQUENCY":
+    # GCLK Source 0
+    if event["id"] == symbol_gck_src_0_freq:
         if gclk_src_sel == 0:
             symbol.setValue(event["value"])
-    # PLLADIV2CLK_FREQUENCY
-    elif event["id"] == "PLLADIV2CLK_FREQUENCY":
+    # GCLK Source 1
+    elif event["id"] == symbol_gck_src_1_freq:
         if gclk_src_sel == 1:
             symbol.setValue(event["value"])
-    # DSI_CLOCK_ENABLE
-    elif event["id"] == "DSI_CLOCK_ENABLE":
-        clkmgr_mipiphy_gclk_hz = Database.getSymbolValue("core", "MIPIPHY_GCLK_FREQUENCY")
-    # MIPIPHY_GCLK_FREQUENCY
-    elif event["id"] == "MIPIPHY_GCLK_FREQUENCY":
+    # Peripheral Clock Enable
+    elif event["id"] == symbol_clk_en:
+        clkmgr_mipiphy_gclk_hz = Database.getSymbolValue("core", symbol_gck_freq)
+    # GCLK Frequency
+    elif event["id"] == symbol_gck_freq:
         clkmgr_mipiphy_gclk_hz = event["value"]
     # MIPIPhyGCLKSource
     elif event["id"] == "MIPIPhyGCLKSource":
         gclk_src_sel = event["value"]
         if gclk_src_sel == 0:
-            symbol.setValue(Database.getSymbolValue("core", "MCK_FREQUENCY"))
+            symbol.setValue(Database.getSymbolValue("core", symbol_gck_src_0_freq))
         elif gclk_src_sel == 1:
-            symbol.setValue(Database.getSymbolValue("core", "PLLADIV2CLK_FREQUENCY"))
+            symbol.setValue(Database.getSymbolValue("core", symbol_gck_src_1_freq))
     # MIPIPhyGCLKOutHint
     out_clk = event["source"].getSymbolValue("MIPIPhyGCLKSrcHint") / event["source"].getSymbolValue("MIPIPhyGCLKDiv")
     if clk_help_test_sym():
@@ -656,8 +690,8 @@ def update_dphy_pll_clock(symbol, event):
 # Clock Validity
 # GCLK
 def show_mipi_gclk_valid_hint(symbol, event):
-    if event["value"] > 27000000:
-        symbol.setLabel("[Warning! Must not exceed 27 MHz]")
+    if event["value"] > gck_max_freq:
+        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq/1000000)) + " MHz]")
         symbol.setVisible(True)
     elif event["value"] <= 0:
         symbol.setLabel("[Warning! 0Hz?]")
@@ -716,8 +750,8 @@ def clk_show_sym_inv(symbol, event):
 def clk_help_test_sym():
     is_set = False
     test_symbols = [
-        ["core", "DSI_CLOCK_ENABLE"],
-        ["core", "CLK_MIPIPHY_GCLKEN"],
+        ["core", symbol_clk_en],
+        ["core", symbol_gclk_en],
     ]
 
     for item in test_symbols:

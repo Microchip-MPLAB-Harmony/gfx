@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_display_module_nvdi_10_1in" id="E31E4611-519B-4407-AF64-6757FE16E062" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

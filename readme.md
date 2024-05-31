@@ -1,9 +1,9 @@
 ﻿---
-title: Harmony 3 Graphics Package
+title: Microchip Graphics Suite Harmony Package
 nav_order: 1
 ---
 
-# ![Microchip Technology](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png) MPLAB® Harmony 3 Microchip Graphics Suite Support Package
+# ![Microchip Technology](https://mchpgfx.github.io/legato.docs/docs/legato/images/mgs.svg) Microchip Graphics Suite Harmony Package
 
 MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating
 embedded firmware solutions for Microchip 32-bit SAM and PIC® microcontroller
@@ -62,7 +62,7 @@ For additional information, visit the [MGS Harmony Composer User Guide](https://
 ***
 ## MGS Simulator
 ***
-MGS Harmony Web Simulator allows developers to prototype and debug graphics applications on a PC, before deploying them on the actual hardware. It emulates the graphics controller of an MCU, allowing you to see the output of your code in real-time. 
+MGS Harmony Simulator allows developers to prototype and debug graphics applications on a PC, before deploying them on the actual hardware. It emulates the graphics controller of an MCU, allowing you to see the output of your code in real-time. 
 
 For information on how to download and use the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
 
@@ -104,6 +104,7 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 ***
 **LVGL** - demonstrations interfacing with LVGL are available for the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7), the [SAM D5x/E5x Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_d5x_e5x), and the [PIC32MZ DA Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_da).
 
+**Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [SAM A5D2 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_sam_a5d2)
 ***
 
 ## Image Sensor Support

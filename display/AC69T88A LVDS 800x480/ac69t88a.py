@@ -137,3 +137,9 @@ def instantiateComponent(component):
     lvds_bpp.setDescription("The supported pixel data size in bits.")
     lvds_bpp.setDefaultValue(24)  # 18 or 24
     lvds_bpp.setReadOnly(True)
+
+    lvds_clk = component.createIntegerSymbol("LVDSDotClk", lvds_menu)
+    lvds_clk.setLabel("LCD Pixel Clock (kHz)")
+    lvds_clk.setDescription("The pixel clock of the LCD panel.")
+    lvds_clk.setDefaultValue(25000)
+    lvds_clk.setReadOnly(True)

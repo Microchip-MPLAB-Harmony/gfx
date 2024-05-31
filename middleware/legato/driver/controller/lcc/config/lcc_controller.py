@@ -24,7 +24,11 @@
 
 import re
 
+global EBIChipSelectBaseAddress
+
 def instantiateComponent(comp):
+	global EBIChipSelectBaseAddress
+
 	projectPath = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/lcc"
 	
 	#comp.setHelpFile("../../../doc/html/help_harmony_gfx_html_alias.h")
@@ -255,9 +259,21 @@ def instantiateComponent(comp):
 	EBIChipSelectIndex.setLabel("EBI Chip Select Index")
 	EBIChipSelectIndex.setDescription("The chip select index")
 	EBIChipSelectIndex.setMin(0)
-	EBIChipSelectIndex.setMax(4)
+	EBIChipSelectIndex.setMax(5)
 	EBIChipSelectIndex.setDefaultValue(0)
 	EBIChipSelectIndex.setVisible(False)
+
+	EBIChipSelectIsDynamic = comp.createBooleanSymbol("EBIChipSelectIsDynamic", None)
+	EBIChipSelectIsDynamic.setLabel("True if Chip select base address is not fixed in memory map")
+	EBIChipSelectIsDynamic.setDefaultValue(False)
+	EBIChipSelectIsDynamic.setVisible(False)
+	EBIChipSelectIsDynamic.setReadOnly(True)
+
+	EBIChipSelectBaseAddress = comp.createStringSymbol("EBIChipSelectBaseAddress", None)
+	EBIChipSelectBaseAddress.setLabel("EBI Chip Select Base Address")
+	EBIChipSelectBaseAddress.setDescription("The chip select base address")
+	EBIChipSelectBaseAddress.setDefaultValue("0x00000000")
+	EBIChipSelectBaseAddress.setVisible(False)
 
 	### Start of Backlight config options
 	BacklightSettings = comp.createMenuSymbol("BacklightSettings", None)
@@ -419,6 +435,32 @@ def resetSMCComponent(lccComponent, smcComponent, smcChipSelNum):
 	smcComponent.clearSymbolValue("SMC_WRITE_ENABLE_MODE_CS" + str(smcChipSelNum))
 	lccComponent.clearSymbolValue("EBIChipSelectIndex")
 
+def configureHSMCComponent(lccComponent, smcComponent, smcChipSelNum):
+	print("LCC: Connecting HSMC_CS" + str(smcChipSelNum))
+	smcComponent.setSymbolValue("SMC_CHIP_SELECT" + str(smcChipSelNum), True, 1)
+	smcComponent.setSymbolValue("SMC_MEM_SCRAMBLING_CS" + str(smcChipSelNum), False, 1)
+	smcComponent.setSymbolValue("SMC_NWE_SETUP_CS" + str(smcChipSelNum), 5, 1)
+	smcComponent.setSymbolValue("SMC_NCS_WR_SETUP_CS" + str(smcChipSelNum), 0, 1)
+	smcComponent.setSymbolValue("SMC_NWE_PULSE_CS" + str(smcChipSelNum), 2, 1)
+	smcComponent.setSymbolValue("SMC_NWE_CYCLE_CS" + str(smcChipSelNum), 6, 1)
+	smcComponent.setSymbolValue("SMC_NCS_WR_PULSE_CS" + str(smcChipSelNum), 6, 1)
+	smcComponent.setSymbolValue("SMC_DATA_BUS_CS" + str(smcChipSelNum), 1, 1)
+	smcComponent.setSymbolValue("SMC_WRITE_ENABLE_MODE_CS" + str(smcChipSelNum), False, 1)
+	lccComponent.setSymbolValue("EBIChipSelectIndex", smcChipSelNum, 1)
+
+def resetHSMCComponent(lccComponent, smcComponent, smcChipSelNum):
+	print("LCC: Disconnecting HSMC_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_CHIP_SELECT" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_MEM_SCRAMBLING_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_NWE_SETUP_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_NCS_WR_SETUP_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_NWE_PULSE_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_NWE_CYCLE_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_NCS_WR_PULSE_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_DATA_BUS_CS" + str(smcChipSelNum))
+	smcComponent.clearSymbolValue("SMC_WRITE_ENABLE_MODE_CS" + str(smcChipSelNum))
+	lccComponent.clearSymbolValue("EBIChipSelectIndex")
+
 def configureDisplayTiming(lccComponent, displayComponent):
 	lccComponent.setSymbolValue("DisplayHorzPulseWidth", displayComponent.getSymbolByID("HorzPulseWidth").getValue())
 	lccComponent.setSymbolValue("DisplayHorzBackPorch", displayComponent.getSymbolByID("HorzBackPorch").getValue())
@@ -456,13 +498,25 @@ def onAttachmentConnected(source, target):
 	elif (source["id"] == "Graphics Display"):
 		#configure timing
 		configureDisplayTiming(source["component"], target["component"])
-
+	#### test for HEMC dependency
+	elif (source["id"] == "HEMC_CS"):
+		sub = re.search('hemc_cs(.*)', str(target["id"]))
+		if (sub and sub.group(1)):
+			selectedCS = int(sub.group(1))
+			chipSelectBaseaddress = target["component"].getSymbolByID("CS_" + str(selectedCS) + "_START_ADDRESS").getValue()
+			source["component"].setSymbolValue("EBIChipSelectIsDynamic", True, 1)
+			EBIChipSelectBaseAddress.setValue(chipSelectBaseaddress)
+			configureHSMCComponent(source["component"], target["component"], selectedCS)
 	
 def onAttachmentDisconnected(source, target):
 	if (source["id"] == "SMC_CS"):
 		sub = re.search('smc_cs(.*)', str(target["id"]))
 		if (sub and sub.group(1)):
 			resetSMCComponent(source["component"], target["component"], int(sub.group(1)))
+	elif (source["id"] == "HEMC_CS"):
+		sub = re.search('hemc_cs(.*)', str(target["id"]))
+		if (sub and sub.group(1)):
+			resetHSMCComponent(source["component"], target["component"], int(sub.group(1)))
 	elif (source["id"] == "Graphics Display"):
 		#reset timing
 		resetDisplayTiming(source["component"], target["component"])
@@ -511,3 +565,12 @@ def updateDisplayManager(component, target):
 def onBlitModeSet(symbol, event):
 	symbol.getComponent().getSymbolByID("DMABlitChannel").setVisible(event["value"] == "DMA")
 	symbol.getComponent().getSymbolByID("BlitModeComment").setVisible(event["value"] == "DMA")
+
+def handleMessage(messageID, args):
+	global EBIChipSelectBaseAddress
+	resDict = {}
+
+	if (messageID == "BASE_ADDRESS_UPDATE"):
+		EBIChipSelectBaseAddress.setValue(args["address"])
+
+	return resDict

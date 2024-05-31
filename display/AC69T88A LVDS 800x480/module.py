@@ -29,6 +29,7 @@ def loadModule():
         for device in [
             "SAM9X75",
             "SAM9X72",
+            "SAMA7D"
         ]
     ):
         component = Module.CreateComponent(

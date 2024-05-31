@@ -12,7 +12,7 @@
 
   Description:
     This library implements a SUBSET of the register configurations
-    for the XLCDC peripheral. 
+    for the XLCDC peripheral.
 
     Created with MPLAB Harmony Version 3.0
 *******************************************************************************/
@@ -77,7 +77,9 @@ typedef enum
     XLCDC_LAYER_HEO,
     XLCDC_LAYER_OVR1,
 </#if>
+<#if SupportOVR2>
     XLCDC_LAYER_OVR2,
+</#if>
 } XLCDC_LAYER;
 
 /*******************************************************************************
@@ -251,6 +253,7 @@ void XLCDC_SetupBaseLayer(void);
     None.
 */
 void XLCDC_SetupOVR1Layer(void);
+<#if SupportOVR2>
 
 /*******************************************************************************
   Function:
@@ -275,6 +278,7 @@ void XLCDC_SetupOVR1Layer(void);
     None.
 */
 void XLCDC_SetupOVR2Layer(void);
+</#if>
 
 /*******************************************************************************
   Function:
@@ -632,7 +636,7 @@ bool XLCDC_UpdateLayerAttributes(XLCDC_LAYER layer);
     None.
 
    Parameters:
-    enable - If True, enables Color Mode On signal. 
+    enable - If True, enables Color Mode On signal.
              If False, disables Color Mode On signal.
 
    Returns:

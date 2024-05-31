@@ -24,7 +24,7 @@
 
 
 def loadModule():
-    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75"]):
+    if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75", "SAMA7D"]):
         print("XLCDC module loaded to support " + str(Variables.get("__PROCESSOR")))
         component = Module.CreateComponent("le_gfx_driver_xlcdc", "LE XLCDC Driver", "/Graphics/Driver", "config/xlcdc.py")
         component.setDisplayType("LE XLCDC Display Driver")

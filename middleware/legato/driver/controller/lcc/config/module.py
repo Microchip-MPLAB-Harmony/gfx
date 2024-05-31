@@ -23,12 +23,22 @@
 ##############################################################################
 
 def loadModule():
+	
 	if ("PIC32MZ" in str(Variables.get("__PROCESSOR"))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_pic32mz.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")
 		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
 		cntlComponent.addDependency("EBI_CS", "EBI_CS", False, True)
 		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+	elif ("SAMRH" in str(Variables.get("__PROCESSOR")) and "7" in str(Variables.get("__PROCESSOR"))):
+		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller.py")
+		cntlComponent.setDisplayType("LE LCC Display Driver")
+		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
+		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+		cntlComponent.addDependency("HEMC_CS", "HEMC_CS", False, True)
+		### TMR dependency for PWM backlight control
+		cntlComponent.addDependency("TMR", "TMR", False, True)
+		cntlComponent.setDependencyEnabled("TMR", False)
 	elif ("SAM" in str(Variables.get("__PROCESSOR")) and "7" in str(Variables.get("__PROCESSOR"))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")
@@ -38,6 +48,15 @@ def loadModule():
 		### TMR dependency for PWM backlight control
 		cntlComponent.addDependency("TMR", "TMR", False, True)
 		cntlComponent.setDependencyEnabled("TMR", False)
+	elif((("PIC32CZ" in str(Variables.get("__PROCESSOR"))) and ("70" in str(Variables.get("__PROCESSOR"))))):
+		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_pic32cz_ca70.py")
+		cntlComponent.setDisplayType("LE LCC Display Driver")
+		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
+		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+		cntlComponent.addDependency("SMC_CS", "SMC_CS", False, True) 
+		### PWM dependency for PWM backlight control
+		cntlComponent.addDependency("Backlight", "PWM", False, True)
+		#cntlComponent.setDependencyEnabled("PWM", False)
 	elif (("SAM" in str(Variables.get("__PROCESSOR")) and "5" in str(Variables.get("__PROCESSOR"))) or ("PIC32CX" in str(Variables.get("__PROCESSOR")))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_e5xd5x.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")
@@ -53,8 +72,8 @@ def loadModule():
 		cntlComponent.addDependency("EBI_CS", "EBI_CS", False, True)
 		### TMR dependency for PWM backlight control
 		cntlComponent.addDependency("TCC", "PWM", False, True)
-		cntlComponent.addDependency("Backlight", "PWM", False)
-	elif ("PIC32CZ" in str(Variables.get("__PROCESSOR"))):
+		cntlComponent.addDependency("Backlight", "PWM", False) 
+	elif ("PIC32CZ" in str(Variables.get("__PROCESSOR")) and ("70" not in str(Variables.get("__PROCESSOR")))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_pic32cz.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")
 		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)

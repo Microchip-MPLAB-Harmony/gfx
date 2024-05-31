@@ -213,10 +213,12 @@ leResult leGPU_FillRect(const leRect* rect,
 #if LE_ALPHA_BLENDING_ENABLED == 1
     if(a < 255 || LE_COLOR_MODE_IS_ALPHA((leColorMode)buf.mode) == 1)
     {
-        intf->setGlobalAlpha(GFX_GLOBAL_ALPHA_ON,
+        intf->setGlobalAlpha(GFX_GLOBAL_ALPHA_SCALE,
                              GFX_GLOBAL_ALPHA_OFF,
                              a,
                              255);
+
+        intf->setBlend(GFX_BLEND_SRC_OVER);
     }
 #else
     (void)a; // unused
@@ -233,6 +235,8 @@ leResult leGPU_FillRect(const leRect* rect,
                              GFX_GLOBAL_ALPHA_OFF,
                              255,
                              255);
+        
+        intf->setBlend(GFX_BLEND_NONE);
     }
 #endif
 

@@ -247,11 +247,11 @@ def instantiateComponent(component):
     tmr_subsys_callback_api_name.setDefaultValue("GFX_SIM_TimerRegisterCallback")
     tmr_subsys_irq_enum_api_stub.setDefaultValue("0")
 
-    # Webpage Options
+    # Web Mode Options
     # Group Name
     web_opt_menu = component.createMenuSymbol("webOpts", None)
-    web_opt_menu.setLabel("Webpage Options")
-    web_opt_menu.setDescription("Contains options for webpage customization.")
+    web_opt_menu.setLabel("Web Mode Options")
+    web_opt_menu.setDescription("Contains options for Web mode.")
 
     # Web page title
     default_title = Variables.get("__CONFIGURATION_NAME")
@@ -301,9 +301,9 @@ def instantiateComponent(component):
     web_opt_con_srtclo_toggle.setVisible(False)
     web_opt_con_srtclo_toggle.setDependencies(consoleEnabled, ["isConsoleEnabled"])
 
-    # Advanced Options
+    # Build Options
     # Group Name
-    build_opt_menu = component.createMenuSymbol("buildOpts", None)
+    build_opt_menu = component.createMenuSymbol("buildOpts", web_opt_menu)
     build_opt_menu.setLabel("Build Options")
     build_opt_menu.setDescription("Customize options for the simulator build.")
 
@@ -337,6 +337,19 @@ def instantiateComponent(component):
         "<br> </html>"
     )
     build_opt_optimization.setDefaultValue(defaultOptimizationLevel)
+
+    # Native Mode Options
+    # Group Name
+    native_opt_menu = component.createMenuSymbol("nativeOpts", None)
+    native_opt_menu.setLabel("Native Mode Options")
+    native_opt_menu.setDescription("Contains options for Native Mode.")
+
+    # AOT Enable
+    native_opt_window_aot = component.createBooleanSymbol("alwaysOnTop", native_opt_menu)
+    native_opt_window_aot.setLabel("Window Always On Top")
+    native_opt_window_aot.setDescription("<html>Enables always on top window.<br />This may help keep the window in view while debugging<br />with breakpoints.</html>")
+    native_opt_window_aot.setDefaultValue(True)
+    native_opt_window_aot.setReadOnly(False)
 
     # Code Generation
     # Paths

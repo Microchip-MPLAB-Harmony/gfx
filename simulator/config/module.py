@@ -26,7 +26,7 @@
 def loadModule():
     component = Module.CreateComponent(
         "mgs_web_sim",
-        "MGS Web Simulator",
+        "MGS Simulator",
         "/Graphics/Simulator/",
         "config/simulator.py",
     )

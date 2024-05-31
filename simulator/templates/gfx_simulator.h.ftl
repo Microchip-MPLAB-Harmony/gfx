@@ -36,7 +36,7 @@
 </#if>
 
 // You may exclude hardware specific code using any of these macros.
-#define MGSWS true
+#define MGS_SIM true
 #define GFX_SIM_ONLY true
 #define GFX_SIMULATOR_ENABLED true
 

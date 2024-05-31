@@ -19,7 +19,7 @@ title: Microchip MPLAB Harmony Graphics help
 lang: en-US
 timezone: America/Phoenix
 
-description: Harmony 3 Graphics package
+description: Microchip Graphics Suite Harmony package
 url: "https://microchip-mplab-harmony.github.io"
 baseurl: "/gfx"
 remote_theme: "mchpgfx/just-the-docs@mchp-harmony"
@@ -68,14 +68,34 @@ heading_anchors: true
 ga_tracking: UA-2724382-16
 
 exclude:
+  - "*.yml"
   - "*.xml"
+  - "*.csv"
+  - "*.mc3"
+  - "*.txt"
+  - "*.properties"
   - "*.py"
   - "*.ftl"
+  - "*.elf"
+  - "*.exe"
+  - "*.log"
+  - "*.ttf"
+  - "*.otf"
+  - "*.prl"
+  - "*.plist"
   - "*.c"
   - "*.h"
   - "*.X"
+  - "*.5*"
+  - "*.pdf"
   - "*.IAR"
+  - "*.cmake"
+  - "*.inc"
+  - "*.inx"
+  - "*.lst"
+  - "Qt*"
   - "Gem*"
+  - "Makefile.*"
   - "*.S"
   - "*.ld"
   - "*.jar"
@@ -94,7 +114,7 @@ aux_links:
     - "https://support.microchip.com"
 
 # Set a path/url to a logo that will be displayed instead of the title
-logo: "/assets/images/vendor/mhgs_logo_transparent.png"
+logo: "/assets/images/vendor/mgs.svg"
 
 # Footer content appears at the bottom of every page's main content
 footer_content: "<img src='https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png' /><br />Copyright &copy; 2024 Microchip Technology."

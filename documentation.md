@@ -4,7 +4,7 @@ nav_order: 3
 ---
 
 ![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
-![MHGS logo small](https://mchpgfx.github.io/legato.docs/docs/legato/images/mhgs.png)
+![Microchip Graphics Suite](https://mchpgfx.github.io/legato.docs/docs/legato/images/mgs.svg)
 
 # Microchip Graphics Suite (MGS) Harmony Documentation
 

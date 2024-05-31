@@ -61,7 +61,7 @@ void LVDSC_Initialize(void)
     /* Initialize LVDSPLL */
     /* Set PLL target to LVDSPLL and configure startup time of 150us */
     PMC_REGS->PMC_PLL_UPDT = PMC_PLL_UPDT_STUPTIM(0x6) |
-                             PMC_PLL_UPDT_ID(0x3);
+                             PMC_PLL_UPDT_ID(0x${LVDSPLLIndex});
 
     /* Set the analog controls to the values recommended in the data sheet */
     PMC_REGS->PMC_PLL_ACR = PMC_PLL_ACR_LOOP_FILTER(0x1B) |
@@ -85,7 +85,7 @@ void LVDSC_Initialize(void)
     PMC_REGS->PMC_PLL_UPDT |= PMC_PLL_UPDT_UPDATE_Msk;
 
     /* Wait for PLL lock */
-    while ((PMC_REGS->PMC_PLL_ISR0 & PMC_PLL_ISR0_LVDSLOCK_Msk) != PMC_PLL_ISR0_LVDSLOCK_Msk);
+    while ((PMC_REGS->PMC_PLL_ISR0 & ${LVDSPLLISRMask}) != ${LVDSPLLISRMask});
 
     /* Enable LVDSC Peripheral Clock */
     PMC_REGS->PMC_PCR = PMC_PCR_CMD_Msk |

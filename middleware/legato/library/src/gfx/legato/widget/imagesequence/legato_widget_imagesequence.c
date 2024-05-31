@@ -380,6 +380,13 @@ static leBool isPlaying(const leImageSequenceWidget* _this)
     return _this->playing;
 }
 
+static int32_t getActiveIndex(const leImageSequenceWidget* _this)
+{
+    LE_ASSERT_THIS();
+
+    return _this->activeIdx;
+}
+
 static leBool getRepeat(const leImageSequenceWidget* _this)
 {
     LE_ASSERT_THIS();
@@ -518,6 +525,7 @@ void _leImageSequenceWidget_GenerateVTable()
     imageSequenceWidgetVTable.play = play;
     imageSequenceWidgetVTable.rewind = rewind;
     imageSequenceWidgetVTable.isPlaying = isPlaying;
+    imageSequenceWidgetVTable.getActiveIndex = getActiveIndex;
     imageSequenceWidgetVTable.getRepeat = getRepeat;
     imageSequenceWidgetVTable.setRepeat = setRepeat;
     imageSequenceWidgetVTable.showImage = showImage;
@@ -629,6 +637,7 @@ static const leImageSequenceWidgetVTable imageSequenceWidgetVTable =
     .play = play,
     .rewind = rewind,
     .isPlaying = isPlaying,
+    .getActiveIndex = getActiveIndex,
     .getRepeat = getRepeat,
     .setRepeat = setRepeat,
     .showImage = showImage,

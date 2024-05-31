@@ -22,7 +22,11 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+global EBIChipSelectBaseAddress
+
 def instantiateComponent(comp):
+	global EBIChipSelectBaseAddress
+
 	GFX_INTF_SMC_H = comp.createFileSymbol("GFX_INTF_SMC_H", None)
 	GFX_INTF_SMC_H.setDestPath("gfx/interface/")
 	GFX_INTF_SMC_H.setSourcePath("../drv_gfx_disp_intf.h")
@@ -72,8 +76,20 @@ def instantiateComponent(comp):
 	EBIChipSelectIndex.setDescription("The chip select index")
 	EBIChipSelectIndex.setDefaultValue(0)
 	EBIChipSelectIndex.setMin(0)
-	EBIChipSelectIndex.setMax(4)
+	EBIChipSelectIndex.setMax(5)
 	EBIChipSelectIndex.setVisible(False)
+
+	EBIChipSelectIsDynamic = comp.createBooleanSymbol("EBIChipSelectIsDynamic", InterfaceSettingsSMCMenu)
+	EBIChipSelectIsDynamic.setLabel("True if Chip select base address is not fixed in memory map")
+	EBIChipSelectIsDynamic.setDefaultValue(False)
+	EBIChipSelectIsDynamic.setVisible(False)
+	EBIChipSelectIsDynamic.setReadOnly(True)
+
+	EBIChipSelectBaseAddress = comp.createStringSymbol("EBIChipSelectBaseAddress", InterfaceSettingsSMCMenu)
+	EBIChipSelectBaseAddress.setLabel("EBI Chip Select Base Address")
+	EBIChipSelectBaseAddress.setDescription("The chip select base address")
+	EBIChipSelectBaseAddress.setDefaultValue("0x00000000")
+	EBIChipSelectBaseAddress.setVisible(False)
 
 	ControlPinsMenu = comp.createMenuSymbol("ControlPinsMenu", InterfaceSettingsSMCMenu)
 	ControlPinsMenu.setLabel("Control Pin Settings")
@@ -133,6 +149,31 @@ def configureSMCComponent(comp, smcComponent):
 	smcComponent.setSymbolValue("SMC_WRITE_ENABLE_MODE_CS" + str(smcChipSelNum), False, 1)
 
 	
+def configureHSMCComponent(comp, smcComponent, smcChipSelNum):
+	print("Configuring HSMC : "+str(smcChipSelNum))
+	comp.setSymbolValue("EBIChipSelectIndex", smcChipSelNum, 1)
+	smcComponent.setSymbolValue("HSMC_CHIP_SELECT" + str(smcChipSelNum), True, 1)
+	smcComponent.setSymbolValue("HSMC_MEM_SCRAMBLING_CS" + str(smcChipSelNum), False, 1)
+	# SMC Write Timings
+	smcComponent.setSymbolValue("HSMC_NWE_SETUP_CS" + str(smcChipSelNum), 4, 1)
+	smcComponent.setSymbolValue("HSMC_NCS_WR_SETUP_CS" + str(smcChipSelNum), 0, 1)
+	smcComponent.setSymbolValue("HSMC_NWE_PULSE_CS" + str(smcChipSelNum), 4, 1)
+	smcComponent.setSymbolValue("HSMC_NCS_WR_PULSE_CS" + str(smcChipSelNum), 10, 1)
+	smcComponent.setSymbolValue("HSMC_DATA_BUS_CS" + str(smcChipSelNum), 1, 1)
+	smcComponent.setSymbolValue("HSMC_NWE_CYCLE_CS" + str(smcChipSelNum), 3, 1)
+	# SMC Read TimingsH
+	smcComponent.setSymbolValue("HSMC_NRD_SETUP_CS" + str(smcChipSelNum), 2, 1)
+	smcComponent.setSymbolValue("HSMC_NCS_RD_SETUP_CS" + str(smcChipSelNum), 0, 1)
+	smcComponent.setSymbolValue("HSMC_NRD_PULSE_CS" + str(smcChipSelNum), 63, 1)
+	smcComponent.setSymbolValue("HSMC_NCS_RD_PULSE_CS" + str(smcChipSelNum), 63, 1)
+	smcComponent.setSymbolValue("HSMC_NRD_CYCLE_CS" + str(smcChipSelNum), 110, 1)
+	# SMC Mode ConfigurationH
+	smcComponent.setSymbolValue("HSMC_DATA_BUS_CS" + str(smcChipSelNum), 1, 1)
+	smcComponent.setSymbolValue("HSMC_BAT_CS" + str(smcChipSelNum), 0, 1)
+	smcComponent.setSymbolValue("HSMC_READ_ENABLE_MODE_CS" + str(smcChipSelNum), True, 1)
+	smcComponent.setSymbolValue("HSMC_WRITE_ENABLE_MODE_CS" + str(smcChipSelNum), False, 1)
+
+
 def onDataCommandSelectSet(sourceSymbol, event):
 	if (sourceSymbol.getComponent().getSymbolByID("DataCommandSelectControl").getValue() == "GPIO"):
 		sourceSymbol.getComponent().getSymbolByID("DCXAddressBit").setVisible(False)
@@ -143,6 +184,23 @@ def onInterfaceTypeChanged(sourceSymbol, event):
 	print("Interface type changed")
 	
 def onAttachmentConnected(source, target):
+	global EBIChipSelectBaseAddress
+
 	#print(source["component"].getID() + ": " + dependencyID + " dependent component added ")
 	if source["id"] == "SMC_CS":
 		configureSMCComponent(source["component"], target["component"])
+	elif source["id"] == "HEMC_CS":
+		selectedCS = int(target["id"].replace('hemc_cs', ''))
+		chipSelectBaseaddress = target["component"].getSymbolByID("CS_" + str(selectedCS) + "_START_ADDRESS").getValue()
+		source["component"].setSymbolValue("EBIChipSelectIsDynamic", True, 1)
+		EBIChipSelectBaseAddress.setValue(chipSelectBaseaddress)
+		configureHSMCComponent(source["component"], target["component"], selectedCS)
+
+def handleMessage(messageID, args):
+	global EBIChipSelectBaseAddress
+	resDict = {}
+
+	if (messageID == "BASE_ADDRESS_UPDATE"):
+		EBIChipSelectBaseAddress.setValue(args["address"])
+
+	return resDict
