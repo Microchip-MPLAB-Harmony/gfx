@@ -65,7 +65,7 @@ search_tokenizer_separator: /[\s/]+/
 heading_anchors: true
 
 # Google Analytics Tracking (optional)
-ga_tracking: UA-2724382-16
+ga_tracking: G-RBHSV5JJEE
 
 exclude:
   - "*.yml"

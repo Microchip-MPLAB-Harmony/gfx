@@ -8,7 +8,9 @@ nav_order: 2
 
 # Microchip Graphics Suite (MGS) Harmony Application Support
 
-Microchip Graphics Suite (MGS) Harmony provides various application examples for a number of device families. See the following repositories for specific applications examples:
+Microchip Graphics Suite (MGS) Harmony provides various application examples for a number of device families. 
+
+See the following repositories for specific applications examples:
 
 | Repository | Product family |
 | ---------- | -------------- |

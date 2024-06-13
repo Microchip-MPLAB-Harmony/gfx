@@ -21,7 +21,8 @@ the following graphics links for release notes, home page, training materials, f
 Graphics application examples can be found at various [device-family specific repositories](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/master/apps) and at [MPLAB® Discover](https://mplab-discover.microchip.com/v2?dsl=Microchip+AND+Graphics+AND+Suite)
  - [Release Notes](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/release_notes.md)
  - [MPLAB® Harmony License](https://microchip-mplab-harmony.github.io/gfx/mplab_harmony_license.html)
- - [Microchip Graphics Suite User Guides on Microchip Develop Help](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/)
+ - [User Guides on Microchip Graphics Suite Harmony](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/)
+ - [Information on Microchip Graphics Suite Development Kits](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits/)
 
 # Features
 
@@ -62,7 +63,7 @@ For additional information, visit the [MGS Harmony Composer User Guide](https://
 ***
 ## MGS Simulator
 ***
-MGS Harmony Simulator allows developers to prototype and debug graphics applications on a PC, before deploying them on the actual hardware. It emulates the graphics controller of an MCU, allowing you to see the output of your code in real-time. 
+MGS Harmony Simulator allows developers to prototype and debug graphics applications on a PC, before deploying them on the actual hardware. It emulates the graphics controller of an MCU/MPU, allowing you to see the output of your code in real-time. 
 
 For information on how to download and use the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
 
@@ -97,16 +98,15 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 ## Blank Library Interface
 ***
 **Blank Library Interface** - the library interface which easily allows a third-party graphics library direct access to the display framebuffer.  Blank library applications are available at various [device-family specific repositories](https://microchip-mplab-harmony.github.io/gfx/apps/readme.html).
+
 ***
-
 ## 3rd-Party Graphics Vendor Support
-
 ***
 **LVGL** - demonstrations interfacing with LVGL are available for the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7), the [SAM D5x/E5x Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_d5x_e5x), and the [PIC32MZ DA Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_da).
 
-**Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [SAM A5D2 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_sam_a5d2)
-***
+**Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [SAM A5D2 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_sam_a5d2), the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), and the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7)
 
+***
 ## Image Sensor Support
 ***
 Image Sensor Controller Drivers for SAM microprocessors and Image Sensor Drivers
