@@ -29,7 +29,7 @@ execfile(Module.getPath() + "../common/display_utils.py")
 pinConfigureFxn = configurePins
 
 execfile(Module.getPath() + "Support_BSP_SAM_9X75_Evaluation_Board.py")
-
+execfile(Module.getPath() + "Support_BSP_SAM_9X75_Curiosity.py")
 
 def enableConfigPins(bspID, configID, enable):
     global pinConfigureFxn

@@ -56,6 +56,7 @@ else:
     gck_max_freq = 90000000
     ovr2_available = False
 
+
 def instantiateComponent(component):
     project_path = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/xlcdc"
 
@@ -79,12 +80,6 @@ def instantiateComponent(component):
     driver_init_name.setVisible(False)
     driver_init_name.setReadOnly(True)
     driver_init_name.setDefaultValue("xlcdcDisplayDriver")
-    # Canvas Mode
-    canvas_mode = component.createBooleanSymbol("CanvasModeOnly", None)
-    canvas_mode.setLabel("Canvas Mode")
-    canvas_mode.setDefaultValue(False)
-    canvas_mode.setVisible(False)
-    canvas_mode.setDescription("Only the GFX Canvas interface will be enabled for Canvas Mode.")
     # Layer Counter
     total_num_layers = component.createIntegerSymbol("TotalNumLayers", None)
     total_num_layers.setLabel("Total Layers")
@@ -385,12 +380,27 @@ def instantiateComponent(component):
     lm_heo_vidpri.setDescription("Draws HEO Layer above OVR1 Layer if enabled.")
     lm_heo_vidpri.setDefaultValue(True)
 
+    lm_heo_ycbcr_en = component.createBooleanSymbol("XLMHEOYCbCrEN", lm_enable_heo)
+    lm_heo_ycbcr_en.setLabel("YCbCr Mode")
+    lm_heo_ycbcr_en.setDescription("Initialize HEO in YCbCr Mode.")
+    lm_heo_ycbcr_en.setDefaultValue(False)
+    lm_heo_ycbcr_en.setDependencies(on_layer_enable, ["XLMHEOYCbCrEN"])
+
     lm_enable_ovr2 = component.createBooleanSymbol("XLMEnableOVR2", layer_menu_enable)
     lm_enable_ovr2.setLabel("Overlay 2")
     lm_enable_ovr2.setDescription("XLCDC Overlay 2 Layer.")
     lm_enable_ovr2.setDefaultValue(ovr2_available)
     lm_enable_ovr2.setVisible(ovr2_available)
     lm_enable_ovr2.setDependencies(on_layer_enable, ["XLMEnableOVR2"])
+
+    lm_col_mode = component.createKeyValueSetSymbol("XLMColMode", layer_menu)
+    lm_col_mode.setLabel("Color Mode")
+    lm_col_mode.setOutputMode("Value")
+    lm_col_mode.setDisplayMode("Description")
+    lm_col_mode.setDescription("XLCDC Layer Default Color Mode for All Layers.")
+    lm_col_mode.addKey("0", "3", "RGB_565")
+    lm_col_mode.addKey("1", "13", "RGBA_8888")
+    lm_col_mode.setDefaultValue(1)
 
     # Driver Options
     driver_menu = component.createMenuSymbol("XLCDCDrvMenu", None)
@@ -418,6 +428,12 @@ def instantiateComponent(component):
     driver_cache_fb.setDescription("Uses cacheable frame buffers if enabled.")
     driver_cache_fb.setDefaultValue(False)
     driver_cache_fb.setVisible(True)
+
+    canvas_mode = component.createBooleanSymbol("CanvasModeOnly", driver_menu)
+    canvas_mode.setLabel("Canvas Mode")
+    canvas_mode.setDefaultValue(False)
+    canvas_mode.setVisible(True)
+    canvas_mode.setDescription("Exposes hardware layer features and control.")
 
     # Output Configuration
     output_menu = component.createMenuSymbol("XLCDCOutMenu", None)
@@ -668,7 +684,7 @@ def update_pwm_clock(symbol, event):
 # Clock Validity
 def show_gclk_valid_hint(symbol, event):
     if event["value"] > gck_max_freq:
-        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq/1000000)) + " MHz]")
+        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq / 1000000)) + " MHz]")
         symbol.setVisible(True)
     elif event["value"] <= 0:
         symbol.setLabel("[Warning! 0Hz?]")
@@ -689,7 +705,8 @@ def on_layer_enable(symbol, event):
     if event["source"].getSymbolValue("XLMEnableOVR1") == True:
         layer_count += 1
     if event["source"].getSymbolValue("XLMEnableHEO") == True:
-        layer_count += 1
+        if event["source"].getSymbolValue("XLMHEOYCbCrEN") == False:
+            layer_count += 1
     if event["source"].getSymbolValue("XLMEnableOVR2") == True:
         layer_count += 1
     event["source"].setSymbolValue("TotalNumLayers", layer_count)

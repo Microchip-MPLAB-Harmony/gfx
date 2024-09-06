@@ -103,6 +103,7 @@ gfxResult DRV_GFX2D_Fill(gfxPixelBuffer* dest,
 {
     GFX2D_BUFFER    dest_buffer;
     GFX2D_RECTANGLE dest_rect;
+    gfxColor        fill_color;
 
     if(dest->orientation != GFX_ORIENT_0)
 		return GFX_FAILURE;
@@ -118,7 +119,16 @@ gfxResult DRV_GFX2D_Fill(gfxPixelBuffer* dest,
     dest_rect.width = (uint32_t)clipRect->width;
     dest_rect.height = (uint32_t)clipRect->height;
 
-    PLIB_GFX2D_Fill(&dest_buffer, &dest_rect, color);
+    if (dest->mode == GFX_COLOR_MODE_RGB_565)
+    {
+        fill_color = gfxColorConvert(dest->mode, GFX_COLOR_MODE_ARGB_8888, color);
+    }
+    else
+    {
+        fill_color = color;
+    }
+
+    PLIB_GFX2D_Fill(&dest_buffer, &dest_rect, fill_color);
 
 <#if DRV_GFX2D_MODE == "Asynchronous">
     while(gpu_end == 0);

@@ -44,6 +44,11 @@
 
 #include "device.h"
 #include "gfx/driver/controller/xlcdc/bridge/dsi/plib_dsi.h"
+
+/* Utility Macros */
+/* Command Packet Status Checks */
+#define WAIT_CPSR_EQ(_x_)   while((DSI_REGS->DSI_CMD_PKT_STATUS & (_x_) ) == (_x_) ){}
+#define WAIT_CPSR_NEQ(_x_)  while((DSI_REGS->DSI_CMD_PKT_STATUS & (_x_) ) != (_x_) ){}
 <#if SupportCSI>
 
 /* Utility Macros */
@@ -120,15 +125,15 @@
 
 /* D-PHY Clocks */
 #define DPHY_BIT_CLOCK_KHZ  ${DPhyPllOutClkKiloHz}
-#define DPHY_BYTE_CLOCK_KHZ (DPHY_BIT_CLOCK_KHZ / 8)
+#define DPHY_BYTE_CLOCK_KHZ (DPHY_BIT_CLOCK_KHZ >> 3)
 
 /* DSI Clock Management */
 #define DSI_CLKMGR_TO_CLK_DIV       10
 #define DSI_CLKMGR_TX_ESC_CLK_DIV   (DPHY_BYTE_CLOCK_KHZ / 20000 + 1)
 
-/* DSI Video Mode Byte Clock Cycles */
-#define __CEIL(__dividend,__divisor) (((__dividend) + (__divisor) - 1) / (__divisor))
-#define DSI_BYTE_CYCLES     __CEIL(DPHY_BYTE_CLOCK_KHZ, LCD_DCLK_KHZ)
+/* DSI Video Mode Lane Byte Clock Cycles */
+#define CEIL(_dividend_, _divisor_) (((_dividend_) + (_divisor_) - 1) / (_divisor_))
+#define DSI_CYC_TO_LBCYC(_cycles_)  CEIL(((_cycles_) * DPHY_BYTE_CLOCK_KHZ), LCD_DCLK_KHZ)
 
 /* Local Utility Functions */
 /* D-PHY Control Operation */
@@ -261,12 +266,12 @@ void DSI_VideoMode(void)
     DSI_REGS->DSI_VID_PKT_SIZE   = LCD_WIDTH;
     DSI_REGS->DSI_VID_NUM_CHUNKS = 0;
     DSI_REGS->DSI_VID_NULL_SIZE  = 0;
-    DSI_REGS->DSI_VID_HSA_TIME   = LCD_TIMING_HPW * DSI_BYTE_CYCLES;
-    DSI_REGS->DSI_VID_HBP_TIME   = LCD_TIMING_HBP * DSI_BYTE_CYCLES - 1;
-    DSI_REGS->DSI_VID_HLINE_TIME = (LCD_WIDTH +
-                                    LCD_TIMING_HPW +
-                                    LCD_TIMING_HBP +
-                                    LCD_TIMING_HFP) * DSI_BYTE_CYCLES;
+    DSI_REGS->DSI_VID_HSA_TIME   = DSI_CYC_TO_LBCYC(LCD_TIMING_HPW);
+    DSI_REGS->DSI_VID_HBP_TIME   = DSI_CYC_TO_LBCYC(LCD_TIMING_HBP);
+    DSI_REGS->DSI_VID_HLINE_TIME = DSI_CYC_TO_LBCYC(LCD_WIDTH +
+                                                    LCD_TIMING_HPW +
+                                                    LCD_TIMING_HBP +
+                                                    LCD_TIMING_HFP);
     DSI_REGS->DSI_VID_VSA_LINES  = LCD_TIMING_VPW;
     DSI_REGS->DSI_VID_VBP_LINES  = LCD_TIMING_VBP;
     DSI_REGS->DSI_VID_VFP_LINES  = LCD_TIMING_VFP;
@@ -282,7 +287,7 @@ void DSI_VideoMode(void)
                                    DSI_DPI_LP_CMD_TIM_OUTVACT_LPCMD_TIME(16);
 
     /* Configure DSI Video Mode */
-    DSI_REGS->DSI_VID_MODE_CFG = DSI_VID_MODE_CFG_VID_MODE_TYPE(0) |
+    DSI_REGS->DSI_VID_MODE_CFG = DSI_VID_MODE_CFG_VID_MODE_TYPE(${VidModeTxType}) |
                                  DSI_VID_MODE_CFG_LP_VSA_EN(1) |
                                  DSI_VID_MODE_CFG_LP_VBP_EN(1) |
                                  DSI_VID_MODE_CFG_LP_VFP_EN(1) |
@@ -298,6 +303,9 @@ void DSI_VideoMode(void)
 
 bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
 {
+    /* Wait while command FIFO is full */
+    WAIT_CPSR_EQ(DSI_CMD_PKT_STATUS_GEN_CMD_FULL_Msk);
+
     switch(hdr->longPacket.dataType)
     {
         /* Generic Short Write */
@@ -310,6 +318,9 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
         {
             DSI_REGS->DSI_GEN_HDR = hdr->headerU32;
 
+            /* Wait for command to complete */
+            WAIT_CPSR_NEQ(DSI_CMD_PKT_STATUS_GEN_CMD_EMPTY_Msk);
+
             return false;
         }
         /* Generic Long Write */
@@ -319,7 +330,7 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
         {
             uint32_t pld_size  = 0;
 
-            /* Check size against max FIFO depth (~4128 bytes)*/
+            /* Check size against max FIFO depth (~4128 bytes) */
             if (hdr->longPacket.size > 4096 || hdr->longPacket.size == 0)
             {
                 return true;
@@ -344,6 +355,9 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
             }
 
             DSI_REGS->DSI_GEN_HDR = hdr->headerU32;
+
+            /* Wait for command to complete */
+            WAIT_CPSR_NEQ(DSI_CMD_PKT_STATUS_GEN_CMD_EMPTY_Msk | DSI_CMD_PKT_STATUS_GEN_PLD_W_EMPTY_Msk);
 
             return false;
         }

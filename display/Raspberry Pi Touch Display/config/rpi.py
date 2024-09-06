@@ -81,19 +81,19 @@ def instantiateComponent(component):
     horz_pulse_width = component.createIntegerSymbol("HorzPulseWidth", horz_menu)
     horz_pulse_width.setLabel("Horizontal Pulse Width")
     horz_pulse_width.setDescription("The horizontal pulse width.")
-    horz_pulse_width.setDefaultValue(23)
+    horz_pulse_width.setDefaultValue(26)
     horz_pulse_width.setReadOnly(True)
 
     horz_back_porch = component.createIntegerSymbol("HorzBackPorch", horz_menu)
     horz_back_porch.setLabel("Horizontal Back Porch")
     horz_back_porch.setDescription("The horizontal back porch size in pixels.")
-    horz_back_porch.setDefaultValue(23)
+    horz_back_porch.setDefaultValue(20)
     horz_back_porch.setReadOnly(True)
 
     horz_front_porch = component.createIntegerSymbol("HorzFrontPorch", horz_menu)
     horz_front_porch.setLabel("Horizontal Front Porch")
     horz_front_porch.setDescription("The horizontal front porch size in pixels.")
-    horz_front_porch.setDefaultValue(185)
+    horz_front_porch.setDefaultValue(78)
     horz_front_porch.setReadOnly(True)
 
     vert_menu = component.createMenuSymbol("VertMenu", None)
@@ -103,19 +103,19 @@ def instantiateComponent(component):
     vert_pulse_width = component.createIntegerSymbol("VertPulseWidth", vert_menu)
     vert_pulse_width.setLabel("Vertical Pulse Width")
     vert_pulse_width.setDescription("The vertical pulse width.")
-    vert_pulse_width.setDefaultValue(10)
+    vert_pulse_width.setDefaultValue(11)
     vert_pulse_width.setReadOnly(True)
 
     vert_back_porch = component.createIntegerSymbol("VertBackPorch", vert_menu)
     vert_back_porch.setLabel("Vertical Back Porch")
     vert_back_porch.setDescription("The vertical back porch size in pixels.")
-    vert_back_porch.setDefaultValue(13)
+    vert_back_porch.setDefaultValue(12)
     vert_back_porch.setReadOnly(True)
 
     vert_front_porch = component.createIntegerSymbol("VertFrontPorch", vert_menu)
     vert_front_porch.setLabel("Vertical Front Porch")
     vert_front_porch.setDescription("The vertical front porch size in pixels.")
-    vert_front_porch.setDefaultValue(22)
+    vert_front_porch.setDefaultValue(12)
     vert_front_porch.setReadOnly(True)
 
     polarity_menu = component.createMenuSymbol("PolarityMenu", None)
@@ -159,7 +159,7 @@ def instantiateComponent(component):
     dsi_lcd_clk = component.createIntegerSymbol("DSIDotClk", dsi_menu)
     dsi_lcd_clk.setLabel("LCD Pixel Clock (kHz)")
     dsi_lcd_clk.setDescription("The pixel clock of the LCD panel.")
-    dsi_lcd_clk.setDefaultValue(32500)
+    dsi_lcd_clk.setDefaultValue(28571)
     dsi_lcd_clk.setReadOnly(True)
 
     # RTOS Menu

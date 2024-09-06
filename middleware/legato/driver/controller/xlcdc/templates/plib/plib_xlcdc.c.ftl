@@ -42,8 +42,59 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+#include <math.h>
 #include "device.h"
 #include "gfx/driver/controller/xlcdc/plib/plib_xlcdc.h"
+<#if XLMHEOYCbCrEN>
+
+/* YUV to RGB Color conversion matrix based on BT.709 standard */
+static const double colConvMatrix[3][3] = {
+//  {Y,   U/C(b),   V/C(r)},
+    {1,        0,  1.28033}, // R
+    {1, -0.21482, -0.38059}, // G
+    {1,  2.12798,        0}  // B
+};
+
+/* Convert fraction to bespoke 13-bit signed integer */
+static uint32_t XLCDC_FRAC_TO_CSC(double fraction) {
+    int32_t scaled = 0;
+
+    if (fraction < -4 || fraction >= 4) {
+        return scaled;
+    }
+
+    scaled = (int32_t)round(fraction * 1024);
+
+    if (scaled < -4096)
+    {
+        scaled = -4096;
+    }
+    if (scaled > 4095)
+    {
+        scaled = 4095;
+    }
+
+    return (uint32_t)(scaled & 0x1FFF);
+}
+</#if>
+
+/* Calculate Scaling Factor */
+static uint32_t CALC_SCALING_FACT(uint32_t memsize, uint32_t size) {
+    if (size == 0)
+    {
+        return 0;
+    }
+
+    uint64_t numerator = (uint64_t)memsize << 20;
+    uint64_t result = (numerator + (size / 2)) / size;
+
+    if (result > UINT32_MAX)
+    {
+        return UINT32_MAX;
+    }
+
+    return (uint32_t)result;
+}
 <#if SupportOVR2>
 
 /* PMC */
@@ -185,7 +236,7 @@ void XLCDC_SetupBaseLayer(void)
     /* Configure Color Mode */
     ${IP}_REGS->LCDC_BASECFG1 = LCDC_BASECFG1_CLUTEN(0) |
                                 LCDC_BASECFG1_GAM(0) |
-                                LCDC_BASECFG1_RGBMODE(13) |
+                                LCDC_BASECFG1_RGBMODE(${XLMColMode}) |
                                 LCDC_BASECFG1_CLUTMODE(3);
 
     /* Configure Row Striding */
@@ -231,7 +282,7 @@ void XLCDC_SetupOVR1Layer(void)
     /* Configure Color Mode */
     ${IP}_REGS->LCDC_OVR1CFG1 = LCDC_OVR1CFG1_CLUTEN(0) |
                                 LCDC_OVR1CFG1_GAM(0) |
-                                LCDC_OVR1CFG1_RGBMODE(13) |
+                                LCDC_OVR1CFG1_RGBMODE(${XLMColMode}) |
                                 LCDC_OVR1CFG1_CLUTMODE(3);
 
     /* Configure Window Position */
@@ -298,7 +349,7 @@ void XLCDC_SetupOVR2Layer(void)
     /* Configure Color Mode */
     ${IP}_REGS->LCDC_OVR2CFG1 = LCDC_OVR2CFG1_CLUTEN(0) |
                                 LCDC_OVR2CFG1_GAM(0) |
-                                LCDC_OVR2CFG1_RGBMODE(13) |
+                                LCDC_OVR2CFG1_RGBMODE(${XLMColMode}) |
                                 LCDC_OVR2CFG1_CLUTMODE(3);
 
     /* Configure Window Position */
@@ -361,13 +412,13 @@ void XLCDC_SetupHEOLayer(void)
 {
     /* Configure System Bus Burst Length */
     ${IP}_REGS->LCDC_HEOCFG0 = LCDC_HEOCFG0_BLEN(4) |
-                               LCDC_HEOCFG0_BLENCC(0);
+                               LCDC_HEOCFG0_BLENCC(4);
 
     /* Configure Color Mode */
     ${IP}_REGS->LCDC_HEOCFG1 = LCDC_HEOCFG1_CLUTEN(0) |
-                               LCDC_HEOCFG1_YCCEN(0) |
+                               LCDC_HEOCFG1_YCCEN(${XLMHEOYCbCrEN?then('1', '0')}) |
                                LCDC_HEOCFG1_GAM(0) |
-                               LCDC_HEOCFG1_RGBMODE(13) |
+                               LCDC_HEOCFG1_RGBMODE(${XLMColMode}) |
                                LCDC_HEOCFG1_CLUTMODE(3) |
                                LCDC_HEOCFG1_YCCMODE(0) |
                                LCDC_HEOCFG1_YCC422ROT(0) |
@@ -432,6 +483,23 @@ void XLCDC_SetupHEOLayer(void)
 
     /* YCbCr to RGB Color Space Conversion Unit */
     /* Coefficients for Red Component */
+    <#if XLMHEOYCbCrEN>
+    ${IP}_REGS->LCDC_HEOCFG16 = LCDC_HEOCFG16_RYGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[0][0])) |
+                                LCDC_HEOCFG16_RCBGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[0][1]));
+    ${IP}_REGS->LCDC_HEOCFG17 = LCDC_HEOCFG17_RCRGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[0][2]));
+    /* Coefficients for Green Component */
+    ${IP}_REGS->LCDC_HEOCFG18 = LCDC_HEOCFG18_GYGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[1][0])) |
+                                LCDC_HEOCFG18_GCBGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[1][1]));
+    ${IP}_REGS->LCDC_HEOCFG19 = LCDC_HEOCFG19_GCRGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[1][2]));
+    /* Coefficients for Blue Component */
+    ${IP}_REGS->LCDC_HEOCFG20 = LCDC_HEOCFG20_BYGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[2][0])) |
+                                LCDC_HEOCFG20_BCBGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[2][1]));
+    ${IP}_REGS->LCDC_HEOCFG21 = LCDC_HEOCFG21_BCRGAIN(XLCDC_FRAC_TO_CSC(colConvMatrix[2][2]));
+    /* Color Space Conversion Fixed Scaling Offsets */
+    ${IP}_REGS->LCDC_HEOCFG22 = LCDC_HEOCFG22_YOFF(1) |
+                                LCDC_HEOCFG22_CBOFF(1) |
+                                LCDC_HEOCFG22_CROFF(1);
+    <#else>
     ${IP}_REGS->LCDC_HEOCFG16 = LCDC_HEOCFG16_RYGAIN(0) |
                                 LCDC_HEOCFG16_RCBGAIN(0);
     ${IP}_REGS->LCDC_HEOCFG17 = LCDC_HEOCFG17_RCRGAIN(0);
@@ -447,13 +515,14 @@ void XLCDC_SetupHEOLayer(void)
     ${IP}_REGS->LCDC_HEOCFG22 = LCDC_HEOCFG22_YOFF(0) |
                                 LCDC_HEOCFG22_CBOFF(0) |
                                 LCDC_HEOCFG22_CROFF(0);
+    </#if>
 
     /* 2D Scaling Unit */
     /* Configure Scaler */
-    ${IP}_REGS->LCDC_HEOCFG23 = LCDC_HEOCFG23_VXSYEN(1) |
-                                LCDC_HEOCFG23_VXSCEN(1) |
-                                LCDC_HEOCFG23_HXSYEN(1) |
-                                LCDC_HEOCFG23_HXSCEN(1);
+    ${IP}_REGS->LCDC_HEOCFG23 = LCDC_HEOCFG23_VXSYEN(0) |
+                                LCDC_HEOCFG23_VXSCEN(0) |
+                                LCDC_HEOCFG23_HXSYEN(0) |
+                                LCDC_HEOCFG23_HXSCEN(0);
     /* Factors */
     ${IP}_REGS->LCDC_HEOCFG24 = LCDC_HEOCFG24_VXSYFACT(0x100000);
     ${IP}_REGS->LCDC_HEOCFG25 = LCDC_HEOCFG25_VXSCFACT(0x100000);
@@ -485,14 +554,17 @@ void XLCDC_SetupHEOLayer(void)
                                 LCDC_HEOCFG31_HXSCTAP2(0) |
                                 LCDC_HEOCFG31_HXSCBICU(0);
     /* Filter Tap Coefficients */
-    ${IP}_REGS->LCDC_HEOVTAP[0].LCDC_HEOVTAP10P = LCDC_HEOVTAP10P_TAP0(0) |
-                                                  LCDC_HEOVTAP10P_TAP1(0x400);
-    ${IP}_REGS->LCDC_HEOVTAP[0].LCDC_HEOVTAP32P = LCDC_HEOVTAP32P_TAP2(0) |
-                                                  LCDC_HEOVTAP32P_TAP3(0);
-    ${IP}_REGS->LCDC_HEOHTAP[0].LCDC_HEOHTAP10P = LCDC_HEOHTAP10P_TAP0(0) |
-                                                  LCDC_HEOHTAP10P_TAP1(0x0400);
-    ${IP}_REGS->LCDC_HEOHTAP[0].LCDC_HEOHTAP32P = LCDC_HEOHTAP32P_TAP2(0) |
-                                                  LCDC_HEOHTAP32P_TAP3(0);
+    for(int i = 0; i < 16; i++)
+    {
+        ${IP}_REGS->LCDC_HEOVTAP[i].LCDC_HEOVTAP10P = LCDC_HEOVTAP10P_TAP0(0) |
+                                                    LCDC_HEOVTAP10P_TAP1(0);
+        ${IP}_REGS->LCDC_HEOVTAP[i].LCDC_HEOVTAP32P = LCDC_HEOVTAP32P_TAP2(0) |
+                                                    LCDC_HEOVTAP32P_TAP3(0);
+        ${IP}_REGS->LCDC_HEOHTAP[i].LCDC_HEOHTAP10P = LCDC_HEOHTAP10P_TAP0(0) |
+                                                    LCDC_HEOHTAP10P_TAP1(0);
+        ${IP}_REGS->LCDC_HEOHTAP[i].LCDC_HEOHTAP32P = LCDC_HEOHTAP32P_TAP2(0) |
+                                                    LCDC_HEOHTAP32P_TAP3(0);
+    }
 
     /* LUT Address for DMA fetch */
     ${IP}_REGS->LCDC_HEOCLA = (uint32_t)NULL;
@@ -1006,6 +1078,181 @@ bool XLCDC_UpdateLayerAttributes(XLCDC_LAYER layer)
     return 1;
 }
 
+<#if XLMHEOYCbCrEN>
+bool XLCDC_DisplayHEOYCbCrSurface(XLCDC_HEO_YCBCR_SURFACE *surface)
+{
+    if (surface->windowSizeX == 0  || surface->windowSizeY == 0  ||
+        surface->imageSizeX == 0  || surface->imageSizeY == 0    ||
+        ((surface->windowStartX + surface->windowSizeX) > ${XTResPPL}) ||
+        ((surface->windowStartY + surface->windowSizeY) > ${XTResRPF}) ||
+        surface->imageAddress[0] == NULL)
+    {
+        return 1; // Invalid parameters
+    }
+
+    if (surface->scaleToWindow)
+    {
+        float dx = 0, dy = 0;
+
+        dx = (float)surface->windowSizeX / (float)surface->imageSizeX;
+        dy = (float)surface->windowSizeY / (float)surface->imageSizeY;
+
+        if (dx > 10 || dx < 0.1 || dy > 10 || dy < 0.1)
+        {
+            return 1; // Exceeds 10x scaling
+        }
+    }
+
+    ${IP}_REGS->LCDC_HEOCFG1 = LCDC_HEOCFG1_YCCEN(1) |
+                               LCDC_HEOCFG1_YCCMODE(surface->colorMode);
+    ${IP}_REGS->LCDC_HEOCFG2 = LCDC_HEOCFG2_XPOS(surface->windowStartX) |
+                               LCDC_HEOCFG2_YPOS(surface->windowStartY);
+    ${IP}_REGS->LCDC_HEOCFG3 = LCDC_HEOCFG3_XSIZE(surface->windowSizeX - 1) |
+                               LCDC_HEOCFG3_YSIZE(surface->windowSizeY - 1);
+    ${IP}_REGS->LCDC_HEOCFG4 = LCDC_HEOCFG4_XMEMSIZE(surface->imageSizeX - 1) |
+                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeX - 1);
+    ${IP}_REGS->LCDC_HEOCFG12 |= LCDC_HEOCFG12_DMA(1);
+
+    if (surface->colorMode == XLCDC_YCBCR_COLOR_MODE_YCBCR_422_PL ||
+        surface->colorMode == XLCDC_YCBCR_COLOR_MODE_YCBCR_420_PL)
+    {
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOYFBA = (uint32_t)surface->imageAddress[0];
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCBFBA = (uint32_t)surface->imageAddress[1];
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCRFBA = (uint32_t)surface->imageAddress[2];
+    }
+    else if(surface->colorMode == XLCDC_YCBCR_COLOR_MODE_YCBCR_422_SP ||
+            surface->colorMode == XLCDC_YCBCR_COLOR_MODE_YCBCR_420_SP)
+    {
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOYFBA = (uint32_t)surface->imageAddress[0];
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCBFBA = (uint32_t)surface->imageAddress[1];
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCRFBA = (uint32_t)NULL;
+    }
+    else
+    {
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOYFBA = (uint32_t)surface->imageAddress[0];
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCBFBA = (uint32_t)NULL;
+        ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCRFBA = (uint32_t)NULL;
+    }
+
+    uint32_t hfactor = 0x100000, vfactor = 0x100000;
+
+    if (surface->scaleToWindow)
+    {
+        hfactor = CALC_SCALING_FACT(surface->imageSizeX, surface->windowSizeX);
+        vfactor = CALC_SCALING_FACT(surface->imageSizeY, surface->windowSizeY);
+    }
+
+    ${IP}_REGS->LCDC_HEOCFG23 = LCDC_HEOCFG23_VXSYEN(1) |
+                                LCDC_HEOCFG23_VXSCEN(1) |
+                                LCDC_HEOCFG23_HXSYEN(1) |
+                                LCDC_HEOCFG23_HXSCEN(1);
+
+    ${IP}_REGS->LCDC_HEOCFG30 = LCDC_HEOCFG30_VXSYCFG(1) |
+                                LCDC_HEOCFG30_VXSYBICU(1) |
+                                LCDC_HEOCFG30_VXSCCFG(1) |
+                                LCDC_HEOCFG30_VXSCBICU(1);
+
+    ${IP}_REGS->LCDC_HEOCFG31 = LCDC_HEOCFG31_HXSYCFG(1) |
+                                LCDC_HEOCFG31_HXSYBICU(1) |
+                                LCDC_HEOCFG31_HXSCCFG(1) |
+                                LCDC_HEOCFG31_HXSCBICU(1);
+
+    ${IP}_REGS->LCDC_HEOCFG24 = LCDC_HEOCFG24_VXSYFACT(vfactor);
+    ${IP}_REGS->LCDC_HEOCFG25 = LCDC_HEOCFG25_VXSCFACT(vfactor);
+    ${IP}_REGS->LCDC_HEOCFG26 = LCDC_HEOCFG26_HXSYFACT(hfactor);
+    ${IP}_REGS->LCDC_HEOCFG27 = LCDC_HEOCFG27_HXSCFACT(hfactor);
+
+    if (surface->colorMode > XLCDC_YCBCR_COLOR_MODE_YCBCR_422_PL)
+    {
+        ${IP}_REGS->LCDC_HEOCFG25 = LCDC_HEOCFG25_VXSCFACT(vfactor/2);
+        ${IP}_REGS->LCDC_HEOCFG27 = LCDC_HEOCFG27_HXSCFACT(hfactor/2);
+    }
+    else if (surface->colorMode > XLCDC_YCBCR_COLOR_MODE_AYCBCR_444 &&
+             surface->colorMode < XLCDC_YCBCR_COLOR_MODE_YCBCR_420_SP)
+    {
+        ${IP}_REGS->LCDC_HEOCFG27 = LCDC_HEOCFG27_HXSCFACT(hfactor/2);
+    }
+
+    ${IP}_REGS->LCDC_ATTRE = LCDC_ATTRE_HEO_Msk;
+    WAIT_ATTRS_EQ(LCDC_ATTRS_SIP_Msk);
+
+    return 0;
+}
+
+<#else>
+bool XLCDC_DisplayHEORGBSurface(XLCDC_HEO_RGB_SURFACE *surface)
+{
+    if (surface->windowSizeX == 0  || surface->windowSizeY == 0  ||
+        surface->imageSizeX == 0  || surface->imageSizeY == 0    ||
+        ((surface->windowStartX + surface->windowSizeX) > ${XTResPPL}) ||
+        ((surface->windowStartY + surface->windowSizeY) > ${XTResRPF}) ||
+        surface->imageAddress == NULL)
+    {
+        return 1; // Invalid parameters
+    }
+
+    if (surface->scaleToWindow)
+    {
+        float dx = 0, dy = 0;
+
+        dx = (float)surface->windowSizeX / (float)surface->imageSizeX;
+        dy = (float)surface->windowSizeY / (float)surface->imageSizeY;
+
+        if (dx > 10 || dx < 0.1 || dy > 10 || dy < 0.1)
+        {
+            return 1; // Exceeds 10x scaling
+        }
+    }
+
+    ${IP}_REGS->LCDC_HEOCFG1 = LCDC_HEOCFG1_RGBMODE(surface->colorMode);
+    ${IP}_REGS->LCDC_HEOCFG2 = LCDC_HEOCFG2_XPOS(surface->windowStartX) |
+                               LCDC_HEOCFG2_YPOS(surface->windowStartY);
+    ${IP}_REGS->LCDC_HEOCFG3 = LCDC_HEOCFG3_XSIZE(surface->windowSizeX - 1) |
+                               LCDC_HEOCFG3_YSIZE(surface->windowSizeY - 1);
+    ${IP}_REGS->LCDC_HEOCFG4 = LCDC_HEOCFG4_XMEMSIZE(surface->imageSizeX - 1) |
+                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeX - 1);
+    ${IP}_REGS->LCDC_HEOCFG12 |= LCDC_HEOCFG12_DMA(1);
+
+
+    ${IP}_REGS->LCDC_HEO[0].LCDC_HEOYFBA = (uint32_t)surface->imageAddress;
+    ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCBFBA = (uint32_t)NULL;
+    ${IP}_REGS->LCDC_HEO[0].LCDC_HEOCRFBA = (uint32_t)NULL;
+
+    uint32_t hfactor = 0x100000, vfactor = 0x100000;
+
+    if (surface->scaleToWindow)
+    {
+        hfactor = CALC_SCALING_FACT(surface->imageSizeX, surface->windowSizeX);
+        vfactor = CALC_SCALING_FACT(surface->imageSizeY, surface->windowSizeY);
+    }
+
+    ${IP}_REGS->LCDC_HEOCFG23 = LCDC_HEOCFG23_VXSYEN(1) |
+                                LCDC_HEOCFG23_VXSCEN(1) |
+                                LCDC_HEOCFG23_HXSYEN(1) |
+                                LCDC_HEOCFG23_HXSCEN(1);
+
+    ${IP}_REGS->LCDC_HEOCFG30 = LCDC_HEOCFG30_VXSYCFG(1) |
+                                LCDC_HEOCFG30_VXSYBICU(1) |
+                                LCDC_HEOCFG30_VXSCCFG(1) |
+                                LCDC_HEOCFG30_VXSCBICU(1);
+
+    ${IP}_REGS->LCDC_HEOCFG31 = LCDC_HEOCFG31_HXSYCFG(1) |
+                                LCDC_HEOCFG31_HXSYBICU(1) |
+                                LCDC_HEOCFG31_HXSCCFG(1) |
+                                LCDC_HEOCFG31_HXSCBICU(1);
+
+    ${IP}_REGS->LCDC_HEOCFG24 = LCDC_HEOCFG24_VXSYFACT(vfactor);
+    ${IP}_REGS->LCDC_HEOCFG25 = LCDC_HEOCFG25_VXSCFACT(vfactor);
+    ${IP}_REGS->LCDC_HEOCFG26 = LCDC_HEOCFG26_HXSYFACT(hfactor);
+    ${IP}_REGS->LCDC_HEOCFG27 = LCDC_HEOCFG27_HXSCFACT(hfactor);
+
+    ${IP}_REGS->LCDC_ATTRE = LCDC_ATTRE_HEO_Msk;
+    WAIT_ATTRS_EQ(LCDC_ATTRS_SIP_Msk);
+
+    return 0;
+}
+
+</#if>
 void XLCDC_MIPIColorModeSignalEnable(bool enable)
 {
     if(enable)

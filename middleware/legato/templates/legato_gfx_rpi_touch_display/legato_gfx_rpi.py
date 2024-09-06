@@ -30,7 +30,7 @@ pinConfigureFxn = configurePins
 addFileCallback = {}
 
 execfile(Module.getPath() + "Support_BSP_SAM_9X75_Evaluation_Board.py")
-
+execfile(Module.getPath() + "Support_BSP_SAM_9X75_Curiosity.py")
 
 def enableConfigPins(bspID, configID, enable):
     global pinConfigureFxn

@@ -1,14 +1,14 @@
 package:
   format-version: "1.0.0"
   name: "gfx"
-  version: "v3.15.1"
+  version: "v3.15.2"
   type: "api"
   status: "production"
 
   dependencies:
     - name: "core"
       type: "package"
-      version: "v3.13.4"
+      version: "v3.13.5"
     - name: "touch"
       type: "package"
       version: "v3.14.0"

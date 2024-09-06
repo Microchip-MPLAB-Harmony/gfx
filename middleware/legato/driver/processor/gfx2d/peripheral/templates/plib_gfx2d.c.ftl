@@ -513,7 +513,7 @@ void ${GFX2D_INSTANCE_NAME}_Disable( void )
     GFX2D_REGS->GFX2D_BASE = (uint32_t)rb;
     GFX2D_REGS->GFX2D_LEN = CONF_GFX2D_LEN_REG;
 
-    ${GFX2D_INSTANCE_NAME}_SetGlobalStatusDisabled(true, true);
+    ${GFX2D_INSTANCE_NAME}_SetGlobalStatusEnabled(false);
 }
 
 void ${GFX2D_INSTANCE_NAME}_InterruptHandler(void)
@@ -555,7 +555,7 @@ GFX2D_STATUS ${GFX2D_INSTANCE_NAME}_Fill(GFX2D_BUFFER *dst, GFX2D_RECTANGLE *rec
     instr.wd0 = GFX2D_INST_FILL_WD0(2, dst->dir, 0, 1);
     instr.wd1 = GFX2D_INST_FILL_WD1((rect->width - 1), (rect->height - 1));
     instr.wd2 = GFX2D_INST_FILL_WD2(rect->x, rect->y);
-    instr.wd3 = GFX2D_INST_FILL_WD3((color>>24)&0xff, (color>>16)&0xff, (color>>8)&0xff, color&0xff);
+    instr.wd3 = color;
 
     return _gpu_instruction((uint32_t *)(&instr), 4);
 }

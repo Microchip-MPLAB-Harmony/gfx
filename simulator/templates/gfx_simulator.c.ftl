@@ -22,6 +22,7 @@
 *******************************************************************************/
 
 #include "gfx_simulator.h"
+#include "gfx/legato/legato_config.h"
 
 // <editor-fold defaultstate="collapsed" desc="SDL2">
 #ifndef __XC32
@@ -40,12 +41,18 @@
 #define SDL_DEF_FB_TYPE uint16_t
 <#elseif CtrlColorMode == "RGBA_8888">
 #define SDL_DEF_FB_TYPE uint32_t
+<#else>
+#define SDL_DEF_FB_TYPE uint32_t
 </#if>
 #define SDL_DEF_FB_PTR_TYPE SDL_DEF_FB_TYPE *
 #define SDL_DEF_PIXEL_FORMAT SDL_PIXELFORMAT_${CtrlColorMode?replace("_", "")}
 #define SDL_DEF_BYTES_PER_PIXEL sizeof(SDL_DEF_FB_TYPE)
 #define SDL_VIRTUAL_LAYERS ${TotalNumLayers}
 #define SDL_BUFFERS_PER_LAYER 1
+/* Check layer parity */
+#if LE_DRIVER_LAYER_MODE == 1 && LE_LAYER_COUNT != SDL_VIRTUAL_LAYERS
+#error "Simulator and Composer layer counts must match in Driver Layer Mode!"
+#endif
 
 /* SDL2 Event Subsystem Config */
 #define SDL_TOUCH_HOR_RES SDL_HOR_RES
@@ -222,15 +229,6 @@ static void GFX_SIM_ProcessInput(SDL_Event *sdl_event)
             SYS_INP_InjectTouchMove(0,
                                   sanitize_mouse(sdl_event->motion.x, 0, SDL_TOUCH_HOR_RES),
                                   sanitize_mouse(sdl_event->motion.y, 0, SDL_TOUCH_VER_RES));
-        break;
-    case SDL_FINGERUP:
-        SYS_INP_InjectTouchUp(sdl_event->tfinger.touchId, sdl_event->tfinger.x * SDL_TOUCH_HOR_RES, sdl_event->tfinger.y * SDL_TOUCH_VER_RES);
-        break;
-    case SDL_FINGERDOWN:
-        SYS_INP_InjectTouchDown(sdl_event->tfinger.touchId, sdl_event->tfinger.x * SDL_TOUCH_HOR_RES, sdl_event->tfinger.y * SDL_TOUCH_VER_RES);
-        break;
-    case SDL_FINGERMOTION:
-        SYS_INP_InjectTouchMove(sdl_event->tfinger.touchId, sdl_event->tfinger.x * SDL_TOUCH_HOR_RES, sdl_event->tfinger.y * SDL_TOUCH_VER_RES);
         break;
     case SDL_QUIT:
         exit(0);

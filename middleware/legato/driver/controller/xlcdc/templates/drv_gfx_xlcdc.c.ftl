@@ -40,8 +40,11 @@
 // DOM-IGNORE-END
 
 #include "gfx/driver/gfx_driver.h"
+<#if !XDMCPUBilt && le_gfx_gfx2d??>
+#include "gfx/driver/processor/gfx2d/drv_gfx2d.h"
+</#if>
 #include "gfx/driver/controller/xlcdc/drv_gfx_xlcdc.h"
-#include "definitions.h"
+#include "gfx/driver/controller/xlcdc/plib/plib_xlcdc.h"
 
 /* Utility Macros */
 /* Frame Buffer Macros */
@@ -50,7 +53,13 @@
 /* Not Cached */
 #define FB_CACHE_NC             __attribute__ ((section(".region_nocache"), aligned (32)))
 /* Frame Buffer Pointer Type */
+<#if XLMColMode == "13">
+#define FB_COL_MODE             XLCDC_RGB_COLOR_MODE_RGBA_8888
 #define FB_BPP_TYPE             uint32_t
+<#else>
+#define FB_COL_MODE             XLCDC_RGB_COLOR_MODE_RGB_565
+#define FB_BPP_TYPE             uint16_t
+</#if>
 #define FB_PTR_TYPE             FB_BPP_TYPE *
 #define FB_TYPE_SZ              sizeof(FB_BPP_TYPE)
 
@@ -77,7 +86,7 @@ static const char layerOrder[XLCDC_TOT_LAYERS] = {
 <#if XLMEnableOVR1 && XLMHEOVIDPRI>
     XLCDC_LAYER_OVR1,
 </#if>
-<#if XLMEnableHEO>
+<#if XLMEnableHEO && !XLMHEOYCbCrEN>
     XLCDC_LAYER_HEO,
 </#if>
 <#if XLMEnableOVR1 && !XLMHEOVIDPRI>
@@ -359,7 +368,7 @@ gfxResult DRV_XLCDC_Initialize(void)
     /* Initialize Layer Attributes */
     for (uint32_t layerCount = 0; layerCount < XLCDC_TOT_LAYERS; layerCount++)
     {
-        drvLayer[layerCount].pixelformat = XLCDC_RGB_COLOR_MODE_RGBA_8888;
+        drvLayer[layerCount].pixelformat = FB_COL_MODE;
         drvLayer[layerCount].resx = XLCDC_HOR_RES;
         drvLayer[layerCount].resy = XLCDC_VER_RES;
         drvLayer[layerCount].startx = 0;

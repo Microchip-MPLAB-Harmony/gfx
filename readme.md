@@ -18,11 +18,14 @@ and microprocessor devices.  Refer to the following links for more information:
 This repository contains the MPLAB® Harmony 3 Support Package for Microchip Graphics Suite (MGS).  The
 suite supports a free fast to market, graphics software development environment for Microchip MPLAB® 32-bit SAM and PIC® microcontroller and microprocessor devices.  Refer to
 the following graphics links for release notes, home page, training materials, framework and application help.
-Graphics application examples can be found at various [device-family specific repositories](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/master/apps) and at [MPLAB® Discover](https://mplab-discover.microchip.com/v2?dsl=Microchip+AND+Graphics+AND+Suite)
+
+For feature-rich, professional Microchip Graphics Suite demonstrations and demonstrations from third-party graphics libaries, refer to user guides on [Microchip Developer Help](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits) or search for "Microchip Graphcis Suite" on [MPLAB® Discover](https://mplab-discover.microchip.com/v2?dsl=Microchip+AND+Graphics+AND+Suite).
+
+Examples for display bring-up can be found at various [device-family specific repositories](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/master/apps)
  - [Release Notes](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/release_notes.md)
- - [MPLAB® Harmony License](https://microchip-mplab-harmony.github.io/gfx/mplab_harmony_license.html)
+ - [MPLAB® Harmony License](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/mplab_harmony_license.md)
  - [User Guides on Microchip Graphics Suite Harmony](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/)
- - [Information on Microchip Graphics Suite Development Kits](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits/)
+ - [Professional Designs on Microchip Graphics Suite Development Kits](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits/)
 
 # Features
 
@@ -41,7 +44,7 @@ The key features of the Microchip Graphics Suite (MGS) are the following:
 - Multi-language font support
 - External input support for use with capacitive, resistive and other devices
 - Fluid-UI support for alpha-blending, animations, scaling
-- Pixel format support for RGBA8888, RGB888, RGB565, RGB5551, RGB332, GS8
+- Pixel format support for RGBA8888, RGB888, RGB565, RGB5551, RGB332, GS8, YrBrCr
 - Multi-image support for industry standard formats, compression choices, external memory accessibility
 - Fully functional demonstrations and quick-starts to enable new development
 - Low memory and low power configurable
@@ -89,10 +92,10 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 |      |   xlcdc | Driver for the XLCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   dsi | Driver for the MIPI-DSI display interface | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
 |      |   lvdsc | Driver for the LVDS display interface | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-| library    | legato | MGS Harmony library | ![app-beta](https://img.shields.io/badge/library-beta-orange?style=plastic) |
-| designer | MGC Harmony | MGS Harmony Composer| ![app-beta](https://img.shields.io/badge/tool-beta-orange?style=plastic) |
+| library    | legato | MGS Harmony library | ![app-beta](https://img.shields.io/badge/library-production-green?style=plastic) |
+| designer | MGC Harmony | MGS Harmony Composer| ![app-beta](https://img.shields.io/badge/tool-production-green?style=plastic) |
 
-**NOTE:** ssd1963 and the ili9488 drivers are deprecated. There functionality are replaced by external controller. All applications using these drivers must transition to external controller.
+**NOTE:** ssd1963 and the ili9488 drivers are deprecated. Their functionality are replaced by external controller driver. All applications using these drivers must transition to external controller driver.
 
 ***
 ## Blank Library Interface
@@ -118,8 +121,8 @@ This chart shows which drivers are located in which repository.
 | Category | Item | Description | Release Status | Repository |
 | --- | --- | ---- |---- |---- |
 | drivers|  isi | Driver for the Image Sensor Interface peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-gfx-green?style=plastic) |
+|      |   cam | Driver for the OV5640 image sensor module for ISI |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-gfx-green?style=plastic) |
 |      |   isc | Driver for the Image Sensor Controller peripheral | ![app-beta](https://img.shields.io/badge/drive-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-vision-blue?style=plastic) |
-|      |   cam | Driver for the OV5640 image sensor module |![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) | ![app-beta](https://img.shields.io/badge/repository-gfx-green?style=plastic) |
 
 ***
 

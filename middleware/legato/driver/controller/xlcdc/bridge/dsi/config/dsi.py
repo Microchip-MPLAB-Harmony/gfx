@@ -101,6 +101,7 @@ else:
     gck_max_freq = 27000000
     mipi_csi_support = False
 
+
 # Run on Module Load
 def instantiateComponent(component):
     project_path = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/xlcdc/bridge"
@@ -404,6 +405,17 @@ def instantiateComponent(component):
     dsi_vid_menu.setDescription("DSI Video Mode Settings.")
     dsi_vid_menu.setVisible(True)
 
+    # Video Mode Transmission Type
+    dsi_vm_tx_type = component.createKeyValueSetSymbol("VidModeTxType", dsi_vid_menu)
+    dsi_vm_tx_type.setLabel("Transmission Type")
+    dsi_vm_tx_type.setDescription("<html>Indicates the video mode transmission type.</hrml>")
+    dsi_vm_tx_type.addKey("VID_MODE_TYPE_0", "0", "Non-burst with sync pulses")
+    dsi_vm_tx_type.addKey("VID_MODE_TYPE_1", "1", "Non-burst with sync events")
+    dsi_vm_tx_type.addKey("VID_MODE_TYPE_2", "2", "Burst mode")
+    dsi_vm_tx_type.setOutputMode("Value")
+    dsi_vm_tx_type.setDisplayMode("Description")
+    dsi_vm_tx_type.setDefaultValue(0)
+
     # Timing Config Hint
     global dsi_vm_tim_hint
     dsi_vm_tim_hint = component.createCommentSymbol("TimingMenuHint", dsi_vid_menu)
@@ -691,7 +703,7 @@ def update_dphy_pll_clock(symbol, event):
 # GCLK
 def show_mipi_gclk_valid_hint(symbol, event):
     if event["value"] > gck_max_freq:
-        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq/1000000)) + " MHz]")
+        symbol.setLabel("[Warning! Must not exceed " + str(int(gck_max_freq / 1000000)) + " MHz]")
         symbol.setVisible(True)
     elif event["value"] <= 0:
         symbol.setLabel("[Warning! 0Hz?]")
