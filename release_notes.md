@@ -8,6 +8,48 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.15.3
+
+### Issues Fixed
+
+* Composer: Fixes dependency errors with Linux binary
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.0.8 (Windows/Linux)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** MGS Harmony Composer UI/UX modernized for Windows and Linux builds only
+  * MacOS Build version remains at:
+     * Microchip Graphics Composer v1.4.1b
+        * Legato Plugin v2.3.15b
+
+  **NOTE 2:** MGS Harmony Composer users on Windows may have missing DLLs on launch: VCRUNTIME140.dll, VCRUNTIME140_1.dll and MSCVP140.dll.
+  
+  To remedy this, make sure to install the latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
+
+
+### MGS Simulator
+
+* MGS Simulator v1.1.0
+
+* For information on how to download and install the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+
+### Development Tools
+
+- [MPLAB® X IDE v6.20](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.35](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.5.1
+
+### Dependent Components
+
+* [Core v3.13.5 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.13.5)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+
 ## Graphics Release v3.15.2
 
 ### Issues Fixed
