@@ -85,7 +85,7 @@
 #define DISP_HOR_FRONT_PORCH ${Val_HorzFrontPorch}
 #define DISP_HOR_BACK_PORCH ${Val_HorzBackPorch}
 #define DISP_VER_PULSE_WIDTH ${Val_VertPulseWidth}
-#define DISP_VER_FRONT_PORCH ${Val_HorzFrontPorch}
+#define DISP_VER_FRONT_PORCH ${Val_VertFrontPorch}
 #define DISP_VER_BACK_PORCH ${Val_VertBackPorch}
 
 #define PIXEL_BUFFER_COLOR_MODE GFX_COLOR_MODE_RGB_565
