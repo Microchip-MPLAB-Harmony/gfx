@@ -22,7 +22,9 @@
 *******************************************************************************/
 
 #include "gfx_simulator.h"
+<#if CtrlCanvasMode == "DISABLED">
 #include "gfx/legato/legato_config.h"
+</#if>
 
 // <editor-fold defaultstate="collapsed" desc="SDL2">
 #ifndef __XC32
@@ -49,10 +51,12 @@
 #define SDL_DEF_BYTES_PER_PIXEL sizeof(SDL_DEF_FB_TYPE)
 #define SDL_VIRTUAL_LAYERS ${TotalNumLayers}
 #define SDL_BUFFERS_PER_LAYER 1
+<#if CtrlCanvasMode == "DISABLED">
 /* Check layer parity */
 #if LE_DRIVER_LAYER_MODE == 1 && LE_LAYER_COUNT != SDL_VIRTUAL_LAYERS
 #error "Simulator and Composer layer counts must match in Driver Layer Mode!"
 #endif
+</#if>
 
 /* SDL2 Event Subsystem Config */
 #define SDL_TOUCH_HOR_RES SDL_HOR_RES

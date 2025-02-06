@@ -26,6 +26,8 @@ if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75
     resgister_base_address = "XLCDC"
     symbol_clk_en = "XLCDC_CLOCK_ENABLE"
     symbol_gclk_en = "CLK_XLCDC_GCLKEN"
+    symbol_lvdsc_en = "LVDSC_CLOCK_ENABLE"
+    symbol_lvdspll_en = "CLK_LVDSPLL_EN"
     symbol_mck_freq = "MCK_FREQUENCY"
     symbol_gck_freq = "XLCDC_GCLK_FREQUENCY"
     symbol_gck_src_0_freq = "MCK_FREQUENCY"
@@ -38,11 +40,16 @@ if any(device in Variables.get("__PROCESSOR") for device in ["SAM9X72", "SAM9X75
     gck_src_1_reg = "PMC_PCR_GCLKCSS_PLLADIV2CLK_Val"
     gck_max_freq = 75000000
     ovr2_available = True
-
+    lvdspll_updt_id = 3
+    lvdspll_isr0_mask = "PMC_PLL_ISR0_LVDSLOCK_Msk"
+    out_max_freq = 550000000
+    arm_neon = False
 else:
     resgister_base_address = "LCDC"
     symbol_clk_en = "LCDC_CLOCK_ENABLE"
     symbol_gclk_en = "CLK_LCDC_GCLKEN"
+    symbol_lvdsc_en = "LVDSC_CLOCK_ENABLE"
+    symbol_lvdspll_en = "CLK_LVDSPLL_EN"
     symbol_mck_freq = "MCK3_FREQUENCY"
     symbol_gck_freq = "LCDC_GCLK_FREQUENCY"
     symbol_gck_src_0_freq = "MCK1_FREQUENCY"
@@ -55,6 +62,10 @@ else:
     gck_src_1_reg = "PMC_PCR_GCLKCSS_MAINCK_Val"
     gck_max_freq = 90000000
     ovr2_available = False
+    lvdspll_updt_id = 7
+    lvdspll_isr0_mask = "PMC_PLL_ISR0_LOCK7_Msk"
+    out_max_freq = 630000000
+    arm_neon = True
 
 
 def instantiateComponent(component):
@@ -86,18 +97,32 @@ def instantiateComponent(component):
     total_num_layers.setDescription("Number of hardware layers enabled")
     total_num_layers.setDefaultValue(4 if ovr2_available else 3)
     total_num_layers.setVisible(False)
-    # Initialize GCLK inside XLCDC PLIB
-    plib_clk_en = component.createBooleanSymbol("XLCDCGCLKEnable", None)
-    plib_clk_en.setLabel("GCLK Enable")
-    plib_clk_en.setDescription("Enable GCLK in PLIB")
+    # Initialize clocks inside XLCDC PLIB
+    global plib_clk_en
+    plib_clk_en = component.createBooleanSymbol("XLCDCClockEnable", None)
+    plib_clk_en.setLabel("Clock Enable")
+    plib_clk_en.setDescription("Enable Clocks in PLIB")
     plib_clk_en.setDefaultValue(show_clk_help)
     plib_clk_en.setVisible(False)
-    plib_clk_en.setDependencies(clk_help_cb, ["core." + symbol_clk_en, "core." + symbol_gclk_en])
+    plib_clk_en.setDependencies(clk_help_cb, ["core." + symbol_clk_en, "core." + symbol_gclk_en, "core." + symbol_lvdsc_en, "core." + symbol_lvdspll_en])
     # Overlay 2 Availability
     ovr2_support = component.createBooleanSymbol("SupportOVR2", None)
     ovr2_support.setVisible(False)
     ovr2_support.setReadOnly(True)
     ovr2_support.setDefaultValue(ovr2_available)
+    # ARM NEON Availability
+    neon_support = component.createBooleanSymbol("SupportNEON", None)
+    neon_support.setVisible(False)
+    neon_support.setReadOnly(True)
+    neon_support.setDefaultValue(arm_neon)
+    # LVDSPLL Index value for PLL control
+    lvdspll_index = component.createIntegerSymbol("LVDSPLLIndex", None)
+    lvdspll_index.setDefaultValue(lvdspll_updt_id)
+    lvdspll_index.setVisible(False)
+    # LVDSPLL Lock Mask
+    lvdspll_mask = component.createStringSymbol("LVDSPLLISRMask", None)
+    lvdspll_mask.setDefaultValue(lvdspll_isr0_mask)
+    lvdspll_mask.setVisible(False)
 
     # RTOS Menu
     rtos_menu = component.createMenuSymbol("RTOSMenu", None)
@@ -129,18 +154,26 @@ def instantiateComponent(component):
     clock_menu.setDescription("XLCDC Clock Control Settings.")
     clock_menu.setVisible(True)
 
+    # Clock Config Helper Availability Hint
+    global clock_gclk_hint
+    clock_gclk_hint = component.createCommentSymbol("XClockGCLKHint", clock_menu)
+    clock_gclk_hint.setLabel("GCLK is managed by Clock Manager")
+    clock_gclk_hint.setVisible(not show_clk_help)
+    clock_gclk_hint.setDependencies(clk_show_sym_inv, ["XLCDCClockEnable"])
+
+    # XLCDC Pixel Clock Source Selection
+    global clock_src_sel
+    clock_src_sel = component.createComboSymbol("XClkGenSel", clock_menu, ["GCLK", "LVDSPLL"])
+    clock_src_sel.setLabel("Clock Generator")
+    clock_src_sel.setDefaultValue("GCLK")
+    clock_src_sel.setDependencies(clk_show_sym, ["XLCDCClockEnable"])
+
     # GCLK Menu
     clock_gclk_menu = component.createMenuSymbol("XClockGCLKMenu", clock_menu)
     clock_gclk_menu.setLabel("GCLK Clock")
     clock_gclk_menu.setDescription("XLCDC GCLK Clock Control Settings.")
     clock_gclk_menu.setVisible(show_clk_help)
-    clock_gclk_menu.setDependencies(clk_show_sym, ["XLCDCGCLKEnable"])
-
-    # Clock Config Hints
-    clock_gclk_hint = component.createCommentSymbol("XClockGCLKHint", clock_menu)
-    clock_gclk_hint.setLabel("GCLK is managed by Clock Manager")
-    clock_gclk_hint.setVisible(not show_clk_help)
-    clock_gclk_hint.setDependencies(clk_show_sym_inv, ["XLCDCGCLKEnable"])
+    clock_gclk_menu.setDependencies(clk_show_sym, ["XLCDCClockEnable", "XClkGenSel"])
 
     # GCLK Source Selection
     gclk_source = component.createKeyValueSetSymbol("XClockGCLKSource", clock_gclk_menu)
@@ -174,19 +207,95 @@ def instantiateComponent(component):
     else:
         gclk_out_hint_hz = gclk_src_hint.getValue() / gclk_div.getValue()
     gclk_out_hint = component.createIntegerSymbol("XClockGCLKOutHint", clock_gclk_menu)
-    gclk_out_hint.setLabel("Output Clock (Hz)")
-    gclk_out_hint.setDescription("GCLK Output Clock, i.e. Input Clock to XLCDC.")
+    gclk_out_hint.setLabel("Pixel Clock (Hz)")
+    gclk_out_hint.setDescription("GCLK Output Clock, i.e. Pixel Clock to XLCDC.")
     gclk_out_hint.setDefaultValue(gclk_out_hint_hz)
     gclk_out_hint.setReadOnly(True)
     gclk_out_hint.setDependencies(update_gclk_clock, ["XClockGCLKSrcHint", "XClockGCLKDiv", "core." + symbol_clk_en, "core." + symbol_gck_freq])
 
-    # GCLK Clock Validity Hint
+    # GCLK Pixel Clock Validity Hint
     gclk_valid_hint = component.createCommentSymbol("XClockGCLKValidHint", clock_gclk_menu)
     gclk_valid_hint.setLabel("[Warning! Must not exceed 75 MHz]")
     gclk_valid_hint.setVisible(False)
     gclk_valid_hint.setDependencies(show_gclk_valid_hint, ["XClockGCLKOutHint"])
     # Update start-up state by manually triggering the dependency callback
     show_gclk_valid_hint(gclk_valid_hint, {"value": gclk_out_hint.getValue()})
+
+    # LVDSPLL Clock Menu
+    clock_lvdspll_menu = component.createMenuSymbol("XClockLVDSPLLMenu", clock_menu)
+    clock_lvdspll_menu.setLabel("LVDSPLL Clock")
+    clock_lvdspll_menu.setDescription("XLCDC LVDSPLL Clock Control Settings.")
+    clock_lvdspll_menu.setVisible(False)
+    clock_lvdspll_menu.setDependencies(clk_show_sym, ["XLCDCClockEnable", "XClkGenSel"])
+
+    # Source Clock Hint
+    cm_lvdspll_src = component.createIntegerSymbol("LVDSClockSrcHint", clock_lvdspll_menu)
+    cm_lvdspll_src.setLabel("Source Clock (Hz)")
+    cm_lvdspll_src.setDescription("LVDSPLL Input Clock (S).")
+    cm_lvdspll_src.setDefaultValue(Database.getSymbolValue("core", "CLK_MOSCXT_FREQ"))
+    cm_lvdspll_src.setReadOnly(True)
+    cm_lvdspll_src.setDependencies(lvdspll_update_clocks, ["core.CLK_MOSCXT_FREQ"])
+
+    # LVDSPLL Multiplier
+    cm_lvdspll_mul = component.createIntegerSymbol("LVDSClockMul", clock_lvdspll_menu)
+    cm_lvdspll_mul.setLabel("Muliplier")
+    cm_lvdspll_mul.setDescription("LVDSPLL Clock Multiplier (M).")
+    cm_lvdspll_mul.setMin(1)
+    cm_lvdspll_mul.setMax(256)
+    cm_lvdspll_mul.setDefaultValue(29)
+
+    # LVDSPLL Fractional Factor
+    cm_lvdspll_frac = component.createIntegerSymbol("LVDSClockFrac", clock_lvdspll_menu)
+    cm_lvdspll_frac.setLabel("Fractional Factor")
+    cm_lvdspll_frac.setDescription("LVDSPLL Fractional Multiplication Factor (F).")
+    cm_lvdspll_frac.setMin(0)
+    cm_lvdspll_frac.setMax(2**22 - 1)
+    cm_lvdspll_frac.setDefaultValue(699051)
+
+    # LVDSPLL Core Clock Validity Hint
+    lvdspll_valid_hint = component.createCommentSymbol("LVDSCoreValidHint", clock_lvdspll_menu)
+    lvdspll_valid_hint.setLabel("[Ok!]")
+    lvdspll_valid_hint.setVisible(False)
+    lvdspll_valid_hint.setDependencies(lvdspll_core_valid_hint, ["LVDSClockSrcHint", "LVDSClockMul", "LVDSClockFrac"])
+
+    # LVDSPLL Divider
+    lvdspll_divpmc = component.createIntegerSymbol("LVDSClockDivPMC", clock_lvdspll_menu)
+    lvdspll_divpmc.setLabel("Divider")
+    lvdspll_divpmc.setDescription("LVDSPLL Clock Divider (D).")
+    lvdspll_divpmc.setMin(1)
+    lvdspll_divpmc.setMax(256)
+    lvdspll_divpmc.setDefaultValue(4)
+
+    # LVDSPLL Clock Output Hint
+    lvdspll_out_hint_val = int(cm_lvdspll_src.getValue() * (cm_lvdspll_mul.getValue() + (float(cm_lvdspll_frac.getValue()) / 2**22)) / lvdspll_divpmc.getValue())
+    lvdspll_out_hint = component.createIntegerSymbol("LVDSClockOutHint", clock_lvdspll_menu)
+    lvdspll_out_hint.setLabel("Output Clock (Hz)")
+    lvdspll_out_hint.setDescription("<html>LVDSPLL Output Clock, i.e. Input Clock to LVDSC (O).<br>O = S * (M + (F / 2^22)) / D</html>")
+    lvdspll_out_hint.setDefaultValue(lvdspll_out_hint_val)
+    lvdspll_out_hint.setReadOnly(True)
+    lvdspll_out_hint.setDependencies(lvdspll_update_clocks, ["LVDSClockSrcHint", "LVDSClockMul", "LVDSClockFrac", "LVDSClockDivPMC"])
+
+    # LVDSPLL Clock Validity Hint
+    lvdspll_valid_hint = component.createCommentSymbol("LVDSClockValidHint", clock_lvdspll_menu)
+    lvdspll_valid_hint.setLabel("[Ok!]")
+    lvdspll_valid_hint.setVisible(False)
+    lvdspll_valid_hint.setDependencies(lvdspll_out_valid_hint, ["LVDSClockOutHint"])
+
+    # XLCDC Pixel Clock through LVDSPLL Hint
+    xlcdc_pix_hint = component.createIntegerSymbol("XLCDCPixClockHint", clock_lvdspll_menu)
+    xlcdc_pix_hint.setLabel("Pixel Clock (Hz)")
+    xlcdc_pix_hint.setDescription("<html>XLCDC Pixel Clock (P).<br>P = O / 7</html>")
+    xlcdc_pix_hint.setDefaultValue(lvdspll_out_hint_val / 7)
+    xlcdc_pix_hint.setReadOnly(True)
+    xlcdc_pix_hint.setDependencies(update_xlcdc_pix_hint, ["LVDSClockOutHint"])
+
+    # LVDSPLL Pixel Clock Validity Hint
+    pixclk_valid_hint = component.createCommentSymbol("XClockLVDSPLLValidHint", clock_lvdspll_menu)
+    pixclk_valid_hint.setLabel("[Warning! Must not exceed 75 MHz]")
+    pixclk_valid_hint.setVisible(False)
+    pixclk_valid_hint.setDependencies(show_gclk_valid_hint, ["XLCDCPixClockHint"])
+    # Update start-up state by manually triggering the dependency callback
+    show_gclk_valid_hint(pixclk_valid_hint, {"value": xlcdc_pix_hint.getValue()})
 
     # PWM Clock Menu
     clock_pwm_menu = component.createMenuSymbol("XClockPWMMenu", clock_menu)
@@ -253,6 +362,7 @@ def instantiateComponent(component):
     timing_menu_res_x.setMin(1)
     timing_menu_res_x.setMax(2**11)
 
+    global timing_menu_res_y
     timing_menu_res_y = component.createIntegerSymbol("XTResRPF", timing_menu_res)
     timing_menu_res_y.setLabel("Height")
     timing_menu_res_y.setDescription("The vertical height in pixels")
@@ -375,11 +485,13 @@ def instantiateComponent(component):
     lm_enable_heo.setDefaultValue(True)
     lm_enable_heo.setDependencies(on_layer_enable, ["XLMEnableHEO"])
 
+    global lm_heo_vidpri
     lm_heo_vidpri = component.createBooleanSymbol("XLMHEOVIDPRI", lm_enable_heo)
     lm_heo_vidpri.setLabel("Prioritize")
     lm_heo_vidpri.setDescription("Draws HEO Layer above OVR1 Layer if enabled.")
     lm_heo_vidpri.setDefaultValue(True)
 
+    global lm_heo_ycbcr_en
     lm_heo_ycbcr_en = component.createBooleanSymbol("XLMHEOYCbCrEN", lm_enable_heo)
     lm_heo_ycbcr_en.setLabel("YCbCr Mode")
     lm_heo_ycbcr_en.setDescription("Initialize HEO in YCbCr Mode.")
@@ -429,11 +541,234 @@ def instantiateComponent(component):
     driver_cache_fb.setDefaultValue(False)
     driver_cache_fb.setVisible(True)
 
+    global canvas_mode
     canvas_mode = component.createBooleanSymbol("CanvasModeOnly", driver_menu)
     canvas_mode.setLabel("Canvas Mode")
     canvas_mode.setDefaultValue(False)
     canvas_mode.setVisible(True)
     canvas_mode.setDescription("Exposes hardware layer features and control.")
+
+    # Double Buffering
+    double_buffering = component.createBooleanSymbol("DoubleBuffering", driver_menu)
+    double_buffering.setLabel("Double Buffering")
+    double_buffering.setDefaultValue(False)
+    double_buffering.setVisible(True)
+    double_buffering.setDescription(
+        "<html>Uses an additional buffer for off-screen drawing.<br>Eliminates screen tearing but doubles the required memory.<br>Only works when not in Canvas Mode.</html>"
+    )
+    double_buffering.setDependencies(db_manage_sym, ["CanvasModeOnly", "DoubleBuffering"])
+
+    db_rect_opt = component.createComboSymbol("DBRectOpt", double_buffering, ["Basic", "Simple", "Smart"])
+    db_rect_opt.setLabel("Sync Optimization")
+    db_rect_opt.setDefaultValue("Basic")
+    db_rect_opt.setVisible(False)
+    db_rect_opt.setDependencies(show_db_opts, ["DoubleBuffering"])
+    db_rect_opt.setDescription(
+        "<html>Optimizes rectangles during synchronization.<br> Basic - No optimization, just tracks dirty rectangles and blits them<br> Simple - Merges dirty rectangles if close (within pixel threshold) or adjacent<br> Smart - Like Simple, but calculates thresholds dynamically</html>"
+    )
+
+    db_max_rects = component.createIntegerSymbol("DBROMaxRects", db_rect_opt)
+    db_max_rects.setLabel("Sync Buffer Size")
+    db_max_rects.setDescription("Specifies the maximum number of dirty rectangles buffered; beyond it, the entire screen syncs.")
+    db_max_rects.setDefaultValue(32)
+    db_max_rects.setMin(32)
+    db_max_rects.setMax(256)
+    db_max_rects.setVisible(True)
+
+    global db_merge_threshold
+    db_merge_threshold = component.createIntegerSymbol("DBROMergeThrBase", db_rect_opt)
+    db_merge_threshold.setLabel("Merge Threshold (px)")
+    db_merge_threshold.setDescription("Merges rectangles if they within the pixel threshold.")
+    db_merge_threshold.setDefaultValue(10)
+    db_merge_threshold.setMin(1)
+    db_merge_threshold.setMax(50)
+    db_merge_threshold.setVisible(False)
+    db_merge_threshold.setDependencies(show_db_opts, ["DBRectOpt"])
+
+    global db_merge_thr_min
+    db_merge_thr_min = component.createIntegerSymbol("DBROMergeThrMin", db_rect_opt)
+    db_merge_thr_min.setLabel("Minimum Threshold (px)")
+    db_merge_thr_min.setDescription("Minimum Threshold for Smart Sync Optimization.")
+    db_merge_thr_min.setDefaultValue(1)
+    db_merge_thr_min.setMin(1)
+    db_merge_thr_min.setMax(50)
+    db_merge_thr_min.setVisible(False)
+    db_merge_thr_min.setDependencies(show_db_opts, ["DBRectOpt"])
+
+    global db_merge_thr_max
+    db_merge_thr_max = component.createIntegerSymbol("DBROMergeThrMax", db_rect_opt)
+    db_merge_thr_max.setLabel("Maximum Threshold (px)")
+    db_merge_thr_max.setDescription("Maximum Threshold for Smart Sync Optimization.")
+    db_merge_thr_max.setDefaultValue(10)
+    db_merge_thr_max.setMin(1)
+    db_merge_thr_max.setMax(50)
+    db_merge_thr_max.setVisible(False)
+    db_merge_thr_max.setDependencies(show_db_opts, ["DBRectOpt"])
+
+    global db_merge_ohr
+    db_merge_ohr = component.createIntegerSymbol("DBROMergeOHR", db_rect_opt)
+    db_merge_ohr.setLabel("Overhead Ratio (%)")
+    db_merge_ohr.setDescription("Acceptable extra pixels in percentage, beyond this merge will abort.")
+    db_merge_ohr.setDefaultValue(30)
+    db_merge_ohr.setMin(1)
+    db_merge_ohr.setMax(50)
+    db_merge_ohr.setVisible(False)
+    db_merge_ohr.setDependencies(show_db_opts, ["DBRectOpt"])
+
+    # Interrupt Configuration
+    global interrupt_enable
+    interrupt_enable = component.createBooleanSymbol("InterruptEnable", driver_menu)
+    interrupt_enable.setLabel("Enable Interrupts")
+    interrupt_enable.setDefaultValue(False)
+    interrupt_enable.setVisible(True)
+    interrupt_enable.setDescription("Enables LCDC Interrupts.")
+
+    global int_en_sof
+    int_en_sof = component.createBooleanSymbol("IntEnSof", interrupt_enable)
+    int_en_sof.setLabel("Start of Frame")
+    int_en_sof.setDefaultValue(False)
+    int_en_sof.setVisible(False)
+    int_en_sof.setDescription("Enables LCDC Start of Frame Interrupt.")
+    int_en_sof.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    int_en_row = component.createBooleanSymbol("IntEnRow", interrupt_enable)
+    int_en_row.setLabel("Row Interrupt")
+    int_en_row.setDefaultValue(False)
+    int_en_row.setVisible(False)
+    int_en_row.setDescription("Enables Row Interrupt.")
+    int_en_row.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    global int_row_num
+    int_row_num = component.createIntegerSymbol("IntRowNum", int_en_row)
+    int_row_num.setLabel("Row No.")
+    int_row_num.setDescription(
+        "<html>Triggers Row Interrupt on Specified Line Number<br>Setting it to 0 triggers an interrupt when the first line is displayed<br>Setting it to (Height - 1) triggers an interrupt when the last line is displayed</html>"
+    )
+    int_row_num.setDefaultValue(0)
+    int_row_num.setMin(0)
+    int_row_num.setMax(2**11 - 1)
+    int_row_num.setVisible(False)
+    int_row_num.setDependencies(int_show_sym, ["IntEnRow"])
+
+    int_en_fifo = component.createBooleanSymbol("IntEnFifoError", interrupt_enable)
+    int_en_fifo.setLabel("Output FIFO Error")
+    int_en_fifo.setDefaultValue(False)
+    int_en_fifo.setVisible(False)
+    int_en_fifo.setDescription("Enables Output FIFO Error Interrupt.")
+    int_en_fifo.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    int_en_base = component.createBooleanSymbol("IntEnBase", interrupt_enable)
+    int_en_base.setLabel("BASE Layer Interrupts")
+    int_en_base.setDefaultValue(False)
+    int_en_base.setVisible(False)
+    int_en_base.setDescription("Enables Layer Interrupts.")
+    int_en_base.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    int_en_base_end = component.createBooleanSymbol("IntEnBaseEnd", int_en_base)
+    int_en_base_end.setLabel("EOF DMA Transfer")
+    int_en_base_end.setDefaultValue(False)
+    int_en_base_end.setVisible(False)
+    int_en_base_end.setDescription("Enables End of Frame DMA Transfer Interrupt.")
+    int_en_base_end.setDependencies(int_show_sym, ["IntEnBase"])
+
+    int_en_base_error = component.createBooleanSymbol("IntEnBaseError", int_en_base)
+    int_en_base_error.setLabel("Transfer Error")
+    int_en_base_error.setDefaultValue(False)
+    int_en_base_error.setVisible(False)
+    int_en_base_error.setDescription("Enables Transfer Error Interrupt.")
+    int_en_base_error.setDependencies(int_show_sym, ["IntEnBase"])
+
+    int_en_base_ovf = component.createBooleanSymbol("IntEnBaseOvf", int_en_base)
+    int_en_base_ovf.setLabel("Overflow")
+    int_en_base_ovf.setDefaultValue(False)
+    int_en_base_ovf.setVisible(False)
+    int_en_base_ovf.setDescription("Enables Overflow Interrupt.")
+    int_en_base_ovf.setDependencies(int_show_sym, ["IntEnBase"])
+
+    int_en_ovr1 = component.createBooleanSymbol("IntEnOvr1", interrupt_enable)
+    int_en_ovr1.setLabel("OVR1 Layer Interrupts")
+    int_en_ovr1.setDefaultValue(False)
+    int_en_ovr1.setVisible(False)
+    int_en_ovr1.setDescription("Enables Layer Interrupts.")
+    int_en_ovr1.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    int_en_ovr1_end = component.createBooleanSymbol("IntEnOvr1End", int_en_ovr1)
+    int_en_ovr1_end.setLabel("EOF DMA Transfer")
+    int_en_ovr1_end.setDefaultValue(False)
+    int_en_ovr1_end.setVisible(False)
+    int_en_ovr1_end.setDescription("Enables End of Frame DMA Transfer Interrupt.")
+    int_en_ovr1_end.setDependencies(int_show_sym, ["IntEnOvr1"])
+
+    int_en_ovr1_error = component.createBooleanSymbol("IntEnOvr1Error", int_en_ovr1)
+    int_en_ovr1_error.setLabel("Transfer Error")
+    int_en_ovr1_error.setDefaultValue(False)
+    int_en_ovr1_error.setVisible(False)
+    int_en_ovr1_error.setDescription("Enables Transfer Error Interrupt.")
+    int_en_ovr1_error.setDependencies(int_show_sym, ["IntEnOvr1"])
+
+    int_en_ovr1_ovf = component.createBooleanSymbol("IntEnOvr1Ovf", int_en_ovr1)
+    int_en_ovr1_ovf.setLabel("Overflow")
+    int_en_ovr1_ovf.setDefaultValue(False)
+    int_en_ovr1_ovf.setVisible(False)
+    int_en_ovr1_ovf.setDescription("Enables Overflow Interrupt.")
+    int_en_ovr1_ovf.setDependencies(int_show_sym, ["IntEnOvr1"])
+
+    int_en_heo = component.createBooleanSymbol("IntEnHeo", interrupt_enable)
+    int_en_heo.setLabel("HEO Layer Interrupts")
+    int_en_heo.setDefaultValue(False)
+    int_en_heo.setVisible(False)
+    int_en_heo.setDescription("Enables Layer Interrupts.")
+    int_en_heo.setDependencies(int_show_sym, ["InterruptEnable"])
+
+    int_en_heo_end = component.createBooleanSymbol("IntEnHeoEnd", int_en_heo)
+    int_en_heo_end.setLabel("EOF DMA Transfer")
+    int_en_heo_end.setDefaultValue(False)
+    int_en_heo_end.setVisible(False)
+    int_en_heo_end.setDescription("Enables End of Frame DMA Transfer Interrupt.")
+    int_en_heo_end.setDependencies(int_show_sym, ["IntEnHeo"])
+
+    int_en_heo_error = component.createBooleanSymbol("IntEnHeoError", int_en_heo)
+    int_en_heo_error.setLabel("Transfer Error")
+    int_en_heo_error.setDefaultValue(False)
+    int_en_heo_error.setVisible(False)
+    int_en_heo_error.setDescription("Enables Transfer Error Interrupt.")
+    int_en_heo_error.setDependencies(int_show_sym, ["IntEnHeo"])
+
+    int_en_heo_ovf = component.createBooleanSymbol("IntEnHeoOvf", int_en_heo)
+    int_en_heo_ovf.setLabel("Overflow")
+    int_en_heo_ovf.setDefaultValue(False)
+    int_en_heo_ovf.setVisible(False)
+    int_en_heo_ovf.setDescription("Enables Overflow Interrupt.")
+    int_en_heo_ovf.setDependencies(int_show_sym, ["IntEnHeo"])
+
+    if ovr2_available:
+        int_en_ovr2 = component.createBooleanSymbol("IntEnOvr2", interrupt_enable)
+        int_en_ovr2.setLabel("OVR2 Layer Interrupts")
+        int_en_ovr2.setDefaultValue(False)
+        int_en_ovr2.setVisible(False)
+        int_en_ovr2.setDescription("Enables Layer Interrupts.")
+        int_en_ovr2.setDependencies(int_show_sym, ["InterruptEnable"])
+
+        int_en_ovr2_end = component.createBooleanSymbol("IntEnOvr2End", int_en_ovr2)
+        int_en_ovr2_end.setLabel("EOF DMA Transfer")
+        int_en_ovr2_end.setDefaultValue(False)
+        int_en_ovr2_end.setVisible(False)
+        int_en_ovr2_end.setDescription("Enables End of Frame DMA Transfer Interrupt.")
+        int_en_ovr2_end.setDependencies(int_show_sym, ["IntEnOvr2"])
+
+        int_en_ovr2_error = component.createBooleanSymbol("IntEnOvr2Error", int_en_ovr2)
+        int_en_ovr2_error.setLabel("Transfer Error")
+        int_en_ovr2_error.setDefaultValue(False)
+        int_en_ovr2_error.setVisible(False)
+        int_en_ovr2_error.setDescription("Enables Transfer Error Interrupt.")
+        int_en_ovr2_error.setDependencies(int_show_sym, ["IntEnOvr2"])
+
+        int_en_ovr2_ovf = component.createBooleanSymbol("IntEnOvr2Ovf", int_en_ovr2)
+        int_en_ovr2_ovf.setLabel("Overflow")
+        int_en_ovr2_ovf.setDefaultValue(False)
+        int_en_ovr2_ovf.setVisible(False)
+        int_en_ovr2_ovf.setDescription("Enables Overflow Interrupt.")
+        int_en_ovr2_ovf.setDependencies(int_show_sym, ["IntEnOvr2"])
 
     # Output Configuration
     output_menu = component.createMenuSymbol("XLCDCOutMenu", None)
@@ -562,6 +897,14 @@ def instantiateComponent(component):
     drv_xldcd_c.setType("SOURCE")
     drv_xldcd_c.setMarkup(True)
 
+    global drv_xldcd_int
+    drv_xldcd_int = component.createFileSymbol("INTERRUPTS_C", None)
+    drv_xldcd_int.setType("STRING")
+    drv_xldcd_int.setSourcePath("templates/interrupt.c.ftl")
+    drv_xldcd_int.setOutputName("core.LIST_SYSTEM_INTERRUPT_SHARED_HANDLERS")
+    drv_xldcd_int.setMarkup(True)
+    drv_xldcd_int.setEnabled(False)
+
 
 # Callbacks
 # Callback on component attach
@@ -585,7 +928,8 @@ def onAttachmentConnected(source, target):
     if remote_comp.getID() == "gfx_canvas":
         if remote_id == "gfx_display_driver":
             print(local_name + " Canvas Mode Enabled")
-            local_comp.setSymbolValue("CanvasModeOnly", True)
+            canvas_mode.setValue(True)
+            canvas_mode.setReadOnly(True)
 
     # Try to fetch display connected to DPI bridge
     # Define and update DisplayIDString string symbol in DPI bridge component
@@ -604,6 +948,12 @@ def onAttachmentConnected(source, target):
         disp_id = remote_comp.getID()
         print(local_name + " Display ID is " + disp_id)
         update_display_config(local_comp, disp_id)
+
+    # LVDSC is connected
+    if remote_id == "gfx_dpi_bridge_cap":
+        if remote_name == "LVDSC":
+            clock_src_sel.setValue("LVDSPLL")
+            clock_src_sel.setReadOnly(True)
 
 
 # Callback on component detach
@@ -627,7 +977,13 @@ def onAttachmentDisconnected(source, target):
     if remote_comp.getID() == "gfx_canvas":
         if remote_id == "gfx_display_driver":
             print(local_name + " Canvas Mode Disabled")
-            local_comp.setSymbolValue("CanvasModeOnly", False)
+            canvas_mode.setValue(False)
+            canvas_mode.setReadOnly(False)
+
+    # LVDSC is disconnected
+    if remote_id == "gfx_dpi_bridge_cap":
+        if remote_name == "LVDSC":
+            clock_src_sel.setReadOnly(False)
 
 
 # Variable Callbacks
@@ -707,6 +1063,11 @@ def on_layer_enable(symbol, event):
     if event["source"].getSymbolValue("XLMEnableHEO") == True:
         if event["source"].getSymbolValue("XLMHEOYCbCrEN") == False:
             layer_count += 1
+        lm_heo_vidpri.setVisible(True)
+        lm_heo_ycbcr_en.setVisible(True)
+    else:
+        lm_heo_vidpri.setVisible(False)
+        lm_heo_ycbcr_en.setVisible(False)
     if event["source"].getSymbolValue("XLMEnableOVR2") == True:
         layer_count += 1
     event["source"].setSymbolValue("TotalNumLayers", layer_count)
@@ -764,7 +1125,12 @@ def clk_help_cb(symbol, event):
 
 
 def clk_show_sym(symbol, event):
-    symbol.setVisible(event["value"])
+    if event["id"] == "XClkGenSel":
+        select = event["source"].getSymbolValue("XClkGenSel")
+        sym = symbol.getID()
+        symbol.setVisible((select == "GCLK" and sym == "XClockGCLKMenu") or (select == "LVDSPLL" and sym == "XClockLVDSPLLMenu"))
+    else:
+        symbol.setVisible(event["value"])
 
 
 def clk_show_sym_inv(symbol, event):
@@ -776,6 +1142,8 @@ def clk_help_test_sym():
     test_symbols = [
         ["core", symbol_clk_en],
         ["core", symbol_gclk_en],
+        ["core", symbol_lvdsc_en],
+        ["core", symbol_lvdspll_en],
     ]
 
     for item in test_symbols:
@@ -783,3 +1151,97 @@ def clk_help_test_sym():
 
     # Return true if none of the test symbols are set
     return not is_set
+
+
+# Update LVDSPLL Clocks
+def lvdspll_update_clocks(symbol, event):
+    # CLK_MOSCXT_FREQ
+    if event["id"] == "CLK_MOSCXT_FREQ":
+        symbol.setValue(event["value"])
+
+    # Set LVDSClockOutHint
+    src = event["source"].getSymbolValue("LVDSClockSrcHint")
+    mul = event["source"].getSymbolValue("LVDSClockMul")
+    frac = event["source"].getSymbolValue("LVDSClockFrac")
+    divpmc = event["source"].getSymbolValue("LVDSClockDivPMC")
+    out_clk = int(src * (mul + (float(frac) / 2**22)) / divpmc)
+    event["source"].setSymbolValue("LVDSClockOutHint", out_clk)
+
+
+# Update XLCDC Pixel Clock through LVDSPLL Hint
+def update_xlcdc_pix_hint(symbol, event):
+    symbol.setValue(event["value"] / 7)
+
+
+# LVDSPLL Core Validity
+def lvdspll_core_valid_hint(symbol, event):
+    # Calculate PLL Core Clock Output
+    src = event["source"].getSymbolValue("LVDSClockSrcHint")
+    mul = event["source"].getSymbolValue("LVDSClockMul")
+    frac = event["source"].getSymbolValue("LVDSClockFrac")
+    out_clk = int(src * (mul + (float(frac) / 2**22)))
+    mul_tot = float(mul + (float(frac) / 2**22))
+
+    if out_clk > 1200000000:
+        symbol.setLabel("[Invalid! S * %.9f > 1200 MHz]" % mul_tot)
+        symbol.setVisible(True)
+    elif out_clk < 600000000:
+        symbol.setLabel("[Invalid! S * %.9f < 600 MHz]" % mul_tot)
+        symbol.setVisible(True)
+    else:
+        symbol.setLabel("[Ok! S * %.9f = %d]" % (mul_tot, out_clk))
+        symbol.setVisible(True)
+
+
+# LVDSPLL Clock Validity
+def lvdspll_out_valid_hint(symbol, event):
+    if event["value"] > out_max_freq:
+        symbol.setLabel("[Invalid! O > " + str(int(out_max_freq / 1000000)) + " MHz]")
+        symbol.setVisible(True)
+    else:
+        symbol.setLabel("[Ok!]")
+        symbol.setVisible(False)
+
+
+# Interrupt Helper
+def int_show_sym(symbol, event):
+    if event["id"] == "InterruptEnable":
+        drv_xldcd_int.setEnabled(event["value"])
+        Database.setSymbolValue("core", resgister_base_address + "_INTERRUPT_ENABLE", event["value"])
+        Database.setSymbolValue("core", resgister_base_address + "_INTERRUPT_HANDLER", resgister_base_address + "_InterruptHandler")
+    if event["id"] == "IntEnRow":
+        y_res = timing_menu_res_y.getValue()
+        int_row_num.setMax(y_res - 1)
+    symbol.setVisible(event["value"])
+
+
+# Double Buffering
+def db_manage_sym(symbol, event):
+    if event["id"] == "CanvasModeOnly":
+        symbol.setReadOnly(event["value"])
+    if event["id"] == "DoubleBuffering":
+        interrupt_enable.setValue(event["value"])
+        int_en_sof.setValue(event["value"])
+        interrupt_enable.setReadOnly(event["value"])
+        int_en_sof.setReadOnly(event["value"])
+
+
+def show_db_opts(symbol, event):
+    if event["id"] == "DoubleBuffering":
+        symbol.setVisible(event["value"])
+    if event["id"] == "DBRectOpt":
+        if event["value"] == "Basic":
+            db_merge_threshold.setVisible(False)
+            db_merge_thr_min.setVisible(False)
+            db_merge_thr_max.setVisible(False)
+            db_merge_ohr.setVisible(False)
+        if event["value"] == "Simple":
+            db_merge_threshold.setVisible(True)
+            db_merge_thr_min.setVisible(False)
+            db_merge_thr_max.setVisible(False)
+            db_merge_ohr.setVisible(False)
+        if event["value"] == "Smart":
+            db_merge_threshold.setVisible(True)
+            db_merge_thr_min.setVisible(True)
+            db_merge_thr_max.setVisible(True)
+            db_merge_ohr.setVisible(True)

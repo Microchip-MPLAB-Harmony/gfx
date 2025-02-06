@@ -54,8 +54,10 @@
 #include "gfx/legato/core/legato_debug.h"
 #endif
 
+#include "gfx/driver/gfx_driver.h"
 #include "gfx/legato/common/legato_color.h"
 #include "gfx/legato/common/legato_math.h"
+#include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/core/legato_input.h"
 #include "gfx/legato/core/legato_scheme.h"
 #include "gfx/legato/core/legato_state.h"
@@ -64,13 +66,11 @@
 #include "gfx/legato/image/legato_image.h"
 #include "gfx/legato/image/legato_palette.h"
 #include "gfx/legato/memory/legato_memory.h"
-#include "gfx/driver/gfx_driver.h"
 #include "gfx/legato/renderer/legato_renderer.h"
 #include "gfx/legato/string/legato_dynamicstring.h"
 #include "gfx/legato/string/legato_fixedstring.h"
 #include "gfx/legato/string/legato_tablestring.h"
-#include "gfx/legato/common/legato_utils.h"
-
+#include "gfx/legato/vector/legato_vector.h"
 #include "gfx/legato/widget/legato_editwidget.h"
 
 #if LE_ARC_WIDGET_ENABLED

@@ -1176,6 +1176,10 @@ static leResult _decoderExec(void)
             // restart the pipeline
             _state.currentStage = 0;
         }
+
+#if LE_PREEMPTION_LEVEL > 0
+        return LE_SUCCESS;
+#endif
     }
 
 #if LE_STREAMING_ENABLED == 1

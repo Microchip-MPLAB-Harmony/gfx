@@ -87,7 +87,7 @@ def instantiateComponent(component):
     horz_pulse_width = component.createIntegerSymbol("HorzPulseWidth", horz_menu)
     horz_pulse_width.setLabel("Horizontal Pulse Width")
     horz_pulse_width.setDescription("The horizontal pulse width.")
-    horz_pulse_width.setDefaultValue(120)
+    horz_pulse_width.setDefaultValue(32)
     horz_pulse_width.setReadOnly(True)
 
     horz_back_porch = component.createIntegerSymbol("HorzBackPorch", horz_menu)
@@ -99,7 +99,7 @@ def instantiateComponent(component):
     horz_front_porch = component.createIntegerSymbol("HorzFrontPorch", horz_menu)
     horz_front_porch.setLabel("Horizontal Front Porch")
     horz_front_porch.setDescription("The horizontal front porch size in pixels.")
-    horz_front_porch.setDefaultValue(200)
+    horz_front_porch.setDefaultValue(330)
     horz_front_porch.setReadOnly(True)
 
     vert_menu = component.createMenuSymbol("VertMenu", None)

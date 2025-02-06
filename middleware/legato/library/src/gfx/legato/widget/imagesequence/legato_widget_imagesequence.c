@@ -316,7 +316,7 @@ static leVAlignment getImageVAlignment(const leImageSequenceWidget* _this,
     if(idx >= _this->count)
         return 0;
         
-    return _this->images[idx].halign;
+    return _this->images[idx].valign;
 }
 
 static leResult setImageVAlignment(leImageSequenceWidget* _this,

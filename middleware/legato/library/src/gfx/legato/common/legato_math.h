@@ -53,38 +53,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief Used to define the types of trig functions
- * @details Trigonomtry is used in Legato.
- */
-typedef enum
-{
-    LE_TRIG_SINE_TYPE,
-    LE_TRIG_COSINE_TYPE,
-} LE_TRIG_FUNCTION_TYPE;
-
-/**
- * @brief Used to define the basic four quandrants of a coordinate plane
- * @details .
- */
-typedef enum
-{
-    LE_Q1,
-    LE_Q2,
-    LE_Q3,
-    LE_Q4
-} LE_QUADRANT;
-
-/**
- * @brief Used to define arc direction
- * @details The parameters CW and CCW enable you to define the direction of the arc.
- */
-typedef enum
-{
-    LE_CCW,     /**< counter clock wise. */
-    LE_CW,      /**< clock wise. */
-} leArcDir;
-
 // *****************************************************************************
 /* Function:
     int32_t leMini(int32_t l, int32_t r);
@@ -253,6 +221,7 @@ int32_t leClampi(int32_t min, int32_t max, int32_t i);
  * @return a clamp integer
  */
 float leClampf(float min, float max, float f);
+
 
 // *****************************************************************************
 /* Function:

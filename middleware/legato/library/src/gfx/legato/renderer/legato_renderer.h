@@ -961,7 +961,7 @@ leResult leRenderer_ArcFill(const leRect* drawRect,
     int32_t y - the y component of the ellipse origin (screen space)
     int32_t a - the major axis component of the ellipse
     int32_t b - the minor axis component of the ellipse
-    int32_t theta - the rotation component of the ellipse
+    int32_t theta - the rotat#if 0ion component of the ellipse
     int32_t startAngle - the starting angle
     int32_t centerAngle - the center angle
     leColor clr - the color to write

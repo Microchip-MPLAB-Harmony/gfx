@@ -346,6 +346,56 @@ void XLCDC_SetupOVR2Layer(void);
 */
 void XLCDC_SetupHEOLayer(void);
 
+<#if InterruptEnable>
+/*******************************************************************************
+  Function:
+    void XLCDC_EnableInterrupts(void)
+
+   Summary:
+    Enables the XLCDC Interrupts.
+
+   Description:
+    None.
+
+   Precondition:
+    None.
+
+   Parameters:
+    None.
+
+   Returns:
+    None.
+
+   Remarks:
+    None.
+*/
+void XLCDC_EnableInterrupts(void);
+
+/*******************************************************************************
+  Function:
+    void XLCDC_DisableInterrupts(void)
+
+   Summary:
+    Disables the XLCDC Interrupts.
+
+   Description:
+    None.
+
+   Precondition:
+    None.
+
+   Parameters:
+    None.
+
+   Returns:
+    None.
+
+   Remarks:
+    None.
+*/
+void XLCDC_DisableInterrupts(void);
+
+</#if>
 /*******************************************************************************
   Function:
     void XLCDC_EnableBacklight(void)

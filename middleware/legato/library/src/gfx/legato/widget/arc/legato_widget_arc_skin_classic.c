@@ -33,6 +33,7 @@
 #include "gfx/legato/string/legato_string.h"
 #include "gfx/legato/common/legato_utils.h"
 #include "gfx/legato/widget/legato_widget.h"
+#include "gfx/legato/renderer/legato_renderer.h"
 
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 

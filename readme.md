@@ -34,7 +34,8 @@ The key features of the Microchip Graphics Suite (MGS) are the following:
 - Hardware optimized for use with Microchip 32-bit SAM and PIC® devices
 - Compatible component for use with MPLAB Code Configurator (MCC)
 - **MGS Harmony Composer** WYSWYG UI designer tool for Windows, Linux and Mac
-- **MGS Simulator** A tool to generate simulated GUI designs to run on Windows, Linux and Mac
+- **MGS Harmony Composer** Import UI design from [Figma](https://www.figma.com/community/plugin/1436449232324855213/mgs-composer-exporter)
+- **MGS Simulator** A tool to generate simulated GUI designs in WebAssembly or native C-code to run on Windows, Linux and Mac
 - Written in C with MISRA C (Mandatory) compliancy
 - RTOS (FreeRTOS, ThreadX) and non-RTOS support
 - Configurable widget building blocks buttons, labels, lists, sliders, and images
@@ -52,6 +53,7 @@ The key features of the Microchip Graphics Suite (MGS) are the following:
 - LVDS-interface display support
 - MIPI-DSI display support
 - 3rd-Party Graphics Vendor support
+- Fixed-point vectorized primitives draw support
 
 
 # Contents Summary
@@ -89,9 +91,9 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 |      |   parallel_portgroup | Inteface to the parallel portgroup registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   parallel_smc | Interface to the parallel smc registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 |      |   spi | Interface to the spi registers | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
-|      |   xlcdc | Driver for the XLCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   dsi | Driver for the MIPI-DSI display interface | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
-|      |   lvdsc | Driver for the LVDS display interface | ![app-beta](https://img.shields.io/badge/driver-beta-orange?style=plastic) |
+|      |   xlcdc | Driver for the XLCDC display controller peripheral | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   dsi | Driver for the MIPI-DSI display interface | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
+|      |   lvdsc | Driver for the LVDS display interface | ![app-beta](https://img.shields.io/badge/driver-production-green?style=plastic) |
 | library    | legato | MGS Harmony library | ![app-beta](https://img.shields.io/badge/library-production-green?style=plastic) |
 | designer | MGC Harmony | MGS Harmony Composer| ![app-beta](https://img.shields.io/badge/tool-production-green?style=plastic) |
 
@@ -105,7 +107,7 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 ***
 ## 3rd-Party Graphics Vendor Support
 ***
-**LVGL** - demonstrations interfacing with LVGL are available for the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7), the [SAM D5x/E5x Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_d5x_e5x), and the [PIC32MZ DA Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_pic32mz_da).
+**LVGL** - demonstrations interfacing with LVGL are available for the [SAM E5x/D5x/E5x Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM 9x60 Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM 9x7 Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM D5x/E5x Family](https://github.com/mchpgfx/mgsh_lvgl), the [PIC32MZ EF Family](https://github.com/mchpgfx/mgsh_lvgl), and the [PIC32MZ DA Family](https://github.com/mchpgfx/mgsh_lvgl).
 
 **Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [SAM A5D2 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_sam_a5d2), the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), and the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7)
 

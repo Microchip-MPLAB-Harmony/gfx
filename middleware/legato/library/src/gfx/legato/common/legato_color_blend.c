@@ -81,7 +81,7 @@ leColor leColorBlend_RGBA_8888(leColor c1, leColor c2)
                    (RGBA8888_to_xGxx8x(c2) * (255-c1a))) &
                   RGBA_8888_GREEN_MASK;
 
-        result |= RGBA_8888_ALPHA_MASK;
+        result |= c2a;
     }
     else
     {

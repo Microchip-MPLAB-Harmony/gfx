@@ -375,7 +375,7 @@ static leResult setArcEnabled(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -413,7 +413,7 @@ static leResult setArcStartAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -454,7 +454,7 @@ static leResult setArcEndAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -495,7 +495,7 @@ static leResult setArcOffset(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -533,7 +533,7 @@ static leResult setArcScheme(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -571,7 +571,7 @@ static leResult setArcThickness(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->arcsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeArc* arc = (leCircularGaugeArc*)leArray_Get(&_this->arcsArray, idx);
 
@@ -732,7 +732,7 @@ static leResult setTickRangeEnabled(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -770,7 +770,7 @@ static leResult setTickRangeStartAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -811,7 +811,7 @@ static leResult setTickRangeEndAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -852,7 +852,7 @@ static leResult setTickRangeOffset(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -890,7 +890,7 @@ static leResult setTickRangeScheme(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -928,7 +928,7 @@ static leResult setTickRangeThickness(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -966,7 +966,7 @@ static leResult setTickRangeDivisions(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->ticksArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeTickRange* tick = (leCircularGaugeTickRange*)leArray_Get(&_this->ticksArray, idx);
 
@@ -1124,7 +1124,7 @@ static leResult setLabelRangeEnabled(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1162,7 +1162,7 @@ static leResult setLabelRangeStartAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1203,7 +1203,7 @@ static leResult setLabelRangeEndAngle(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1241,7 +1241,7 @@ static leResult setLabelRangeOffset(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1282,7 +1282,7 @@ static leResult setLabelRangeScheme(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1320,7 +1320,7 @@ static leResult setLabelRangeFont(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 
@@ -1358,7 +1358,7 @@ static leResult setLabelRangeDivisions(leCircularGaugeWidget* _this,
     LE_ASSERT_THIS();
 
     if(idx >= _this->labelsArray.size)
-        return LE_FALSE;
+        return LE_FAILURE;
 
     leCircularGaugeLabelRange* label = (leCircularGaugeLabelRange*)leArray_Get(&_this->labelsArray, idx);
 

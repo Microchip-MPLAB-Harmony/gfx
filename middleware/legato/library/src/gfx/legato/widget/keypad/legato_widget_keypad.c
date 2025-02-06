@@ -318,7 +318,17 @@ void _leWidget_Destructor(leWidget* _this);
 
 static void destructor(leKeyPadWidget* _this)
 {
-    LE_FREE(_this->cells);
+	uint32_t r;
+	
+    if(_this->cells != NULL)
+    {
+        for(r = 0; r < _this->rows; ++r)
+        {
+            LE_FREE(_this->cells[r]);
+        }
+
+        LE_FREE(_this->cells);
+    }
     
     _leWidget_Destructor((leWidget*)_this);
 }

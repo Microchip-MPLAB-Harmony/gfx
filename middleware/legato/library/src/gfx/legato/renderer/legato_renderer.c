@@ -32,6 +32,7 @@
 #include "gfx/legato/common/legato_rect.h"
 #include "gfx/legato/common/legato_pixelbuffer.h"
 #include "gfx/legato/common/legato_utils.h"
+#include "gfx/legato/common/legato_math.h"
 #include "gfx/legato/core/legato_state.h"
 #include "gfx/legato/datastructure/legato_rectarray.h"
 #include "gfx/legato/memory/legato_memory.h"
@@ -140,12 +141,18 @@ void _leRenderer_InitDrawForMode(leColorMode mode);
 
 static uint8_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _dataBuffers[SCRATCH_BUFFER_SZ];
 
-
 struct leScratchBuffer
 {
     lePixelBuffer renderBuffer;
     gfxPixelBuffer gfxBuffer;
 };
+
+#if LE_WIDGET_BUFFER_ENABLE == 1
+
+static uint32_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _widgetBufferData[SCRATCH_BUFFER_SZ];
+static lePixelBuffer _widgetBuffer;
+
+#endif
 
 static uint32_t maxScratchPixels;
 
@@ -188,7 +195,11 @@ lePixelBuffer* leGetRenderBuffer(void)
     if(_rendererState.currentScratchBuffer == -1)
         return NULL;
 
+#if LE_WIDGET_BUFFER_ENABLE == 1
+    return &_widgetBuffer;
+#else
     return &_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer;
+#endif
 }
 
 leColorMode leRenderer_CurrentColorMode()
@@ -637,6 +648,14 @@ static void preRect(void)
                         &_dataBuffers[idx],
                         &buf->renderBuffer);
 
+#if LE_WIDGET_BUFFER_ENABLE == 1
+    lePixelBufferCreate(width,
+                        height,
+                        LE_COLOR_MODE_RGBA_8888,
+                        _widgetBufferData,
+                        &_widgetBuffer);
+#endif
+
     switch(layerState->clearMode)
     {
         case LE_LAYERCLEARMODE_FORCE:
@@ -666,6 +685,15 @@ static void preRect(void)
                    0,
                    buf->renderBuffer.buffer_length);
         }
+
+#if LE_WIDGET_BUFFER_ENABLE == 1
+        if(leGPU_ClearBuffer(&_widgetBuffer) == LE_FAILURE)
+        {
+            memset(_widgetBufferData,
+                   0,
+                   _widgetBuffer.buffer_length);
+        }
+#endif
     }
 
     _rendererState.frameState = LE_FRAME_PREWIDGET;
@@ -723,6 +751,15 @@ static void preWidget(void)
         _rendererState.currentWidget->status.drawState = LE_WIDGET_DRAW_STATE_READY;
         _rendererState.frameState = LE_FRAME_DRAWING;
     }
+
+#if LE_WIDGET_BUFFER_ENABLE == 1
+    if(leGPU_ClearBuffer(&_widgetBuffer) == LE_FAILURE)
+    {
+        memset(_widgetBufferData,
+               0,
+               _widgetBuffer.buffer_length);
+    }
+#endif
 }
 
 static leBool paintWidget(leWidget* widget)
@@ -740,12 +777,22 @@ static leBool paintWidget(leWidget* widget)
         
     // if widget is completely transparent just mark clean and return
 #if LE_ALPHA_BLENDING_ENABLED == 1
-    if(widget->fn->getCumulativeAlphaEnabled(widget) == LE_TRUE &&
-       widget->fn->getCumulativeAlphaAmount(widget) == 0)
+    if(widget->fn->getCumulativeAlphaEnabled(widget) == LE_TRUE)
     {
-        widget->fn->_validateChildren(widget);
-        
-        return LE_TRUE;
+        _rendererState.alphaEnable = LE_TRUE;
+        _rendererState.alpha = widget->fn->getCumulativeAlphaAmount(widget);
+
+        if(_rendererState.alpha == 0)
+        {
+            widget->fn->_validateChildren(widget);
+
+            return LE_TRUE;
+        }
+    }
+    else
+    {
+        _rendererState.alphaEnable = LE_FALSE;
+        _rendererState.alpha = 0xFF;
     }
 #endif
     
@@ -828,6 +875,231 @@ static leBool paintWidget(leWidget* widget)
         return LE_TRUE;
     
     return LE_TRUE;
+}
+
+#if LE_WIDGET_BUFFER_ENABLE == 1
+static leResult _gpuBlitWidgetBuffer(void)
+{
+    gfxPixelBuffer sourceBuf, destBuf;
+    gfxRect gfxSourceRect;
+    leRect frameRect;
+    gfxResult res;
+    lePixelBuffer* leBuf;
+
+    if(_rendererState.gpuDriver == NULL)
+    {
+        return LE_FAILURE;
+    }
+
+    frameRect = _rendererState.currentRenderLayer->frameRectList.rects[_rendererState.frameRectIdx];
+
+    gfxSourceRect.x = _rendererState.drawRect.x - frameRect.x;
+    gfxSourceRect.y = _rendererState.drawRect.y - frameRect.y;
+    gfxSourceRect.width = _rendererState.drawRect.width;
+    gfxSourceRect.height = _rendererState.drawRect.height;
+
+    sourceBuf.pixel_count = _widgetBuffer.pixel_count;
+    sourceBuf.size.width = _widgetBuffer.size.width;
+    sourceBuf.size.height = _widgetBuffer.size.height;
+    sourceBuf.mode = _convertColorMode(_widgetBuffer.mode);
+    sourceBuf.buffer_length = _widgetBuffer.buffer_length;
+    sourceBuf.flags = 0;
+    sourceBuf.pixels = (gfxBuffer)_widgetBuffer.pixels;
+    sourceBuf.orientation = GFX_ORIENT_0;
+
+    leBuf = &_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer;
+
+    destBuf.pixel_count = leBuf->pixel_count;
+    destBuf.size.width = leBuf->size.width;
+    destBuf.size.height = leBuf->size.height;
+    destBuf.mode = _convertColorMode(leBuf->mode);
+    destBuf.buffer_length = leBuf->buffer_length;
+    destBuf.flags = 0;
+    destBuf.pixels = (gfxBuffer)leBuf->pixels;
+    destBuf.orientation = GFX_ORIENT_0;
+
+    leRenderer_GetFrameRect(&frameRect);
+
+    //gfxDestRect.x = destRect->x - frameRect.x;
+    //gfxDestRect.y = destRect->y - frameRect.y;
+    //gfxDestRect.width = destRect->width;
+    //gfxDestRect.height = destRect->height;
+
+#if LE_ALPHA_BLENDING_ENABLED == 1
+    if((_rendererState.alphaEnable == LE_TRUE && _rendererState.alpha < 255) || LE_COLOR_MODE_IS_ALPHA(leBuf->mode) == 1)
+    {
+        _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_SCALE,
+                                                 GFX_GLOBAL_ALPHA_OFF,
+                                                 _rendererState.alpha,
+                                                 255);
+
+        _rendererState.gpuDriver->setBlend(GFX_BLEND_SRC_OVER);
+    }
+#else
+    (void)a; // unused
+#endif
+
+    res = _rendererState.gpuDriver->blitBuffer(&sourceBuf,
+                                               &gfxSourceRect,
+                                               &destBuf,
+                                               &gfxSourceRect);
+
+#if LE_ALPHA_BLENDING_ENABLED == 1
+    if((_rendererState.alphaEnable == LE_TRUE && _rendererState.alpha < 255) || LE_COLOR_MODE_IS_ALPHA(leBuf->mode) == 1)
+    {
+        _rendererState.gpuDriver->setGlobalAlpha(GFX_GLOBAL_ALPHA_OFF,
+                                                 GFX_GLOBAL_ALPHA_OFF,
+                                                 255,
+                                                 255);
+
+        _rendererState.gpuDriver->setBlend(GFX_BLEND_NONE);
+    }
+#endif
+
+    return res == GFX_SUCCESS ? LE_SUCCESS : LE_FAILURE;
+}
+
+/*static void _swBlitWidgetAlpha(void)
+{
+
+}*/
+
+/*static void _swBlitWidgetColorAlpha(void)
+{
+
+}*/
+
+/*static void _swBlitWidgetGlobalAlpha(void)
+{
+
+}*/
+
+/*static void _swBlitWidgetAlpha(void)
+{
+
+}*/
+
+static void _swBlitWidgetBuffer(void)
+{
+    int32_t xItr;
+    int32_t yItr;
+    int32_t drawX;
+    int32_t drawY;
+    leColor srcColor;
+    leColor destColor;
+    leColor resultClr;
+    leColorMode colorMode;
+    uint32_t currentAlpha;
+    uint32_t alphaPercent;
+    leColor nativeDest;
+
+    if(_rendererState.alpha == 0)
+    {
+        return;
+    }
+
+    leRect frameRect = _rendererState.currentRenderLayer->frameRectList.rects[_rendererState.frameRectIdx];
+    colorMode = leGetLayerColorMode(_rendererState.layerIdx);
+
+    for(yItr = 0; yItr < _rendererState.drawRect.height; ++yItr)
+    {
+        for(xItr = 0; xItr < _rendererState.drawRect.width; ++xItr)
+        {
+            drawX = xItr + (_rendererState.drawRect.x - frameRect.x);
+            drawY = yItr + (_rendererState.drawRect.y - frameRect.y);
+
+            srcColor = lePixelBufferGet_Unsafe(&_widgetBuffer,
+                                               drawX,
+                                               drawY);
+
+#if LE_RENDER_ORIENTATION != 0
+            leUtils_PointLogicalToScratch((int16_t*)&drawX, (int16_t*)&drawY);
+#endif
+            currentAlpha = leColorChannelAlpha(srcColor, LE_COLOR_MODE_RGBA_8888);
+
+            if(currentAlpha == 0)
+            {
+                continue;
+            }
+
+            // upscale to alpha channel type
+            destColor = lePixelBufferGet_Unsafe(&_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer,
+                                                drawX,
+                                                drawY);
+
+            nativeDest = leColorConvert(colorMode,
+                                        LE_COLOR_MODE_RGBA_8888,
+                                        destColor);
+
+            // blend existing alpha channel value with global alpha argument value
+            if(_rendererState.alphaEnable == LE_TRUE && _rendererState.alpha < 0xFF)
+            {
+                switch(colorMode)
+                {
+                    case LE_COLOR_MODE_ARGB_8888:
+                    case LE_COLOR_MODE_RGBA_8888:
+                    case LE_COLOR_MODE_RGBA_5551:
+                    {
+
+                        currentAlpha = srcColor & 0xFF;
+                        alphaPercent = lePercentWholeRounded(_rendererState.alpha, 255);
+                        currentAlpha = lePercentOf(currentAlpha, alphaPercent);
+
+                        srcColor &= ~(RGBA_8888_ALPHA_MASK);
+                        srcColor |= currentAlpha;
+
+                        break;
+                    }
+                    default:
+                    {
+                        srcColor &= ~(RGBA_8888_ALPHA_MASK);
+                        srcColor |= _rendererState.alpha;
+                    }
+                }
+            }
+
+            if((srcColor & RGBA_8888_ALPHA_MASK) == 0)
+            {
+                return;
+            }
+
+            if((nativeDest & RGBA_8888_ALPHA_MASK) == 0 || (srcColor & RGBA_8888_ALPHA_MASK) == 0xFF)
+            {
+                lePixelBufferSet_Unsafe(&_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer,
+                                        drawX,
+                                        drawY,
+                                        leColorConvert(LE_COLOR_MODE_RGBA_8888,
+                                                       leRenderer_CurrentColorMode(),
+                                                       srcColor));
+            }
+            else
+            {
+                resultClr = leColorBlend_RGBA_8888(srcColor, nativeDest);
+
+                // convert to destination format
+                resultClr = leColorConvert(LE_COLOR_MODE_RGBA_8888,
+                                           colorMode,
+                                           resultClr);
+
+                lePixelBufferSet_Unsafe(&_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer,
+                                        drawX,
+                                        drawY,
+                                        resultClr);
+            }
+        }
+    }
+}
+
+#endif
+
+static void _postWidget(void)
+{
+#if LE_WIDGET_BUFFER_ENABLE == 1
+    if(_gpuBlitWidgetBuffer() == LE_FAILURE)
+    {
+        _swBlitWidgetBuffer();
+    }
+#endif
 }
 
 static void _nextRect(void)
@@ -1044,6 +1316,8 @@ void leRenderer_Paint()
             }
             case LE_FRAME_POSTWIDGET:
             {
+                _postWidget();
+
                 _rendererState.frameState = LE_FRAME_PREWIDGET;
                 
                 break;

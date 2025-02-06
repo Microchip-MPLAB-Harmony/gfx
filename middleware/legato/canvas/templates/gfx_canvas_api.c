@@ -44,6 +44,7 @@ None
 
 #include <stdlib.h>
 
+#include "gfx/canvas/gfx_canvas_config.h"
 #include "gfx/canvas/gfx_canvas_api.h"
 #include "gfx/canvas/gfx_canvas.h"
 
@@ -54,7 +55,7 @@ int gfxcCreate(void)
 	unsigned int i = CANVAS_ID_INVALID;
 
 	//Try to allocate from static canvas objects
-	for (i = 0; i < CONFIG_NUM_CANVAS_OBJ; i++)
+	for (i = 0; i < CONFIG_CANVAS_NUM_OBJ; i++)
 	{
 		if (canvas[i].id == CANVAS_ID_INVALID)
 		{
@@ -76,7 +77,7 @@ int gfxcCreate(void)
 
 GFXC_RESULT gfxcDestroy(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].id = CANVAS_ID_INVALID;
 		canvas[canvasID].layer.id = LAYER_ID_INVALID;
@@ -93,7 +94,7 @@ GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
 	const GFXC_COLOR_FORMAT format,
 	void * buf)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		gfxPixelBufferCreate(width, height, format, (const void *)buf, &canvas[canvasID].pixelBuffer);
 
@@ -108,9 +109,8 @@ GFXC_RESULT gfxcSetPixelBuffer(unsigned int canvasID,
 
 GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ &&
-		canvas[canvasID].active == GFX_FALSE &&
-		layerID < CONFIG_NUM_LAYERS)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ &&
+		canvas[canvasID].active == GFX_FALSE)
 	{
 		canvas[canvasID].layer.id = layerID;
 
@@ -122,7 +122,7 @@ GFXC_RESULT gfxcSetLayer(unsigned int canvasID, unsigned int layerID)
 
 int gfxcGetlayer(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		return canvas[canvasID].layer.id;
 	}
@@ -132,7 +132,7 @@ int gfxcGetlayer(unsigned int canvasID)
 
 GFXC_RESULT gfxcClearLayer(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		if (canvas[canvasID].active == GFX_FALSE)
 		{
@@ -147,7 +147,7 @@ GFXC_RESULT gfxcClearLayer(unsigned int canvasID)
 
 GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].layer.alpha = alpha;
 
@@ -159,7 +159,7 @@ GFXC_RESULT gfxcSetWindowAlpha(unsigned int canvasID, uint8_t alpha)
 
 GFXC_RESULT gfxcSetWindowPosition(unsigned int canvasID, int xpos, int ypos)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].layer.pos.xpos = xpos;
 		canvas[canvasID].layer.pos.ypos = ypos;
@@ -175,7 +175,7 @@ GFXC_RESULT gfxcGetWindowPosition(unsigned int canvasID, int* xpos, int* ypos)
 	if (xpos == NULL || ypos == NULL)
 		return GFX_FAILURE;
 
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		*xpos = canvas[canvasID].layer.pos.xpos;
 		*ypos = canvas[canvasID].layer.pos.ypos;
@@ -188,7 +188,7 @@ GFXC_RESULT gfxcGetWindowPosition(unsigned int canvasID, int* xpos, int* ypos)
 
 GFXC_RESULT gfxcSetWindowSize(unsigned int canvasID, unsigned int width, unsigned int height)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].layer.size.width = width;
 		canvas[canvasID].layer.size.height = height;
@@ -204,7 +204,7 @@ GFXC_RESULT gfxcGetWindowSize(unsigned int canvasID, unsigned int* width, unsign
 	if (width == NULL || height == NULL)
 		return GFX_FAILURE;
 
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		*width = canvas[canvasID].layer.size.width;
 		*height = canvas[canvasID].layer.size.height;
@@ -218,7 +218,7 @@ GFXC_RESULT gfxcGetWindowSize(unsigned int canvasID, unsigned int* width, unsign
 
 GFXC_RESULT gfxcShowCanvas(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].active = GFX_TRUE;
 		return GFX_SUCCESS;
@@ -229,7 +229,7 @@ GFXC_RESULT gfxcShowCanvas(unsigned int canvasID)
 
 GFXC_RESULT gfxcHideCanvas(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].active = GFX_FALSE;
 		return GFX_SUCCESS;
@@ -253,7 +253,7 @@ GFXC_RESULT gfxcSetBaseCanvasID(unsigned int base)
 
 GFXC_RESULT gfxcCanvasUpdate(unsigned int canvasID)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		_gfxcCanvasUpdate(canvasID);
 
@@ -270,7 +270,7 @@ GFXC_RESULT gfxcSetEffectsInterval(unsigned int ms)
 
 GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void * parm)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		canvas[canvasID].effects.cb = cb;
 		canvas[canvasID].effects.parm = parm;
@@ -283,7 +283,7 @@ GFXC_RESULT gfxcSetEffectsCallback(unsigned int canvasID, gfxcCallback cb, void 
 
 GFXC_RESULT gfxcStartEffectFade(unsigned int canvasID, uint8_t startAlpha, uint8_t endAlpha, uint8_t delta)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ &&
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ &&
 		canvas[canvasID].effects.fade.status == GFXC_FX_IDLE &&
 		canvas[canvasID].active == GFX_TRUE)
 	{
@@ -316,7 +316,7 @@ GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
 	int endY,
 	unsigned int delta)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ &&
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ &&
 		canvas[canvasID].effects.move.status == GFXC_FX_IDLE &&
 		canvas[canvasID].active == GFX_TRUE)
 	{
@@ -345,7 +345,7 @@ GFXC_RESULT gfxcStartEffectMove(unsigned int canvasID,
 
 GFXC_RESULT gfxcStopEffect(unsigned int canvasID, GFXC_FX_TYPE effect)
 {
-	if (canvasID < CONFIG_NUM_CANVAS_OBJ)
+	if (canvasID < CONFIG_CANVAS_NUM_OBJ)
 	{
 		switch (effect)
 		{

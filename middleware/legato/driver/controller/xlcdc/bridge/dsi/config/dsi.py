@@ -620,6 +620,7 @@ def update_display_config(component, display_id):
     display_vbp = disp_component.getSymbolValue("VertBackPorch")
     display_vfp = disp_component.getSymbolValue("VertFrontPorch")
     display_lanes = disp_component.getSymbolValue("DSILanes")
+    display_vmt = disp_component.getSymbolValue("DSIVidMode")
     display_dotclk = disp_component.getSymbolValue("DSIDotClk")
     # Update Timings
     component.setSymbolValue("DVTResPPL", display_width)
@@ -632,6 +633,9 @@ def update_display_config(component, display_id):
     component.setSymbolValue("DVTVerFP", display_vfp)
     component.setSymbolValue("DSIIfActiveLanes", display_lanes)
     component.setSymbolValue("DVTDotClkKiloHz", display_dotclk)
+    # Set Video Mode Type
+    if display_vmt != None:
+        component.setSymbolValue("VidModeTxType", display_vmt)
 
 
 # Update Clocks

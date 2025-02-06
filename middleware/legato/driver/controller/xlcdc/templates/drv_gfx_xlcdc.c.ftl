@@ -5,11 +5,11 @@
     drv_gfx_xlcdc.c
 
   Summary:
-    Build-time generated implementation for the XLCDC Driver for SAM9X72/75 MPUs.
+    Build-time generated implementation for the XLCDC Driver for SAM9X7/SAMA7D MPUs.
 
   Description:
     Contains function definitions and the data types that make up the interface to the XLCDC
-    Graphics Controller for SAM9X72/75 MPUs.
+    Graphics Controller for SAM9X7/SAMA7D MPUs.
 
     Created with MPLAB Harmony Version 3.0
 *******************************************************************************/
@@ -39,7 +39,14 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
+<#if SupportNEON>
+#include "arm_neon.h"
+</#if>
+#include "toolchain_specifics.h"
 #include "gfx/driver/gfx_driver.h"
+<#if DoubleBuffering && gfx_legato??>
+#include "gfx/legato/legato_config.h"
+</#if>
 <#if !XDMCPUBilt && le_gfx_gfx2d??>
 #include "gfx/driver/processor/gfx2d/drv_gfx2d.h"
 </#if>
@@ -47,6 +54,12 @@
 #include "gfx/driver/controller/xlcdc/plib/plib_xlcdc.h"
 
 /* Utility Macros */
+/* Math */
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define ABS(x) ((x) >= 0 ? (x) : -(x))
+/* Alignment Check */
+#define IS_ALIGNED(ptr, align) (((uintptr_t)(ptr) & ((align) - 1)) == 0)
 /* Frame Buffer Macros */
 /* Cached, Cache Aligned */
 #define FB_CACHE_CA             CACHE_ALIGN
@@ -64,20 +77,28 @@
 #define FB_TYPE_SZ              sizeof(FB_BPP_TYPE)
 
 /* Driver Settings */
-#define XLCDC_TOT_LAYERS        ${TotalNumLayers}
-#define XLCDC_BUF_PER_LAYER     1
 #define XLCDC_HOR_RES           ${XTResPPL}
 #define XLCDC_VER_RES           ${XTResRPF}
+#define XLCDC_TOT_LAYERS        ${TotalNumLayers}
+#define XLCDC_BUF_PER_LAYER     ${DoubleBuffering?then('2', '1')}
+<#if DoubleBuffering>
+#define XLCDC_SYNC_RECT_COUNT   ${DBROMaxRects}
+<#if DBRectOpt == "Simple">
+#define XLCDC_MERGE_THR_PX      ${DBROMergeThrBase}
+<#elseif DBRectOpt == "Smart">
+#define XLCDC_INI_MERGE_THR_PX  ${DBROMergeThrBase}
+#define XLCDC_MIN_MERGE_THR_PX  ${DBROMergeThrMin}
+#define XLCDC_MAX_MERGE_THR_PX  ${DBROMergeThrMax}
+#define XLCDC_MAX_OVRHD_RATIO   ${(DBROMergeOHR / 100.0)?string("0.00")}f
+</#if>
+</#if>
 
 /* Local Data */
 /* Driver */
 typedef enum
 {
     INIT = 0,
-    DRAW,
-    SWAP,
-    SYNC,
-    FREEZE
+    DRAW
 } DRV_STATE;
 
 /* Generated Layer Order */
@@ -123,7 +144,14 @@ typedef struct
     uint32_t alpha;
     FB_PTR_TYPE baseaddr[XLCDC_BUF_PER_LAYER];
     gfxPixelBuffer pixelBuffer[XLCDC_BUF_PER_LAYER];
-    volatile uint32_t bufferIdx;
+    volatile uint32_t frontBufferIdx;
+<#if DoubleBuffering>
+    volatile uint32_t backBufferIdx;
+    volatile bool swapPending;
+    volatile bool syncEntireLayer;
+    volatile uint32_t syncRectIndex;
+    gfxRect syncRect[XLCDC_SYNC_RECT_COUNT];
+</#if>
     volatile LAYER_LOCK_STATUS updateLock;
 } LAYER_ATTRIBUTES;
 
@@ -139,6 +167,167 @@ FB_BPP_TYPE FB_CACHE_CA frame_buffer [XLCDC_TOT_LAYERS * XLCDC_BUF_PER_LAYER][XL
 FB_BPP_TYPE FB_CACHE_NC frame_buffer [XLCDC_TOT_LAYERS * XLCDC_BUF_PER_LAYER][XLCDC_HOR_RES * XLCDC_VER_RES];
 </#if>
 
+<#if DoubleBuffering>
+/* XLCDC SOF Interrupt callback */
+void DRV_XLCDC_SOF_Interrupt(void)
+{
+#if LE_DRIVER_LAYER_MODE
+    bool swapAllLayers = true;
+
+    for (int i = 0; i < LE_LAYER_COUNT; i++)
+    {
+        if (!drvLayer[i].swapPending)
+        {
+            swapAllLayers = false;
+            break;
+        }
+    }
+
+    if (swapAllLayers)
+    {
+        for (int i = 0; i < LE_LAYER_COUNT; i++)
+        {
+            XLCDC_UpdateLayerAttributes(layerOrder[i]);
+            drvLayer[i].swapPending = false;
+        }
+    }
+#else
+    for (int i = 0; i < XLCDC_TOT_LAYERS; i++)
+    {
+        if (drvLayer[i].swapPending)
+        {
+            XLCDC_UpdateLayerAttributes(layerOrder[i]);
+            drvLayer[i].swapPending = false;
+        }
+    }
+#endif
+}
+
+<#if DBRectOpt == "Simple">
+static void DRV_XLCDC_OptimizeDirtyRects(uint32_t layerIdx)
+{
+    if (drvLayer[layerIdx].syncEntireLayer || drvLayer[layerIdx].syncRectIndex <= 1)
+        return;
+
+    for (uint32_t i = 0; i < drvLayer[layerIdx].syncRectIndex; i++)
+    {
+        for (uint32_t j = i + 1; j < drvLayer[layerIdx].syncRectIndex; j++)
+        {
+            gfxRect* rect1 = &drvLayer[layerIdx].syncRect[i];
+            gfxRect* rect2 = &drvLayer[layerIdx].syncRect[j];
+
+            bool horizontalAdjacent =
+                (rect1->y == rect2->y && rect1->height == rect2->height &&
+                 (rect1->x + rect1->width == rect2->x || rect2->x + rect2->width == rect1->x));
+
+            bool verticalAdjacent =
+                (rect1->x == rect2->x && rect1->width == rect2->width &&
+                 (rect1->y + rect1->height == rect2->y || rect2->y + rect2->height == rect1->y));
+
+            bool horizontalMergeable =
+                (ABS((rect1->x + rect1->width) - rect2->x) <= XLCDC_MERGE_THR_PX) ||
+                (ABS(rect1->x - (rect2->x + rect2->width)) <= XLCDC_MERGE_THR_PX);
+
+            bool verticalMergeable =
+                (ABS((rect1->y + rect1->height) - rect2->y) <= XLCDC_MERGE_THR_PX) ||
+                (ABS(rect1->y - (rect2->y + rect2->height)) <= XLCDC_MERGE_THR_PX);
+
+            if (horizontalAdjacent || verticalAdjacent || (horizontalMergeable && verticalMergeable))
+            {
+                int32_t minX = MIN(rect1->x, rect2->x);
+                int32_t minY = MIN(rect1->y, rect2->y);
+                int32_t maxX = MAX(rect1->x + rect1->width, rect2->x + rect2->width);
+                int32_t maxY = MAX(rect1->y + rect1->height, rect2->y + rect2->height);
+
+                rect1->x = minX;
+                rect1->y = minY;
+                rect1->width = maxX - minX;
+                rect1->height = maxY - minY;
+
+                for (uint32_t k = j; k < drvLayer[layerIdx].syncRectIndex - 1; k++)
+                {
+                    drvLayer[layerIdx].syncRect[k] = drvLayer[layerIdx].syncRect[k + 1];
+                }
+
+                drvLayer[layerIdx].syncRectIndex--;
+                j--;
+            }
+        }
+    }
+}
+
+<#elseif DBRectOpt == "Smart">
+static void DRV_XLCDC_OptimizeDirtyRects(uint32_t layerIdx)
+{
+    if (drvLayer[layerIdx].syncEntireLayer || drvLayer[layerIdx].syncRectIndex <= 1)
+        return;
+
+    static uint32_t layerMergeThr[XLCDC_TOT_LAYERS] = {0};
+    if (layerMergeThr[layerIdx] == 0) {
+        layerMergeThr[layerIdx] = XLCDC_INI_MERGE_THR_PX;
+    }
+
+    uint32_t mergedRectCount = 0;
+    for (uint32_t i = 0; i < drvLayer[layerIdx].syncRectIndex; i++)
+    {
+        for (uint32_t j = i + 1; j < drvLayer[layerIdx].syncRectIndex; j++)
+        {
+            gfxRect* rect1 = &drvLayer[layerIdx].syncRect[i];
+            gfxRect* rect2 = &drvLayer[layerIdx].syncRect[j];
+
+            int32_t minX = MIN(rect1->x, rect2->x);
+            int32_t minY = MIN(rect1->y, rect2->y);
+            int32_t maxX = MAX(rect1->x + rect1->width, rect2->x + rect2->width);
+            int32_t maxY = MAX(rect1->y + rect1->height, rect2->y + rect2->height);
+
+            uint32_t originalArea1 = rect1->width * rect1->height;
+            uint32_t originalArea2 = rect2->width * rect2->height;
+            uint32_t mergedArea = (maxX - minX) * (maxY - minY);
+            uint32_t overheadArea = mergedArea - (originalArea1 + originalArea2);
+            float overheadRatio = (float)overheadArea / (originalArea1 + originalArea2);
+
+            bool horizontalAdjacent =
+                (rect1->y == rect2->y && rect1->height == rect2->height &&
+                 (rect1->x + rect1->width == rect2->x || rect2->x + rect2->width == rect1->x));
+            bool verticalAdjacent =
+                (rect1->x == rect2->x && rect1->width == rect2->width &&
+                 (rect1->y + rect1->height == rect2->y || rect2->y + rect2->height == rect1->y));
+            bool horizontalMergeable =
+                (ABS((rect1->x + rect1->width) - rect2->x) <= layerMergeThr[layerIdx]) ||
+                (ABS(rect1->x - (rect2->x + rect2->width)) <= layerMergeThr[layerIdx]);
+            bool verticalMergeable =
+                (ABS((rect1->y + rect1->height) - rect2->y) <= layerMergeThr[layerIdx]) ||
+                (ABS(rect1->y - (rect2->y + rect2->height)) <= layerMergeThr[layerIdx]);
+
+            if ((horizontalAdjacent || verticalAdjacent ||
+                 (horizontalMergeable && verticalMergeable)) &&
+                overheadRatio <= XLCDC_MAX_OVRHD_RATIO)
+            {
+                rect1->x = minX;
+                rect1->y = minY;
+                rect1->width = maxX - minX;
+                rect1->height = maxY - minY;
+
+                for (uint32_t k = j; k < drvLayer[layerIdx].syncRectIndex - 1; k++)
+                {
+                    drvLayer[layerIdx].syncRect[k] = drvLayer[layerIdx].syncRect[k + 1];
+                }
+                drvLayer[layerIdx].syncRectIndex--;
+                mergedRectCount++;
+                j--;
+            }
+        }
+    }
+
+    if (mergedRectCount > 0) {
+        layerMergeThr[layerIdx] = MAX(XLCDC_MIN_MERGE_THR_PX, layerMergeThr[layerIdx] - 1);
+    } else {
+        layerMergeThr[layerIdx] = MIN(XLCDC_MAX_MERGE_THR_PX, layerMergeThr[layerIdx] + 1);
+    }
+}
+
+</#if>
+</#if>
 /* Local Functions */
 /* Convert XLCDC Color Mode to GFX Color Mode */
 static gfxColorMode DRV_XLCDC_ColorModeGFXFromXLCDC(XLCDC_RGB_COLOR_MODE mode)
@@ -191,32 +380,177 @@ static XLCDC_RGB_COLOR_MODE DRV_XLCDC_ColorModeXLCDCFromGFX(gfxColorMode mode)
 
 </#if>
 <#if XDMCPUBilt || !le_gfx_gfx2d??>
-/* Perform a CPU based Blit */
-static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer *source,
-                                    const gfxRect *rectSrc,
-                                    const gfxPixelBuffer *dest,
-                                    const gfxRect *rectDest)
+<#if SupportNEON>
+/* Perform a CPU based Blit w/ NEON */
+static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
+                                   const gfxRect* restrict rectSrc,
+                                   const gfxPixelBuffer* restrict dest,
+                                   const gfxRect* restrict rectDest)
 {
-    void *srcPtr;
-    void *destPtr;
-    uint32_t width, height;
-    uint32_t row, rowSize;
+    if (!source || !rectSrc || !dest || !rectDest)
+        return GFX_FAILURE;
 
-    width = (rectSrc->width < rectDest->width) ? rectSrc->width : rectDest->width;
-    height = (rectSrc->height < rectDest->height) ? rectSrc->height : rectDest->height;
-    rowSize = width * gfxColorInfoTable[dest->mode].size;
+    // Calculate dimensions
+    const uint32_t width = MIN(rectSrc->width, rectDest->width);
+    const uint32_t height = MIN(rectSrc->height, rectDest->height);
 
-    for (row = 0; row < height; row++)
+    if (width == 0 || height == 0)
+        return GFX_FAILURE;
+
+    // Calculate row size in bytes
+    const uint32_t pixelSize = gfxColorInfoTable[dest->mode].size;
+    const uint32_t rowSize = width * pixelSize;
+
+    // Calculate source and destination strides based on buffer widths
+    const uint32_t srcStride = source->size.width * pixelSize;
+    const uint32_t destStride = dest->size.width * pixelSize;
+
+    uint8_t* restrict srcBase = (uint8_t*)gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y);
+    uint8_t* restrict destBase = (uint8_t*)gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y);
+
+    // Check if we can do a single large transfer i.e. we have contiguous data
+    if (width == source->size.width && width == dest->size.width)
     {
-        srcPtr = gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y + row);
-        destPtr = gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y + row);
+        const uint32_t totalSize = rowSize * height;
 
-        memcpy(destPtr, srcPtr, rowSize);
+        if (IS_ALIGNED(srcBase, 4) && IS_ALIGNED(destBase, 4) && totalSize >= 16)
+        {
+            uint8_t* src = srcBase;
+            uint8_t* dst = destBase;
+            uint32_t vectors = totalSize / 16;
+            uint32_t remain = totalSize & 15;
+
+            // Aggressive pre-fetch
+            __builtin_prefetch(src);
+            __builtin_prefetch(src + 32);
+            __builtin_prefetch(src + 64);
+            __builtin_prefetch(src + 96);
+
+            while (vectors--)
+            {
+                // Keep pre-fetching ahead
+                __builtin_prefetch(src + 128);
+                __builtin_prefetch(src + 160);
+
+                uint8x16_t data = vld1q_u8(src);
+                vst1q_u8(dst, data);
+
+                src += 16;
+                dst += 16;
+            }
+
+            if (remain)
+            {
+                memcpy(dst, src, remain);
+            }
+        }
+        else
+        {
+            memcpy(destBase, srcBase, totalSize);
+        }
+
+        return GFX_SUCCESS;
+    }
+
+    // Row by row processing for non-contiguous data
+    for (uint32_t row = 0; row < height; row++)
+    {
+        uint8_t* restrict src = srcBase + row * srcStride;
+        uint8_t* restrict dst = destBase + row * destStride;
+
+        if (IS_ALIGNED(src, 4) && IS_ALIGNED(dst, 4) && rowSize >= 16)
+        {
+            uint32_t vectors = rowSize / 16;
+            uint32_t remain = rowSize & 15;
+
+            // Aggressive pre-fetch
+            if (row < height - 1)
+            {
+                __builtin_prefetch(src + srcStride);
+                __builtin_prefetch(src + srcStride + 32);
+                __builtin_prefetch(src + srcStride + 64);
+                __builtin_prefetch(src + srcStride + 96);
+            }
+
+            uint8_t* vectorSrc = src;
+            uint8_t* vectorDst = dst;
+
+            while (vectors--)
+            {
+                // Keep pre-fetching ahead
+                __builtin_prefetch(vectorSrc + 128);
+                __builtin_prefetch(vectorSrc + 160);
+
+                uint8x16_t data = vld1q_u8(vectorSrc);
+                vst1q_u8(vectorDst, data);
+
+                vectorSrc += 16;
+                vectorDst += 16;
+            }
+
+            if (remain)
+            {
+                memcpy(vectorDst, vectorSrc, remain);
+            }
+        }
+        else
+        {
+            memcpy(dst, src, rowSize);
+        }
     }
 
     return GFX_SUCCESS;
 }
 
+<#else>
+/* Perform a CPU based Blit */
+static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
+                                   const gfxRect* restrict rectSrc,
+                                   const gfxPixelBuffer* restrict dest,
+                                   const gfxRect* restrict rectDest)
+{
+    if (!source || !rectSrc || !dest || !rectDest)
+        return GFX_FAILURE;
+
+    // Calculate dimensions
+    const uint32_t width = MIN(rectSrc->width, rectDest->width);
+    const uint32_t height = MIN(rectSrc->height, rectDest->height);
+
+    if (width == 0 || height == 0)
+        return GFX_FAILURE;
+
+    // Calculate row size in bytes
+    const uint32_t pixelSize = gfxColorInfoTable[dest->mode].size;
+    const uint32_t rowSize = width * pixelSize;
+
+    // Calculate source and destination strides based on buffer widths
+    const uint32_t srcStride = source->size.width * pixelSize;
+    const uint32_t destStride = dest->size.width * pixelSize;
+
+    uint8_t* restrict srcBase = (uint8_t*)gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y);
+    uint8_t* restrict destBase = (uint8_t*)gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y);
+
+    // Check if we can do a single large transfer i.e. we have contiguous data
+    if (width == source->size.width && width == dest->size.width)
+    {
+        const uint32_t totalSize = rowSize * height;
+        memcpy(destBase, srcBase, totalSize);
+
+        return GFX_SUCCESS;
+    }
+
+    // Row by row processing for non-contiguous data
+    for (uint32_t row = 0; row < height; row++)
+    {
+        uint8_t* restrict src = srcBase + row * srcStride;
+        uint8_t* restrict dst = destBase + row * destStride;
+        memcpy(dst, src, rowSize);
+    }
+
+    return GFX_SUCCESS;
+}
+
+</#if>
 </#if>
 <#if CanvasModeOnly>
 /* Process the Layer IOCTL Subset */
@@ -354,7 +688,19 @@ void DRV_XLCDC_Update(void)
             break;
         }
         case DRAW:
-        case SWAP:
+<#if DBRectOpt != "Basic" && DoubleBuffering>
+        {
+            for (uint32_t layerIdx = 0; layerIdx < XLCDC_TOT_LAYERS; layerIdx++)
+            {
+                if (!drvLayer[layerIdx].syncEntireLayer)
+                {
+                    DRV_XLCDC_OptimizeDirtyRects(layerIdx);
+                }
+            }
+
+            break;
+        }
+</#if>
         default:
             break;
     }
@@ -382,7 +728,15 @@ gfxResult DRV_XLCDC_Initialize(void)
         drvLayer[layerCount].enabled = false;
 </#if>
         drvLayer[layerCount].updateLock = LAYER_LOCK_UNLOCKED;
-        drvLayer[layerCount].bufferIdx = XLCDC_BUF_PER_LAYER - 1;
+<#if DoubleBuffering>
+        drvLayer[layerCount].frontBufferIdx = 0;
+        drvLayer[layerCount].backBufferIdx = (drvLayer[layerCount].frontBufferIdx + 1) % XLCDC_BUF_PER_LAYER;
+        drvLayer[layerCount].swapPending = false;
+        drvLayer[layerCount].syncEntireLayer = false;
+        drvLayer[layerCount].syncRectIndex = 0;
+<#else>
+        drvLayer[layerCount].frontBufferIdx = 0;
+</#if>
 
 <#if !CanvasModeOnly>
         for (uint32_t bufferCount = 0; bufferCount < XLCDC_BUF_PER_LAYER; ++bufferCount)
@@ -400,7 +754,7 @@ gfxResult DRV_XLCDC_Initialize(void)
 
 </#if>
         XLCDC_SetLayerEnable(layerOrder[layerCount], false, true);
-        XLCDC_SetLayerAddress(layerOrder[layerCount], (uint32_t) drvLayer[layerCount].baseaddr[drvLayer[layerCount].bufferIdx], false);
+        XLCDC_SetLayerAddress(layerOrder[layerCount], (uint32_t) drvLayer[layerCount].baseaddr[drvLayer[layerCount].frontBufferIdx], false);
         XLCDC_SetLayerOpts(layerOrder[layerCount], 255, true, false);
         XLCDC_SetLayerWindowXYPos(layerOrder[layerCount], 0, 0, false);
         XLCDC_SetLayerWindowXYSize(layerOrder[layerCount], XLCDC_HOR_RES, XLCDC_VER_RES, false);
@@ -429,14 +783,44 @@ gfxResult DRV_XLCDC_BlitBuffer(int32_t x, int32_t y, gfxPixelBuffer* buf)
     destRect.height = buf->size.height;
     destRect.width = buf->size.width;
 
-<#if !XDMCPUBilt && le_gfx_gfx2d??>
-    result = gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].bufferIdx], &destRect);
+<#if DoubleBuffering>
+    if (drvLayer[activeLayer].syncRectIndex < XLCDC_SYNC_RECT_COUNT)
+    {
+        drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex] =
+        (gfxRect)
+        {
+            .x = x,
+            .y = y,
+            .width = buf->size.width,
+            .height = buf->size.height
+        };
 
+        drvLayer[activeLayer].syncRectIndex++;
+    }
+    else
+    {
+        drvLayer[activeLayer].syncEntireLayer = true;
+    }
+</#if>
+<#if !XDMCPUBilt && le_gfx_gfx2d??>
+<#if DoubleBuffering>
+    result = gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
+<#else>
+    result = gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx], &destRect);
+</#if>
+
+<#else>
+<#if DoubleBuffering>
+    result = DRV_XLCDC_CPU_Blit(buf,
+                                &srcRect,
+                                &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx],
+                                &destRect);
 <#else>
     result = DRV_XLCDC_CPU_Blit(buf,
                                 &srcRect,
-                                &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].bufferIdx],
+                                &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx],
                                 &destRect);
+</#if>
 
 </#if>
     gfxPixelBuffer_SetLocked(buf, GFX_FALSE);
@@ -454,6 +838,16 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
     {
         case GFX_IOCTL_LAYER_SWAP:
         {
+<#if DoubleBuffering>
+            drvLayer[activeLayer].frontBufferIdx = drvLayer[activeLayer].backBufferIdx;
+
+            drvLayer[activeLayer].backBufferIdx = (drvLayer[activeLayer].frontBufferIdx + 1) % XLCDC_BUF_PER_LAYER;
+
+            XLCDC_SetLayerAddress(layerOrder[activeLayer], (uint32_t) drvLayer[activeLayer].baseaddr[drvLayer[activeLayer].frontBufferIdx], false);
+
+            drvLayer[activeLayer].swapPending = true;
+
+</#if>
             return GFX_IOCTL_OK;
         }
 
@@ -501,18 +895,59 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
 
         case GFX_IOCTL_SET_ACTIVE_LAYER:
         {
+            gfxDriverIOCTLResponse response = GFX_IOCTL_OK;
+
             val = (gfxIOCTLArg_Value *)arg;
 
             if (val->value.v_uint >= XLCDC_TOT_LAYERS)
             {
-                return GFX_IOCTL_ERROR_UNKNOWN;
+                response =  GFX_IOCTL_ERROR_UNKNOWN;
             }
             else
             {
                 activeLayer = val->value.v_uint;
+<#if DoubleBuffering>
 
-                return GFX_IOCTL_OK;
+                if (drvLayer[activeLayer].syncEntireLayer)
+                {
+                    gfxResult result = DRV_XLCDC_BlitBuffer(0, 0, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx]);
+
+                    drvLayer[activeLayer].syncEntireLayer = false;
+                    drvLayer[activeLayer].syncRectIndex = 0;
+
+                    if (result != GFX_SUCCESS)
+                    {
+                        response = GFX_IOCTL_ERROR_UNKNOWN;
+                    }
+                }
+                else if (drvLayer[activeLayer].syncRectIndex > 0)
+                {
+                    while(drvLayer[activeLayer].syncRectIndex > 0)
+                    {
+                        drvLayer[activeLayer].syncRectIndex--;
+
+<#if !XDMCPUBilt && le_gfx_gfx2d??>
+                        gfxResult result = gfxGPUInterface.blitBuffer(&drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx],
+                                                &drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex],
+                                                &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx],
+                                                &drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex]);
+<#else>
+                        gfxResult result = DRV_XLCDC_CPU_Blit(&drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx],
+                                        &drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex],
+                                        &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx],
+                                        &drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex]);
+</#if>
+
+                        if (result != GFX_SUCCESS)
+                        {
+                            response = GFX_IOCTL_ERROR_UNKNOWN;
+                        }
+                    }
+                }
+</#if>
             }
+
+            return response;
         }
 
         case GFX_IOCTL_GET_LAYER_RECT:
@@ -545,7 +980,11 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
         {
             val = (gfxIOCTLArg_Value *)arg;
 
-            val->value.v_pbuffer = &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].bufferIdx];
+<#if DoubleBuffering>
+            val->value.v_pbuffer = &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx];
+<#else>
+            val->value.v_pbuffer = &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx];
+</#if>
 
             return GFX_IOCTL_OK;
         }

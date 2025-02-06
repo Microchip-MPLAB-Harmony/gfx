@@ -71,11 +71,18 @@
 /* Configuration Macros */
 /* LCD Parameters */
 <#if XLCDCConnected>
-<#if le_gfx_driver_xlcdc.XClockGCLKOutHint gt 1000>
-#define LCD_DCLK_KHZ      ${(le_gfx_driver_xlcdc.XClockGCLKOutHint / 1000)?round?c}
+    <#if le_gfx_driver_xlcdc.XClkGenSel == "GCLK">
+        <#assign clock_freq = le_gfx_driver_xlcdc.XClockGCLKOutHint>
+        <#assign clock_source = "GCLK">
+    <#elseif le_gfx_driver_xlcdc.XClkGenSel == "LVDSPLL">
+        <#assign clock_freq = le_gfx_driver_xlcdc.XLCDCPixClockHint>
+        <#assign clock_source = "LVDSPLL">
+    </#if>
+<#if clock_freq?? && clock_freq gt 1000>
+#define LCD_DCLK_KHZ      ${(clock_freq / 1000)?round?c}
 <#else>
-#error "Invalid XLCDC GCLK!"
-#define LCD_DCLK_KHZ      ${(le_gfx_driver_xlcdc.XClockGCLKOutHint / 1000)?round?c}
+#error "Invalid XLCDC ${clock_source} Frequency!"
+#define LCD_DCLK_KHZ      ${(clock_freq / 1000)?round?c}
 </#if>
 #define LCD_WIDTH         ${le_gfx_driver_xlcdc.XTResPPL}
 #define LCD_HEIGHT        ${le_gfx_driver_xlcdc.XTResRPF}
@@ -328,26 +335,13 @@ bool DSI_Write(DSI_GENERIC_HEADER * hdr, DSI_GENERIC_PAYLOAD * pld)
         /* DCS Long Write */
         case 0x39:
         {
-            uint32_t pld_size  = 0;
-
             /* Check size against max FIFO depth (~4128 bytes) */
             if (hdr->longPacket.size > 4096 || hdr->longPacket.size == 0)
             {
                 return true;
             }
-            else if (hdr->longPacket.size < 4)
-            {
-                pld_size = 1;
-            }
-            else if (hdr->longPacket.size % 4)
-            {
-                pld_size = hdr->longPacket.size + 4 - (hdr->longPacket.size % 4);
-                pld_size /= 4;
-            }
-            else
-            {
-                pld_size /= 4;
-            }
+
+            uint32_t pld_size = (hdr->longPacket.size + 3) >> 2;
 
             for (int idx = 0; idx < pld_size; idx++)
             {

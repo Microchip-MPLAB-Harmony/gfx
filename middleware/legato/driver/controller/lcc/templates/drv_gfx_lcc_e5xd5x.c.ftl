@@ -75,11 +75,14 @@
 #define DRV_GFX_LCC_DMA_CHANNEL_INDEX DMAC_CHANNEL_${DMAChannel}
 #define DRV_GFX_LCC_DMA_TC_TRIGGER_INDEX ${DMATimerTriggerIndex}
 
+<#if __PROCESSOR == "WBZ653" || __PROCESSOR == "PIC32WM_BZ6204">
+#define DATABUS_PTR ((uint32_t)(&(GPIOB_REGS->GPIO_PORT)))
+<#else>
 <#if (PinGroup == "31 - 16")>
 #define DATABUS_PTR ((uint32_t)(&(PORT_REGS->GROUP[${PortGroup}].PORT_OUT)) + 2)
 <#else>
 #define DATABUS_PTR ((uint32_t)(&(PORT_REGS->GROUP[${PortGroup}].PORT_OUT)))
-</#if>
+</#if></#if>
 
 <#if (PaletteMode??) && (PaletteMode == true)>
 #define FRAMEBUFFER_COLOR_MODE GFX_COLOR_MODE_PALETTE

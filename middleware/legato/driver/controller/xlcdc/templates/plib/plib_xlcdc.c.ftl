@@ -162,16 +162,51 @@ static uint32_t CALC_SCALING_FACT(uint32_t memsize, uint32_t size) {
 
 void XLCDC_EnableClocks(void)
 {
-<#if XLCDCGCLKEnable>
-    /* Enable Peripheral Clock and GLCK */
+<#if XLCDCClockEnable && XClkGenSel == "GCLK">
+    /* Enable XLCDC Peripheral Clock and GLCK */
     PMC_REGS->PMC_PCR = PMC_PCR_CMD(1) |
                         PMC_PCR_PID(ID_${IP}) |
                         PMC_PCR_EN(1) |
                         PMC_PCR_GCLKEN(1) |
                         PMC_PCR_GCLKDIV(${XClockGCLKDiv} - 1) |
                         PMC_PCR_GCLKCSS(${XClockGCLKSource});
-</#if>
 
+<#elseif XLCDCClockEnable && XClkGenSel == "LVDSPLL">
+    /* Initialize LVDSPLL */
+    /* Set PLL target to LVDSPLL and configure startup time of 150us */
+    PMC_REGS->PMC_PLL_UPDT = PMC_PLL_UPDT_STUPTIM(0x6) |
+                             PMC_PLL_UPDT_ID(0x${LVDSPLLIndex});
+
+    /* Set the analog controls to the values recommended in the data sheet */
+    PMC_REGS->PMC_PLL_ACR = PMC_PLL_ACR_LOOP_FILTER(0x1B) |
+                            PMC_PLL_ACR_LOCK_THR(0x4) |
+                            PMC_PLL_ACR_CONTROL(0x10);
+
+    /* Set loop parameters for the fractional PLL */
+    PMC_REGS->PMC_PLL_CTRL1 = PMC_PLL_CTRL1_MUL(${LVDSClockMul} - 1) |
+                              PMC_PLL_CTRL1_FRACR(${LVDSClockFrac});
+
+    /* Update the PLL target i.e. LVDSPLL, with the configured settings */
+    PMC_REGS->PMC_PLL_UPDT |= PMC_PLL_UPDT_UPDATE_Msk;
+
+    /* Enable and lock LVDSPLL clock, enable it for use by PMC */
+    PMC_REGS->PMC_PLL_CTRL0 = PMC_PLL_CTRL0_ENLOCK_Msk |
+                              PMC_PLL_CTRL0_ENPLL_Msk |
+                              PMC_PLL_CTRL0_DIVPMC(${LVDSClockDivPMC} - 1) |
+                              PMC_PLL_CTRL0_ENPLLCK_Msk;
+
+    /* Update the PLL target i.e. LVDSPLL, with the configured settings */
+    PMC_REGS->PMC_PLL_UPDT |= PMC_PLL_UPDT_UPDATE_Msk;
+
+    /* Wait for PLL lock */
+    while ((PMC_REGS->PMC_PLL_ISR0 & ${LVDSPLLISRMask}) != ${LVDSPLLISRMask});
+
+    /* Enable XLCDC Peripheral Clock */
+    PMC_REGS->PMC_PCR = PMC_PCR_CMD(1) |
+                        PMC_PCR_PID(ID_${IP}) |
+                        PMC_PCR_EN(1);
+
+</#if>
     /* Setup XLCDC Clock  */
     ${IP}_REGS->LCDC_LCDCFG0 = LCDC_LCDCFG0_CLKPOL(1) |
                                LCDC_LCDCFG0_CLKBYP(1) |
@@ -587,6 +622,62 @@ void XLCDC_SetupHEOLayer(void)
     WAIT_ATTRS_EQ(LCDC_ATTRS_SIP_Msk);
 }
 
+<#if InterruptEnable>
+void XLCDC_EnableInterrupts(void)
+{
+<#if IntEnBase>
+    ${IP}_REGS->LCDC_BASEIER = LCDC_BASEIER_END(${IntEnBaseEnd?then('1', '0')}) |
+                               LCDC_BASEIER_ERROR(${IntEnBaseError?then('1', '0')}) |
+                               LCDC_BASEIER_OVF(${IntEnBaseOvf?then('1', '0')});
+
+</#if>
+<#if IntEnOvr1>
+    ${IP}_REGS->LCDC_OVR1IER = LCDC_OVR1IER_END(${IntEnOvr1End?then('1', '0')}) |
+                               LCDC_OVR1IER_ERROR(${IntEnOvr1Error?then('1', '0')}) |
+                               LCDC_OVR1IER_OVF(${IntEnOvr1Ovf?then('1', '0')});
+
+</#if>
+<#if IntEnHeo>
+    ${IP}_REGS->LCDC_HEOIER = LCDC_HEOIER_END(${IntEnHeoEnd?then('1', '0')}) |
+                              LCDC_HEOIER_ERROR(${IntEnHeoError?then('1', '0')}) |
+                              LCDC_HEOIER_OVF(${IntEnHeoOvf?then('1', '0')});
+
+</#if>
+<#if SupportOVR2 && IntEnOvr2>
+    ${IP}_REGS->LCDC_OVR2IER = LCDC_OVR2IER_END(${IntEnOvr2End?then('1', '0')}) |
+                               LCDC_OVR2IER_ERROR(${IntEnOvr2Error?then('1', '0')}) |
+                               LCDC_OVR2IER_OVF(${IntEnOvr2Ovf?then('1', '0')});
+
+</#if>
+<#if IntEnRow>
+    ${IP}_REGS->LCDC_LCDCFG7 = LCDC_LCDCFG7_ROW(${XTResRPF} - 1 - ${IntRowNum});
+
+</#if>
+    ${IP}_REGS->LCDC_LCDIER = LCDC_LCDIER_SOFIE(${IntEnSof?then('1', '0')}) |
+                              LCDC_LCDIER_ROWIE(${IntEnRow?then('1', '0')}) |
+                              LCDC_LCDIER_FIFOERRIE(${IntEnFifoError?then('1', '0')}) |
+                              LCDC_LCDIER_BASEIE(${IntEnBase?then('1', '0')}) |
+                              LCDC_LCDIER_OVR1IE(${IntEnOvr1?then('1', '0')}) |
+<#if SupportOVR2>
+                              LCDC_LCDIER_HEOIE(${IntEnHeo?then('1', '0')}) |
+                              LCDC_LCDIER_OVR2IE(${IntEnOvr2?then('1', '0')});
+<#else>
+                              LCDC_LCDIER_HEOIE(${IntEnHeo?then('1', '0')});
+</#if>
+}
+
+void XLCDC_DisableInterrupts(void)
+{
+    ${IP}_REGS->LCDC_BASEIDR = LCDC_BASEIDR_Msk;
+    ${IP}_REGS->LCDC_OVR1IDR = LCDC_OVR1IDR_Msk;
+    ${IP}_REGS->LCDC_HEOIDR = LCDC_HEOIDR_Msk;
+<#if SupportOVR2>
+    ${IP}_REGS->LCDC_OVR2IDR = LCDC_OVR2IDR_Msk;
+</#if>
+    ${IP}_REGS->LCDC_LCDIDR = LCDC_LCDIDR_Msk;
+}
+
+</#if>
 void XLCDC_EnableBacklight(void)
 {
     ${IP}_REGS->LCDC_LCDEN = LCDC_LCDEN_PWMEN_Msk;
@@ -1110,7 +1201,7 @@ bool XLCDC_DisplayHEOYCbCrSurface(XLCDC_HEO_YCBCR_SURFACE *surface)
     ${IP}_REGS->LCDC_HEOCFG3 = LCDC_HEOCFG3_XSIZE(surface->windowSizeX - 1) |
                                LCDC_HEOCFG3_YSIZE(surface->windowSizeY - 1);
     ${IP}_REGS->LCDC_HEOCFG4 = LCDC_HEOCFG4_XMEMSIZE(surface->imageSizeX - 1) |
-                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeX - 1);
+                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeY - 1);
     ${IP}_REGS->LCDC_HEOCFG12 |= LCDC_HEOCFG12_DMA(1);
 
     if (surface->colorMode == XLCDC_YCBCR_COLOR_MODE_YCBCR_422_PL ||
@@ -1210,7 +1301,7 @@ bool XLCDC_DisplayHEORGBSurface(XLCDC_HEO_RGB_SURFACE *surface)
     ${IP}_REGS->LCDC_HEOCFG3 = LCDC_HEOCFG3_XSIZE(surface->windowSizeX - 1) |
                                LCDC_HEOCFG3_YSIZE(surface->windowSizeY - 1);
     ${IP}_REGS->LCDC_HEOCFG4 = LCDC_HEOCFG4_XMEMSIZE(surface->imageSizeX - 1) |
-                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeX - 1);
+                               LCDC_HEOCFG4_YMEMSIZE(surface->imageSizeY - 1);
     ${IP}_REGS->LCDC_HEOCFG12 |= LCDC_HEOCFG12_DMA(1);
 
 
@@ -1323,6 +1414,9 @@ void XLCDC_Initialize(void)
 </#if>
 <#if XPWMEnable>
     XLCDC_EnableBacklight();
+</#if>
+<#if InterruptEnable>
+    XLCDC_EnableInterrupts();
 </#if>
     XLCDC_Start();
 }

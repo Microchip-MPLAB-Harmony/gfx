@@ -71,11 +71,11 @@ def instantiateComponent(comp):
 	ColorMode.setDescription("<html> The default color mode of all the canvas objects</html>")
 	ColorMode.setDefaultValue("RGBA_8888")
 
-	DefaultNumLayers = comp.createIntegerSymbol("DefaultNumLayers", CanvasSettings)
-	DefaultNumLayers.setLabel("Default Number of Layers")
-	DefaultNumLayers.setDescription("<html>The default number of layeres. <br>"
-		"This value will be overridden by the actual layers in the display controller, if used.</html>")
-	DefaultNumLayers.setReadOnly(True)
+	# DefaultNumLayers = comp.createIntegerSymbol("DefaultNumLayers", CanvasSettings)
+	# DefaultNumLayers.setLabel("Default Number of Layers")
+	# DefaultNumLayers.setDescription("<html>The default number of layeres. <br>"
+	# 	"This value will be overridden by the actual layers in the display controller, if used.</html>")
+	# DefaultNumLayers.setReadOnly(True)
 
 	MaXCanvasObjects = comp.createIntegerSymbol("MaXCanvasObjects", CanvasSettings)
 	MaXCanvasObjects.setLabel("Max Number of Parameters")

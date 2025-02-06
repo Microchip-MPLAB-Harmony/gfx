@@ -58,6 +58,12 @@ static leResult _RGBPutPixel(int32_t x,
     leUtils_PointLogicalToScratch((int16_t*)&x, (int16_t*)&y);
 #endif
 
+#if defined LE_WIDGET_BUFFER_ENABLE && LE_WIDGET_BUFFER_ENABLE == 1
+    clr = leColorConvert(leRenderer_CurrentColorMode(),
+                         LE_COLOR_MODE_RGBA_8888,
+                         clr);
+#endif
+
     lePixelBufferSet_Unsafe(leGetRenderBuffer(),
                             x,
                             y,
@@ -102,10 +108,13 @@ static leResult _RGBBlendPixel(int32_t x,
     // upscale to alpha channel type
     nativeSource = lePixelBufferGet_Unsafe(leGetRenderBuffer(), x, y);
 
+#if defined LE_WIDGET_BUFFER_ENABLE && LE_WIDGET_BUFFER_ENABLE == 1
+    rgbaDest = nativeSource;
+#else
     rgbaDest = leColorConvert(leRenderer_CurrentColorMode(),
                               LE_COLOR_MODE_RGBA_8888,
                               nativeSource);
-
+#endif
     rgbaSource = leColorConvert(leRenderer_CurrentColorMode(),
                                 LE_COLOR_MODE_RGBA_8888,
                                 clr);
@@ -139,15 +148,23 @@ static leResult _RGBBlendPixel(int32_t x,
 
     resultClr = leColorBlend_RGBA_8888(rgbaSource, rgbaDest);
 
+#if defined LE_WIDGET_BUFFER_ENABLE && LE_WIDGET_BUFFER_ENABLE == 1
+    lePixelBufferSet_Unsafe(leGetRenderBuffer(),
+                            x,
+                            y,
+                            resultClr);
+#else
     // convert to destination format
     clr = leColorConvert(LE_COLOR_MODE_RGBA_8888,
                          leRenderer_CurrentColorMode(),
                          resultClr);
 
+
     lePixelBufferSet_Unsafe(leGetRenderBuffer(),
                             x,
                             y,
                             clr);
+#endif
 
     return LE_SUCCESS;
 }
@@ -212,6 +229,12 @@ static leResult _RGBFill(int32_t x,
         height = rotRect.height;
 #endif
 
+#if defined LE_WIDGET_BUFFER_ENABLE && LE_WIDGET_BUFFER_ENABLE == 1
+    clr = leColorConvert(leRenderer_CurrentColorMode(),
+                         LE_COLOR_MODE_RGBA_8888,
+                         clr);
+#endif
+
     lePixelBufferAreaFill(leGetRenderBuffer(),
                           pnt.x,
                           pnt.y,
@@ -262,6 +285,12 @@ static leResult _RGBBlendFill(int32_t x,
     fillRect.y = pnt.y;
     fillRect.width = width;
     fillRect.height = height;
+
+#if defined LE_WIDGET_BUFFER_ENABLE && LE_WIDGET_BUFFER_ENABLE == 1
+    clr = leColorConvert(leRenderer_CurrentColorMode(),
+                         LE_COLOR_MODE_RGBA_8888,
+                         clr);
+#endif
 
     if(leGPU_FillRect(&fillRect, clr, a) == LE_SUCCESS)
         return LE_SUCCESS;

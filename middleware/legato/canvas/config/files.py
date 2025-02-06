@@ -1,14 +1,28 @@
 # generate code files
 projectPath = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/canvas"
 
-# common gfx driver header
+GFX_CANVAS_CONFIG_H = comp.createFileSymbol("GFX_CANVAS_CONFIG_H", None)
+GFX_CANVAS_CONFIG_H.setSourcePath("templates/gfx_canvas_config.h.ftl")
+GFX_CANVAS_CONFIG_H.setDestPath("gfx/canvas/")
+GFX_CANVAS_CONFIG_H.setOutputName("gfx_canvas_config.h")
+GFX_CANVAS_CONFIG_H.setProjectPath(projectPath)
+GFX_CANVAS_CONFIG_H.setType("HEADER")
+GFX_CANVAS_CONFIG_H.setMarkup(True)
+
+GFX_CANVAS_CONFIG_C = comp.createFileSymbol("GFX_CANVAS_CONFIG_C", None)
+GFX_CANVAS_CONFIG_C.setSourcePath("templates/gfx_canvas_config.c.ftl")
+GFX_CANVAS_CONFIG_C.setDestPath("gfx/canvas/")
+GFX_CANVAS_CONFIG_C.setOutputName("gfx_canvas_config.c")
+GFX_CANVAS_CONFIG_C.setProjectPath(projectPath)
+GFX_CANVAS_CONFIG_C.setType("SOURCE")
+GFX_CANVAS_CONFIG_C.setMarkup(True)
+
 GFX_CANVAS_H = comp.createFileSymbol("GFX_CANVAS_H", None)
 GFX_CANVAS_H.setSourcePath("templates/gfx_canvas.h")
 GFX_CANVAS_H.setDestPath("gfx/canvas/")
 GFX_CANVAS_H.setOutputName("gfx_canvas.h")
 GFX_CANVAS_H.setProjectPath(projectPath)
 GFX_CANVAS_H.setType("HEADER")
-GFX_CANVAS_H.setMarkup(True)
 
 GFX_CANVAS_C = comp.createFileSymbol("GFX_CANVAS_C", None)
 GFX_CANVAS_C.setSourcePath("templates/gfx_canvas.c")
@@ -16,7 +30,6 @@ GFX_CANVAS_C.setDestPath("gfx/canvas/")
 GFX_CANVAS_C.setOutputName("gfx_canvas.c")
 GFX_CANVAS_C.setProjectPath(projectPath)
 GFX_CANVAS_C.setType("SOURCE")
-GFX_CANVAS_C.setMarkup(True)
 
 GFX_CANVAS_API_H = comp.createFileSymbol("GFX_CANVAS_API_H", None)
 GFX_CANVAS_API_H.setSourcePath("templates/gfx_canvas_api.h")

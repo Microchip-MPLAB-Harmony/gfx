@@ -12,6 +12,6 @@ Below are resources to assist with software development using Microchip Graphics
 
 [MGS Harmony User Guides](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/) - Provides dynamic solution driven documentation and feedback in a release-independent manner. It contains how-to guides and step-by-step tutorials.
 
-[MGS Harmony Graphics Demonstration Documentation via MPLAB® Discover](https://mplab-discover.microchip.com/v2?dsl=Microchip+AND+Graphics+AND+Suite) - Graphics demonstrations featuring a wide variety display technology permuations using Micrcohip microcontroller and microprocessor products.
+[MGS Harmony Graphics Demonstrations on Microchip Developer Help](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits/) - Graphics demonstrations featuring a wide variety display technology permuations using Micrcohip microcontroller and microprocessor products.
 
 ***

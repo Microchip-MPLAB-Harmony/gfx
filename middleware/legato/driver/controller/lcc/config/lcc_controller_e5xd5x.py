@@ -27,7 +27,7 @@ import re
 def instantiateComponent(comp):
 	projectPath = "config/" + Variables.get("__CONFIGURATION_NAME") + "/gfx/driver/lcc"
 	
-	comp.setHelpFile("../../../docs/help_harmony_gfx_html_alias.h")
+	#comp.setHelpFile("../../../doc/html/help_harmony_gfx_html_alias.h")
 	#comp.setHelp("IDH_HTML_GFX_CMP__3__Display_Driver_Component")
 	
 	# common gfx driver header
@@ -296,7 +296,10 @@ def instantiateComponent(comp):
 	execfile(Module.getPath() + "/config/lcc_rtos.py")
 	
 	if (Database.getComponentByID("ccl") is None):
-		Database.activateComponents("ccl")	 
+		try:
+			Database.activateComponents("ccl")
+		except:
+			print("WARNING: LCC driver try activateComponents 'ccl' failed, this is just a warning, the CCL component may be loaded later")
 
 def configureDisplaySettings(lccComponent, displayComponent):
 	lccComponent.setSymbolValue("DisplayHorzPulseWidth", displayComponent.getSymbolByID("HorzPulseWidth").getValue())

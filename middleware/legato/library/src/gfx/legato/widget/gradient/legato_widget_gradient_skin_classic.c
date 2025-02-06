@@ -102,14 +102,14 @@ static void drawBackground(leGradientWidget* grad)
     {
         grad->fn->rectToScreen(grad, &rect);
         
-        if(grad->dir == LE_DIRECTION_LEFT)
+        if(grad->dir == LE_DIRECTION_RIGHT)
         {
             leRenderer_HorzGradientRect(&rect,
                                         leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND),
                                         leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),
                                         paintState.alpha);
         }
-        else if(grad->dir == LE_DIRECTION_RIGHT)
+        else if(grad->dir == LE_DIRECTION_LEFT)
         {
             leRenderer_HorzGradientRect(&rect,
                                         leScheme_GetRenderColor(grad->widget.scheme, LE_SCHM_FOREGROUND_INACTIVE),

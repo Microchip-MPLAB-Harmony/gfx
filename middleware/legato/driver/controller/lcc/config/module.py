@@ -57,7 +57,14 @@ def loadModule():
 		### PWM dependency for PWM backlight control
 		cntlComponent.addDependency("Backlight", "PWM", False, True)
 		#cntlComponent.setDependencyEnabled("PWM", False)
-	elif (("SAM" in str(Variables.get("__PROCESSOR")) and "5" in str(Variables.get("__PROCESSOR"))) or ("PIC32CX" in str(Variables.get("__PROCESSOR")))):
+	elif ((("SAM" in str(Variables.get("__PROCESSOR")) and "5" in str(Variables.get("__PROCESSOR"))))):
+		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_e5xd5x.py")
+		cntlComponent.setDisplayType("LE LCC Display Driver")
+		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
+		cntlComponent.addDependency("Graphics Display", "Graphics Display", False)
+		### TMR dependency for DMA control
+		cntlComponent.addDependency("TMR", "TMR", False, True)
+	elif ((("PIC32WM_BZ6204" in str(Variables.get("__PROCESSOR"))) or ("WBZ653" in str(Variables.get("__PROCESSOR"))))):
 		cntlComponent = Module.CreateComponent("le_gfx_driver_lcc", "LE LCC ", "/Graphics/Driver", "config/lcc_controller_e5xd5x.py")
 		cntlComponent.setDisplayType("LE LCC Display Driver")
 		cntlComponent.addCapability("gfx_driver_lcc", "LE Display Driver", False)
