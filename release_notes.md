@@ -8,6 +8,72 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.16.1
+
+### Issues Fixed
+
+* Some files had missing 'extern "C"
+* leStringUtils_ToCStr doesn't NULL terminate C string
+* PIC32MZ DA Graphics : touch up event gets lost
+* Keypad Widget setCellArraySize API issue
+* Build error when LE_USE_DEBUG_ALLOCATOR is enabled.
+* Compile error caused by the #include <toolchain_specifics.h> in the legato_config.h file.
+* Image color masking doesn't work with RGB565 and with GPU enabled
+* Composer: Crashes when configuring keypad widget
+* Composer: setImagePosition is not being generated for keypad buttons
+* Composer: Composer is crashing when configuring non-CJK font range
+* Composer: Composer crashes when toggling antialiasing in font asset
+* Composer: Memory Location doesn't update Internal Flash Usage tab
+* Composer: PNG format not working in New Composer
+* Composer: Inconsistent Flash usage information
+* Composer: Image Sequence widget fails to build if starting image is not 0.
+* Composer: Keypad widget still shows filled background even when set to None
+* Composer: Line Graph clipped text
+* Composer: Bar Graph Scheme helper error
+* Composer: The Circle slider widget "snapping" feature is broken
+* Composer: circle slider widget "Touch on button only" property is broken
+* Composer: line graph widget fails to build
+* Composer: Changing the alpha value of the widget in Composer doesn't change the widget in the screen preview
+* Composer: Line Graph widget does not have a scheme helper in Composer
+* Composer: rectangle widget crashes when widget size is < 3 pixels
+* Simulator: Canvas doesn't work anymore with Simulator (v3.16)
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.2.0 (Windows/Linux)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** MGS Harmony Composer UI/UX modernized for Windows and Linux builds only
+  * MacOS Build version remains at:
+     * Microchip Graphics Composer v1.4.1b
+        * Legato Plugin v2.3.15b
+
+  **NOTE 2:** MGS Harmony Composer users on Windows may have missing DLLs on launch: VCRUNTIME140.dll, VCRUNTIME140_1.dll and MSCVP140.dll.
+  
+  To remedy this, make sure to install the latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
+
+
+### MGS Simulator
+
+* MGS Simulator v1.1.0
+
+* For information on how to download and install the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+
+### Development Tools
+
+- [MPLAB® X IDE v6.25](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.60](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.6
+
+### Dependent Components
+
+* [Core v3.15.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.15.1)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+
 ## Graphics Release v3.16.0
 
 ### New Features

@@ -61,16 +61,30 @@ uint32_t leStringUtils_ToCStr(const leChar* str,
                               uint32_t bufSize)
 {
     uint32_t itr;
+    uint32_t copyLength;
 
     if(str == NULL || strSize == 0 || buf == NULL || bufSize == 0)
         return LE_FAILURE;
 
-    for(itr = 0; itr < strSize; itr++)
+    if (bufSize == 1)
     {
-        if(itr >= bufSize)
-            break;
+        buf[0] = '\0';
+        return 1;
+    }
 
-        if(str[itr] >= ASCII_MIN && str[itr] <= ASCII_MAX)
+    // Consider null terminator when evaluating size
+    if ((bufSize - 1) < strSize)
+    {
+        copyLength = bufSize - 1;
+    }
+    else
+    {
+        copyLength = strSize;
+    }
+
+    for (itr = 0; itr < copyLength; itr++)
+    {
+        if (str[itr] >= ASCII_MIN && str[itr] <= ASCII_MAX)
         {
             buf[itr] = (char)str[itr];
         }
@@ -79,6 +93,8 @@ uint32_t leStringUtils_ToCStr(const leChar* str,
             buf[itr] = ASCII_SPACE;
         }
     }
+
+    buf[itr] = '\0';
 
     return itr;
 }

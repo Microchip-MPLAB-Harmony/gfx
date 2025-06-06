@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_le_gpu2dc" id="160020DD-F551-4A67-BCE2-0172D7B11FF0" version="1.0.0">
+    <ConfigRoot path="module.py"/>
+</Module>

@@ -128,6 +128,10 @@ leResult leEvent_ProcessEvents()
             
             node = NULL;
         }
+        else
+        {
+            return LE_FAILURE;
+        }        
     }
 
     return LE_SUCCESS;

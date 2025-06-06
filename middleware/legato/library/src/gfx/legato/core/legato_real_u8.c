@@ -59,7 +59,7 @@ uint32_t leReal_u8_Middle(leReal_u8 rl)
     uint32_t t;
 
     t = (uint32_t)rl;
-    t &= 0xFFFFFFF00;
+    t &= 0xFFFFFF00;
     t |= LE_REAL_U8_ONE_OVER_TWO;
 
     return (leReal_u8)(t);

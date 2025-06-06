@@ -39,7 +39,7 @@
 #include "gfx/legato/widget/legato_widget.h"
 #include "gfx/legato/widget/legato_widget_skin_classic_common.h"
 
-#define MAX_TICK_LABEL_DIGITS 10
+#define MAX_TICK_LABEL_DIGITS 12
 #define MAX_TICK_LABEL_VALUE 999999999
 #define LABEL_OFFSET_MIN_PIX 5
 #define TICK_LABEL_MARGIN 3
@@ -262,7 +262,7 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
     if(graph->ticksLabelFont == NULL)
         return;
 
-    sprintf(paintState.strbuff, "%d", (int32_t)graph->minValue);
+    sprintf(paintState.strbuff, "%d", (int)graph->minValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff,
                               graph->ticksLabelFont,
@@ -271,7 +271,7 @@ static void _getValueLabelMaxDrawRect(const leLineGraphWidget* graph,
     leStringUtils_KerningRect((leRasterFont*)graph->ticksLabelFont,
                               &minRect);
 
-    sprintf(paintState.strbuff, "%d", (int32_t)graph->maxValue);
+    sprintf(paintState.strbuff, "%d", (int)graph->maxValue);
 
     leStringUtils_GetRectCStr(paintState.strbuff, graph->ticksLabelFont, &maxRect);
 

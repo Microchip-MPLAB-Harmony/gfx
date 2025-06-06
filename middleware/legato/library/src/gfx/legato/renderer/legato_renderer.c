@@ -1119,6 +1119,9 @@ static void _nextRect(void)
 static leResult postRect(void)
 {
     int32_t rotX, rotY;
+#if LE_DEBUG_BLIT_RECTS == 1    
+    leRect blitRect;
+#endif    
 
     leRect frameRect = _rendererState.currentRenderLayer->frameRectList.rects[_rendererState.frameRectIdx];
 
@@ -1143,6 +1146,15 @@ static leResult postRect(void)
     _scratchBuffers[_rendererState.currentScratchBuffer].gfxBuffer.buffer_length = _scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer.buffer_length;
     _scratchBuffers[_rendererState.currentScratchBuffer].gfxBuffer.flags = 0;
     _scratchBuffers[_rendererState.currentScratchBuffer].gfxBuffer.pixels = (gfxBuffer)_scratchBuffers[_rendererState.currentScratchBuffer].renderBuffer.pixels;
+
+#if LE_DEBUG_BLIT_RECTS == 1
+    blitRect.x = rotX;
+    blitRect.y = rotY;
+    blitRect.width = _scratchBuffers[_rendererState.currentScratchBuffer].gfxBuffer.size.width;
+    blitRect.height = _scratchBuffers[_rendererState.currentScratchBuffer].gfxBuffer.size.height;
+
+    leRenderer_RectLine(&blitRect, 0xff0000ff, 0xff);
+#endif      
 
     /* render buffer may be locked by something or display driver may not be ready */
     if(_rendererState.dispDriver->blitBuffer(rotX,

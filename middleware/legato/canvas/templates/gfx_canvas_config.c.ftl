@@ -42,6 +42,7 @@
 *******************************************************************************/
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "gfx/driver/gfx_driver.h"
 #include "gfx/canvas/gfx_canvas_config.h"

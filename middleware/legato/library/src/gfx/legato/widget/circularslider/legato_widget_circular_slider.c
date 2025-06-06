@@ -942,7 +942,13 @@ static void handleTouchDownEvent(leCircularSliderWidget* _this,
 
     if(_pointInButton(_this, pnt) == LE_FALSE)
     {
-        if(_this->buttonTouch == LE_FALSE && _pointInActiveArc(_this, pnt) == LE_FALSE)
+        if(_this->buttonTouch == LE_TRUE)
+        {
+            _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
+
+            return;
+        }
+        else if(_this->buttonTouch == LE_FALSE && _pointInActiveArc(_this, pnt) == LE_FALSE)
         {
             _this->btnState = LE_CIRCULAR_SLIDER_STATE_UP;
 

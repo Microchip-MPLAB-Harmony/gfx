@@ -79,7 +79,7 @@ static void _calculateBoundingRect(void)
 
 static void _buildPlanes(void)
 {
-    _context.planes = leMalloc(sizeof(struct lePlane) * _context.count);
+    _context.planes = LE_MALLOC(sizeof(struct lePlane) * _context.count);
     struct leVector2 normal;
     struct leLineF line;
 

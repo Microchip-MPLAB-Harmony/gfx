@@ -24,7 +24,7 @@
 
 
 # Imports
-import os.path
+import os
 
 # Component ID prefix for debug print
 comp_id_str = "[mgs_web_sim] "
@@ -357,11 +357,28 @@ def instantiateComponent(component):
     project_path = "config/" + config_name + "/gfx/simulator"
     common_driver_project_path = "config/" + config_name + "/gfx/driver"
 
-    # Normalize absolute path based on OS
+    # Get the root path of the Harmony framework
     framework_path = Variables.get("__FRAMEWORK_ROOT")
-    common_driver_template_path = "/gfx/middleware/legato/driver/templates/gfx_driver"
-    common_driver_template_path = framework_path + os.path.normpath(common_driver_template_path)
-    print(comp_id_str + "Common driver path set to: " + common_driver_template_path)
+
+    # Base directory to search for the middleware path
+    gfx_root = os.path.join(framework_path, "gfx")
+
+    # Initialize template path
+    common_driver_template_path = None
+
+    # Recursively search for the middleware path
+    for root, dirs, files in os.walk(gfx_root):
+        if "middleware" in dirs:
+            candidate = os.path.join(root, "middleware", "legato", "driver", "templates", "gfx_driver")
+            if os.path.exists(candidate + ".c.ftl") and os.path.exists(candidate + ".h.ftl"):
+                common_driver_template_path = candidate
+                break
+
+    # Log result
+    if common_driver_template_path is None:
+        Log.writeErrorMessage(comp_id_str + ": Could not locate gfx_driver templates.")
+    else:
+        Log.writeInfoMessage(comp_id_str + ": Common driver path set to: " + common_driver_template_path)
 
     # File Generation Toggle
     global file_gen_toggle

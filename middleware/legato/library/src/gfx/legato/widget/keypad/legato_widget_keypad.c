@@ -94,6 +94,8 @@ static void _reallocateCells(leKeyPadWidget* _this,
         memset(newCells[r], 0, cols * sizeof(leKeyPadCell));
     }
 
+    _this->fn->removeAllChildren(_this);
+
     // copy old values or initialize new cells
     for(r = 0; r < rows; ++r)
     {
@@ -113,6 +115,7 @@ static void _reallocateCells(leKeyPadWidget* _this,
             else
             {
                 newCells[r][c] = _this->cells[r][c];
+                _this->fn->addChild(_this, (leWidget*)newCells[r][c].button);
             }
         }
     }

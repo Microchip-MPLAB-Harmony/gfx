@@ -49,6 +49,8 @@
 </#if>
 <#if !XDMCPUBilt && le_gfx_gfx2d??>
 #include "gfx/driver/processor/gfx2d/drv_gfx2d.h"
+<#elseif !XDMCPUBilt && le_gfx_driver_gpu2dc??>
+#include "gfx/driver/gpu2dc/drv_gfx_gpu2dc.h"
 </#if>
 #include "gfx/driver/controller/xlcdc/drv_gfx_xlcdc.h"
 #include "gfx/driver/controller/xlcdc/plib/plib_xlcdc.h"
@@ -379,7 +381,7 @@ static XLCDC_RGB_COLOR_MODE DRV_XLCDC_ColorModeXLCDCFromGFX(gfxColorMode mode)
 }
 
 </#if>
-<#if XDMCPUBilt || !le_gfx_gfx2d??>
+<#if XDMCPUBilt || (!le_gfx_gfx2d?? && !le_gfx_driver_gpu2dc??)>
 <#if SupportNEON>
 /* Perform a CPU based Blit w/ NEON */
 static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
@@ -802,7 +804,7 @@ gfxResult DRV_XLCDC_BlitBuffer(int32_t x, int32_t y, gfxPixelBuffer* buf)
         drvLayer[activeLayer].syncEntireLayer = true;
     }
 </#if>
-<#if !XDMCPUBilt && le_gfx_gfx2d??>
+<#if !XDMCPUBilt && (le_gfx_gfx2d?? || le_gfx_driver_gpu2dc??)>
 <#if DoubleBuffering>
     result = gfxGPUInterface.blitBuffer(buf, &srcRect, &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx], &destRect);
 <#else>
@@ -926,7 +928,7 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
                     {
                         drvLayer[activeLayer].syncRectIndex--;
 
-<#if !XDMCPUBilt && le_gfx_gfx2d??>
+<#if !XDMCPUBilt && (le_gfx_gfx2d?? || le_gfx_driver_gpu2dc??)>
                         gfxResult result = gfxGPUInterface.blitBuffer(&drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].frontBufferIdx],
                                                 &drvLayer[activeLayer].syncRect[drvLayer[activeLayer].syncRectIndex],
                                                 &drvLayer[activeLayer].pixelBuffer[drvLayer[activeLayer].backBufferIdx],
