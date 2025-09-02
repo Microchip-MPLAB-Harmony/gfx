@@ -32,6 +32,7 @@
 #define LE_STRING_RENDERER_H
 
 #include "gfx/legato/string/legato_string.h"
+#include "gfx/legato/common/legato_rect.h"
 
 // *****************************************************************************
 /* Structure:

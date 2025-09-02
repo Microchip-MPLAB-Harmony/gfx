@@ -380,7 +380,9 @@ static void onImageStreamFinished(leStreamManager* strm)
 
 static void drawImage(leButtonWidget* btn)
 {
-    leRect imgRect, imgSrcRect;
+    leRect imgRect = leRect_Zero;
+    leRect imgSrcRect = leRect_Zero;
+
     const leImage* img = NULL;
     
     if(btn->state != LE_BUTTON_STATE_UP)
@@ -430,7 +432,8 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leButtonWidget* btn)
 {
-    leRect boundingRect, kerningRect;
+    leRect boundingRect = leRect_Zero;
+    leRect kerningRect = leRect_Zero;
     leStringRenderRequest req;
     leColor background;
 

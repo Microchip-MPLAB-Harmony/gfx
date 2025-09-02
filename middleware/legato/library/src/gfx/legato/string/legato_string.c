@@ -188,7 +188,7 @@ leResult _leString_GetLineRect(const leString* _this,
     uint32_t idx;
     uint32_t len;
     leRasterFont* fnt;
-    leFontGlyph glyph;
+    leFontGlyph glyph = {0};
     uint32_t startIdx, endIdx;
     leChar chr;
 
@@ -228,7 +228,7 @@ leResult _leString_GetCharRect(const leString* _this,
     uint32_t idx;
     uint32_t len;
     leRasterFont* fnt;
-    leFontGlyph glyph;
+    leFontGlyph glyph = {0};
     leChar chr;
 
     LE_ASSERT_THIS();
@@ -278,7 +278,7 @@ leResult _leString_GetCharIndexAtPoint(const leString* _this,
     uint32_t idx;
     uint32_t len;
     leRasterFont* fnt;
-    leFontGlyph glyph;
+    leFontGlyph glyph = {0};
     leChar chr;
     leRect rect;
 

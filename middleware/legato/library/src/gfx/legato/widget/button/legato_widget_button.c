@@ -67,7 +67,8 @@ void _leButtonWidget_InvalidateBorderAreas(const leButtonWidget* _this);
 
 static void invalidateImageRect(const leButtonWidget* _this)
 {
-    leRect imgRect, imgSrcRect;
+    leRect imgRect = leRect_Zero;
+    leRect imgSrcRect = leRect_Zero;
     
     _leButtonWidget_GetImageRect(_this, &imgRect, &imgSrcRect);
     

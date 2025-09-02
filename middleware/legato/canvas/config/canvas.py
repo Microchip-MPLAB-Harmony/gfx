@@ -66,7 +66,7 @@ def instantiateComponent(comp):
 	WindowClippingEnabled.setDescription("<html> Clips the canvas window if the canvas goes out of bounds. <br>"
 			"Enable for display controllers that don't allow out of bounds frames.</html>")
 
-	ColorMode = comp.createComboSymbol("ColorMode" , CanvasSettings, ["GS_8", "RGB_565", "RGBA_8888"])
+	ColorMode = comp.createComboSymbol("ColorMode" , CanvasSettings, ["GS_8", "RGB_565", "RGBA_8888", "ARGB_8888"])
 	ColorMode.setLabel("Default Color Mode")
 	ColorMode.setDescription("<html> The default color mode of all the canvas objects</html>")
 	ColorMode.setDefaultValue("RGBA_8888")
@@ -105,7 +105,7 @@ def instantiateComponent(comp):
 		Height.setDefaultValue(272)
 		Height.setDescription("<html> The vertical resolution (height) of the canvas in pixels. </html>")
 
-		Mode = comp.createComboSymbol("Canvas" + str(x) + "Mode" , Canvas, ["GS_8", "RGB_565", "RGBA_8888"])
+		Mode = comp.createComboSymbol("Canvas" + str(x) + "Mode" , Canvas, ["GS_8", "RGB_565", "RGBA_8888", "ARGB_8888"])
 		Mode.setLabel("Color Mode")
 		Mode.setDescription("<html> The color mode of the canvas. </html>")
 		Mode.setDefaultValue("RGBA_8888")

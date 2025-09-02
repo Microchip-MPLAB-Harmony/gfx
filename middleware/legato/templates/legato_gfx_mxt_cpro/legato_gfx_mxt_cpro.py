@@ -22,9 +22,9 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
-componentsIDTable = ["HarmonyCore", "gfx_legato", "gfx_hal_le", "gfx_disp_mxt_cpro_320x480", "le_gfx_driver_ili9488", "sys_input", "gfx_maxtouch_controller"]
-autoConnectTable = [["le_gfx_driver_ili9488", "Graphics Display", "gfx_disp_mxt_cpro_320x480", "gfx_display"],
-					["gfx_legato", "gfx_driver", "le_gfx_driver_ili9488", "gfx_driver_ili9488"],
+componentsIDTable = ["HarmonyCore", "gfx_legato", "gfx_hal_le", "gfx_disp_mxt_cpro_320x480", "le_gfx_driver_external", "sys_input", "gfx_maxtouch_controller"]
+autoConnectTable = [["le_gfx_driver_external", "Graphics Display", "gfx_disp_mxt_cpro_320x480", "gfx_display"],
+					["gfx_legato", "gfx_driver", "le_gfx_driver_external", "gfx_driver_external"],
 					["gfx_maxtouch_controller", "touch_panel", "gfx_disp_mxt_cpro_320x480", "touch_panel"]]
 deactivateIDTable = ["FreeRTOS"]
 
@@ -38,6 +38,7 @@ pinResetFxn = resetPins
 #Add BSP support
 execfile(Module.getPath() + "Support_BSP_SAM_E54_Curiosity_Ultra.py")
 execfile(Module.getPath() + "Support_BSP_PIC32CX_SG_Curiosity_Ultra.py")
+execfile(Module.getPath() + "Support_BSP_PIC32CZ_CA70_MC70_Curiosity_Ultra.py")
 
 def enableConfigPins(bspID, configID, enable):
 	global pinConfigureFxn

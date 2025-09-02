@@ -68,8 +68,8 @@ static leResult _draw(const leImage* img,
 
     uint8_t* encodedData = NULL;
     uint8_t* decodedData = NULL;
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
 
     imgRect.x = 0;
     imgRect.y = 0;
@@ -194,8 +194,8 @@ static leResult _render(const leImage* src,
 
     uint8_t* encodedData = NULL;
     uint8_t* decodedData = NULL;
-    uint32_t width;
-    uint32_t height;
+    uint32_t width = 0;
+    uint32_t height = 0;
     (void)ignoreMask; // unused
     (void)ignoreAlpha; // unused
 

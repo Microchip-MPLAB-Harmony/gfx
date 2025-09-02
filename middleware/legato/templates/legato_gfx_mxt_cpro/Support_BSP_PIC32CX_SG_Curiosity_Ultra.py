@@ -24,7 +24,7 @@
 
 ############ SPI CONFIG ######################################################
 pic32cx_sg4x_cult_cpro_spi_ActivateList = ["le_gfx_intf_spi4", "sercom0", "drv_spi", "drv_spi_0","sercom6", "drv_i2c", "drv_i2c0", "tc0", "sys_time"]
-pic32cx_sg4x_cult_cpro_spi_ConnectList = [["le_gfx_driver_ili9488", "SPI Display Interface", "le_gfx_intf_spi4", "le_gfx_intf_spi4"],
+pic32cx_sg4x_cult_cpro_spi_ConnectList = [["le_gfx_driver_external", "SPI Display Interface", "le_gfx_intf_spi4", "le_gfx_intf_spi4"],
 						["le_gfx_intf_spi4", "DRV_SPI", "drv_spi_0", "drv_spi"],
 						["drv_spi_0", "drv_spi_SPI_dependency", "sercom0", "SERCOM0_SPI"],
 						["gfx_maxtouch_controller", "i2c", "drv_i2c_0", "drv_i2c"],
@@ -46,6 +46,8 @@ def pic32cx_sg4x_cult_cpro_spi_eventHandler(event):
 	if (event == "configure"):
 		#set the SPI clock to 8MHz
 		try:
+			Database.setSymbolValue("le_gfx_driver_external", "BaseDriverType", "ILI9488", 1)
+			Database.setSymbolValue("le_gfx_driver_external", "DisplayInterfaceType", "SPI 4-line", 1)
 			Database.setSymbolValue("sercom0", "SPI_BAUD_RATE", 8000000, 1)
 			Database.setSymbolValue("sercom0", "SPI_DIPO", 3, 1)
 		except:

@@ -68,7 +68,10 @@
 /* Not Cached */
 #define FB_CACHE_NC             __attribute__ ((section(".region_nocache"), aligned (32)))
 /* Frame Buffer Pointer Type */
-<#if XLMColMode == "13">
+<#if XLMColMode == "12">
+#define FB_COL_MODE             XLCDC_RGB_COLOR_MODE_ARGB_8888
+#define FB_BPP_TYPE             uint32_t
+<#elif XLMColMode == "13">
 #define FB_COL_MODE             XLCDC_RGB_COLOR_MODE_RGBA_8888
 #define FB_BPP_TYPE             uint32_t
 <#else>

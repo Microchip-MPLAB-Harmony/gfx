@@ -38,10 +38,11 @@ leResult _leCStringStreamRenderer_Draw(leCStringRenderRequest* req);
 static leResult drawString(leStringRenderRequest* req)
 {
     uint32_t charItr, len, lines, lineItr;
-    leFontGlyph glyphInfo;
+    leFontGlyph glyphInfo = {0};
     leChar codePoint;
     int32_t stringY, lineX;
-    leRect stringRect, lineRect;
+    leRect stringRect = leRect_Zero;
+    leRect lineRect = leRect_Zero;  
     uint32_t startIdx, endIdx;
     leRasterFont* font;
     leBool rightToLeft = LE_FALSE;
@@ -187,10 +188,11 @@ leResult leStringRenderer_DrawString(leStringRenderRequest* req)
 static leResult drawUString(leUStringRenderRequest* req)
 {
     uint32_t charItr, lines, lineItr;
-    leFontGlyph glyphInfo;
+    leFontGlyph glyphInfo = {0};
     leChar codePoint = 0;
     int32_t stringY, lineX;
-    leRect stringRect, lineRect;
+    leRect stringRect = leRect_Zero;
+    leRect lineRect = leRect_Zero;
     uint32_t startIdx = 0;
     uint32_t endIdx = 0;
     leRasterFont* rasFnt;
@@ -277,10 +279,11 @@ static leResult drawCString(leCStringRenderRequest* req)
 {
     uint32_t charItr, lines, lineItr;
     uint32_t size;
-    leFontGlyph glyphInfo;
+    leFontGlyph glyphInfo = {0};
     leChar codePoint = 0;
     int32_t stringY, lineX;
-    leRect stringRect, lineRect;
+    leRect stringRect = leRect_Zero;
+    leRect lineRect = leRect_Zero;    
     uint32_t startIdx = 0;
     uint32_t endIdx = 0;
     leRasterFont* rasFnt = (leRasterFont*)req->font;

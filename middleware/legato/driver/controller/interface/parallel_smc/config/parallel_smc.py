@@ -22,6 +22,8 @@
 # THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 ##############################################################################
 
+import re
+
 global EBIChipSelectBaseAddress
 
 def instantiateComponent(comp):
@@ -77,7 +79,7 @@ def instantiateComponent(comp):
 	EBIChipSelectIndex.setDefaultValue(0)
 	EBIChipSelectIndex.setMin(0)
 	EBIChipSelectIndex.setMax(5)
-	EBIChipSelectIndex.setVisible(False)
+	#EBIChipSelectIndex.setVisible(False)
 
 	EBIChipSelectIsDynamic = comp.createBooleanSymbol("EBIChipSelectIsDynamic", InterfaceSettingsSMCMenu)
 	EBIChipSelectIsDynamic.setLabel("True if Chip select base address is not fixed in memory map")
@@ -98,7 +100,7 @@ def instantiateComponent(comp):
 	ChipSelectControl.setLabel("CS# Control")
 	ChipSelectControl.setDescription("Chip Select Control")
 	ChipSelectControl.setDefaultValue("GPIO")
-	ChipSelectControl.setReadOnly(True)
+	#ChipSelectControl.setReadOnly(True)
 
 	DataCommandSelectControl = comp.createComboSymbol("DataCommandSelectControl", ControlPinsMenu, ["GPIO", "Peripheral"])
 	DataCommandSelectControl.setLabel("D/C# Control")
@@ -124,9 +126,10 @@ def instantiateComponent(comp):
 	DCXAddressBit.setMax(31)
 	###
 	
-def configureSMCComponent(comp, smcComponent):
+def configureSMCComponent(comp, smcComponent, smcChipSelNum):
 	print("Configuring SMC")
-	smcChipSelNum = comp.getSymbolValue("EBIChipSelectIndex")
+	#smcChipSelNum = comp.getSymbolValue("EBIChipSelectIndex")
+	print("dependency Connected = " + str(smcChipSelNum))
 	smcComponent.setSymbolValue("SMC_CHIP_SELECT" + str(smcChipSelNum), True, 1)
 	smcComponent.setSymbolValue("SMC_MEM_SCRAMBLING_CS" + str(smcChipSelNum), False, 1)
 	# SMC Write Timings
@@ -188,7 +191,11 @@ def onAttachmentConnected(source, target):
 
 	#print(source["component"].getID() + ": " + dependencyID + " dependent component added ")
 	if source["id"] == "SMC_CS":
-		configureSMCComponent(source["component"], target["component"])
+		print("SMC_CS dependency connected to " + str(target["component"]))
+		if (source["id"] == "SMC_CS"):
+			sub = re.search('smc_cs(.*)', str(target["id"]))
+			if (sub and sub.group(1)):
+				configureSMCComponent(source["component"], target["component"], int(sub.group(1)))
 	elif source["id"] == "HEMC_CS":
 		selectedCS = int(target["id"].replace('hemc_cs', ''))
 		chipSelectBaseaddress = target["component"].getSymbolByID("CS_" + str(selectedCS) + "_START_ADDRESS").getValue()

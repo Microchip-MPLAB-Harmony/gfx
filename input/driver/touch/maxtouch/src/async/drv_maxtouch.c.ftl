@@ -83,6 +83,9 @@
 
 #define DRV_MAXTOUCH_NUM_QUEUE      2
 
+/* Wait Time Timeout */
+#define DRV_MAXTOUCH_WAIT_STATE_TIMEOUT_MS 150 /* msec */
+
 /* MXT_GEN_COMMAND_T6 field */
 #define MXT_COMMAND_RESET       0
 #define MXT_COMMAND_BACKUPNV	1
@@ -464,6 +467,11 @@ struct DEVICE_OBJECT
     /* Driver state */
     DEVICE_STATE deviceState;
     
+#ifdef DEBUG_ENABLE
+    /* Keep track of the previous state */
+    DEVICE_STATE previousDeviceState;
+#endif
+    
     API_EVENTS apiEvent;
     
     /* Config State*/
@@ -512,6 +520,12 @@ struct DEVICE_OBJECT
     uint16_t yRes;
     
     uint32_t readRequest;
+    
+    /* Timer to keep various configuration states from spinning indefinitely */
+    SYS_TIME_HANDLE resetTimer;
+    
+    /* Timer to keep wait state from spinning indefinitely */
+    SYS_TIME_HANDLE waitStateTimer;
     
     /* I2C Buffer handle */
     DRV_I2C_TRANSFER_HANDLE hInformationBlockRequest;
@@ -602,8 +616,6 @@ static uint8_t checksumMessage(uint8_t* msg);
 /* MAXTOUCH Driver instance object */
 struct DEVICE_OBJECT sMAXTOUCHDriverInstances[DRV_MAXTOUCH_INDEX_COUNT];
 
-static SYS_TIME_HANDLE resetTimer;
-
 static void _mxt_DelayMS(int ms)
 {
 	SYS_TIME_HANDLE timer = SYS_TIME_HANDLE_INVALID;
@@ -640,7 +652,7 @@ static void resetTimer_Callback ( uintptr_t context )
         default:
             break;
     }
-    SYS_TIME_TimerDestroy(resetTimer);
+    SYS_TIME_TimerDestroy(obj->resetTimer);
 }
 
 void DRV_MAXTOUCH_I2CEventHandler ( DRV_I2C_TRANSFER_EVENT  event,
@@ -1015,9 +1027,9 @@ void DRV_MAXTOUCH_ConfigParse ( SYS_MODULE_OBJ object, DRV_MAXTOUCH_Firmware * f
     firmware->mem = &pDrvObject->data.config_mem;
     firmware->mem_size = pDrvObject->data.config_mem_size;
     
-    SYS_TIME_TimerDestroy(resetTimer);
+    SYS_TIME_TimerDestroy(pDrvObject->resetTimer);
 
-    resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
+    pDrvObject->resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
                         (uintptr_t)pDrvObject,
                         MXT_RESET_INVALID_CHG,
                         SYS_TIME_SINGLE);
@@ -1039,9 +1051,9 @@ void DRV_MAXTOUCH_ConfigLoad ( SYS_MODULE_OBJ object, DRV_MAXTOUCH_Firmware * fi
     firmware->mem = &pDrvObject->data.config_mem;
     firmware->mem_size = pDrvObject->data.config_mem_size;
 
-    SYS_TIME_TimerDestroy(resetTimer);
+    SYS_TIME_TimerDestroy(pDrvObject->resetTimer);
 
-    resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
+    pDrvObject->resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
                         (uintptr_t)pDrvObject,
                         MXT_RESET_INVALID_CHG,
                         SYS_TIME_SINGLE);
@@ -1054,9 +1066,9 @@ void DRV_MAXTOUCH_ConfigSave (SYS_MODULE_OBJ object, DRV_MAXTOUCH_ConfigProgress
 {
     struct DEVICE_OBJECT* pDrvObject = (struct DEVICE_OBJECT *)object;
 
-    SYS_TIME_TimerDestroy(resetTimer);
+    SYS_TIME_TimerDestroy(pDrvObject->resetTimer);
 
-    resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
+    pDrvObject->resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
                         (uintptr_t)pDrvObject,
                         MXT_RESET_INVALID_CHG,
                         SYS_TIME_SINGLE);
@@ -1069,12 +1081,36 @@ void DRV_MAXTOUCH_ConfigSave (SYS_MODULE_OBJ object, DRV_MAXTOUCH_ConfigProgress
 //	mxt_init_t7_power_cfg(data);
 }
 
+static void waitStateTimeoutCallback(uintptr_t context);
+
+static void waitStateTimeoutCallback(uintptr_t context)
+{
+    struct DEVICE_OBJECT* pDrvObject = (struct DEVICE_OBJECT*)context;
+
+    if (pDrvObject->deviceState == DEVICE_STATE_WAIT)
+    {
+        /* Comm failure, reset to open state to reestablish comm */
+        pDrvObject->deviceState = DEVICE_STATE_OPEN;
+    }
+
+    SYS_TIME_TimerDestroy(pDrvObject->waitStateTimer);
+    pDrvObject->waitStateTimer = SYS_TIME_HANDLE_INVALID;
+}
+
 static void handleMessage(struct DEVICE_OBJECT* pDrvObject);
 
 void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
 {
     
     struct DEVICE_OBJECT* pDrvObject = (struct DEVICE_OBJECT *)object;
+
+    
+#ifdef DEBUG_ENABLE    
+    if (pDrvObject->deviceState != DEVICE_STATE_WAIT) 
+    {
+        pDrvObject->previousDeviceState = pDrvObject->deviceState;
+    }
+#endif
 
     if(object == SYS_MODULE_OBJ_INVALID)
         return;
@@ -1084,16 +1120,26 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
     {
         case DEVICE_STATE_WAIT:
         {
+            /* Make sure the wait state has a time-out */
+            pDrvObject->waitStateTimer = SYS_TIME_CallbackRegisterMS(
+            waitStateTimeoutCallback,
+            (uintptr_t)pDrvObject,
+            DRV_MAXTOUCH_WAIT_STATE_TIMEOUT_MS,
+            SYS_TIME_SINGLE);
+
             break;
         }
                 
         case DEVICE_STATE_OPEN:
         {
             DRV_MAXTOUCH_Open(0, DRV_IO_INTENT_EXCLUSIVE);
-                    
-            SYS_TIME_TimerDestroy(resetTimer);
 
-            resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
+            SYS_TIME_TimerDestroy(pDrvObject->resetTimer);
+
+            SYS_TIME_TimerDestroy(pDrvObject->waitStateTimer);
+            pDrvObject->waitStateTimer = SYS_TIME_HANDLE_INVALID;
+
+            pDrvObject->resetTimer = SYS_TIME_CallbackRegisterMS(resetTimer_Callback, 
                                 (uintptr_t)pDrvObject,
                                 MXT_RESET_INVALID_CHG,
                                 SYS_TIME_SINGLE);
@@ -1108,7 +1154,7 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
 #ifdef DEBUG_ENABLE           
             SYS_DEBUG_Print("MXT State Init\n");
 #endif           
-			
+
             /* set information block address read */
             buf[0] = 0;
             buf[1] = 0;
@@ -1446,10 +1492,6 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
         {
             _MessageObjectRead(pDrvObject);
             pDrvObject->deviceState = DEVICE_STATE_WAIT;
-
-//            pDrvObject->deviceState = DEVICE_STATE_HANDLE_MESSAGE_OBJECT;
-//            pDrvObject->deviceState = DEVICE_STATE_WAIT;
-            
             break;
         }
                         

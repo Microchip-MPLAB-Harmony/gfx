@@ -109,7 +109,7 @@ The bare-metal graphics library for Microchip Graphics Suite. Supports Microchip
 ***
 **LVGL** - demonstrations interfacing with LVGL are available for the [SAM E5x/D5x/E5x Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM 9x60 Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM 9x7 Family](https://github.com/mchpgfx/mgsh_lvgl), the [SAM D5x/E5x Family](https://github.com/mchpgfx/mgsh_lvgl), the [PIC32MZ EF Family](https://github.com/mchpgfx/mgsh_lvgl), and the [PIC32MZ DA Family](https://github.com/mchpgfx/mgsh_lvgl).
 
-**Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [SAM A5D2 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_sam_a5d2), the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), and the [SAM 9x7 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x7)
+**Tara Embedded Wizard** - demonstrations interfacing with Tara Embedded Wizard are available for the [PIC32MZ DA Family](https://www.embedded-wizard.de/platforms/microchip/pic32mz-da), the[SAM A5 Family](https://www.embedded-wizard.de/platforms/microchip/sama5), the [SAM 9x60 Family](https://github.com/Microchip-MPLAB-Harmony/gfx_apps_sam_9x60), and the [SAM 9x7 Family](https://www.embedded-wizard.de/platforms/microchip/sam9x75)
 
 ***
 ## Image Sensor Support

@@ -8,6 +8,50 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.16.2
+
+### Issues Fixed
+
+* Fixed XLCDC ARGB8888 support
+* Fixed function `leStringUtils_ToCStr`, setting `strSize` to `0` will cause the function to do nothing and return `LE_ERROR`. When `strSize == 0`, output a single null-terminator and return success
+* Dead comms with maXTouch: Added watch dog recover timer 
+* MISRA Mandatory errors
+* Composer: Fixed load design issue if path has spaces
+* Composer: Update MacOS build
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.2.5 (Windows)
+* MGS Harmony Composer v3.2.0 (Linux)
+* MGS Harmony Composer v3.1.0 (MacOS)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** As of v3.16.2, MGS Harmony Composer UI/UX has been modernized for Windows, Linux and MacOS
+
+  **NOTE 2:** MGS Harmony Composer users on Windows may have missing DLLs on launch: VCRUNTIME140.dll, VCRUNTIME140_1.dll and MSCVP140.dll
+  
+### MGS Simulator
+
+* MGS Simulator v1.1.0
+
+* For information on how to download and install the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+
+### Development Tools
+
+- [MPLAB® X IDE v6.25](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.60](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.6
+
+### Dependent Components
+
+* [Core v3.15.4 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.15.4)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+
+
 ## Graphics Release v3.16.1
 
 ### Issues Fixed

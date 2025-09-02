@@ -33,5 +33,10 @@ def loadModule():
 		component.setDisplayType("Parallel Display Interface via SMC")
 		component.addCapability("le_gfx_intf_parallel_smc", "Parallel Display Interface", False)
 		component.addDependency("SMC_CS", "SMC_CS", False, True)
+	elif ("PIC32" in str(Variables.get("__PROCESSOR")) and "70" in str(Variables.get("__PROCESSOR"))):
+		component = Module.CreateComponent("le_gfx_intf_parallel_smc", "LE Parallel (SMC)", "/Graphics/Interface", "config/parallel_smc.py")
+		component.setDisplayType("Parallel Display Interface via SMC")
+		component.addCapability("le_gfx_intf_parallel_smc", "Parallel Display Interface", False)
+		component.addDependency("SMC_CS", "SMC_CS", False, True)
 	else:
 		print("LE Parallel (SMC) module not loaded.  No support for " + str(Variables.get("__PROCESSOR")))

@@ -182,7 +182,8 @@ static void onStringStreamFinished(leStreamManager* strm)
 
 static void drawString(leLabelWidget* lbl)
 {
-    leRect boundingRect, kerningRect;
+    leRect boundingRect = leRect_Zero;
+    leRect kerningRect = leRect_Zero;
     leStringRenderRequest req;
 
     _leLabelWidget_GetTextRects(lbl, &boundingRect, &kerningRect);
