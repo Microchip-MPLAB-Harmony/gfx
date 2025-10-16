@@ -8,6 +8,54 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.16.3
+
+### Issues Fixed
+
+* maXTouch: Add API to check driver status
+* maXTouch: Wait State Lock-up
+* maXTouch: Added support with NVD TM5664 round display 
+* legato: maxScratchPixels calculation for Mono color mode is incorrect
+* legato: Add byte-alignment padding for monochrome color mode
+* legato: Changing LE_MONOCHROME_ON does not invert the monochrome colors
+* Update "drv_gfx_disp_intf_parallel_portgroup_dma.c" for PIC32-BZ6
+* Address MISRA-C mandatory violations with parallel 8080
+* Fix `leColorSwap` inconsistent code
+* Fix SAMA7D65 LVDS driver build fail with DFP1.8.85
+* XLCDC driver: RGBA8888 mode for multi-layer is broken in v3.16.2
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.2.6 (Windows)
+* MGS Harmony Composer v3.2.6 (Linux)
+* MGS Harmony Composer v3.1.0 (MacOS)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** As of v3.16.2, MGS Harmony Composer UI/UX has been modernized for Windows, Linux and MacOS
+
+  **NOTE 2:** MGS Harmony Composer users on Windows may have missing DLLs on launch: VCRUNTIME140.dll, VCRUNTIME140_1.dll and MSCVP140.dll
+  
+### MGS Simulator
+
+* MGS Simulator v1.1.0
+
+* For information on how to download and install the Simulator as a productivity tools to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+
+### Development Tools
+
+- [MPLAB® X IDE v6.25](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.60](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.6
+
+### Dependent Components
+
+* [Core v3.15.5 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.15.5)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+
 ## Graphics Release v3.16.2
 
 ### Issues Fixed

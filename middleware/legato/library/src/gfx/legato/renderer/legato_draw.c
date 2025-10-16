@@ -184,7 +184,7 @@ static leResult _MonoPutPixel(int32_t x,
     lePixelBufferSet_Unsafe(leGetRenderBuffer(),
                             x,
                             y,
-                            clr > 0 ? 1 : 0);
+                            clr > 0 ? LE_MONOCHROME_ON : !LE_MONOCHROME_ON);
 
     return LE_SUCCESS;
 }
@@ -348,7 +348,7 @@ static leResult _MonoFill(int32_t x,
                                  pnt.y,
                                  width,
                                  height,
-                                 clr > 0 ? 1 : 0);
+                                 clr > 0 ? LE_MONOCHROME_ON : !LE_MONOCHROME_ON);
 
     return LE_SUCCESS;
 }

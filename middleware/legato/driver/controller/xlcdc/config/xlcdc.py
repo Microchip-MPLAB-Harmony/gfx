@@ -511,8 +511,8 @@ def instantiateComponent(component):
     lm_col_mode.setDisplayMode("Description")
     lm_col_mode.setDescription("XLCDC Layer Default Color Mode for All Layers.")
     lm_col_mode.addKey("0", "3", "RGB_565")
-    lm_col_mode.addKey("1", "12", "ARGB_8888")
-    lm_col_mode.addKey("2", "13", "RGBA_8888")
+    lm_col_mode.addKey("1", "13", "RGBA_8888")
+    lm_col_mode.addKey("2", "12", "ARGB_8888")
     lm_col_mode.setDefaultValue(1)
 
     # Driver Options

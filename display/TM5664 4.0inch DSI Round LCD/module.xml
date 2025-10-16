@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_display_mod_tm5664_dsi" id="EA3F07FE-E0A1-43D3-8F39-F8883DF722D5" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

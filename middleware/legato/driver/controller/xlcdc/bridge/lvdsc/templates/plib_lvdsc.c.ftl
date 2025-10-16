@@ -68,7 +68,7 @@ void LVDSC_Initialize(void)
 
     /* Configuration */
     LVDSC_REGS->LVDSC_CFGR = LVDSC_CFGR_LCDC_PIXSIZE(${LVDSCDPIInput}) |
-            LVDSC_CFGR_LCDC_DEN_POL(${LVDSCDENPol}) |
+<#--            LVDSC_CFGR_LCDC_DEN_POL(${LVDSCDENPol}) | //MGS-322 - Hide this -->
 <#if LVDSCDCMode == "LVDSC_CFGR_DC_BAL_UNBALANCED_Val">
             LVDSC_CFGR_MAPPING(${LVDSCDCMapping}) |
 </#if>

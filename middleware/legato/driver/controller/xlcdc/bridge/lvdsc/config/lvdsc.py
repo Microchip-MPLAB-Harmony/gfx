@@ -58,7 +58,7 @@ def instantiateComponent(component):
     den_polarity.setOutputMode("Value")
     den_polarity.setDisplayMode("Description")
     den_polarity.setDefaultValue(1)
-    den_polarity.setVisible(True)
+    den_polarity.setVisible(False)  # MGS-322 - Hide this
 
     # DC Output Mode
     dc_mode = component.createKeyValueSetSymbol("LVDSCDCMode", config_menu)

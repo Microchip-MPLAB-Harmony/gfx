@@ -71,6 +71,11 @@ static leResult _draw(const leImage* img,
     uint32_t width = 0;
     uint32_t height = 0;
 
+    uint32_t rSwap = 0;
+    uint32_t gSwap = 0;
+    uint32_t bSwap = 0;
+    uint32_t aSwap = 0;
+
     imgRect.x = 0;
     imgRect.y = 0;
     imgRect.width = img->buffer.size.width;
@@ -152,7 +157,11 @@ static leResult _draw(const leImage* img,
         for(itr = 0; itr < decodedImage.buffer.pixel_count; ++itr)
         {
             clr = ((uint32_t*) decodedImage.buffer.pixels)[itr];
-            clr = leColorSwap(clr, decodedImage.buffer.mode);
+            rSwap = (clr >> 24) & 0xFF;
+            gSwap = (clr >> 16) & 0xFF;
+            bSwap = (clr >> 8)  & 0xFF;
+            aSwap = (clr >> 0)  & 0xFF;
+            clr = (aSwap << 24) | (bSwap << 16) | (gSwap << 8) | (rSwap << 0);
             ((uint32_t*) decodedImage.buffer.pixels)[itr] = clr;
         }
     }

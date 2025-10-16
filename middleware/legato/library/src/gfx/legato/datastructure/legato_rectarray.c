@@ -562,7 +562,7 @@ leResult leRectArray_CropToSizeY(leRectArray* arr,
 }
 
 leResult leRectArray_CropToSizeX(leRectArray* arr,
-                                 uint32_t size)
+                                uint32_t size)
 {
     uint32_t rectItr;
     leRect split;
@@ -596,6 +596,34 @@ leResult leRectArray_CropToSizeX(leRectArray* arr,
 
             leRectArray_PushBack(arr, &split);
         }
+    }
+
+    return LE_SUCCESS;
+}
+
+leResult leRectArray_PadXToSize(leRectArray* arr,
+                                uint32_t size)
+{
+    uint32_t rectItr;
+
+    #define FLOOR_DIV(x, y) ((x) / (y))
+    #define CEIL_DIV(x, y) (((x) + (y) - 1) / (y))
+
+    /* minimal sane magic number size limit */
+    if(size < 8)
+        return LE_FAILURE;
+
+    for(rectItr = 0; rectItr < arr->size; rectItr++)
+    {
+        // Align right edge up to nearest multiple of size
+        int16_t x_end = arr->rects[rectItr].x + arr->rects[rectItr].width;
+        int16_t x_end_aligned = size * CEIL_DIV(x_end, size);
+
+        // Align x-position down to nearest multiple of size
+        arr->rects[rectItr].x = size * FLOOR_DIV(arr->rects[rectItr].x, size);
+
+        arr->rects[rectItr].width = x_end_aligned - arr->rects[rectItr].x;
+
     }
 
     return LE_SUCCESS;

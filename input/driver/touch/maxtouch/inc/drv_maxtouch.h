@@ -372,6 +372,44 @@ void DRV_MAXTOUCH_Reinitialize(SYS_MODULE_OBJ object);
 
 SYS_STATUS DRV_MAXTOUCH_Status(SYS_MODULE_OBJ object);
 
+/**************************************************************************
+  Function:
+    bool DRV_MAXTOUCH_IsReady(SYS_MODULE_OBJ object)
+
+  Summary:
+    Returns true of the maXTouch device is ready
+	<p><b>Implementation:</b> Dynamic</p>
+
+  Description:
+    This function returns true if the maXTouch device has been configured and ready
+
+  Precondition:
+    The DRV_MAXTOUCH_Initialize function must have been called before 
+    calling this function.
+
+  Parameters:
+    object -  Driver object handle, returned from DRV_MAXTOUCH_Initialize
+
+  Returns:
+    true - indicates that the maxTouch module has been successfully configured and is ready
+
+  Example:
+    <code>
+    SYS_MODULE_OBJ      object;  // Returned from DRV_MAXTOUCH_Initialize
+    bool          ready;
+
+    ready = DRV_MAXTOUCH_IsReady( object );
+    if( true != ready)
+    {
+        // Handle error
+    }
+    </code>
+
+  Remarks:
+    None
+*/
+bool DRV_MAXTOUCH_IsReady(SYS_MODULE_OBJ object);
+
 void DRV_MAXTOUCH_SoftReset ( SYS_MODULE_OBJ object );
 
 // *****************************************************************************

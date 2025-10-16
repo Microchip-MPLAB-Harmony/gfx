@@ -42,9 +42,14 @@
 
 #include "gfx/interface/drv_gfx_disp_intf.h"
 
+<#if __PROCESSOR == "WBZ653" || __PROCESSOR == "PIC32WM_BZ6204">
+#define GFX_DISP_INTF_PORT  GPIO_PORT_B
+#define DATABUS_PTR ((uint32_t)(&(GPIOB_REGS->GPIO_PORT)))
+<#else>
 #define GFX_DISP_INTF_PORT  (PORT_GROUP_${PortGroup})
-#define GFX_INTF_DMA_CHANNEL ${DMAChannel}
 #define DATABUS_PTR (&(PORT_REGS->GROUP[${PortGroup}].PORT_OUT))
+</#if>
+#define GFX_INTF_DMA_CHANNEL ${DMAChannel}
 
 #ifdef GFX_DISP_INTF_PIN_RSDC_Set
 #define GFX_DISP_RSDC_Control(intf, value) GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, value)
@@ -68,7 +73,11 @@ typedef enum
 typedef struct
 {
     /* port to use */
+<#if __PROCESSOR == "WBZ653" || __PROCESSOR == "PIC32WM_BZ6204">
+    GPIO_PORT port;
+<#else>
     PORT_GROUP port;
+</#if>
 
     /* interface lock */
     int locked;

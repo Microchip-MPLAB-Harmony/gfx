@@ -392,6 +392,8 @@ static void addRectToFrameList(leRect* rect)
     leRectArray_PushBack(&_rendererState.currentRenderLayer->frameRectList, rect);
 }
 
+
+
 leResult leRenderer_DamageArea(const leRect* rect,
                                uint32_t layerIdx)
 {
@@ -464,7 +466,7 @@ static void preLayer(void)
     leRectArray_Clear(&_rendererState.currentRenderLayer->scratchRectList);
     leRectArray_Clear(&_rendererState.currentRenderLayer->frameRectList);
 
-    maxScratchPixels = SCRATCH_BUFFER_SZ / leColorInfoTable[leGetLayerColorMode(_rendererState.layerIdx)].size;
+    maxScratchPixels = (SCRATCH_BUFFER_SZ * 8) / leColorInfoTable[leGetLayerColorMode(_rendererState.layerIdx)].bpp;
 
     // merge rectangle lists
     if(_rendererState.bufferCount > 1)
@@ -509,22 +511,24 @@ static void preLayer(void)
         // sort frame rects by Y
         leRectArray_CropToSizeY(&_rendererState.currentRenderLayer->scratchRectList, maxScratchPixels);
     }
-
+    
 #if LE_SCRATCH_BUFFER_PADDING == 1
-    padSize = 4;
-
-    if(leGetLayerColorMode(_rendererState.layerIdx) == LE_COLOR_MODE_RGB_565)
+    if(leGetLayerColorMode(_rendererState.layerIdx) == LE_COLOR_MODE_MONOCHROME)
     {
-        padSize = 8;
+        leRectArray_PadXToSize(&_rendererState.currentRenderLayer->scratchRectList, 8);
     }
+    else
+    {
+        padSize = (leGetLayerColorMode(_rendererState.layerIdx) == LE_COLOR_MODE_RGB_565) ? 8 : 4;
 
 #if LE_RENDER_ORIENTATION == 90 || LE_RENDER_ORIENTATION == 270
-    leRectArray_PadRectangleHeight(&_rendererState.currentRenderLayer->scratchRectList,
-                                   padSize);
+        leRectArray_PadRectangleHeight(&_rendererState.currentRenderLayer->scratchRectList,
+                                       padSize);
 #else
-    leRectArray_PadRectangleWidth(&_rendererState.currentRenderLayer->scratchRectList,
-                                  padSize);
+        leRectArray_PadRectangleWidth(&_rendererState.currentRenderLayer->scratchRectList,
+                                      padSize);
 #endif
+    }
 #endif
 
     while(_rendererState.currentRenderLayer->scratchRectList.size != 0)

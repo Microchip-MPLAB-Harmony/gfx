@@ -69,44 +69,29 @@ uint32_t leColorChannelAlpha(leColor clr, leColorMode mode)
 leColor leColorSwap(leColor clr,
                     leColorMode mode)
 {
-    uint32_t r, g, b, a;
+    uint32_t r, b;
 
-    switch(mode)
+    switch (mode)
     {
         case LE_COLOR_MODE_RGB_565:
-        {
-            r = leColorChannelRed(clr, LE_COLOR_MODE_RGB_565);
-            g = leColorChannelGreen(clr, LE_COLOR_MODE_RGB_565);
-            b = leColorChannelBlue(clr, LE_COLOR_MODE_RGB_565);
-
-            return r | (g << 5) | (b << 11);
-        }
         case LE_COLOR_MODE_RGBA_5551:
-        {
-            r = leColorChannelRed(clr, LE_COLOR_MODE_RGBA_5551);
-            g = leColorChannelGreen(clr, LE_COLOR_MODE_RGBA_5551);
-            b = leColorChannelBlue(clr, LE_COLOR_MODE_RGBA_5551);
-            a = leColorChannelAlpha(clr, LE_COLOR_MODE_RGBA_5551);
-
-            return r | (g << 6) | (b << 11) | (a << 15);
-        }
         case LE_COLOR_MODE_RGB_888:
-        {
-            r = (clr & 0xFF0000) >> 16;
-            g = (clr & 0xFF00) >> 8;
-            b = (clr & 0xFF) >> 0;
-
-            return r | (g << 8) | (b << 16);
-        }
         case LE_COLOR_MODE_RGBA_8888:
         case LE_COLOR_MODE_ARGB_8888:
         {
-            r = (clr & 0xFF000000) >> 24;
-            g = (clr & 0xFF0000) >> 16;
-            b = (clr & 0xFF00) >> 8;
-            a = (clr & 0xFF) >> 0;
+            // Store the red and blue values of the color
+            r = leColorChannelRed(clr, mode);
+            b = leColorChannelBlue(clr, mode);
 
-            return r | (g << 8) | (b << 16) | (a << 24);
+            // Zero out the red and blue bits within the color
+            clr &= ~(leColorInfoTable[mode].mask.red);
+            clr &= ~(leColorInfoTable[mode].mask.blue);
+
+            // Add the stored red and blue colors back in swapped positions
+            clr += r << leColorInfoTable[mode].shift.blue;
+            clr += b << leColorInfoTable[mode].shift.red;
+
+            return clr;
         }
         default:
         {

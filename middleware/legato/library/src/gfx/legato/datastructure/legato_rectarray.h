@@ -446,6 +446,23 @@ leResult leRectArray_CropToSizeY(leRectArray* arr, uint32_t size);
  */
 leResult leRectArray_CropToSizeX(leRectArray* arr, uint32_t size);
 
+// *****************************************************************************
+/**
+ * @brief Pads the rectangle x-pos and widt to size
+ * @details Pads <span class="param">arr</span> to
+ * given <span class="param">size</span>
+ * @code
+ * leRectArray* arr;
+ * uint32_t size;
+ * leResult res = leRectArray_PadRectangleToX(arr, size);
+ * @endcode
+ * @param arr the array to modify.
+ * @param size the number of pixels pad to.
+ * @returns LE_SUCCESS , otherwise LE_FAILURE.
+ */
+leResult leRectArray_PadXToSize(leRectArray* arr,
+                                uint32_t size);
+
 #ifdef __cplusplus
 }
 #endif

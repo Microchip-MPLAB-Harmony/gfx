@@ -902,6 +902,13 @@ SYS_STATUS DRV_MAXTOUCH_Status(SYS_MODULE_OBJ object)
     return pDrvInstance->status;
 }
 
+bool DRV_MAXTOUCH_IsReady(SYS_MODULE_OBJ object)
+{
+    struct DEVICE_OBJECT* pDrvInstance = (struct DEVICE_OBJECT *)object;
+
+    return (pDrvInstance->deviceState == DEVICE_STATE_READY);
+}
+
 DRV_HANDLE DRV_MAXTOUCH_Open(const SYS_MODULE_INDEX index,
                             const DRV_IO_INTENT intent)
 { 
@@ -1089,8 +1096,8 @@ static void waitStateTimeoutCallback(uintptr_t context)
 
     if (pDrvObject->deviceState == DEVICE_STATE_WAIT)
     {
-        /* Comm failure, reset to open state to reestablish comm */
-        pDrvObject->deviceState = DEVICE_STATE_OPEN;
+        /* Likely comm failure, raise ERROR state */
+        pDrvObject->deviceState = DEVICE_STATE_ERROR;
     }
 
     SYS_TIME_TimerDestroy(pDrvObject->waitStateTimer);
@@ -1121,12 +1128,16 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
         case DEVICE_STATE_WAIT:
         {
             /* Make sure the wait state has a time-out */
-            pDrvObject->waitStateTimer = SYS_TIME_CallbackRegisterMS(
-            waitStateTimeoutCallback,
-            (uintptr_t)pDrvObject,
-            DRV_MAXTOUCH_WAIT_STATE_TIMEOUT_MS,
-            SYS_TIME_SINGLE);
+            if (pDrvObject->waitStateTimer == SYS_TIME_HANDLE_INVALID)
+            {
+                SYS_TIME_TimerDestroy(pDrvObject->waitStateTimer);
 
+                pDrvObject->waitStateTimer = SYS_TIME_CallbackRegisterMS(
+                waitStateTimeoutCallback,
+                (uintptr_t)pDrvObject,
+                DRV_MAXTOUCH_WAIT_STATE_TIMEOUT_MS,
+                SYS_TIME_SINGLE);
+            }
             break;
         }
                 
@@ -1718,7 +1729,8 @@ void DRV_MAXTOUCH_Tasks ( SYS_MODULE_OBJ object )
         
         case DEVICE_STATE_ERROR: /* In error state */
         {
-            pDrvObject->status = SYS_STATUS_ERROR;
+            /* Attempt driver recovery */
+            pDrvObject->status = DEVICE_STATE_OPEN;
             break;
         }
         
