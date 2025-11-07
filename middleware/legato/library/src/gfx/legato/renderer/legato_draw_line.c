@@ -59,9 +59,9 @@ leResult leRenderer_HorzLine(int32_t x,
         return LE_SUCCESS;
     }
     else if(leGPU_DrawLine(drawRect.x,
-                           drawRect.x,
-                           w,
-                           1,
+                           drawRect.y,
+                           drawRect.x + drawRect.width - 1,
+                           drawRect.y,
                            &clipRect,
                            clr,
                            a) == LE_SUCCESS)
@@ -112,8 +112,8 @@ leResult leRenderer_VertLine(int32_t x,
     }
     else if(leGPU_DrawLine(drawRect.x,
                            drawRect.y,
-                           1,
-                           h,
+                           drawRect.x,
+                           drawRect.y + drawRect.height - 1,
                            &clipRect,
                            clr,
                            a) == LE_SUCCESS)

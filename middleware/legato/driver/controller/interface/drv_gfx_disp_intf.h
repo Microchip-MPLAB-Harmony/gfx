@@ -86,10 +86,13 @@ typedef enum
  */
 typedef enum
 {
-    GFX_DISP_INTF_PIN_CS,        //Chip Select
-    GFX_DISP_INTF_PIN_WR,        //Write Strobe
-    GFX_DISP_INTF_PIN_RD,        //Read Strobe
-    GFX_DISP_INTF_PIN_RSDC,      //Register Select or Data/Command
+    GFX_DISP_INTF_PIN_CS = 0, //Chip Select 0
+    GFX_DISP_INTF_PIN_CS1,    //Chip Select 1
+    GFX_DISP_INTF_PIN_CS2,    //Chip Select 2           
+    GFX_DISP_INTF_PIN_CS3,    //Chip Select 3
+    GFX_DISP_INTF_PIN_WR,     //Write Strobe
+    GFX_DISP_INTF_PIN_RD,     //Read Strobe
+    GFX_DISP_INTF_PIN_RSDC,   //Register Select or Data/Command
 } GFX_DISP_INTF_PIN;
 
 /** GFX_DISP_INTF_PIN_VALUE

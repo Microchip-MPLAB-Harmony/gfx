@@ -50,6 +50,7 @@
 <#assign Val_VertPulseWidth = gfx_hal_le.DisplayVertPulseWidth>
 <#assign Val_VSYNCNegative = !gfx_hal_le.DisplayVSYNCNegative>
 <#assign Val_HSYNCNegative = !gfx_hal_le.DisplayHSYNCNegative>
+<#assign Val_BacklightEnable = gfx_hal_le.DisplayBacklightEnable>
 <#else>
 
 <#assign Val_Width = DisplayWidth>
@@ -62,6 +63,7 @@
 <#assign Val_VertPulseWidth = DisplayVertPulseWidth>
 <#assign Val_VSYNCNegative = !DisplayVSYNCNegative>
 <#assign Val_HSYNCNegative = !DisplayHSYNCNegative>
+<#assign Val_BacklightEnable = DisplayBacklightEnable>
 </#if>
 
 #include "gfx/driver/controller/lcc/drv_gfx_lcc.h"

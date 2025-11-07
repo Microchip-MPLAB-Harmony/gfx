@@ -632,7 +632,7 @@ SYS_STATUS DRV_MAXTOUCH_Status(SYS_MODULE_OBJ object)
 
 bool DRV_MAXTOUCH_IsReady(SYS_MODULE_OBJ object)
 {
-    struct DEVICE_OBJECT* pDrvInstance = (struct DEVICE_OBJECT *)object;
+    struct mxt_data* pDrvInstance = (struct mxt_data *)object;
 
     return (pDrvInstance->deviceState == DEVICE_STATE_READY);
 }

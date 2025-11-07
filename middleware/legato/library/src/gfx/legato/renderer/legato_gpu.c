@@ -64,15 +64,15 @@ leResult leGPU_DrawLine(int32_t x0,
     buf.pixels = (gfxBuffer)leBuf->pixels;
     buf.orientation = GFX_ORIENT_0;
 
-    leRenderer_GetClipRect(&frameRect);
+    leRenderer_GetFrameRect(&frameRect);
 
-    p0.x = frameRect.x - x0;
-    p0.y = frameRect.y - y0;
-    p1.x = frameRect.x - x1;
-    p1.y = frameRect.y - y1;
+    p0.x = x0 - frameRect.x;
+    p0.y = y0 - frameRect.y;
+    p1.x = x1 - frameRect.x;
+    p1.y = y1 - frameRect.y;
 
-    clipRect.x = frameRect.x - clip->x;
-    clipRect.y = frameRect.y - clip->y;
+    clipRect.x = clip->x - frameRect.x;
+    clipRect.y = clip->y - frameRect.y;
     clipRect.width = clip->width;
     clipRect.height = clip->height;
 

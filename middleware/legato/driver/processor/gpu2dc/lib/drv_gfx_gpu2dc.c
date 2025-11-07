@@ -45,13 +45,13 @@ static gfxBlend blendState = GFX_BLEND_NONE;
 
 static n2d_buffer_format_t n2dFormats[GFX_COLOR_MODE_LAST + 1] =
 {
-    N2D_A8              // GFX_COLOR_MODE_GS_8
+    N2D_A8,             // GFX_COLOR_MODE_GS_8
     -1,                 // GFX_COLOR_MODE_RGB_332
     N2D_RGB565,         // GFX_COLOR_MODE_RGB_565
     N2D_R5G5B5A1,       // GFX_COLOR_MODE_RGBA_5551
     N2D_RGB888,         // GFX_COLOR_MODE_RGB_888
-    N2D_ARGB8888,       // GFX_COLOR_MODE_RGBA_8888
-    N2D_RGBA8888,       // GFX_COLOR_MODE_ARGB_8888
+    N2D_RGBA8888,       // GFX_COLOR_MODE_RGBA_8888
+    N2D_ARGB8888,       // GFX_COLOR_MODE_ARGB_8888
     N2D_INDEX1,         // GFX_COLOR_MODE_INDEX_1
     -1,                 // GFX_COLOR_MODE_INDEX_4
     N2D_INDEX8,         // GFX_COLOR_MODE_INDEX_8
@@ -67,8 +67,28 @@ gfxResult DRV_GPU2DC_Line(gfxPixelBuffer* dest, const gfxPoint* p1, const gfxPoi
     n2d_point_t np1 = {p1->x, p1->y};
     n2d_point_t np2 = {p2->x, p2->y};
 
-    if (np1.x == np2.x) np2.y += (np1.y < np2.y) ? 1 : -1;
-    else if (np1.y == np2.y) np2.x += (np1.x < np2.x) ? 1 : -1;
+    /* Extend vertical/horizontal lines by 1 pixel so the GPU rasterizer
+       sees non-zero extent.  Always grow the larger coordinate to avoid
+       producing negative values that fail the hardware bounds check. */
+    if (np1.x == np2.x) {
+        if (np1.y <= np2.y) np2.y += 1;
+        else                np1.y += 1;
+    } else if (np1.y == np2.y) {
+        if (np1.x <= np2.x) np2.x += 1;
+        else                np1.x += 1;
+    }
+
+    /* Clamp endpoints to buffer bounds.  The clip rect will constrain
+       the visible output so this does not change the rendered result
+       for horizontal/vertical lines. */
+    if (np1.x < 0) np1.x = 0;
+    if (np1.y < 0) np1.y = 0;
+    if (np2.x < 0) np2.x = 0;
+    if (np2.y < 0) np2.y = 0;
+    if (np1.x > dest->size.width)  np1.x = dest->size.width;
+    if (np1.y > dest->size.height) np1.y = dest->size.height;
+    if (np2.x > dest->size.width)  np2.x = dest->size.width;
+    if (np2.y > dest->size.height) np2.y = dest->size.height;
 
     buffer.width = dest->size.width;
     buffer.height = dest->size.height;
@@ -255,6 +275,7 @@ const gfxGraphicsProcessor gfxGPUInterface =
 {
     DRV_GPU2DC_Line,
     DRV_GPU2DC_Fill,
+    DRV_GPU2DC_Blit,
     DRV_GPU2DC_Blit,
     DRV_GPU2DC_SetBlend,
     DRV_GPU2DC_SetGlobalAlpha,

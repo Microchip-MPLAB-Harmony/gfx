@@ -1241,6 +1241,11 @@ typedef struct gfxGraphicsProcessor
                             const gfxPixelBuffer* dest,
                             const gfxRect* destRect);
 
+    gfxResult (*blitStretchBuffer)(const gfxPixelBuffer* source,
+                                   const gfxRect* srcRect,
+                                   const gfxPixelBuffer* dest,
+                                   const gfxRect* destRect);
+
     gfxResult (*setBlend)(const gfxBlend blend);
 
     gfxResult (*setGlobalAlpha)(

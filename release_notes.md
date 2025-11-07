@@ -8,6 +8,82 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.17.0
+
+### New Features
+
+* Composer: Improve default save location when saving designs
+* Composer: Increase memory pool sizes for MPUs
+* XLCDC driver: Add PCLK configuration to XLCDC driver for parallel RGB mode
+* legato: Add multi-display support
+* Composer: Remember most recent path for Open Project
+* Composer: Support relative path regeneration directory
+* Composer: Add warning when opening Composer design named differently than MPLAB project
+* Composer: Make Splash Screen Window draggable
+
+### Issues Fixed
+
+* LCDC: BASE_ISR OVR bit issue in SAM9X60 Bare-Metal implementation
+* Composer: Fixed issue where MacOS build wouldn't show open/save dialogs
+* LCC fails to regenerate on VS Code (PIC32CZ CA70)
+* MCC: `.legato_generate_cache.zip` file gets indefinitely locked in VSCode MCC extension
+* legato: _dataBuffers does not account for actual buffer count
+* Composer: Unable to generate MGS Composer design on Linux with VS Code extensions
+* Fix SSD1309 Write Frame for PIC32CM Lxx oled demo
+* legato: leGPU_BlitStretchBuffer doesn't work on MPUs
+* maXTouch: 10" LVDS display is flickering
+* legato: Fix keyboard widget header
+* legato: Image corruption when using SQI
+* legato: Double-buffering on SAM9x75 shows some tearing
+* legato: slider widget step function doesn't allow negative step value
+* Composer: UndoRedo doesn't work on duplicated screen
+* Composer: Locked widgets shouldn't be movable by mouse
+* Composer: Ctrl+MouseRelease does not reparent widget
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.3.5 (Windows)
+* MGS Harmony Composer v3.3.5 (Linux)
+* MGS Harmony Composer v3.3.5 (MacOS)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** MGS Harmony Composer users on **Windows** may have missing DLLs on launch: `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`, and `MSCVP140.dll`.
+  * Download the latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version) to fix this issue.
+
+  **NOTE 2:** MGS Harmony Composer users on **MacOS** may encounter the error: *"Composer.app is damaged and can’t be opened. You should move it to the Trash."*
+  * This is due to MGS Harmony Composer not being officially signed for MacOS. To fix this issue, run the following terminal commands in the same directory as `Composer.app`:
+    * `codesign --force --deep --sign - Composer.app`
+    * `xattr -d com.apple.quarantine Composer.app`
+
+### MGS Simulator
+
+* For information on how to download and install the Simulator as a productivity tool to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+### Development Tools
+- [MPLAB® X IDE v6.30](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v5.00](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.6.4
+
+### Dependent Components
+
+* [Core v3.16.1 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.16.1)
+* [Touch v3.14.0 ](https://github.com/Microchip-MPLAB-Harmony/touch/releases/tag/v3.14.0)
+
+### Visual Studio Code
+- Graphics Release v3.17.0 has been tested on Visual Studio Code v1.110.0
+- If you do not already have VSCode installed, you can download VSCode v1.110.0 here:
+    - [Windows x64 User installer](https://update.code.visualstudio.com/1.110.0/win32-x64-user/stable)
+    - [Linux x64](https://update.code.visualstudio.com/1.110.0/linux-x64/stable)
+    - [macOS Apple silicon](https://update.code.visualstudio.com/1.110.0/darwin-arm64/stable)
+- To install the latest version of VSCode, visit the [Visual Studio Code](https://code.visualstudio.com/) website.
+    - **NOTE** Harmony Graphics v3.17.0 has been tested on VSCode v1.110.0. If you run into issues with later versions of VSCode, try installing VSCode v1.110.0.
+- Use [Visual Studio Code FAQ: VS Code Versions](https://code.visualstudio.com/docs/supporting/FAQ#_vs-code-versions) for more information about:
+    - How to disable automatic updates in VSCode
+    - Installing other versions of VSCode
+    - Installing VSCode on other operating systems
+
 ## Graphics Release v3.16.3
 
 ### Issues Fixed

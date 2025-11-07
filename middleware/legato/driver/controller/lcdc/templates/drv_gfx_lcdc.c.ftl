@@ -546,46 +546,64 @@ gfxResult DRV_LCDC_Initialize()
     //1. Configure the LCD timing parameters
     LCDC_WaitForSyncInProgress();
     LCDC_SetPWMClockSourceSelection(LCDC_PWM_CLOCK_SOURCE);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetClockDivider(PIXEL_CLOCK_DIV);
 <#if PixelClockPol == "Negative">
+    LCDC_WaitForSyncInProgress();
     LCDC_SetPixelClockPolarity(LCDC_POLARITY_NEGATIVE);
 </#if>
 
     //Disable all layers for now
+    LCDC_WaitForSyncInProgress();
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_BASE, false);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_OVR1, false);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_OVR2, false);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_HEO, false);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetLayerClockGatingDisable(LCDC_LAYER_PP, false);
 
     LCDC_WaitForSyncInProgress();
     LCDC_SetHSYNCPulseWidth(hsyncLength); //Set the pulse widths
+    LCDC_WaitForSyncInProgress();
     LCDC_SetVSYNCPulseWidth(vsyncLength);
 
     LCDC_WaitForSyncInProgress();
     LCDC_SetVerticalFrontPorchWidth(lowerMargin); //Set the vertical porches
+    LCDC_WaitForSyncInProgress();
     LCDC_SetVerticalBackPorchWidth(upperMargin);
 
     LCDC_WaitForSyncInProgress();
     LCDC_SetHorizontalFrontPorchWidth(rightMargin); //Set the horizontal porches
+    LCDC_WaitForSyncInProgress();
     LCDC_SetHorizontalBackPorchWidth(leftMargin);
 
     LCDC_WaitForSyncInProgress();
     LCDC_SetNumActiveRows(yResolution);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetNumPixelsPerLine(xResolution);
 
     LCDC_WaitForSyncInProgress();
     LCDC_SetDisplayGuardTime(LCDC_DISPLAY_GUARD_NUM_FRAMES);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetOutputMode(LCDC_OUTPUT_COLOR_MODE);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetDisplaySignalSynchronization(true);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetVSYNCPulseStart(LCDC_SYNC_EDGE);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetVSYNCPolarity(LCDC_VSYNC_POLARITY);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetHSYNCPolarity(LCDC_HSYNC_POLARITY);
 
 <#if BacklightPWMEnable == true>
     LCDC_WaitForSyncInProgress();
     LCDC_SetPWMCompareValue(LCDC_DEFAULT_BRIGHTNESS_PCT * 0xFF / 100);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetPWMSignalPolarity(LCDC_PWM_POLARITY);
+    LCDC_WaitForSyncInProgress();
     LCDC_SetPWMPrescaler(LCDC_PWM_PRESCALER);
 </#if>
 

@@ -4,7 +4,7 @@ V2.001 - 20230126
 
 Under Microchip Technology Incorporated’s (“Microchip”) intellectual property rights and subject to applicable licensing terms for any third-party software incorporated in this software and any applicable Open Source Software (as defined here below), the redistribution, reproduction and use in source and binary forms of the software or any part thereof, with or without modification, are permitted provided that the following conditions are met:
 
-© [**YEAR first created**], Microchip Technology Inc., and its subsidiaries. All rights reserved.
+© [**2024**], Microchip Technology Inc., and its subsidiaries. All rights reserved.
 
     1. Redistribution of source code (modified or unmodified) must retain the copyright notice accompanying the software and documentation, this list of conditions and the disclaimer in capital type at the end of this software license agreement.
 
@@ -30,7 +30,7 @@ Under Microchip Technology Incorporated’s (“Microchip”) intellectual prope
 
 DISCLAIMER:
 
-© [**YEAR**], Microchip Technology Inc., and its subsidiaries. All rights reserved.
+© [**2026**], Microchip Technology Inc., and its subsidiaries. All rights reserved.
 
 The software and documentation is provided by Microchip and its contributors "as is" and any express, implied or statutory warranties, including, but not limited to, the implied warranties of merchantability, fitness for a particular purpose and non-infringement of third party intellectual property rights are disclaimed to the fullest extent permitted by law. In no event shall Microchip or its contributors be liable for any direct, indirect, incidental, special,exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of the software and documentation, even if advised of the possibility of such damage.
 

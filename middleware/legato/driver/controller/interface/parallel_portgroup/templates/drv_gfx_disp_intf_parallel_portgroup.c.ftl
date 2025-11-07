@@ -142,15 +142,69 @@ int GFX_Disp_Intf_PinControl(GFX_Disp_Intf intf, GFX_DISP_INTF_PIN pin, GFX_DISP
     switch(pin)
     {
         case GFX_DISP_INTF_PIN_CS:
+        {
 #ifdef GFX_DISP_INTF_PIN_CS_Set
-            if (value == GFX_DISP_INTF_PIN_CLEAR)
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
                 GFX_DISP_INTF_PIN_CS_Clear();
+            }
             else
+            {
                 GFX_DISP_INTF_PIN_CS_Set();
+            }
             
             res = 0;
 #endif
             break;
+        }
+        case GFX_DISP_INTF_PIN_CS1:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS1_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS1_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS1_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }
+        case GFX_DISP_INTF_PIN_CS2:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS2_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS2_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS2_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }
+        case GFX_DISP_INTF_PIN_CS3:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS3_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS3_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS3_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }
         case GFX_DISP_INTF_PIN_WR:
 #ifdef GFX_DISP_INTF_PIN_WR_Set
             if (value == GFX_DISP_INTF_PIN_CLEAR)

@@ -49,6 +49,10 @@
 #include "gfx/legato/common/legato_common.h"
 #include "gfx/legato/datastructure/legato_list.h"
 
+#ifdef LEGATO_USE_OSAL
+#include "osal/osal.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,6 +133,8 @@ typedef struct leEventState
 leEventState* _leGetEventState(void);
 leResult leEvent_Init(void);
 void leEvent_Shutdown(void);
+void leEvent_Lock(void);
+void leEvent_Unlock(void);
 /**
   * @endcond
   *

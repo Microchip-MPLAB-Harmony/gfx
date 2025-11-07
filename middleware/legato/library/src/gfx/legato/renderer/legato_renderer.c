@@ -139,7 +139,7 @@ leRenderState _rendererState;
 
 void _leRenderer_InitDrawForMode(leColorMode mode);
 
-static uint8_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _dataBuffers[SCRATCH_BUFFER_SZ];
+static uint8_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _dataBuffers[LE_SCRATCH_BUFFER_COUNT][SCRATCH_BUFFER_SZ];
 
 struct leScratchBuffer
 {

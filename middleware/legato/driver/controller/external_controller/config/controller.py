@@ -1,4 +1,4 @@
-numCommands = 32
+numCommands = 50			
 defaultNumCommands = 3
 numParms = 16
 defaultNumParms = 0

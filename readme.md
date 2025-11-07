@@ -23,7 +23,7 @@ For feature-rich, professional Microchip Graphics Suite demonstrations and demon
 
 Examples for display bring-up can be found at various [device-family specific repositories](https://github.com/Microchip-MPLAB-Harmony/gfx/tree/master/apps)
  - [Release Notes](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/release_notes.md)
- - [MPLAB® Harmony License](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/mplab_harmony_license.md)
+ - [MPLAB® Harmony License](https://github.com/Microchip-MPLAB-Harmony/gfx/blob/master/License.md)
  - [User Guides on Microchip Graphics Suite Harmony](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/)
  - [Professional Designs on Microchip Graphics Suite Development Kits](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/dev-kits/)
 

@@ -1,3 +1,4 @@
+// DOM-IGNORE-BEGIN
 /*******************************************************************************
 * Copyright (C) 2020 Microchip Technology Inc. and its subsidiaries.
 *
@@ -20,6 +21,7 @@
 * ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *******************************************************************************/
+// DOM-IGNORE-END
 
 /*******************************************************************************
   Custom ${ControllerName}Display Top-Level Driver Source File
@@ -79,21 +81,14 @@
 #endif
 </#if>
 
-#define DRV_${ControllerName}_NCSAssert(intf)   GFX_Disp_Intf_PinControl(intf, \
-                                    GFX_DISP_INTF_PIN_CS, \
-                                    GFX_DISP_INTF_PIN_CLEAR)
-
-#define DRV_${ControllerName}_NCSDeassert(intf) GFX_Disp_Intf_PinControl(intf, \
-                                    GFX_DISP_INTF_PIN_CS, \
-                                    GFX_DISP_INTF_PIN_SET)
-
-
 <#if BaseDriverType == "SSD1309">
 #define PIXELS_PER_BYTE 8
 #define LCD_FRAMEBUFFER_SIZE ((128 * 64) / PIXELS_PER_BYTE)
 
 static uint8_t framebuffer[LCD_FRAMEBUFFER_SIZE] = {0};
 </#if>
+
+#define DISPLAY_COUNT ${DisplayCount}
 
 <#if PassiveDriver == false>
 <#if DataWriteSize == "8">
@@ -127,6 +122,8 @@ typedef struct ILI9488_DRV
 } ${ControllerName}_DRV;
 
 ${ControllerName}_DRV drv;
+
+static uint32_t activeDisplay = 0;
 
 <#if PassiveDriver == false>
 static uint32_t swapCount = 0;
@@ -209,7 +206,12 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr)
 </#if>
 
 <#if InitCommandsCount != 0>
-    DRV_${ControllerName}_NCSAssert(intf);
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+    </#list>
+</#if>
 
     <#list 0.. (InitCommandsCount - 1) as i>
         <#assign COMMAND = "Command" + i>
@@ -239,7 +241,13 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr)
     </#if>
 
     </#list>
-    DRV_${ControllerName}_NCSDeassert(intf);
+
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+    </#list>
+</#if>
 </#if>
 
     return 0;
@@ -311,8 +319,29 @@ static void DRV_${ControllerName}_WriteFrame(void)
     GFX_Disp_Intf intf = (GFX_Disp_Intf) drv.port_priv;
     uint8_t cmd[16];
 
-    DRV_${ControllerName}_NCSAssert(intf);
-    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
+    switch(activeDisplay)
+    {
+        case 0:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+            
+            break;
+        }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+        case ${i}:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+            
+            break;
+        }
+    </#list>
+</#if>           
+        default:
+        {
+            return;
+        }
+    }
 
     //Set Column Address
     cmd[0] = 0x21;
@@ -329,7 +358,29 @@ static void DRV_${ControllerName}_WriteFrame(void)
 
     GFX_Disp_Intf_WriteData(intf, framebuffer, DISPLAY_WIDTH * DISPLAY_HEIGHT / 8);
 
-    DRV_${ControllerName}_NCSDeassert(intf);
+    switch(activeDisplay)
+    {
+        case 0:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+            
+            break;
+        }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+        case ${i}:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+            
+            break;
+        }
+    </#list>
+</#if>           
+        default:
+        {
+            return;
+        }
+    }
 }
 </#if>
 
@@ -359,6 +410,29 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
 
     intf = (GFX_Disp_Intf) drv.port_priv;
 
+    switch(activeDisplay)
+    {
+        case 0:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+            
+            break;
+        }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+        case ${i}:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+            
+            break;
+        }
+    </#list>
+</#if>           
+        default:
+        {
+            return GFX_SUCCESS;
+        }
+    }
 <#if XAddressOffset != 0>
     //Add X offset
     x += ${XAddressOffset};
@@ -367,8 +441,6 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
     //Add Y offset
     y += ${YAddressOffset};
 </#if>
-
-    DRV_${ControllerName}_NCSAssert(intf);
 
 <#if FrameAddressSize == "2-bytes">
     //Write X/Column Address
@@ -413,7 +485,7 @@ gfxResult DRV_${ControllerName}_BlitBuffer(int32_t x,
                             (uint8_t *) ptr,
                             PIXEL_BUFFER_BYTES_PER_PIXEL *
                             buf->size.width *
-buf->size.height);
+                            buf->size.height);
 <#else>
 
     for(row = 0; row < buf->size.height; row++)
@@ -442,7 +514,31 @@ buf->size.height);
     }
 </#if>
 </#if>
-    DRV_${ControllerName}_NCSDeassert(intf);
+
+    switch(activeDisplay)
+    {
+        case 0:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+            
+            break;
+        }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+        case ${i}:
+        {
+            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+            
+            break;
+        }
+    </#list>
+</#if>           
+        default:
+        {
+            return GFX_SUCCESS;
+        }
+    }
+
 <#else>
 <#if BaseDriverType == "SSD1309">
     uint8_t page, pixel_mask, pixel_value, lx, ly;
@@ -482,7 +578,6 @@ buf->size.height);
         }
     }
 
-    return GFX_SUCCESS;
 <#elseif StubGenerateBuildErrorDisable != true>
 #error "Blit buffer procedure is not complete. Please complete definition of blit function."
 </#if>
@@ -508,6 +603,16 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
 </#if>
             return GFX_IOCTL_OK;
         }
+        case GFX_IOCTL_SET_ACTIVE_LAYER:
+        {
+            gfxDriverIOCTLResponse response = GFX_IOCTL_OK;
+
+            val = (gfxIOCTLArg_Value *)arg;
+
+            activeDisplay = val->value.v_uint;
+            
+            return response;
+        }        
         case GFX_IOCTL_GET_COLOR_MODE:
         {
             val = (gfxIOCTLArg_Value*)arg;

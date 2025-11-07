@@ -539,6 +539,7 @@ static const gfxGraphicsProcessor gfxGPUInterface =
     NULL,
     DRV_2DGPU_Fill,
     DRV_2DGPU_Blit,
+    DRV_2DGPU_Blit,
     DRV_2DGPU_SetBlend,
     DRV_2DGPU_SetGlobalAlpha,
     DRV_2DGPU_SetPalette,

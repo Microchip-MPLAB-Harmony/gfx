@@ -141,5 +141,5 @@ def instantiateComponent(component):
     lvds_clk = component.createIntegerSymbol("LVDSDotClk", lvds_menu)
     lvds_clk.setLabel("LCD Pixel Clock (kHz)")
     lvds_clk.setDescription("The pixel clock of the LCD panel.")
-    lvds_clk.setDefaultValue(35000)
+    lvds_clk.setDefaultValue(63500)
     lvds_clk.setReadOnly(True)

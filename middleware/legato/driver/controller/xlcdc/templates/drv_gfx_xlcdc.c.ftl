@@ -177,33 +177,16 @@ FB_BPP_TYPE FB_CACHE_NC frame_buffer [XLCDC_TOT_LAYERS * XLCDC_BUF_PER_LAYER][XL
 void DRV_XLCDC_SOF_Interrupt(void)
 {
 #if LE_DRIVER_LAYER_MODE
-    bool swapAllLayers = true;
-
     for (int i = 0; i < LE_LAYER_COUNT; i++)
     {
-        if (!drvLayer[i].swapPending)
-        {
-            swapAllLayers = false;
-            break;
-        }
-    }
-
-    if (swapAllLayers)
-    {
-        for (int i = 0; i < LE_LAYER_COUNT; i++)
-        {
-            XLCDC_UpdateLayerAttributes(layerOrder[i]);
-            drvLayer[i].swapPending = false;
-        }
+        XLCDC_UpdateLayerAttributes(layerOrder[i]);
+        drvLayer[i].swapPending = false;
     }
 #else
     for (int i = 0; i < XLCDC_TOT_LAYERS; i++)
     {
-        if (drvLayer[i].swapPending)
-        {
-            XLCDC_UpdateLayerAttributes(layerOrder[i]);
-            drvLayer[i].swapPending = false;
-        }
+        XLCDC_UpdateLayerAttributes(layerOrder[i]);
+        drvLayer[i].swapPending = false;
     }
 #endif
 }

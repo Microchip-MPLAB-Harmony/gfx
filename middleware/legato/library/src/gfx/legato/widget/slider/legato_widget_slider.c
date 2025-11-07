@@ -415,10 +415,10 @@ static leResult step(leSliderWidget* _this,
 
     invalidateHandle(_this);
 
+    _this->value += amount;
+
     if(amount < 0)
     {
-        _this->value -= amount;
-
         if(_this->value < _this->min)
         {
             _this->value = _this->min;
@@ -426,8 +426,6 @@ static leResult step(leSliderWidget* _this,
     }
     else
     {
-        _this->value += amount;
-
         if(_this->value > _this->max)
         {
             _this->value = _this->max;

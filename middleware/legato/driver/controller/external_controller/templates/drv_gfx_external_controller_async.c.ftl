@@ -81,21 +81,14 @@
 #endif
 </#if>
 
-#define DRV_${ControllerName}_NCSAssert(intf)   GFX_Disp_Intf_PinControl(intf, \
-                                    GFX_DISP_INTF_PIN_CS, \
-                                    GFX_DISP_INTF_PIN_CLEAR)
-
-#define DRV_${ControllerName}_NCSDeassert(intf) GFX_Disp_Intf_PinControl(intf, \
-                                    GFX_DISP_INTF_PIN_CS, \
-                                    GFX_DISP_INTF_PIN_SET)
-
-
 <#if BaseDriverType == "SSD1309">
 #define PIXELS_PER_BYTE 8
 #define LCD_FRAMEBUFFER_SIZE ((128 * 64) / PIXELS_PER_BYTE)
 
 static uint8_t framebuffer[LCD_FRAMEBUFFER_SIZE] = {0};
 </#if>
+
+#define DISPLAY_COUNT ${DisplayCount}
 
 <#if PassiveDriver == false>
 <#if DataWriteSize == "8">
@@ -161,6 +154,8 @@ typedef struct
 } ${ControllerName}_CMD_PARAM;
 
 ${ControllerName}_DRV drv;
+
+static uint32_t activeDisplay = 0;
 
 <#if PassiveDriver == false>
 static uint32_t swapCount = 0;
@@ -252,7 +247,12 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr,
     GFX_Disp_Intf intf = (GFX_Disp_Intf) drvPtr->port_priv;
     unsigned int i, returnValue;
 
-    DRV_${ControllerName}_NCSAssert(intf);
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+    </#list>
+</#if>
 
     for (i = 0; i < numVals; i++, initVals++)
     {
@@ -287,7 +287,12 @@ static int DRV_${ControllerName}_Configure(${ControllerName}_DRV *drvPtr,
         }
     }
 
-    DRV_${ControllerName}_NCSDeassert(intf);
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+    </#list>
+</#if>
 
     return 0;
 }
@@ -311,7 +316,29 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
                 break;
 </#if>
 
-            DRV_${ControllerName}_NCSAssert(intf);
+            switch(activeDisplay)
+            {
+                case 0:
+                {
+                    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+
+                    break;
+                }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+                case ${i}:
+                {
+                    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+
+                    break;
+                }
+    </#list>
+</#if>           
+                default:
+                {
+                    return;
+                }
+            }
 
             drv.state = BLIT_COLUMN_DATA;
 
@@ -478,7 +505,30 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-            DRV_${ControllerName}_NCSDeassert(intf);
+            switch(activeDisplay)
+            {
+                case 0:
+                {
+                    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+
+                    break;
+                }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+                case ${i}:
+                {
+                    GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+
+                    break;
+                }
+    </#list>
+</#if>           
+                default:
+                {
+                    return;
+                }
+            }
+
             gfxPixelBuffer_SetLocked(drv.blitParms.buf, GFX_FALSE);
             drv.state = IDLE;
             if (drvBlitCallBack != NULL)
@@ -506,8 +556,31 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
             if (GFX_Disp_Intf_Ready(intf) == false)
                 break;
 </#if>
-			DRV_${ControllerName}_NCSAssert(intf);
-			GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
+                        switch(activeDisplay)
+                        {
+                            case 0:
+                            {
+                                GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_CLEAR);
+
+                                break;
+                            }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+                            case ${i}:
+                            {
+                                GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_CLEAR);
+
+                                break;
+                            }
+    </#list>
+</#if>           
+                            default:
+                            {
+                                return;
+                            }
+                        }
+
+                        GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
 
 			//Set Column Address
 			cmd[0] = 0x21;
@@ -550,12 +623,36 @@ void DRV_${ControllerName}_Transfer(GFX_Disp_Intf intf)
 		case BLIT_DONE:
 		{
 <#if BlitType == "Driver Asynchronous">
-            if (GFX_Disp_Intf_Ready(intf) == false)
-                break;
+                    if (GFX_Disp_Intf_Ready(intf) == false)
+                        break;
 </#if>
-            DRV_${ControllerName}_NCSDeassert(intf);
-			drv.state = IDLE;
-			break;
+                    switch(activeDisplay)
+                    {
+                        case 0:
+                        {
+                            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS, GFX_DISP_INTF_PIN_SET);
+
+                            break;
+                        }
+<#if DisplayCount != 1>
+    <#list 1.. (DisplayCount - 1) as i>
+                        case ${i}:
+                        {
+                            GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_CS${i}, GFX_DISP_INTF_PIN_SET);
+
+                            break;
+                        }
+    </#list>
+</#if>           
+                        default:
+                        {
+                            return;
+                        }
+                     }
+
+                     GFX_Disp_Intf_PinControl(intf, GFX_DISP_INTF_PIN_RSDC, GFX_DISP_INTF_PIN_CLEAR);
+                     drv.state = IDLE;
+                     break;
 		}
 		default:
 			break;
@@ -727,11 +824,21 @@ gfxDriverIOCTLResponse DRV_${ControllerName}_IOCTL(gfxDriverIOCTLRequest request
         case GFX_IOCTL_FRAME_END:
         {
 <#if BaseDriverType == "SSD1309">
-			drv.state = BLIT_COLUMN_CMD;
+            drv.state = BLIT_COLUMN_CMD;
             DRV_${ControllerName}_Transfer((GFX_Disp_Intf) drv.port_priv);
 </#if>
             return GFX_IOCTL_OK;
         }
+        case GFX_IOCTL_SET_ACTIVE_LAYER:
+        {
+            gfxDriverIOCTLResponse response = GFX_IOCTL_OK;
+
+            val = (gfxIOCTLArg_Value *)arg;
+
+            activeDisplay = val->value.v_uint;
+            
+            return response;
+        }        
         case GFX_IOCTL_GET_COLOR_MODE:
         {
             val = (gfxIOCTLArg_Value*)arg;

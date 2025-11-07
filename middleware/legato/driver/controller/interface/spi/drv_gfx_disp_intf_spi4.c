@@ -170,11 +170,15 @@ GFX_Disp_Intf GFX_Disp_Intf_Open(void)
     setup.clockPolarity = DRV_SPI_CLOCK_POLARITY_IDLE_HIGH;
 </#if>
     setup.dataBits = DRV_SPI_DATA_BITS_${DataBits};
+<#if CSPolarity == "None">
+    setup.chipSelect = SYS_PORT_PIN_NONE;
+<#else>
     setup.chipSelect = GFX_DISP_INTF_PIN_CS_PIN;
 <#if CSPolarity == "Active Low">
     setup.csPolarity = DRV_SPI_CS_POLARITY_ACTIVE_LOW;
 <#else>
     setup.csPolarity = DRV_SPI_CS_POLARITY_ACTIVE_HIGH;
+</#if>
 </#if>
 
     spiIntf.drvSPIHandle = DRV_SPI_Open(${DRV_INTERFACE_SPI_INDEX}, DRV_IO_INTENT_READWRITE);
@@ -228,6 +232,54 @@ int GFX_Disp_Intf_PinControl(GFX_Disp_Intf intf,
 #endif
             break;
         }
+        case GFX_DISP_INTF_PIN_CS1:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS1_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS1_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS1_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }
+        case GFX_DISP_INTF_PIN_CS2:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS2_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS2_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS2_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }
+        case GFX_DISP_INTF_PIN_CS3:
+        {
+#ifdef GFX_DISP_INTF_PIN_CS3_Set
+            if(value == GFX_DISP_INTF_PIN_CLEAR)
+            {
+                GFX_DISP_INTF_PIN_CS3_Clear();
+            }
+            else
+            {
+                GFX_DISP_INTF_PIN_CS3_Set();
+            }
+            
+            res = 0;
+#endif
+            break;
+        }        
         case GFX_DISP_INTF_PIN_WR:
         {
 #ifdef GFX_DISP_INTF_PIN_WR_Set

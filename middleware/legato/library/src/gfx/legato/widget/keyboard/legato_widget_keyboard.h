@@ -43,8 +43,8 @@
  * @details This module implements keyboard widget functions.
  */
 
-#ifndef LEGATO_KEYPAD_H
-#define LEGATO_KEYPAD_H
+#ifndef LEGATO_KEYBOARD_H
+#define LEGATO_KEYBOARD_H
 
 #include "gfx/legato/common/legato_common.h"
 

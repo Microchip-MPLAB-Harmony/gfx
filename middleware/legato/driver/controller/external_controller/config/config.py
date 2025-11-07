@@ -56,6 +56,13 @@ PassiveDriver.setDependencies(onPassiveDriverChanged, ["PassiveDriver"])
 DisplaySettingsMenu = comp.createMenuSymbol("DisplaySettingsMenu", None)
 DisplaySettingsMenu.setLabel("Display Settings")
 
+DisplayCount = comp.createIntegerSymbol("DisplayCount", DisplaySettingsMenu)
+DisplayCount.setLabel("Count")
+DisplayCount.setDescription("The number of displays on the interface")
+DisplayCount.setMin(1)
+DisplayCount.setMax(4)
+DisplayCount.setDefaultValue(1)
+
 DisplayWidth = comp.createIntegerSymbol("DisplayWidth", DisplaySettingsMenu)
 DisplayWidth.setLabel("Width")
 DisplayWidth.setDescription("The width of the frame buffer in pixels.")

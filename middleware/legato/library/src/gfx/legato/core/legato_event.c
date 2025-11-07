@@ -23,11 +23,8 @@
 *******************************************************************************/
 // DOM-IGNORE-END
 
-
-#include "gfx/legato/core/legato_event.h"
-
 #include <string.h>
-
+#include "gfx/legato/core/legato_event.h"
 #include "gfx/legato/core/legato_input.h"
 #include "gfx/legato/memory/legato_memory.h"
 
@@ -45,10 +42,28 @@ leEventState* _leGetEventState()
 leResult leEvent_Init()
 {
     leList_Create(&_state.events);
-    
+
     _state.filter = NULL;
-    
+
+#ifdef LEGATO_USE_OSAL
+    OSAL_MUTEX_Create(&_state.eventLock);
+#endif
+
     return LE_SUCCESS;
+}
+
+void leEvent_Lock(void)
+{
+#ifdef LEGATO_USE_OSAL
+    OSAL_MUTEX_Lock(&_state.eventLock, OSAL_WAIT_FOREVER);
+#endif
+}
+
+void leEvent_Unlock(void)
+{
+#ifdef LEGATO_USE_OSAL
+    OSAL_MUTEX_Unlock(&_state.eventLock);
+#endif
 }
 
 void leEvent_Shutdown()
@@ -82,7 +97,9 @@ leResult leEvent_AddEvent(leEvent* evt)
 
 leResult leEvent_ClearList()
 {
+    leEvent_Lock();
     leList_Destroy(&_state.events);
+    leEvent_Unlock();
 
     return LE_SUCCESS;
 }
@@ -93,16 +110,21 @@ leResult leEvent_ProcessEvents()
     leListNode* node;
     leEventResult res;
 
+    leEvent_Lock();
+
     if(_state.events.size == 0)
+    {
+        leEvent_Unlock();
         return LE_SUCCESS;
-        
+    }
+
     node = _state.events.head;
-    
+
     if(_state.events.size > 1)
     {
         node = node;
     }
-    
+
     while(node != NULL)
     {
         //evt = _state.events.values[i];
@@ -115,25 +137,27 @@ leResult leEvent_ProcessEvents()
         node = node->next;
 
         res = processEvent(evt);
-        
+
         if(res == LE_EVENT_HANDLED)
         {
             leList_Remove(&_state.events, evt);
-            
+
             LE_FREE(evt);
         }
         else if(res == LE_EVENT_RESET_QUEUE)
         {
             leList_Destroy(&_state.events);
-            
+
             node = NULL;
         }
         else
         {
+            leEvent_Unlock();
             return LE_FAILURE;
-        }        
+        }
     }
 
+    leEvent_Unlock();
     return LE_SUCCESS;
 }
 
@@ -150,7 +174,7 @@ static leEventResult processEvent(leEvent* evt)
         default:
             break;
     }
-    
+
     return LE_EVENT_HANDLED;
 }
 

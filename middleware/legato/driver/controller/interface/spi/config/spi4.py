@@ -23,7 +23,7 @@
 ##############################################################################
 
 polarityModeList = ["Idle Low","Idle High"]
-csModeList = ["Active Low","Active High"]
+csModeList = ["Active Low","Active High","None"]
 edgeModeList = ["Valid Leading Edge", "Valid Trailing Edge"]
 dataBitModeList = ["8","9","10","11","12","13","14","15","16","32"]
 
@@ -83,6 +83,7 @@ def instantiateComponent(comp):
 
 	CSPolarity = comp.createComboSymbol("CSPolarity", TransferModeSettingsMenu, csModeList)
 	CSPolarity.setLabel("Chip Select Polarity")
+	CSPolarity.setDescription("Select 'None' if CS is controlled by upper level controller driver, or for multi-display mode.")
 	CSPolarity.setDefaultValue(csModeList[0])
 
 def onAttachmentConnected(source, target):

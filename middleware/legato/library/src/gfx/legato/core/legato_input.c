@@ -108,6 +108,8 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
 #endif
 
     // dispatch the event
+    leEvent_Lock();
+
     _state.touch[id].valid = LE_TRUE;
     _state.touch[id].x = pnt.x;
     _state.touch[id].y = pnt.y;
@@ -115,7 +117,10 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
     evt = LE_MALLOC(sizeof(leWidgetEvent_TouchDown));
 
     if(evt == NULL)
+    {
+        leEvent_Unlock();
         return LE_FAILURE;
+    }
 
     evt->event.owner = NULL;
     evt->event.id = LE_EVENT_TOUCH_DOWN;
@@ -131,9 +136,11 @@ leResult leInput_InjectTouchDown(uint32_t id, int32_t x, int32_t y)
     {
         LE_FREE(evt);
 
+        leEvent_Unlock();
         return LE_FAILURE;
     }
 
+    leEvent_Unlock();
     return LE_SUCCESS;
 }
 
@@ -150,8 +157,6 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     {
         return LE_FAILURE;
     }
-
-    _state.touch[id].valid = LE_FALSE;
 
     // reorient touch coordinates if the user interface is rotated
 #if LE_TOUCH_ORIENTATION != 0
@@ -175,11 +180,18 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     pnt.x = dispSize.height - 1 - y;
 #endif
 
+    leEvent_Lock();
+
+    _state.touch[id].valid = LE_FALSE;
+
     // dispatch event
     evt = LE_MALLOC(sizeof(leWidgetEvent_TouchUp));
 
     if(evt == NULL)
+    {
+        leEvent_Unlock();
         return LE_FAILURE;
+    }
 
     evt->event.owner = NULL;
     evt->event.id = LE_EVENT_TOUCH_UP;
@@ -195,9 +207,11 @@ leResult leInput_InjectTouchUp(uint32_t id, int32_t x, int32_t y)
     {
         LE_FREE(evt);
 
+        leEvent_Unlock();
         return LE_FAILURE;
     }
 
+    leEvent_Unlock();
     return LE_SUCCESS;
 }
 
@@ -221,6 +235,8 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
 
     leRenderer_DisplaySize(&dispSize);
 #endif
+
+    leEvent_Lock();
 
     // find any existing touch moved event and overwrite
     node = _leGetEventState()->events.head;
@@ -263,6 +279,7 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
                 _state.touch[id].x = pnt.x;
                 _state.touch[id].y = pnt.y;
 
+                leEvent_Unlock();
                 return LE_SUCCESS;
             }
         }
@@ -273,7 +290,10 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
     evt = LE_MALLOC(sizeof(leWidgetEvent_TouchMove));
 
     if(evt == NULL)
+    {
+        leEvent_Unlock();
         return LE_FAILURE;
+    }
 
     // reorient touch coordinates if the user interface is rotated
 #if LE_TOUCH_ORIENTATION == 0
@@ -309,9 +329,11 @@ leResult leInput_InjectTouchMoved(uint32_t id, int32_t x, int32_t y)
     {
         LE_FREE(evt);
 
+        leEvent_Unlock();
         return LE_FAILURE;
     }
 
+    leEvent_Unlock();
     return LE_SUCCESS;
 }
 

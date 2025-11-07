@@ -108,12 +108,13 @@ gfxResult ${setTransFunc}(
 static const gfxGraphicsProcessor gfxGPUInterface =
 {
     .drawLine = ${drawLineFunc},
-	.fillRect = ${fillRectFunc},
-	.blitBuffer = ${blitBuffFunc},
-	.setBlend = ${blendFunc},
-	.setGlobalAlpha = ${setGlobalAlphaFunc},
-	.setPalette = ${setPaletteFunc},
-	.setTransparency = ${setTransFunc},
+    .fillRect = ${fillRectFunc},
+    .blitBuffer = ${blitBuffFunc},
+    .blitStretchBuffer = ${blitStretchBuffFunc},
+    .setBlend = ${blendFunc},
+    .setGlobalAlpha = ${setGlobalAlphaFunc},
+    .setPalette = ${setPaletteFunc},
+    .setTransparency = ${setTransFunc},
 };
 
 #ifdef __cplusplus

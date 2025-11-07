@@ -242,7 +242,7 @@ static leResult exec_blocking(struct StreamReadStage* stage)
         // if the offset is contained in the current cache then just return the value
         if(streamReadStage.rleDecodeCount > 0 &&
            op->bufferIndex >= streamReadStage.rleIndexOffset &&
-           op->bufferIndex <= streamReadStage.rleIndexOffset + streamReadStage.rleLength)
+           op->bufferIndex < streamReadStage.rleIndexOffset + streamReadStage.rleLength)
         {
             op->data = streamReadStage.rleData;
         }
@@ -294,7 +294,7 @@ static leResult exec_blocking(struct StreamReadStage* stage)
 
                 // found the appropriate RLE entry
                 if(op->bufferIndex >= streamReadStage.rleIndexOffset &&
-                   op->bufferIndex <= streamReadStage.rleIndexOffset + streamReadStage.rleLength)
+                   op->bufferIndex < streamReadStage.rleIndexOffset + streamReadStage.rleLength)
                 {
                     op->data = streamReadStage.rleData;
 

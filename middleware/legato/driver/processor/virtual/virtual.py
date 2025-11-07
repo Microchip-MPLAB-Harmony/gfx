@@ -71,6 +71,10 @@ def instantiateComponent(comp):
 	blitBuffFunc = comp.createStringSymbol("blitBuffFunc", vgpuIntfCustomMenu)
 	blitBuffFunc.setLabel("Blit Buffer")
 	blitBuffFunc.setDefaultValue("NULL")
+
+	blitStretchBuffFunc = comp.createStringSymbol("blitStretchBuffFunc", vgpuIntfCustomMenu)
+	blitStretchBuffFunc.setLabel("Blit Stretch Buffer")
+	blitStretchBuffFunc.setDefaultValue("NULL")
 	
 	blendFunc = comp.createStringSymbol("blendFunc", vgpuIntfCustomMenu)
 	blendFunc.setLabel("Blend")

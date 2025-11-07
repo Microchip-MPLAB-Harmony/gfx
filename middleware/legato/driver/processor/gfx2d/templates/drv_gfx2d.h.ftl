@@ -337,6 +337,7 @@ static const gfxGraphicsProcessor gfxGPUInterface =
     NULL, // Line Draw not supported
     DRV_GFX2D_Fill,
     DRV_GFX2D_Blit,
+    NULL, //Blit Stretch not supported
     DRV_GFX2D_SetBlend,
     DRV_GFX2D_SetGlobalAlpha,
     DRV_GFX2D_SetPalette,
