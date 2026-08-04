@@ -521,6 +521,14 @@ def instantiateComponent(component):
     driver_menu.setDescription("Configures the XLCDC Driver Options.")
     driver_menu.setVisible(True)
 
+    sb_alloc = component.createIntegerSymbol("ScratchBufferSize", driver_menu)
+    sb_alloc.setLabel("Render Buffer Size (kB)")
+    sb_alloc.setDescription("Allocates a render buffer for the gfx library.")
+    sb_alloc.setDefaultValue(0)
+    sb_alloc.setMin(0)
+    sb_alloc.setMax(16384)
+    sb_alloc.setVisible(True)    
+
     driver_color_fb = component.createHexSymbol("XDMColorFB", driver_menu)
     driver_color_fb.setLabel("Frame Buffer Fill Color")
     driver_color_fb.setDescription("Frambefuffers are filled with specified color on initialization.")

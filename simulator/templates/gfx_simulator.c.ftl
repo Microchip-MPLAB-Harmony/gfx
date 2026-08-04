@@ -39,16 +39,29 @@
 /* SDL2 Video Subsystem Config */
 #define SDL_HOR_RES ${valDispHorRes}
 #define SDL_VER_RES ${valDispVerRes}
-<#if CtrlColorMode == "RGB_565">
+<#if CtrlColorMode == "MONO">
+#define SDL_DEF_FB_TYPE uint8_t
+#define SDL_DEF_FB_PTR_TYPE SDL_DEF_FB_TYPE *
+#define SDL_DEF_PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888
+#define SDL_DEF_BYTES_PER_PIXEL 1
+#define SDL_MONO_FB_SIZE ((SDL_HOR_RES * SDL_VER_RES + 7) / 8)
+#define SDL_MONO_CONV_BUF_SIZE (SDL_HOR_RES * SDL_VER_RES)
+<#elseif CtrlColorMode == "RGB_565">
 #define SDL_DEF_FB_TYPE uint16_t
-<#elseif CtrlColorMode == "RGBA_8888">
-#define SDL_DEF_FB_TYPE uint32_t
-<#else>
-#define SDL_DEF_FB_TYPE uint32_t
-</#if>
 #define SDL_DEF_FB_PTR_TYPE SDL_DEF_FB_TYPE *
 #define SDL_DEF_PIXEL_FORMAT SDL_PIXELFORMAT_${CtrlColorMode?replace("_", "")}
 #define SDL_DEF_BYTES_PER_PIXEL sizeof(SDL_DEF_FB_TYPE)
+<#elseif CtrlColorMode == "RGBA_8888">
+#define SDL_DEF_FB_TYPE uint32_t
+#define SDL_DEF_FB_PTR_TYPE SDL_DEF_FB_TYPE *
+#define SDL_DEF_PIXEL_FORMAT SDL_PIXELFORMAT_${CtrlColorMode?replace("_", "")}
+#define SDL_DEF_BYTES_PER_PIXEL sizeof(SDL_DEF_FB_TYPE)
+<#else>
+#define SDL_DEF_FB_TYPE uint32_t
+#define SDL_DEF_FB_PTR_TYPE SDL_DEF_FB_TYPE *
+#define SDL_DEF_PIXEL_FORMAT SDL_PIXELFORMAT_${CtrlColorMode?replace("_", "")}
+#define SDL_DEF_BYTES_PER_PIXEL sizeof(SDL_DEF_FB_TYPE)
+</#if>
 #define SDL_VIRTUAL_LAYERS ${TotalNumLayers}
 #define SDL_BUFFERS_PER_LAYER 1
 <#if CtrlCanvasMode == "DISABLED">
@@ -244,7 +257,12 @@ static SDL_Window *sdl_window;
 static SDL_Renderer *sdl_renderer;
 static SDL_Texture *sdl_texture[SDL_VIRTUAL_LAYERS];
 static SDL_Rect texture_rect[SDL_VIRTUAL_LAYERS], render_rect[SDL_VIRTUAL_LAYERS];
+<#if CtrlColorMode == "MONO">
+uint8_t frame_buffer[SDL_VIRTUAL_LAYERS][SDL_MONO_FB_SIZE];
+static uint32_t mono_conv_buffer[SDL_VIRTUAL_LAYERS][SDL_MONO_CONV_BUF_SIZE];
+<#else>
 SDL_DEF_FB_TYPE frame_buffer[SDL_VIRTUAL_LAYERS][SDL_HOR_RES * SDL_VER_RES];
+</#if>
 
 typedef enum
 {
@@ -270,7 +288,11 @@ volatile int32_t waitForAlphaSetting[SDL_VIRTUAL_LAYERS] = {0};
 
 typedef struct __display_layer
 {
+<#if CtrlColorMode == "MONO">
+    uint8_t* baseaddr[SDL_BUFFERS_PER_LAYER];
+<#else>
     SDL_DEF_FB_PTR_TYPE baseaddr[SDL_BUFFERS_PER_LAYER];
+</#if>
     uint32_t resx;
     uint32_t resy;
     uint32_t startx;
@@ -353,6 +375,8 @@ static uint32_t getSDLPixelFormatFromGFXColorMode(gfxColorMode mode)
             return SDL_PIXELFORMAT_RGB888;
         case GFX_COLOR_MODE_ARGB_8888:
             return SDL_PIXELFORMAT_ARGB8888;
+        case GFX_COLOR_MODE_MONOCHROME:
+            return SDL_PIXELFORMAT_ARGB8888;
         case GFX_COLOR_MODE_RGBA_8888:
         default:
             return SDL_PIXELFORMAT_RGBA8888;
@@ -364,6 +388,33 @@ static gfxResult GFX_SIM_BufferBlit(const gfxPixelBuffer *source,
                                      const gfxPixelBuffer *dest,
                                      const gfxRect *rectDest)
 {
+<#if CtrlColorMode == "MONO">
+    uint32_t row, col;
+    unsigned int width, height;
+    width = (rectSrc->width < rectDest->width) ? rectSrc->width : rectDest->width;
+    height = (rectSrc->height < rectDest->height) ? rectSrc->height : rectDest->height;
+
+    for (row = 0; row < height; row++)
+    {
+        for (col = 0; col < width; col++)
+        {
+            uint32_t src_x = rectSrc->x + col;
+            uint32_t src_y = rectSrc->y + row;
+            uint32_t dst_x = rectDest->x + col;
+            uint32_t dst_y = rectDest->y + row;
+
+            gfxColor pixel = gfxPixelBufferGet_Unsafe(source, src_x, src_y);
+
+            uint32_t idx = dst_x + (dst_y * dest->size.width);
+            uint32_t byte_offset = idx / 8;
+            uint32_t bit_offset = 7 - (idx % 8);
+            uint8_t *byte_ptr = ((uint8_t *)dest->pixels) + byte_offset;
+
+            *byte_ptr &= ~(1 << bit_offset);
+            *byte_ptr |= ((pixel & 0x01) << bit_offset);
+        }
+    }
+<#else>
     void *srcPtr;
     void *destPtr;
     uint32_t row, rowSize;
@@ -379,10 +430,28 @@ static gfxResult GFX_SIM_BufferBlit(const gfxPixelBuffer *source,
 
         memcpy(destPtr, srcPtr, rowSize);
     }
+</#if>
 
     return GFX_SUCCESS;
 }
 
+<#if CtrlColorMode == "MONO">
+static void GFX_SIM_MonoToARGB8888(uint8_t *mono_src, uint32_t *argb_dest, uint32_t width, uint32_t height)
+{
+    uint32_t total_pixels = width * height;
+    uint32_t i;
+
+    for (i = 0; i < total_pixels; i++)
+    {
+        uint32_t byte_idx = i / 8;
+        uint32_t bit_idx = 7 - (i % 8);
+        uint8_t bit = (mono_src[byte_idx] >> bit_idx) & 0x01;
+
+        argb_dest[i] = bit ? 0xFFFFFFFF : 0xFF000000;
+    }
+}
+
+</#if>
 void GFX_SIM_Update()
 {
     switch (state)
@@ -402,7 +471,11 @@ void GFX_SIM_Update()
             {
                 if (drvLayer[layerCount].updateLock == LAYER_LOCKED_PENDING)
                 {
+<#if CtrlColorMode == "MONO">
+                    drvLayer[layerCount].stride = drvLayer[layerCount].resx * sizeof(uint32_t);
+<#else>
                     drvLayer[layerCount].stride = drvLayer[layerCount].resx * getPixelFormatStrideBytes(drvLayer[layerCount].pixelformat);
+</#if>
 
                     texture_rect[layerCount].x = drvLayer[layerCount].startx;
                     texture_rect[layerCount].y = drvLayer[layerCount].starty;
@@ -416,8 +489,19 @@ void GFX_SIM_Update()
 
                     drvLayer[layerCount].updateLock = LAYER_UNLOCKED;
                 }
+<#if CtrlColorMode == "MONO">
+                GFX_SIM_MonoToARGB8888(drvLayer[layerCount].baseaddr[0],
+                                       mono_conv_buffer[layerCount],
+                                       drvLayer[layerCount].resx,
+                                       drvLayer[layerCount].resy);
+                SDL_SetTextureAlphaMod(sdl_texture[layerCount], (uint8_t)(drvLayer[layerCount].alpha & 0xff));
+                SDL_UpdateTexture(sdl_texture[layerCount], &texture_rect[layerCount],
+                                  mono_conv_buffer[layerCount],
+                                  drvLayer[layerCount].stride);
+<#else>
                 SDL_SetTextureAlphaMod(sdl_texture[layerCount], (uint8_t)(drvLayer[layerCount].alpha & 0xff));
                 SDL_UpdateTexture(sdl_texture[layerCount], &texture_rect[layerCount], drvLayer[layerCount].baseaddr[0], drvLayer[layerCount].stride);
+</#if>
                 SDL_RenderCopy(sdl_renderer, sdl_texture[layerCount], &texture_rect[layerCount], &render_rect[layerCount]);
             }
         }
@@ -456,14 +540,22 @@ void GFX_SIM_Initialize()
 
     for (uint32_t layerCount = 0; layerCount < SDL_VIRTUAL_LAYERS; layerCount++)
     {
+<#if CtrlColorMode == "MONO">
+        drvLayer[layerCount].baseaddr[0] = (uint8_t *)frame_buffer[layerCount];
+<#else>
         drvLayer[layerCount].baseaddr[0] = (SDL_DEF_FB_PTR_TYPE)frame_buffer[layerCount];
+</#if>
         drvLayer[layerCount].resx = SDL_HOR_RES;
         drvLayer[layerCount].resy = SDL_VER_RES;
         drvLayer[layerCount].startx = 0;
         drvLayer[layerCount].starty = 0;
         drvLayer[layerCount].sizex = drvLayer[layerCount].resx;
         drvLayer[layerCount].sizey = drvLayer[layerCount].resy;
+<#if CtrlColorMode == "MONO">
+        drvLayer[layerCount].stride = SDL_HOR_RES * sizeof(uint32_t);
+<#else>
         drvLayer[layerCount].stride = SDL_HOR_RES * SDL_DEF_BYTES_PER_PIXEL;
+</#if>
         drvLayer[layerCount].alpha = 255;
         drvLayer[layerCount].blendmode = SDL_BLENDMODE_BLEND;
         drvLayer[layerCount].pixelformat = SDL_DEF_PIXEL_FORMAT;
@@ -483,9 +575,36 @@ void GFX_SIM_Initialize()
 
         for (uint32_t bufferCount = 0; bufferCount < SDL_BUFFERS_PER_LAYER; ++bufferCount)
         {
+<#if CtrlColorMode == "MONO">
+            memset(drvLayer[layerCount].baseaddr[bufferCount], 0x00, SDL_MONO_FB_SIZE);
+<#else>
             memset(drvLayer[layerCount].baseaddr[bufferCount], 0x00, SDL_HOR_RES * SDL_VER_RES * SDL_DEF_BYTES_PER_PIXEL);
+</#if>
         }
 
+<#if CtrlColorMode == "MONO">
+        gfxPixelBufferCreate(SDL_HOR_RES,
+                             SDL_VER_RES,
+                             GFX_COLOR_MODE_MONOCHROME,
+                             drvLayer[layerCount].baseaddr[0],
+                             &drvLayer[layerCount].pixelBuffer[drvLayer[layerCount].bufferIdx]);
+
+        sdl_texture[layerCount] = SDL_CreateTexture(sdl_renderer,
+                                                    SDL_PIXELFORMAT_ARGB8888,
+                                                    SDL_TEXTUREACCESS_STREAMING,
+                                                    drvLayer[layerCount].resx,
+                                                    drvLayer[layerCount].resy);
+
+        SDL_SetTextureBlendMode(sdl_texture[layerCount], drvLayer[layerCount].blendmode);
+        SDL_SetTextureAlphaMod(sdl_texture[layerCount], (uint8_t)(drvLayer[layerCount].alpha & 0xff));
+        GFX_SIM_MonoToARGB8888(drvLayer[layerCount].baseaddr[0],
+                               mono_conv_buffer[layerCount],
+                               drvLayer[layerCount].resx,
+                               drvLayer[layerCount].resy);
+        SDL_UpdateTexture(sdl_texture[layerCount], &texture_rect[layerCount],
+                          mono_conv_buffer[layerCount],
+                          drvLayer[layerCount].stride);
+<#else>
         gfxPixelBufferCreate(SDL_HOR_RES,
                              SDL_VER_RES,
                              getGFXColorModeFromSDLPixelFormat(drvLayer[layerCount].pixelformat),
@@ -501,6 +620,7 @@ void GFX_SIM_Initialize()
         SDL_SetTextureBlendMode(sdl_texture[layerCount], drvLayer[layerCount].blendmode);
         SDL_SetTextureAlphaMod(sdl_texture[layerCount], (uint8_t)(drvLayer[layerCount].alpha & 0xff));
         SDL_UpdateTexture(sdl_texture[layerCount], &texture_rect[layerCount], drvLayer[layerCount].baseaddr[0], drvLayer[layerCount].stride);
+</#if>
         SDL_RenderCopy(sdl_renderer, sdl_texture[layerCount], &texture_rect[layerCount], &render_rect[layerCount]);
     }
     SDL_RenderPresent(sdl_renderer);

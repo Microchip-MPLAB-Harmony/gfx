@@ -462,8 +462,8 @@ void leRotatePoint(lePoint pos,
     int32_t s = leSin(-ang);
     int32_t c = leCos(-ang);
 
-    res->x = ((pos.x * c) / TRIG_SCALAR) - ((pos.y * s) / TRIG_SCALAR);
-    res->y = ((pos.x * s) / TRIG_SCALAR) + ((pos.y * c) / TRIG_SCALAR);
+    res->x = ((pos.x * c) - (pos.y * s)) / TRIG_SCALAR;
+    res->y = ((pos.x * s) + (pos.y * c)) / TRIG_SCALAR;
 
     res->x += org.x;
     res->y += org.y;

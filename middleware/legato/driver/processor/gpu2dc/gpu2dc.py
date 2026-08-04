@@ -36,7 +36,7 @@ def instantiateComponent(component):
     driver_ver = component.createStringSymbol("Version", None)
     driver_ver.setVisible(True)
     driver_ver.setReadOnly(True)
-    driver_ver.setDefaultValue("1.0.0 beta")
+    driver_ver.setDefaultValue("1.1.0")
 
     # Utility Symbols (hidden)
     # Driver IP name

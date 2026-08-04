@@ -59,11 +59,31 @@ def instantiateComponent(component):
 	LE_SYS_RTOS_TASK_C.setSourcePath("templates/le_rtos_tasks.c.ftl")
 	LE_SYS_RTOS_TASK_C.setMarkup(True)
 
+	LE_HARMONY_PERF_C = component.createFileSymbol("LE_HARMONY_PERF_C", None)
+	LE_HARMONY_PERF_C.setSourcePath("templates/le_harmony_perf.c.ftl")
+	LE_HARMONY_PERF_C.setDestPath("gfx/legato/generated/")
+	LE_HARMONY_PERF_C.setProjectPath(projectPath)
+	LE_HARMONY_PERF_C.setOutputName("le_gen_harmony.c")
+	LE_HARMONY_PERF_C.setMarkup(True)
+	LE_HARMONY_PERF_C.setType("SOURCE")
+	LE_HARMONY_PERF_C.setEnabled(False)
+
+	LE_HARMONY_PERF_H = component.createFileSymbol("LE_HARMONY_PERF_H", None)
+	LE_HARMONY_PERF_H.setSourcePath("templates/le_harmony_perf.h.ftl")
+	LE_HARMONY_PERF_H.setDestPath("gfx/legato/generated/")
+	LE_HARMONY_PERF_H.setProjectPath(projectPath)
+	LE_HARMONY_PERF_H.setOutputName("le_gen_harmony.h")
+	LE_HARMONY_PERF_H.setMarkup(True)
+	LE_HARMONY_PERF_H.setType("HEADER")
+	LE_HARMONY_PERF_H.setEnabled(False)
+
 	LeGPUConnected = component.createBooleanSymbol("LeGPUConnected", None)
 	LeGPUConnected.setDescription("Hints if a GPU module is connected to Legato")
 	LeGPUConnected.setDefaultValue(False)
 	LeGPUConnected.setVisible(False)
 
+	component.setDependencyEnabled("SYS_TIME", True);
+	
 def onAttachmentConnected(source, target):
 	if source["id"] == "gfx_driver":
 		driverName = target["component"].getSymbolValue("DriverInitName")
@@ -72,10 +92,6 @@ def onAttachmentConnected(source, target):
 	if source["id"] == "gpu_driver":
 		source["component"].setSymbolValue("LeGPUConnected", True)
         
-	#if source["id"] == "gfx_hal":
-	#	target["component"].setSymbolValue("GlobalPaletteModeHint", source["component"].getSymbolValue("useGlobalPalette"), 1)
-	#	target["component"].setSymbolValue("DisableGlobalPaletteModeHint", True, 1)
-
 def onAttachmentDisconnected(source, target):
 	if source["id"] == "gfx_driver":
 		source["component"].clearSymbolValue("driverInitName")
@@ -98,6 +114,17 @@ def onAttachmentDisconnected(source, target):
 	
 def showRTOSMenu(symbol, event):
 	symbol.setVisible(event["value"] != "BareMetal")
+
+def onEnableInputChanged(source, event):
+	source.getComponent().setDependencyEnabled("Input System Service", event["value"] == True)
+
+def onEnablePerformanceMetricsChanged(source, event):
+	source.getComponent().getSymbolByID("LE_HARMONY_PERF_C").setEnabled(event['value'] == True)
+	source.getComponent().getSymbolByID("LE_HARMONY_PERF_H").setEnabled(event['value'] == True)
+	source.getComponent().getSymbolByID("enableUsageMonitorPrint").setVisible(event['value'] == True)	
+	source.getComponent().getSymbolByID("periodUsageMonitorOutput").setVisible(event['value'] == True)
+	source.getComponent().getSymbolByID("libraryTaskPeriod").setVisible(event['value'] == True)	
+	source.getComponent().getSymbolByID("enableInputEvents").setVisible(event['value'] == True)	
 
 """def enableAriaRTOSExtensions(symbol, event):
 	enableAriaExtensionsFiles(symbol.getComponent(), event["value"] == True)

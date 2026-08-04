@@ -32,6 +32,6 @@ def loadModule():
     )
     component.setDisplayType("Simulated Graphics System")
     component.addDependency("mgs_web_sim_core_dep", "Core Service", True, True)
-    component.addDependency("mgs_web_sim_inp_dep", "Input System Service", True, True)
+    component.addDependency("mgs_web_sim_inp_dep", "Input System Service", True, False)
     component.addCapability("mgs_web_sim_drv_cap", "LE Display Driver", False)
     component.addCapability("mgs_web_sim_tmr_cap", "TMR", False)

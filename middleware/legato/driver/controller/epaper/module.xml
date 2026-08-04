@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Module name="gfx_le_epaper" id="02415064-DE50-4D55-BF02-31E906D90A1D" version="1.0.0">
+    <ConfigRoot path="config/module.py"/>
+</Module>

@@ -86,6 +86,8 @@
 #define XLCDC_VER_RES           ${XTResRPF}
 #define XLCDC_TOT_LAYERS        ${TotalNumLayers}
 #define XLCDC_BUF_PER_LAYER     ${DoubleBuffering?then('2', '1')}
+#define RENDER_BUFFER_SIZE_KB   ${ScratchBufferSize}
+
 <#if DoubleBuffering>
 #define XLCDC_SYNC_RECT_COUNT   ${DBROMaxRects}
 <#if DBRectOpt == "Simple">
@@ -170,6 +172,10 @@ static LAYER_ATTRIBUTES drvLayer[XLCDC_TOT_LAYERS];
 FB_BPP_TYPE FB_CACHE_CA frame_buffer [XLCDC_TOT_LAYERS * XLCDC_BUF_PER_LAYER][XLCDC_HOR_RES * XLCDC_VER_RES];
 <#else>
 FB_BPP_TYPE FB_CACHE_NC frame_buffer [XLCDC_TOT_LAYERS * XLCDC_BUF_PER_LAYER][XLCDC_HOR_RES * XLCDC_VER_RES];
+</#if>
+
+<#if ScratchBufferSize gt 0>
+uint8_t FB_CACHE_NC render_buffer [RENDER_BUFFER_SIZE_KB * 1024];
 </#if>
 
 <#if DoubleBuffering>
@@ -385,23 +391,25 @@ static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
     if (width == 0 || height == 0)
         return GFX_FAILURE;
 
-    // Calculate row size in bytes
-    const uint32_t pixelSize = gfxColorInfoTable[dest->mode].size;
-    const uint32_t rowSize = width * pixelSize;
+    // Calculate row size in bytes, use each buffer's own format
+    const uint32_t srcPixelSize  = gfxColorInfoTable[source->mode].size;
+    const uint32_t destPixelSize = gfxColorInfoTable[dest->mode].size;
+    const uint32_t rowSize = width * destPixelSize;
 
     // Calculate source and destination strides based on buffer widths
-    const uint32_t srcStride = source->size.width * pixelSize;
-    const uint32_t destStride = dest->size.width * pixelSize;
+    const uint32_t srcStride  = source->size.width * srcPixelSize;
+    const uint32_t destStride = dest->size.width   * destPixelSize;
 
     uint8_t* restrict srcBase = (uint8_t*)gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y);
     uint8_t* restrict destBase = (uint8_t*)gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y);
 
     // Check if we can do a single large transfer i.e. we have contiguous data
-    if (width == source->size.width && width == dest->size.width)
+    if (width == source->size.width && width == dest->size.width
+        && srcPixelSize == destPixelSize)
     {
         const uint32_t totalSize = rowSize * height;
 
-        if (IS_ALIGNED(srcBase, 4) && IS_ALIGNED(destBase, 4) && totalSize >= 16)
+        if (totalSize >= 16)
         {
             uint8_t* src = srcBase;
             uint8_t* dst = destBase;
@@ -446,12 +454,16 @@ static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
         uint8_t* restrict src = srcBase + row * srcStride;
         uint8_t* restrict dst = destBase + row * destStride;
 
-        if (IS_ALIGNED(src, 4) && IS_ALIGNED(dst, 4) && rowSize >= 16)
+        if (rowSize >= 16)
         {
             uint32_t vectors = rowSize / 16;
             uint32_t remain = rowSize & 15;
 
-            // Aggressive pre-fetch
+            // Pre-fetch current row and next row
+            __builtin_prefetch(src);
+            __builtin_prefetch(src + 32);
+            __builtin_prefetch(src + 64);
+            __builtin_prefetch(src + 96);
             if (row < height - 1)
             {
                 __builtin_prefetch(src + srcStride);
@@ -507,19 +519,21 @@ static gfxResult DRV_XLCDC_CPU_Blit(const gfxPixelBuffer* restrict source,
     if (width == 0 || height == 0)
         return GFX_FAILURE;
 
-    // Calculate row size in bytes
-    const uint32_t pixelSize = gfxColorInfoTable[dest->mode].size;
-    const uint32_t rowSize = width * pixelSize;
+    // Calculate row size in bytes, use each buffer's own format
+    const uint32_t srcPixelSize  = gfxColorInfoTable[source->mode].size;
+    const uint32_t destPixelSize = gfxColorInfoTable[dest->mode].size;
+    const uint32_t rowSize = width * destPixelSize;
 
     // Calculate source and destination strides based on buffer widths
-    const uint32_t srcStride = source->size.width * pixelSize;
-    const uint32_t destStride = dest->size.width * pixelSize;
+    const uint32_t srcStride  = source->size.width * srcPixelSize;
+    const uint32_t destStride = dest->size.width   * destPixelSize;
 
     uint8_t* restrict srcBase = (uint8_t*)gfxPixelBufferOffsetGet(source, rectSrc->x, rectSrc->y);
     uint8_t* restrict destBase = (uint8_t*)gfxPixelBufferOffsetGet(dest, rectDest->x, rectDest->y);
 
     // Check if we can do a single large transfer i.e. we have contiguous data
-    if (width == source->size.width && width == dest->size.width)
+    if (width == source->size.width && width == dest->size.width
+        && srcPixelSize == destPixelSize)
     {
         const uint32_t totalSize = rowSize * height;
         memcpy(destBase, srcBase, totalSize);
@@ -821,6 +835,7 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
     gfxIOCTLArg_Value *val;
     gfxIOCTLArg_DisplaySize *disp;
     gfxIOCTLArg_LayerRect *rect;
+    gfxIOCTLArg_Buffer * buff;
 
     switch (request)
     {
@@ -976,7 +991,16 @@ gfxDriverIOCTLResponse DRV_XLCDC_IOCTL(gfxDriverIOCTLRequest request, void* arg)
 
             return GFX_IOCTL_OK;
         }
+<#if ScratchBufferSize gt 0>
+        case GFX_IOCTL_GET_RENDERBUFFER:
+        {
+            buff = (gfxIOCTLArg_Buffer *) arg;
+            buff->buffer = render_buffer;
+            buff->size = sizeof(render_buffer);
 
+            return GFX_IOCTL_OK;
+        }
+</#if>        
         case GFX_IOCTL_SET_PALETTE:
         {
             return GFX_IOCTL_UNSUPPORTED;

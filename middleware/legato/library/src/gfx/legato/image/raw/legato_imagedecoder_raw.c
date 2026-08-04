@@ -1052,7 +1052,13 @@ static leResult _rotateDraw(const leImage* src,
     _state.targetX = 0;
 
     _state.angle = angle;
-    //_state.sourceOrigin = srcRect->width
+
+    // compute rotation center in destRect-local coordinates
+    // the rotation center in screen space is the center of the full
+    // (unclipped) rotated bounding box, which coincides with the center
+    // of the source image rect (imgRect)
+    _state.targetOrigin.x = (drawRect.x + drawRect.width / 2) - clipRect.x;
+    _state.targetOrigin.y = (drawRect.y + drawRect.height / 2) - clipRect.y;
 
     _state.targetMode = leRenderer_CurrentColorMode();
 

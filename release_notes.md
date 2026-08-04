@@ -8,6 +8,71 @@ nav_order: 99
 
 # Microchip Graphics Suite Harmony Release Notes
 
+## Graphics Release v3.17.1
+
+### New Features
+
+* legato: Add performance monitoring
+* legato: Enable renderer support for display driver scratch buffer allocation
+* simulator: Add support for mono-color mode
+* XLCDC: Add display driver scratch buffer allocation support
+* Add Waveshare 8.8inch DSI Touch A Display support
+* Add display driver support for ePaper displays
+
+### Issues Fixed
+
+* GFX2D: Add cache maintenance after GPU operations
+* legato: Fix memory leak in `variable_heap` code
+* legato: Improve `TextFieldWidget` API
+* legato: Fix `ListWidget` "Icon Behind" setting
+* legato: Fix `setFromCStr()` issue
+* simulator: Fix `ImageRotateWidget` rendering
+* MCC: Fix issue where Composer was not available in Plugin dropdown menu
+
+### MGS Harmony Composer
+
+* MGS Harmony Composer v3.3.5 (Windows)
+* MGS Harmony Composer v3.3.5 (Linux)
+* MGS Harmony Composer v3.3.5 (MacOS)
+
+* For more information about how to user the MGS Harmony Graphics Composer, visit the [MGS Harmony Composer User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/composer-ug/) at Microchip Develop Help.
+
+  **NOTE 1:** MGS Harmony Composer users on **Windows** may have missing DLLs on launch: `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll`, and `MSCVP140.dll`.
+  * Download the latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version) to fix this issue.
+
+  **NOTE 2:** MGS Harmony Composer users on **MacOS** may encounter the error: *"Composer.app is damaged and can’t be opened. You should move it to the Trash."*
+  * This is due to MGS Harmony Composer not being officially signed for MacOS. To fix this issue, run the following terminal commands in the same directory as `Composer.app`:
+    * `codesign --force --deep --sign - Composer.app`
+    * `xattr -d com.apple.quarantine Composer.app`
+
+### MGS Simulator
+
+* For information on how to download and install the Simulator as a productivity tool to shorten development time and reduce the overall cost of your embedded GUI designs, visit the [MGS Simulator User Guide](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/mgs/mgs-harmony-guide/simulator/) at Microchip Develop Help.
+
+### Development Tools
+- [MPLAB® X IDE v6.30](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v5.00](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+    - MPLAB® Code Configurator (MCC) Plugin v5.9.0
+
+### Dependent Components
+
+* [Core v3.17.0 ](https://github.com/Microchip-MPLAB-Harmony/core/releases/tag/v3.17.0)
+
+### Visual Studio Code
+- Graphics Release v3.17.1 has been tested on Visual Studio Code v1.130.0
+    - MPLAB Extensions version 1.2.6
+- If you do not already have VSCode installed, you can download VSCode v1.130.0 here:
+    - [Windows x64 User installer](https://update.code.visualstudio.com/1.130.0/win32-x64-user/stable)
+    - [Linux x64](https://update.code.visualstudio.com/1.130.0/linux-x64/stable)
+    - [macOS Apple silicon](https://update.code.visualstudio.com/1.130.0/darwin-arm64/stable)
+- To install the latest version of VSCode, visit the [Visual Studio Code](https://code.visualstudio.com/) website.
+    - **NOTE** Harmony Graphics v3.17.1 has been tested on VSCode v1.130.0. If you run into issues with later versions of VSCode, try installing VSCode v1.130.0.
+- Use [Visual Studio Code FAQ: VS Code Versions](https://code.visualstudio.com/docs/supporting/FAQ#_vs-code-versions) for more information about:
+    - How to disable automatic updates in VSCode
+    - Installing other versions of VSCode
+    - Installing VSCode on other operating systems
+
 ## Graphics Release v3.17.0
 
 ### New Features

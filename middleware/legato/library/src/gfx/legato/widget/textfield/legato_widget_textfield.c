@@ -45,6 +45,7 @@
 #define DEFAULT_HEIGHT          25
 
 #define DEFAULT_CURSOR_TIME     1000
+#define DEFAULT_MAX_CHARS       1024
 
 static
 #if LE_DYNAMIC_VTABLES == 0
@@ -184,6 +185,7 @@ void leTextFieldWidget_Constructor(leTextFieldWidget* _this)
     _this->cursorEnable = LE_TRUE;
     _this->cursorDelay = DEFAULT_CURSOR_TIME;
     _this->clearOnFirstEdit = LE_TRUE;
+    _this->maxChars = DEFAULT_MAX_CHARS;
 
     _this->textChangedEvent = NULL;
     _this->focusChangedEvent = NULL;
@@ -230,6 +232,30 @@ static void update(leTextFieldWidget* _this,
             _invalidateCursor(_this);
         }
     }
+}
+
+static uint32_t getMaxChars(const leTextFieldWidget* _this)
+{
+    LE_ASSERT_THIS();
+
+    return _this->maxChars;
+}
+
+static leResult setMaxChars(leTextFieldWidget* _this,
+                            uint32_t max)
+{
+    LE_ASSERT_THIS();
+
+    if(_this->maxChars == max)
+        return LE_FAILURE;
+
+    _this->maxChars = max;
+
+#if LE_DEBUG == 1
+    _leDebugNotify_WidgetPropertyChanged((leWidget*)_this);
+#endif
+
+    return LE_SUCCESS;
 }
 
 static uint32_t getCursorDelay(const leTextFieldWidget* _this)
@@ -549,13 +575,24 @@ static void editAccept(leTextFieldWidget* _this)
 static void editAppend(leTextFieldWidget* _this,
                        const leString* str)
 {
+    uint32_t currentLen;
+    uint32_t appendLen;
+
     LE_ASSERT_THIS();
 
     if(str == NULL)
         return;
 
+    currentLen = _this->text.fn->length(&_this->text);
+    appendLen = str->fn->length(str);
+
+    if (currentLen + appendLen > _this->maxChars)
+    {
+        return;
+    }
+
     _this->text.fn->insert(&_this->text, str, _this->cursorPos);
-    _this->cursorPos += str->fn->length(str);
+    _this->cursorPos += appendLen;
 
     if(_this->cursorEnable == LE_TRUE)
     {
@@ -701,6 +738,8 @@ void _leTextFieldWidget_GenerateVTable()
     textFieldWidgetVTable.editBackspace = editBackspace;
     
     /* member functions */
+    textFieldWidgetVTable.getMaxChars = getMaxChars;
+    textFieldWidgetVTable.setMaxChars = setMaxChars;
     textFieldWidgetVTable.getCursorDelay = getCursorDelay;
     textFieldWidgetVTable.setCursorDelay = setCursorDelay;
     textFieldWidgetVTable.getCursorEnabled = getCursorEnabled;
@@ -817,6 +856,8 @@ static const leTextFieldWidgetVTable textFieldWidgetVTable =
     .editBackspace = editBackspace,
 
     /* member functions */
+    .getMaxChars = getMaxChars,
+    .setMaxChars = setMaxChars,
     .getCursorDelay = getCursorDelay,
     .setCursorDelay = setCursorDelay,
     .getCursorEnabled = getCursorEnabled,

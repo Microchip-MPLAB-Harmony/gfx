@@ -130,11 +130,15 @@ leResult leEvent_ProcessEvents()
         //evt = _state.events.values[i];
         evt = (leEvent*)node->val;
 
+        node = node->next;
+
         if(_state.filter != NULL &&
            _state.filter(evt) == LE_FALSE)
-           continue;
-
-        node = node->next;
+        {
+            leList_Remove(&_state.events, evt);
+            LE_FREE(evt);
+            continue;
+        }
 
         res = processEvent(evt);
 

@@ -94,6 +94,8 @@ typedef void (* leTextFieldWidget_FocusChangedCallback)(leTextFieldWidget*, leBo
 #define LE_TEXTFIELDWIDGET_VTABLE(THIS_TYPE) \
     LE_EDITWIDGET_VTABLE(THIS_TYPE) \
     \
+    uint32_t   (*getMaxChars)(const THIS_TYPE* _this); \
+    leResult   (*setMaxChars)(THIS_TYPE* _this, uint32_t max); \
     uint32_t   (*getCursorDelay)(const THIS_TYPE* _this); \
     leResult   (*setCursorDelay)(THIS_TYPE* _this, uint32_t dt); \
     leBool     (*getCursorEnabled)(const THIS_TYPE* _this); \
@@ -148,6 +150,7 @@ typedef struct leTextFieldWidget
     leBool cursorEnable; // cursor enabled flag
     leBool cursorVisible; // cursor visbility flag
     leBool clearOnFirstEdit; // needs clear on first edit
+    uint32_t maxChars; // maximum number of characters allowed
 
     leTextFieldWidget_TextChangedCallback textChangedEvent; // text changed event
     leTextFieldWidget_FocusChangedCallback focusChangedEvent; // focus changed event
@@ -187,6 +190,36 @@ void leTextFieldWidget_Constructor(leTextFieldWidget* wgt);
 #ifdef _DOXYGEN_
 #define THIS_TYPE struct leWidget
 
+
+// *****************************************************************************
+/**
+ * @brief Get maximum character limit.
+ * @details Gets the maximum number of characters allowed from <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * uint32_t max = _this->fn->getMaxChars(_this);
+ * @endcode
+ * @param  _this is the widget to query
+ * @return the maximum character limit.
+ */
+virtual uint32_t getMaxChars(const leTextFieldWidget* _this);
+
+
+// *****************************************************************************
+/**
+ * @brief Set maximum character limit.
+ * @details Sets the maximum number of characters allowed for <span class="param">_this</span>.
+ * @code
+ * leTextFieldWidget* _this;
+ * uint32_t max;
+ * leResult res = _this->fn->setMaxChars(_this, max);
+ * @endcode
+ * @param _this is the widget to modify.
+ * @param max the maximum number of characters.
+ * @return LE_SUCCESS if set, otherwise LE_FAILURE.
+ */
+virtual leResult setMaxChars(leTextFieldWidget* _this,
+                             uint32_t max);
 
 // *****************************************************************************
 /**

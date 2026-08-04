@@ -26,16 +26,23 @@
 #include "gfx/driver/gpu2dc/drv_gfx_gpu2dc.h"
 #include "nano2D.h"
 
+#ifdef __ARM_NEON
+#include <arm_neon.h>
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
 /* GPU2DC Stride Alignment Check */
 #define GFX_STRIDE_ALIGN_FAILS(w, m, p) ( \
     ((uintptr_t)(p) & 0xF) != 0 || ( \
-    ((m)==0 || (m)==1 || (m)==9) ? ((w) & 0xF)  != 0 : /* 16-byte aligned */  \
-    ((m)==2 || (m)==3)           ? ((w) & 0x7)  != 0 : /* 8-byte aligned */   \
-    ((m)==4)                     ? ((w) % 6)    != 0 : /* 6-byte aligned */   \
-    ((m)==5 || (m)==6)           ? ((w) & 0x3)  != 0 : /* 4-byte aligned */   \
-    ((m)==8)                     ? ((w) & 0x1F) != 0 : /* 32-byte aligned */  \
-    ((m)==7 || (m)==10)          ? ((w) & 0x7F) != 0 : /* 128-byte aligned */ \
-    1)) /* default to fail safe */
+    ((m)==0 || (m)==9)  ? ((w) & 0x0F) != 0 : /* 1bpp:  w%16,  stride=16B */ \
+    ((m)==2 || (m)==3)  ? ((w) & 0x07) != 0 : /* 2bpp:  w%8,   stride=16B */ \
+    ((m)==4)            ? ((w) & 0x0F) != 0 : /* 3bpp:  w%16,  stride=48B */ \
+    ((m)==5 || (m)==6)  ? ((w) & 0x03) != 0 : /* 4bpp:  w%4,   stride=16B */ \
+    ((m)==7)            ? ((w) & 0x7F) != 0 : /* 1bpp indexed: w%128, stride=16B */ \
+    1)) /* unsupported formats (m=1,8,10) always fail */
 
 /* GPU2DC Driver Heap Size */
 #define GPU_HEAP_SIZE 0x100000U // 1MB
@@ -57,6 +64,117 @@ static n2d_buffer_format_t n2dFormats[GFX_COLOR_MODE_LAST + 1] =
     N2D_INDEX8,         // GFX_COLOR_MODE_INDEX_8
     -1,                 // GFX_COLOR_MODE_MONOCHROME
 };
+
+#ifdef __ARM_NEON
+/* CPU NEON blit used as fallback when the GPU blit fails.
+   Only handles GFX_BLEND_NONE (straight copy). Blend modes requiring
+   alpha compositing are not supported and must go through the GPU. */
+static gfxResult DRV_GPU2DC_NEON_Blit(const gfxPixelBuffer* source,
+                                       const gfxRect* srcRect,
+                                       const gfxPixelBuffer* dest,
+                                       const gfxRect* destRect)
+{
+    const uint32_t width  = MIN(srcRect->width,  destRect->width);
+    const uint32_t height = MIN(srcRect->height, destRect->height);
+
+    if (width == 0 || height == 0)
+        return GFX_FAILURE;
+
+    const uint32_t srcPixelSize  = gfxColorInfoTable[source->mode].size;
+    const uint32_t destPixelSize = gfxColorInfoTable[dest->mode].size;
+    const uint32_t rowSize       = width * destPixelSize;
+    const uint32_t srcStride     = source->size.width * srcPixelSize;
+    const uint32_t destStride    = dest->size.width   * destPixelSize;
+
+    uint8_t* srcBase  = (uint8_t*)gfxPixelBufferOffsetGet(source, srcRect->x,  srcRect->y);
+    uint8_t* destBase = (uint8_t*)gfxPixelBufferOffsetGet(dest,   destRect->x, destRect->y);
+
+    /* Contiguous path: both buffers full-width and same format */
+    if (width == source->size.width && width == dest->size.width
+        && srcPixelSize == destPixelSize)
+    {
+        const uint32_t totalSize = rowSize * height;
+
+        if (totalSize >= 16)
+        {
+            uint8_t* src = srcBase;
+            uint8_t* dst = destBase;
+            uint32_t vectors = totalSize / 16;
+            uint32_t remain  = totalSize & 15;
+
+            __builtin_prefetch(src);
+            __builtin_prefetch(src + 32);
+            __builtin_prefetch(src + 64);
+            __builtin_prefetch(src + 96);
+
+            while (vectors--)
+            {
+                __builtin_prefetch(src + 128);
+                __builtin_prefetch(src + 160);
+                vst1q_u8(dst, vld1q_u8(src));
+                src += 16;
+                dst += 16;
+            }
+
+            if (remain)
+                memcpy(dst, src, remain);
+        }
+        else
+        {
+            memcpy(destBase, srcBase, totalSize);
+        }
+
+        return GFX_SUCCESS;
+    }
+
+    /* Row-by-row path for partial or format-differing blits */
+    for (uint32_t row = 0; row < height; row++)
+    {
+        uint8_t* src = srcBase  + row * srcStride;
+        uint8_t* dst = destBase + row * destStride;
+
+        if (rowSize >= 16)
+        {
+            uint32_t vectors = rowSize / 16;
+            uint32_t remain  = rowSize & 15;
+
+            __builtin_prefetch(src);
+            __builtin_prefetch(src + 32);
+            __builtin_prefetch(src + 64);
+            __builtin_prefetch(src + 96);
+
+            if (row < height - 1)
+            {
+                __builtin_prefetch(src + srcStride);
+                __builtin_prefetch(src + srcStride + 32);
+                __builtin_prefetch(src + srcStride + 64);
+                __builtin_prefetch(src + srcStride + 96);
+            }
+
+            uint8_t* vs = src;
+            uint8_t* vd = dst;
+
+            while (vectors--)
+            {
+                __builtin_prefetch(vs + 128);
+                __builtin_prefetch(vs + 160);
+                vst1q_u8(vd, vld1q_u8(vs));
+                vs += 16;
+                vd += 16;
+            }
+
+            if (remain)
+                memcpy(vd, vs, remain);
+        }
+        else
+        {
+            memcpy(dst, src, rowSize);
+        }
+    }
+
+    return GFX_SUCCESS;
+}
+#endif /* __ARM_NEON */
 
 gfxResult DRV_GPU2DC_Line(gfxPixelBuffer* dest, const gfxPoint* p1, const gfxPoint* p2, const gfxRect* clipRect, const gfxColor color)
 {
@@ -138,7 +256,7 @@ gfxResult DRV_GPU2DC_Blit(const gfxPixelBuffer* source, const gfxRect* srcRect, 
         return GFX_FAILURE;
 
     if (GFX_STRIDE_ALIGN_FAILS(source->size.width, source->mode, source->pixels))
-        return GFX_FAILURE;
+        goto gpu_fail;
 
     n2d_buffer_t srcBuf = {0};
     srcBuf.width = source->size.width;
@@ -161,12 +279,19 @@ gfxResult DRV_GPU2DC_Blit(const gfxPixelBuffer* source, const gfxRect* srcRect, 
     dstBuf.gpu = (n2d_uintptr_t)dest->pixels;
 
     n2d_error_t err = n2d_blit(&dstBuf, (n2d_rectangle_t*)destRect, &srcBuf, (n2d_rectangle_t*)srcRect, blendState);
-    if (N2D_IS_ERROR(err)) return GFX_FAILURE;
+    if (N2D_IS_ERROR(err)) goto gpu_fail;
 
     err = n2d_commit();
-    if (N2D_IS_ERROR(err)) return GFX_FAILURE;
+    if (N2D_IS_ERROR(err)) goto gpu_fail;
 
     return GFX_SUCCESS;
+
+gpu_fail:
+#ifdef __ARM_NEON
+    if (blendState == GFX_BLEND_NONE)
+        return DRV_GPU2DC_NEON_Blit(source, srcRect, dest, destRect);
+#endif
+    return GFX_FAILURE;
 }
 
 gfxResult DRV_GPU2DC_SetBlend(const gfxBlend blend)

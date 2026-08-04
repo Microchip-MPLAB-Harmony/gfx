@@ -128,6 +128,8 @@ gfxResult DRV_GFX2D_Fill(gfxPixelBuffer* dest,
         fill_color = color;
     }
 
+    dcache_CleanInvalidateByAddr(dest->pixels, dest->buffer_length);
+
     PLIB_GFX2D_Fill(&dest_buffer, &dest_rect, fill_color);
 
 <#if DRV_GFX2D_MODE == "Asynchronous">
@@ -137,6 +139,8 @@ gfxResult DRV_GFX2D_Fill(gfxPixelBuffer* dest,
     while(PLIB_GFX2D_GetGlobalStatusBusy() == true);
 
 </#if>
+    dcache_CleanInvalidateByAddr(dest->pixels, dest->buffer_length);
+
     return GFX_SUCCESS;
 }
 
@@ -210,6 +214,8 @@ gfxResult DRV_GFX2D_Blit(const gfxPixelBuffer* source,
     while(PLIB_GFX2D_GetGlobalStatusBusy() == true);
 
 </#if>
+    dcache_CleanInvalidateByAddr(dest->pixels, dest->buffer_length);
+
     return GFX_SUCCESS;
 }
 

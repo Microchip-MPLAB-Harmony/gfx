@@ -392,20 +392,6 @@ static void nextState(leListWidget* lst)
                 paintState.nextItem = 0;
                 paintState.y = 0;
                 
-                lst->widget.status.drawState = DRAW_STRING;
-                lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
-            
-                return;
-            }
-        }
-        // fall through
-        case DRAW_STRING:
-        {            
-            if(lst->items.size > 0)
-            {
-                paintState.nextItem = 0;
-                paintState.y = 0;
-                
                 lst->widget.status.drawState = DRAW_ICON;
                 lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawIcon;
             
@@ -414,6 +400,20 @@ static void nextState(leListWidget* lst)
         }
         // fall through
         case DRAW_ICON:
+        {            
+            if(lst->items.size > 0)
+            {
+                paintState.nextItem = 0;
+                paintState.y = 0;
+                
+                lst->widget.status.drawState = DRAW_STRING;
+                lst->widget.drawFunc = (leWidget_DrawFunction_FnPtr)&drawString;
+            
+                return;
+            }
+        }
+        // fall through
+        case DRAW_STRING:
         {
             if(lst->widget.style.borderType != LE_WIDGET_BORDER_NONE)
             {

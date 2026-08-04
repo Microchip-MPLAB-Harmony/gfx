@@ -1039,6 +1039,7 @@ typedef enum gfxDriverIOCTLRequest
     GFX_IOCTL_FRAME_END, // indicates that the driver should end the current frame, arg = NULL
     GFX_IOCTL_GET_VSYNC_COUNT, // gets the current driver vsync count, arg = gfxIOCTLArg_Value
     GFX_IOCTL_GET_FRAMEBUFFER, // gets a pointer to the internal driver frame buffer, arg = gfxIOCTLArg_Value
+    GFX_IOCTL_GET_RENDERBUFFER, // gets the render (scratch) buffer , arg = gfxIOCTLArg_Buffer
     GFX_IOCTL_SET_PALETTE, // sets the current driver palette, arg = gfxIOCTLArg_Palette
     GFX_IOCTL_SET_VBLANK_SYNC, // sets the driver to sync update w/ vblank or not, arg = gfxIOCTLArg_Value
 
@@ -1063,6 +1064,7 @@ typedef enum gfxDriverIOCTLRequest
     GFX_IOCTL_SET_BLIT_CALLBACK, // set a callback for scratch buffer blit completion, arg = gfxIOCTLArg_Value
     GFX_IOCTL_SET_IRQ_CALLBACK, // set a callback for the driver IRQ, arg = gfxIOCTLArg_LayerValue
 
+    GFX_IOCTL_VENDOR_START, //start of vendor-specific driver IOCTLs
 } gfxDriverIOCTLRequest;
 
 #define GFX_IOCTL_LAYER_REQ_START GFX_IOCTL_SET_LAYER_LOCK
@@ -1095,6 +1097,16 @@ typedef struct gfxIOCTLArg_Value
         gfxPixelBuffer* v_pbuffer;
     } value;
 } gfxIOCTLArg_Value;
+
+/**
+ * @brief This struct represents a standard IOCTL buffer argument.
+ * @details This struct represents a standard IOCTL buffer argument.
+ */
+typedef struct gfxIOCTLArg_Buffer
+{
+    uint32_t size;
+    void* buffer;
+} gfxIOCTLArg_Buffer;
 
 /**
  * @brief This struct represents a standard IOCTL size value argument.

@@ -132,6 +132,10 @@ leRenderState _rendererState;
 #define LE_NO_CACHE_ATTR
 #endif
 
+#if LE_SCRATCH_BUFFER_SIZE_KB == 0
+#define USE_DRIVER_SCRATCH_BUFFER_ALLOC
+#endif
+
 
 #ifndef __ALIGNED
 #define __ALIGNED(val)
@@ -139,7 +143,15 @@ leRenderState _rendererState;
 
 void _leRenderer_InitDrawForMode(leColorMode mode);
 
+#ifdef USE_DRIVER_SCRATCH_BUFFER_ALLOC
+#if LE_SCRATCH_BUFFER_COUNT == 0
+#error "LE_SCRATCH_BUFFER_COUNT must be > 0 when LE_SCRATCH_BUFFER_SIZE_KB == 0"
+#endif
+static void* _dataBufferPtr = NULL;
+static uint32_t _dataBufferSize = 0;
+#else
 static uint8_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _dataBuffers[LE_SCRATCH_BUFFER_COUNT][SCRATCH_BUFFER_SZ];
+#endif
 
 struct leScratchBuffer
 {
@@ -149,7 +161,12 @@ struct leScratchBuffer
 
 #if LE_WIDGET_BUFFER_ENABLE == 1
 
+#ifdef USE_DRIVER_SCRATCH_BUFFER_ALLOC
+static void* _widgetBufferData = NULL;
+#else
 static uint32_t LE_COHERENT_ATTR LE_NO_CACHE_ATTR __ALIGNED(64) _widgetBufferData[SCRATCH_BUFFER_SZ];
+#endif
+
 static lePixelBuffer _widgetBuffer;
 
 #endif
@@ -279,11 +296,14 @@ leResult leRenderer_Initialize(const gfxDisplayDriver* dispDriver,
                                const gfxGraphicsProcessor* gpuDriver)
 {
     gfxIOCTLArg_Value val;
+#if LE_SCRATCH_BUFFER_SIZE_KB == 0
+    gfxIOCTLArg_Buffer bufArg;
+#endif
 
     _state = leGetState();
 
     memset(&_rendererState, 0, sizeof(leRenderState));
- 
+
     if(dispDriver == NULL ||
        dispDriver->update == NULL ||
        dispDriver->blitBuffer == NULL ||
@@ -300,7 +320,24 @@ leResult leRenderer_Initialize(const gfxDisplayDriver* dispDriver,
 
     _rendererState.bufferCount = val.value.v_uint;
     _rendererState.frameState = LE_FRAME_READY;
-    
+
+#if LE_SCRATCH_BUFFER_SIZE_KB == 0
+    if(dispDriver->ioctl(GFX_IOCTL_GET_RENDERBUFFER, &bufArg) == GFX_IOCTL_OK)
+    {
+        _dataBufferPtr = bufArg.buffer;
+#if LE_WIDGET_BUFFER_ENABLE == 1
+        _dataBufferSize = bufArg.size / (LE_SCRATCH_BUFFER_COUNT + 1);
+        _widgetBufferData = (uint8_t*)bufArg.buffer + (LE_SCRATCH_BUFFER_COUNT * _dataBufferSize);
+#else
+        _dataBufferSize = bufArg.size / LE_SCRATCH_BUFFER_COUNT;
+#endif
+    }
+    else
+    {
+        return LE_FAILURE;
+    }
+#endif
+
     return LE_SUCCESS;
 }
 
@@ -466,7 +503,11 @@ static void preLayer(void)
     leRectArray_Clear(&_rendererState.currentRenderLayer->scratchRectList);
     leRectArray_Clear(&_rendererState.currentRenderLayer->frameRectList);
 
+#ifdef USE_DRIVER_SCRATCH_BUFFER_ALLOC
+    maxScratchPixels = (_dataBufferSize * 8) / leColorInfoTable[leGetLayerColorMode(_rendererState.layerIdx)].bpp;
+#else
     maxScratchPixels = (SCRATCH_BUFFER_SZ * 8) / leColorInfoTable[leGetLayerColorMode(_rendererState.layerIdx)].bpp;
+#endif
 
     // merge rectangle lists
     if(_rendererState.bufferCount > 1)
@@ -646,11 +687,19 @@ static void preRect(void)
     height = _rendererState.currentRenderLayer->frameRectList.rects[_rendererState.frameRectIdx].width;
 #endif
 
+#ifdef USE_DRIVER_SCRATCH_BUFFER_ALLOC
+    lePixelBufferCreate(width,
+                        height,
+                        leGetLayerColorMode(_rendererState.layerIdx),
+                        (uint8_t*)_dataBufferPtr + (idx * _dataBufferSize),
+                        &buf->renderBuffer);
+#else
     lePixelBufferCreate(width,
                         height,
                         leGetLayerColorMode(_rendererState.layerIdx),
                         &_dataBuffers[idx],
                         &buf->renderBuffer);
+#endif
 
 #if LE_WIDGET_BUFFER_ENABLE == 1
     lePixelBufferCreate(width,

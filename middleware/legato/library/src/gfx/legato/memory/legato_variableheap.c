@@ -96,9 +96,9 @@ typedef struct Block
 
 static void _subtractHeapSize(leVariableHeap* heap, size_t size)
 {
-    heap->used -= size;
+    LE_ASSERT(heap->used >= size);  // Check before subtraction to catch underflow
 
-    LE_ASSERT(heap->used >= 0);
+    heap->used -= size;
 }
 
 static void _addHeapSize(leVariableHeap* heap, size_t size)
@@ -170,12 +170,6 @@ static void _insertIntoList(Block** list, Block* blk)
 
     last->next = blk;
     blk->prev = last;
-
-    if(blk->prev != NULL)
-    {
-        blk->prev->next = blk;
-    }
-
     blk->next = listBlock;
 
     if(blk->next != NULL)
@@ -257,14 +251,12 @@ static Block* _findPreviousBlock(leVariableHeap* heap,
 
     while(blk != NULL)
     {
-        if((void*)blk > addr && blk != ignore)
-        {
-            if(blk < last)
-            {
-                last = blk;
-            }
-
+        if((void*)blk > addr)
             break;
+
+        if(blk > last && blk != ignore)
+        {
+            last = blk;
         }
 
         blk = blk->next;
@@ -580,6 +572,7 @@ static Block* _combineFreeBlockNext(leVariableHeap* heap,
 static leResult _shrinkAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 {
     size_t rem;
+    Block* newFreeBlock;
 
     if(_canSplit(blk, size) == LE_FALSE)
         return LE_FAILURE;
@@ -594,11 +587,17 @@ static leResult _shrinkAllocBlock(leVariableHeap* heap, Block* blk, size_t size)
 
     rem -= BLOCK_PHYSICAL_SIZE(blk);
 
-    _createBlock(BLOCK_NEXT_PTR(blk), rem, LE_TRUE);
+    newFreeBlock = _createBlock(BLOCK_NEXT_PTR(blk), rem - BLOCK_OVERHEAD_SIZE, LE_TRUE);
+
+    _insertIntoList((Block**)&heap->freeList, newFreeBlock);
 
     _addHeapSize(heap, BLOCK_PHYSICAL_SIZE(blk));
 
-    _combineFreeBlockNext(heap, blk);
+#if LE_VARIABLEHEAP_DEBUGLEVEL >= 1
+    _fillBlock(newFreeBlock, MS_FREE, newFreeBlock->size);
+#endif
+
+    _combineFreeBlockNext(heap, newFreeBlock);
 
     HEAP_VALIDATE(heap);
 
@@ -968,17 +967,18 @@ static Block* _findFirstFit(leVariableHeap* heap, size_t size)
 {
     Block* blk = heap->freeList;
 
+    if(blk == NULL)
+        return NULL;
+
     LE_ASSERT(blk->free == 1);
 
     /* search the free list for a fit */
     while(blk != NULL)
     {
-        if(blk->capacity >= size)
+        if(blk->size >= size)
             break;
 
         blk = blk->next;
-
-        LE_ASSERT(blk->prev != NULL && blk->prev->next != NULL && blk->free == 1);
     }
 
     return blk;
@@ -1254,9 +1254,15 @@ leBool leVariableHeap_Contains(leVariableHeap* heap, void* ptr)
 
 size_t leVariableHeap_SizeOf(leVariableHeap* heap, void* ptr)
 {
-    (void)heap; // unused
+    Block* blk;
 
-    Block* blk = (Block*)((uint8_t*)ptr - BLOCK_HEADER_SIZE);
+    if(ptr == NULL || leVariableHeap_Contains(heap, ptr) == LE_FALSE)
+        return 0;
+
+    blk = (Block*)((uint8_t*)ptr - BLOCK_HEADER_SIZE);
+
+    if(_validatePointer(blk, heap->allocList) == LE_FAILURE)
+        return 0;
 
     return blk->size;
 }

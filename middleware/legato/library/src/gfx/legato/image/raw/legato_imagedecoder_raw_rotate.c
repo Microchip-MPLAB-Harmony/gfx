@@ -47,12 +47,14 @@ static leResult stage_rotateNearestNeighborPreRead(struct RotateNearestNeighborP
 
     stage->base.state->readCount = 1;
 
-    pnt.x = stage->base.state->colIterator;
-    pnt.y = stage->base.state->rowIterator;
+    pnt.x = stage->base.state->targetX - stage->base.state->destRect.x;
+    pnt.y = stage->base.state->targetY - stage->base.state->destRect.y;
 
-    // transform into cartesian space
-    pnt.x -= stage->base.state->destRect.width / 2;
-    pnt.y -= stage->base.state->destRect.height / 2;
+    // transform into cartesian space using the true rotation center
+    // (targetOrigin is the rotation center in destRect-local coordinates,
+    // which accounts for clipping by the damage rectangle)
+    pnt.x -= stage->base.state->targetOrigin.x;
+    pnt.y -= stage->base.state->targetOrigin.y;
     pnt.y *= -1;
 
     leRotatePoint(pnt,
@@ -62,8 +64,8 @@ static leResult stage_rotateNearestNeighborPreRead(struct RotateNearestNeighborP
 
     // transform into source image space
     pnt.y *= -1;
-    pnt.x += (stage->base.state->source->buffer.size.width / 2) - 1;
-    pnt.y += (stage->base.state->source->buffer.size.height / 2) - 1;
+    pnt.x += stage->base.state->source->buffer.size.width / 2;
+    pnt.y += stage->base.state->source->buffer.size.height / 2;
 
     /*if(stage->base.state->referenceX == 0 && stage->base.state->referenceY == 0)
     {
@@ -114,12 +116,14 @@ static leResult stage_bilinearPreRead(struct RotateBilinearPreReadStage* stage)
     leRawDecodeState* state = stage->base.state;
     lePoint readPoint, filterPoint;
 
-    readPoint.x = stage->base.state->colIterator;
-    readPoint.y = stage->base.state->rowIterator;
+    readPoint.x = stage->base.state->targetX - stage->base.state->destRect.x;
+    readPoint.y = stage->base.state->targetY - stage->base.state->destRect.y;
 
-    // transform into cartesian space
-    readPoint.x -= stage->base.state->destRect.width / 2;
-    readPoint.y -= stage->base.state->destRect.height / 2;
+    // transform into cartesian space using the true rotation center
+    // (targetOrigin is the rotation center in destRect-local coordinates,
+    // which accounts for clipping by the damage rectangle)
+    readPoint.x -= stage->base.state->targetOrigin.x;
+    readPoint.y -= stage->base.state->targetOrigin.y;
     readPoint.y *= -1;
 
     leRotatePoint(readPoint,
@@ -129,8 +133,8 @@ static leResult stage_bilinearPreRead(struct RotateBilinearPreReadStage* stage)
 
     // transform into source image space
     readPoint.y *= -1;
-    readPoint.x += (stage->base.state->source->buffer.size.width / 2) - 1;
-    readPoint.y += (stage->base.state->source->buffer.size.height / 2) - 1;
+    readPoint.x += stage->base.state->source->buffer.size.width / 2;
+    readPoint.y += stage->base.state->source->buffer.size.height / 2;
 
     if(readPoint.x < 0 || readPoint.x >= stage->base.state->source->buffer.size.width ||
        readPoint.y < 0 || readPoint.y >= stage->base.state->source->buffer.size.height)

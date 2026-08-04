@@ -28,5 +28,5 @@ def loadModule():
 	component.addDependency("gfx_driver", "LE Display Driver", False, True)
 	component.addDependency("gpu_driver", "LE GPU Driver", False, False)
 	component.addDependency("sys_input", "Input System Service", True, True)
-	component.setDependencyEnabled("sys_input", False)
+	component.addDependency("SYS_TIME", "SYS_TIME", True, True)
 	component.addPlugin("plugins/legato.jar")

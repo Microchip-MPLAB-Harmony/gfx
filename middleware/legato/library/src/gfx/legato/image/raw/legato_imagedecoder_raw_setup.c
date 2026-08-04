@@ -97,6 +97,15 @@ static leResult stage_targetIterateSetup(leRawDecodeStage* stage)
 {
     leRawDecodeState* state = stage->state;
 
+    // check if previous iteration exhausted all pixels
+    if(state->rowIterator >= (uint32_t)state->destRect.height)
+    {
+        state->currentStage = 0;
+        state->done = LE_TRUE;
+
+        return LE_SUCCESS;
+    }
+
     state->referenceX = state->sourceRect.x + state->colIterator;
     state->referenceY = state->sourceRect.y + state->rowIterator;
 
@@ -104,23 +113,13 @@ static leResult stage_targetIterateSetup(leRawDecodeStage* stage)
     state->targetY = stage->state->destRect.y + state->rowIterator;
     state->targetX = stage->state->destRect.x + state->colIterator;
 
-    if(state->colIterator < (uint32_t)state->destRect.width)
-    {
-        state->colIterator += 1;
-    }
+    // advance to next pixel
+    state->colIterator += 1;
 
-    if(state->colIterator == (uint32_t)state->destRect.width)
+    if(state->colIterator >= (uint32_t)state->destRect.width)
     {
         state->colIterator = 0;
         state->rowIterator += 1;
-
-        if(state->rowIterator >= (uint32_t)state->destRect.height)
-        {
-            state->currentStage = 0;
-            state->done = LE_TRUE;
-
-            return LE_SUCCESS;
-        }
     }
 
     return LE_SUCCESS;

@@ -56,7 +56,7 @@ boolDispIsCircular = listDispSupport[idxDispDefault][4]
 
 # Controller Subsystem Vars
 listCtrlCanvasMode = ["DISABLED", "ENABLED"]
-listCtrlColorMode = ["RGB_565", "RGBA_8888"]
+listCtrlColorMode = ["RGB_565", "RGBA_8888", "MONO"]
 defaultCtrlColorMode = listCtrlColorMode[0]
 valCrtlNumLayers = 1
 

@@ -364,7 +364,7 @@ static leResult setIconPosition(leListWidget* _this,
 {   
     LE_ASSERT_THIS();
     
-    if(pos != LE_RELATIVE_POSITION_LEFTOF && pos != LE_RELATIVE_POSITION_RIGHTOF)
+    if(pos != LE_RELATIVE_POSITION_LEFTOF && pos != LE_RELATIVE_POSITION_RIGHTOF && pos != LE_RELATIVE_POSITION_BEHIND)
         return LE_FAILURE;
         
     if(_this->iconPos == pos)

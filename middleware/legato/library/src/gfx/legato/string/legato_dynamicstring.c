@@ -224,9 +224,13 @@ leResult _leDynamicString_SetFromCStr(leDynamicString* _this,
     }
     
     len = strlen(cstr);
-    
+
     if(len == 0)
+    {
+        _this->fn->clear(_this);
+
         return LE_SUCCESS;
+    }
         
     if(_this->capacity < len)
     {
